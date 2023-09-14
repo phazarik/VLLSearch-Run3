@@ -1,0 +1,9 @@
+*~
+*so
+*pcm
+*.root
+*.d
+*pyc
+*#
+*txt
+CondorSetup/previous_jobs/
