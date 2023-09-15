@@ -1,4 +1,4 @@
-##############################################################################################
+###############################################################################################
 # This is a python script that creates a condor job for only one sample (eg. DYJetsToLL_M50)
 # It uses runana.C, which is kept in the same directory as the condor scripts.
 # It has to be run in a For loop to create condor jobs for all the samples
@@ -13,75 +13,53 @@ from datetime import datetime
 
 timestamp = datetime.now().strftime("%Y-%m-%d")
 
+
 #input arguments:
-jobname = sys.argv[1] 
-samplepath  = sys.argv[2] # input path
-samplename = sys.argv[3] # input name (eg: DYJetsToLL_M50)
-data = sys.argv[4] # "0" = mC, "1" = data
-year = sys.argv[5]
-lep = sys.argv[6] #"el" = electron dataset, "mu" = muon dataset
+jobname    = sys.argv[1] 
+samplepath = sys.argv[2] # input path
+dumpdir    = sys.argv[3]
+samplename = sys.argv[4] # input name (eg: DYJetsToLL_M50)
+data       = sys.argv[5] # "0" = mC, "1" = data
+year       = sys.argv[6]
+lep        = sys.argv[7] #"el" = electron dataset, "mu" = muon dataset
+scriptname = sys.argv[8]
+skim_str   = sys.argv[9]
+debug_str  = sys.argv[10]
 #For the old setup:
-era = 'Z'
-mc = 'wz'
-debug_string = sys.argv[7]
+#era = 'Z'
+#mc = 'wz'
 
+#_____________________________________________________________
+#
+#                     DO NOT TOUCH BELOW
+#_____________________________________________________________
 
-#Collecting some variables from the os itself:
-SCRIPTDIR = os.getcwd()            #Where the condor scripts are located
-os.system('cd ..')                 #go back to the main directory
-MAINDIR = os.getcwd()              #path of the main directory
-USER = os.environ.get('USER')
-
-#CHOOSE THE runana SCRIPT TO RUN:
-skimmode = True
-
-if debug_string == "True" : debug = True
-elif debug_string == "False": debug = False
+if debug_str == "True" :   debug = True
+elif debug_str == "False": debug = False
 else : print("Error: Give correct argument to the debug string!")
 
+if skim_str == "True" :   skim = True
+elif skim_str == "False": skim = False
+else : print("Error: Give correct argument to the debug string!")
+
+if debug == True : print('going in the createCondorJob.py script ...')
 print('debug mode = '+str(debug))
-print('skim mode = '+str(skimmode))
+print('skim mode = '+str(skim))
 
-#scriptname = SCRIPTDIR+"/runana.C" #this file is fixed.
-#For the old setup:
-if skimmode==True: scriptname = '/home/work/phazarik1/work/VLLanalysis/VLLAnalysisUL/archive/prachu/skimmer/runana.C'
-else : scriptname = '/home/work/phazarik1/work/VLLanalysis/VLLAnalysisUL/archive/prachu/skimmed_2LSS/runana.C'
-scriptname = '/home/work/phazarik1/work/VLLanalysis/VLLAnalysisUL/archive/prachu/basic/runana.C'
+outputtag = 'hst'
+if skim : outputtag = 'skim'
 
-#-----------------------------------------------------------------------------
-#For testing without any extra script:
-#samplepath = "/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50"
-#samplename = "DYJetsToLL_M50"
-#data = 0
-#year = 2018
-#lep = "mu"
-#-----------------------------------------------------------------------------
-
-#Input and output directories:
-#if skimmode==True : DUMP="/home/work/phazarik1/work/SkimmedSamples2018"
-if skimmode==True : DUMP="/home/work/phazarik1/work/VLLanalysis/SkimmedSamples"
-else : DUMP="/home/work/phazarik1/work/VLLanalysis/CondorOutput"
-DUMP="/home/work/phazarik1/work/VLLanalysis/CondorOutput"
+#Setting output directories:
 INDIR = samplepath
+CMSDIR="/home/work/phazarik1/work/VLLanalysis/CMSSW_10_3_1/src"
+DUMP = dumpdir
 OUTDIR=DUMP+"/output/"+jobname+"/"+samplename+"_"+timestamp
 LOGDIR=DUMP+"/log/"+jobname+"/"+samplename+"_"+timestamp
-
-#Also, using the appropriate CMSSW version:
-CMSDIR="/home/work/phazarik1/work/VLLanalysis/CMSSW_10_3_1/src"
-
-#Making the output directories where the logs and outputs are kept:
-#and giving them permissions:
-
 if debug == False:
     os.system("mkdir -p "+OUTDIR)
     os.system("mkdir -p "+LOGDIR)
     os.system("chmod -R 777 "+OUTDIR)
     os.system("chmod -R 777 "+LOGDIR)
-
-#________________________________________________________________________________________
-#
-# DO NOT TOUCH BELOW (unless you want to change the arguments that goes into runana.C)
-#________________________________________________________________________________________
 
 
 ########################################################################################
@@ -89,13 +67,18 @@ if debug == False:
 # This shell script is called for each file in the input directory via the .condor file.
 ########################################################################################
 
+SCRIPTDIR = os.getcwd()            #Where the condor scripts are located
+os.system('cd ..')                 #go back to the main directory
+MAINDIR = os.getcwd()              #path of the main directory
+USER = os.environ.get('USER')
+
 runScript=SCRIPTDIR+"/runJobsCondor_simulation.sh"
 #os.system(f"[ -f +"runScript+" ] && rm -rf "+runScript) #if the file already exists, remove it
 os.system("touch "+runScript)
 os.system("chmod a+x "+runScript)
 
-#arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\"\)' #raw string
-arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #for the old setup
+arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\"\)' #raw string
+#arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #for the old setup
 processline = 'root -q -b -l '+scriptname+arguments
 
 list_of_instructions=[
@@ -113,6 +96,7 @@ with open(runScript, 'w') as file:
         file.write(string + '\n')
 
 
+        
 ##################################################################
 #Preparing the condor file that goes as an argument to 'condor_q'
 ##################################################################
@@ -136,32 +120,14 @@ condorfile_info=[
 #We need to add the runana.C script and the  input parameters for each files in this condor file.
 #For that, we need to loop over all files in the input directory.
 input_files = os.listdir(INDIR)
-#print(INDIR)
 filecount=0
-
-#print('test')
 for filename in input_files:
     if filename.endswith(".root"):
         filecount+=1
 
-        #print(filename)
-        
-        if skimmode == True and samplename == 'TTW_TTWToLNu' :
-            #correcting for the poorly named TTW_TTWToLNu files while skimming
-            ofile = "VLL_TTW_TTWToLNu_file"
-        elif samplename.startswith('SingleMuon') :
-            #Correcting for data:
-            ofile = "VLL_"+filename.split("_")[1]+"_"+filename.split("_")[2][-1]
-
-        else :
-            if skimmode == True : ofile = filename
-            else : ofile = filename.split("_")[0]+"_"+filename.split("_")[1]+"_"+filename.split("_")[2]+"_"+filename.split("_")[3]
-            #base = filename.split("_")[0] #"VLL"
-            #example : VLL_DYJetsToLL_M50_10
-            
-
-        if skimmode==True: ifdir = INDIR
-        else : ifdir = filename
+        #For signal files:
+        if INDIR.split("/")[-1].startswith('VLL'):
+            ofile = outputtag+"_"+INDIR.split("/")[-1]+"_"+str(filecount)+".root"
 
         if debug == True :
             print('file no : '+str(filecount))
@@ -173,8 +139,8 @@ for filename in input_files:
             "output = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
             "error = "+LOGDIR+"//$(Cluster)_data_"+filename+".err",
             "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
-            #"arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep),
-            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(era)+" "+str(mc),#for the old setup
+            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep),
+            #"arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(era)+" "+str(mc),#for the old setup
             "queue",
             ""
         ]
@@ -186,6 +152,8 @@ with open(condorfile, 'w') as file:
     for string in condorfile_info:
         file.write(string + '\n')
 
+
+        
 #####################
 # Submitting the job
 #####################
@@ -208,15 +176,8 @@ else : print("Error: Give correct argument to the debug string!")
 ######################
 
 #All the condor files are dumped in the following folder after they are used.
-dumpdir = "previous_jobs/"+timestamp+"/"+samplename
-print('condor dump : '+dumpdir+"/"+condorfile+"\n")
-os.system("mkdir -p "+dumpdir)
-os.system("mv "+condorfile+" "+dumpdir+"/.")
-
-
-
-
-
-
-
-
+dumpjobs = "previous_jobs/"+timestamp+"/"+samplename
+print('condor dump : '+dumpjobs+"/"+condorfile)
+os.system("mkdir -p "+dumpjobs)
+os.system("mv "+condorfile+" "+dumpjobs+"/.")
+if debug == True : print('... done with the condor script.\n')

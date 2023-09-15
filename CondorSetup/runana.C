@@ -17,8 +17,8 @@
 
 void runana(TString ifname="input_file" , TString ofname="outputfile" , TString data="data", TString year="year", TString lep="lep"){
 
-  TString path_to_anaCond ="/home/work/phazarik1/work/General-Analysis-template/AnaCodes/BasicEvtSelection";
-  TString path_to_library ="/home/work/phazarik1/work/General-Analysis-template/AnaCodes/BasicEvtSelection";
+  TString path_to_anaCond ="/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection";
+  TString path_to_library =path_to_anaCond;
   
   TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\")"; //This is the line that is being executed. 
 

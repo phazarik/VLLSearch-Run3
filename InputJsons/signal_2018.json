@@ -1,0 +1,42 @@
+{
+    "VLLD_ele": {
+	"M100":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M100"
+	},
+	"M2200":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M2200"
+	}
+    },
+    "VLLD_mu":{
+	"M100":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/mu/VLLD_mu_M100"
+	},
+	"M2200":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/mu/VLLD_mu_M2200"
+	}
+    },
+    "VLLS_ele": {
+	"M100":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/ele/VLLS_ele_M100"
+	},
+	"M2200":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/ele/VLLS_ele_M2200"
+	}
+    },
+    "VLLS_mu":{
+	"M100":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/mu/VLLS_mu_M100"
+	},
+	"M2200":{
+	    "data":0,
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/mu/VLLS_mu_M2200"
+	}
+    }
+}
