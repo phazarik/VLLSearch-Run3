@@ -13,7 +13,6 @@ import time #for calculating how much time taken
 start_time = time.time()
 
 #Picking the arguments and flags:
-'''
 parser=argparse.ArgumentParser()
 parser.add_argument('--jobname',type=str, required=True, help='AnalysisName: Such as VLL2018_Mar1_v0')
 parser.add_argument('--dryrun' ,type=bool,required=False,help='Check If everything is correct before submitting')
@@ -25,16 +24,12 @@ dryrun = args.dryrun #Don't submit any job
 jobname= args.jobname
 test   = args.test  #submit from only one folder.
 debug  = args.debug #for debugging the condor-script
-'''
+
 #Global parameters:
-dryrun = False
-jobname = 'jobname'
-test = False
-debug = False
 year = 2018
 process_signal = True
 skim = False
-condorsamples = ["VLLD_ele"]
+condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
 dumpdir = "/home/work/phazarik1/work/temp/test"
 script = "/home/work/phazarik1/work/Analysis-Run3/CondorSetup/runana.C"
 
@@ -70,6 +65,7 @@ for item in condorsamples:
             #For example, samplegroup = 'DYJetsToLL', sample = 'M50' 
             #It runs 'createCondorJobs.py' for each sub-sample
             for sample, val in groupvalue.items():
+                if samplegroup.startswith('VLL'): sample = samplegroup+'_'+sample
                 indir = val['samplepath']
                 data = str(val['data'])
                 lep = 'mu'

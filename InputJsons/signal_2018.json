@@ -24,9 +24,9 @@
 	    "data":0,
 	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/ele/VLLS_ele_M100"
 	},
-	"M2200":{
+	"M750":{
 	    "data":0,
-	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/ele/VLLS_ele_M2200"
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/ele/VLLS_ele_M750"
 	}
     },
     "VLLS_mu":{
@@ -34,9 +34,9 @@
 	    "data":0,
 	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/mu/VLLS_mu_M100"
 	},
-	"M2200":{
+	"M750":{
 	    "data":0,
-	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/mu/VLLS_mu_M2200"
+	    "samplepath":"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/mu/VLLS_mu_M750"
 	}
     }
 }
