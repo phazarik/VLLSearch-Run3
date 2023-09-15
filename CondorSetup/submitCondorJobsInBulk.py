@@ -20,7 +20,7 @@ with open(jsonfile,'r') as infile:
 #However, the script only submits codor jobs for the following.
 
 #condorsamples = ["DYJetsToLL","HTbinnedWJets","SingleTop","TTBar", "TTW","WW","WZ","ZZ","QCD_MuEnriched","SingleMuon","EGamma"] #OR
-condorsamples = ["EGamma"]
+condorsamples = ["SingleMuon", "EGamma"]
 #condorsamples = ["DYJetsToLL"]
 #condorsamples = ["HTbinnedWJets","SingleTop","WW","WZ","ZZ","TTW"]
 

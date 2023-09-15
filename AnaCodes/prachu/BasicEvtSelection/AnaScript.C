@@ -6,13 +6,14 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <string>
 using namespace std;
 
 //Including the header files:
-#include "../../../Setup/BookHistograms.h"
-#include "../../../Setup/CustomFunctions.h"
-#include "../../../Setup/ProduceGenCollection.h"
-#include "../../../Setup/ProduceRecoCollection.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/BookHistograms.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -27,6 +28,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtTotal = 0;
   nEvtRan = 0;
   nEvtTrigger=0;
+  nEvtPass=0;
 
   _HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
@@ -40,12 +42,14 @@ void AnaScript::SlaveTerminate()
 
   float goodevtfrac = ((float)nEvtRan)/((float)nEvtTotal);
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
+  float passevtfrac = ((float)nEvtPass)/((float)nEvtTotal);
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
-  cout<<"Total events = "<<nEvtTotal<<endl;
-  cout<<"Total events ran = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
-  cout<<"Total Triggered events = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtTotal = "<<nEvtTotal<<endl;
+  cout<<"nEvtRan = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
   
   time(&end);
@@ -118,22 +122,37 @@ Bool_t AnaScript::Process(Long64_t entry)
       nEvtTrigger++; //only triggered events
       h.nevt->Fill(2);
 
+      //------------------------------------------------------
+      // Applying corrections like SF, trigger efficiency etc.
+      //------------------------------------------------------
+      evtwt = 1.0; //Default value
+      if(_data==0){
+	//Apply corrections on MC
+	evtwt = 1.0;
+      }
+
       //###################
       //Gen particle block
       //###################
 
-      /*
       genMuon.clear();
+      genElectron.clear();
+      genLightLepton.clear();
 
       if(_data==0){
 	createGenLightLeptons();
 	SortPt(genMuon);
+	SortPt(genElectron);
+	SortPt(genLightLepton);
 	//Make gen-level plots here.
-	}*/
+      }
 
       //###################
       //Reco particle block
       //###################
+
+      metpt = *PuppiMET_pt;
+      metphi = *PuppiMET_phi;
       
       Muon.clear();
       Electron.clear();
@@ -160,52 +179,60 @@ Bool_t AnaScript::Process(Long64_t entry)
       //ELectrons
       h.ele[0]->Fill((int)Electron.size());
       for(int i=0; i<(int)Electron.size(); i++){
-	h.ele[1]->Fill(Electron.at(i).v.Pt());
-	h.ele[2]->Fill(Electron.at(i).v.Eta());
-	h.ele[3]->Fill(Electron.at(i).v.Phi());
+	h.ele[1]->Fill(Electron.at(i).v.Pt(), evtwt);
+	h.ele[2]->Fill(Electron.at(i).v.Eta(), evtwt);
+	h.ele[3]->Fill(Electron.at(i).v.Phi(), evtwt);
+	h.ele[4]->Fill(Electron.at(i).reliso03, evtwt);
       }
       //Muons
       h.mu[0]->Fill((int)Muon.size());
       for(int i=0; i<(int)Muon.size(); i++){
-	h.mu[1]->Fill(Muon.at(i).v.Pt());
-	h.mu[2]->Fill(Muon.at(i).v.Eta());
-	h.mu[3]->Fill(Muon.at(i).v.Phi());
-	h.mu[4]->Fill(Muon.at(i).reliso04);
+	h.mu[1]->Fill(Muon.at(i).v.Pt(), evtwt);
+	h.mu[2]->Fill(Muon.at(i).v.Eta(), evtwt);
+	h.mu[3]->Fill(Muon.at(i).v.Phi(), evtwt);
+	h.mu[4]->Fill(Muon.at(i).reliso03, evtwt);
       }
       //Photons
       h.pho[0]->Fill((int)Photon.size());
       for(int i=0; i<(int)Photon.size(); i++){
-	h.pho[1]->Fill(Photon.at(i).v.Pt());
-	h.pho[2]->Fill(Photon.at(i).v.Eta());
-	h.pho[3]->Fill(Photon.at(i).v.Phi());
-	h.pho[4]->Fill(Photon.at(i).reliso04);
+	h.pho[1]->Fill(Photon.at(i).v.Pt(), evtwt);
+	h.pho[2]->Fill(Photon.at(i).v.Eta(), evtwt);
+	h.pho[3]->Fill(Photon.at(i).v.Phi(), evtwt);
+	h.pho[4]->Fill(Photon.at(i).reliso03, evtwt);
       }
       //Taus
       h.tau[0]->Fill((int)Tau.size());
       for(int i=0; i<(int)Tau.size(); i++){
-	h.tau[1]->Fill(Tau.at(i).v.Pt());
-	h.tau[2]->Fill(Tau.at(i).v.Eta());
-	h.tau[3]->Fill(Tau.at(i).v.Phi());
+	h.tau[1]->Fill(Tau.at(i).v.Pt(), evtwt);
+	h.tau[2]->Fill(Tau.at(i).v.Eta(), evtwt);
+	h.tau[3]->Fill(Tau.at(i).v.Phi(), evtwt);
       }
       //Jets
       h.jet[0]->Fill((int)Jet.size());
       for(int i=0; i<(int)Jet.size(); i++){
-	h.jet[1]->Fill(Jet.at(i).v.Pt());
-	h.jet[2]->Fill(Jet.at(i).v.Eta());
-	h.jet[3]->Fill(Jet.at(i).v.Phi());
+	h.jet[1]->Fill(Jet.at(i).v.Pt(), evtwt);
+	h.jet[2]->Fill(Jet.at(i).v.Eta(), evtwt);
+	h.jet[3]->Fill(Jet.at(i).v.Phi(), evtwt);
       }
       //bJets
       h.bjet[0]->Fill((int)bJet.size());
       for(int i=0; i<(int)bJet.size(); i++){
-	h.bjet[1]->Fill(bJet.at(i).v.Pt());
-	h.bjet[2]->Fill(bJet.at(i).v.Eta());
-	h.bjet[3]->Fill(bJet.at(i).v.Phi());
+	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evtwt);
+	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evtwt);
+	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
       }
 
+      //_______________________________________________________________________________________________________      
+      //       Analysis block
       //_______________________________________________________________________________________________________
-      
-      //Analysis block
-      //_______________________________________________________________________________________________________
+
+
+      //Event selection:
+      if(true){
+	nEvtPass++;
+	h.nevt->Fill(3);
+      }  
+
       
     }//TriggeredEvts
   }//GoodEvt

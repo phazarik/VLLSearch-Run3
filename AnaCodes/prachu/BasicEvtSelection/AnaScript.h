@@ -479,7 +479,6 @@ private:
   const char *_HstFileName;
   const char *_SumFileName;
   int _verbosity,_exclude,_sample;
-  int nEvtTotal,nEvtRan,nEvtTrigger;
   int _data, _lep, _year,_mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi,evwt,prob,evtwt,prob1,puppimetpt,puppimetphi;
@@ -487,6 +486,9 @@ private:
 
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
+
+  //Counters:
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass;
 
   time_t start, end;
 
