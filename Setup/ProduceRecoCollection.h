@@ -36,6 +36,7 @@ void AnaScript::createLightLeptons(){
     temp.id = -11*Electron_charge[i];
     temp.ind = i;
     temp.charge = Electron_charge[i];
+    temp.reliso03 = Electron_pfRelIso03_all[i];
 
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4;
     bool cleaned_from_muons = clean_from_array(temp, Muon, 0.5);

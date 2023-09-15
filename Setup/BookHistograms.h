@@ -1,5 +1,6 @@
 void AnaScript::BookHistograms(){
-  h.nevt = new TH1F("nEvents","0-Total events, 1-Total events ran, 2-Total events with trigger applied",5,-1,4);
+
+  h.nevt = new TH1F("nEvents", "0-nEvtTotal, 1-nEvtRan, 2-nEvtTrigger, 3-nEvtPass",5,0,5);
 
   //############################################
   //Object level plots: (before event selection)
@@ -9,33 +10,39 @@ void AnaScript::BookHistograms(){
   h.ele[1] = new TH1F("allele_pt","allele_pt",500,0,500);
   h.ele[2] = new TH1F("allele_eta","allele_eta",200,-4,4);
   h.ele[3] = new TH1F("allele_phi","allele_phi",200,-4,4);
+  h.ele[4] = new TH1F("allele_reliso03","allele_reliso03",200,0,1);
+  for(int i=0; i<5; i++)h.ele[i]->Sumw2();
   //Muons:
   h.mu[0] = new TH1F("nMuons","nMuons",10,0,10);
   h.mu[1] = new TH1F("allmu_pt","allmu_pt",500,0,500);
   h.mu[2] = new TH1F("allmu_eta","allmu_eta",200,-4,4);
   h.mu[3] = new TH1F("allmu_phi","allmu_phi",200,-4,4);
-  h.mu[4] = new TH1F("allmu_reliso04","allmu_reliso04",200,0,1);
+  h.mu[4] = new TH1F("allmu_reliso03","allmu_reliso03",200,0,1);
+  for(int i=0; i<5; i++)h.mu[i]->Sumw2();
   //Photons:
   h.pho[0] = new TH1F("nPhotons","nPhotons",10,0,10);
   h.pho[1] = new TH1F("allpho_pt","allpho_pt",500,0,500);
   h.pho[2] = new TH1F("allpho_eta","allpho_eta",200,-4,4);
   h.pho[3] = new TH1F("allpho_phi","allpho_phi",200,-4,4);
-  h.pho[4] = new TH1F("allpho_reliso04","allpho_reliso04",200,0,1);
+  h.pho[4] = new TH1F("allpho_reliso03","allpho_reliso03",200,0,1);
+  for(int i=0; i<5; i++)h.pho[i]->Sumw2();
   //Taus:
   h.tau[0] = new TH1F("nTaus","nTaus",10,0,10);
   h.tau[1] = new TH1F("alltau_pt","alltau_pt",500,0,500);
   h.tau[2] = new TH1F("alltau_eta","alltau_eta",200,-4,4);
   h.tau[3] = new TH1F("alltau_phi","alltau_phi",200,-4,4);
+  for(int i=0; i<4; i++)h.tau[i]->Sumw2();
   //Jets:
   h.jet[0] = new TH1F("nJets","nJets",10,0,10);
   h.jet[1] = new TH1F("alljet_pt","alljet_pt",500,0,500);
   h.jet[2] = new TH1F("alljet_eta","alljet_eta",200,-4,4);
   h.jet[3] = new TH1F("alljet_phi","alljet_phi",200,-4,4);
+  for(int i=0; i<4; i++)h.jet[i]->Sumw2();
   //bJets:
   h.bjet[0] = new TH1F("nbJets","nbJets",10,0,10);
   h.bjet[1] = new TH1F("allbjet_pt","allbjet_pt",500,0,500);
   h.bjet[2] = new TH1F("allbjet_eta","allbjet_eta",200,-4,4);
   h.bjet[3] = new TH1F("allbjet_phi","allbjet_phi",200,-4,4);
-
+  for(int i=0; i<4; i++)h.bjet[i]->Sumw2();
   
 }
