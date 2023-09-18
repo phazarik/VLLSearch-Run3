@@ -4,7 +4,7 @@
 # depends on how they are kept. So, adjust your json file accordingly.
 # Make sure to make chnages to runana.C also, if you want to use codes from a different directory.
 ###################################################################################################
-#Make sure to use python3 for this. 
+#Make sure to use python3 for this.
 
 import sys
 import os,argparse

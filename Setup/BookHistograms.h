@@ -1,7 +1,11 @@
 void AnaScript::BookHistograms(){
 
-  h.nevt = new TH1F("nEvents", "0-nEvtTotal, 1-nEvtRan, 2-nEvtTrigger, 3-nEvtPass",5,0,5);
-
+  h.nevt = new TH1F("nEvents", "0-nEvtTotal, 1-nEvtRan, 2-nEvtTrigger, 3-nEvtPass",5,0,5); h.nevt->Sumw2();
+  h.evtweight[0] = new TH1F("wt_SF","Reco-ID-Iso Scale Factor",200,0,2);
+  h.evtweight[1] = new TH1F("wt_trigger","Trigger Scale Factor",200,0,2);
+  h.evtweight[2] = new TH1F("wt_evt","Event weight",200,0,2);
+  for(int i=0; i<3; i++)h.evtweight[i]->Sumw2();
+  
   //############################################
   //Object level plots: (before event selection)
   //############################################

@@ -14,6 +14,13 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
+//Corrections:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -122,15 +129,6 @@ Bool_t AnaScript::Process(Long64_t entry)
       nEvtTrigger++; //only triggered events
       h.nevt->Fill(2);
 
-      //------------------------------------------------------
-      // Applying corrections like SF, trigger efficiency etc.
-      //------------------------------------------------------
-      evtwt = 1.0; //Default value
-      if(_data==0){
-	//Apply corrections on MC
-	evtwt = 1.0;
-      }
-
       //###################
       //Gen particle block
       //###################
@@ -222,6 +220,37 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
       }
 
+      //_______________________________________________________________________________________________________            
+      // Applying corrections like SF, trigger efficiency etc.
+      //_______________________________________________________________________________________________________      
+      evtwt = 1.0; //Default value
+      if(_data==0){
+
+	float scalefactor = 1.0;
+	float triggeff = 1.0;
+	
+	//Apply corrections on MC
+	if((int)LightLepton.size()>=3){ //3L or more
+	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
+	  float lep2SF = LeptonIDSF(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
+	  scalefactor = lep0SF * lep1SF * lep2SF;
+	}
+	else if((int)LightLepton.size()==2){ //2L exclusive
+	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
+	  scalefactor = lep0SF * lep1SF;
+	}
+	else if((int)LightLepton.size()==1){//1L events:
+	  scalefactor = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	}
+
+	evtwt = scalefactor * triggeff;
+
+	h.evtweight[0]->Fill(scalefactor);
+	h.evtweight[1]->Fill(triggeff);
+	h.evtweight[2]->Fill(evtwt);
+      }
       //_______________________________________________________________________________________________________      
       //       Analysis block
       //_______________________________________________________________________________________________________
