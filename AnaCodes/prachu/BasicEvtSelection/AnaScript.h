@@ -442,10 +442,97 @@ public :
   void createJets();
   void createGenLightLeptons();
 
+  //--------------------------------------------------------------------------
+  //Correction functions:
+  double LeptonIDSF(int id, float pt, float eta);;
+  double Electron2016SF(float pt, float eta);
+  double Electron2017SF(float pt, float eta);
+  double Electron2018SF(float pt, float eta);
+  double Muon2016SF(float pt, float eta);
+  double Muon2017SF(float pt, float eta);
+  double Muon2018SF(float pt, float eta);
+  double Tau2016SF(float pt, float eta);
+  double Tau2017SF(float pt, float eta);
+  double Tau2018SF(float pt, float eta);
+
+  //Electron Reco scale factors:
+  double Electron_2016UL_Reco_preVFP(float pt, float eta);
+  double Electron_2016UL_Reco_postVFP(float pt, float eta);
+  double Electron_2017UL_Reco(float pt, float eta);
+  double Electron_2018UL_Reco(float pt, float eta);
+  //Electron IDIso scale factors:
+  double Electron_2016UL_IDIso_preVFP(float pt, float eta);
+  double Electron_2016UL_IDIso_postVFP(float pt, float eta);
+  double Electron_2017UL_IDIso(float pt, float eta);
+  double Electron_2018UL_IDIso(float pt, float eta);
+
+  //Muon Reco scale factors:
+  double Muon_2016UL_Reco_preVFP(float pt, float eta);
+  double Muon_2016UL_Reco_postVFP(float pt, float eta);
+  double Muon_2017UL_Reco(float pt, float eta);
+  double Muon_2018UL_Reco(float pt, float eta);
+  //Muon ID scale factors:
+  double Muon_2016UL_ID_preVFP(float pt, float eta);
+  double Muon_2016UL_ID_postVFP(float pt, float eta);
+  double Muon_2017UL_ID(float pt, float eta);
+  double Muon_2018UL_ID(float pt, float eta);
+  //Muon Iso scale factors:
+  double Muon_2016UL_Iso_preVFP(float pt, float eta);
+  double Muon_2016UL_Iso_postVFP(float pt, float eta);
+  double Muon_2017UL_Iso(float pt, float eta);
+  double Muon_2018UL_Iso(float pt, float eta);
+
+  //Tau AntiJet scale factors:
+  double Tau_2016UL_AntiJet_preVFP(float pt);
+  double Tau_2016UL_AntiJet_postVFP(float pt);
+  double Tau_2017UL_AntiJet(float pt);
+  double Tau_2018UL_AntiJet(float pt);
+  //Tau AntiEle scale factors:
+  double Tau_2016UL_AntiEle_preVFP(float eta);
+  double Tau_2016UL_AntiEle_postVFP(float eta);
+  double Tau_2017UL_AntiEle(float eta);
+  double Tau_2018UL_AntiEle(float eta);
+  //Tau AntiMu scale factors:
+  double Tau_2016UL_AntiMu_preVFP(float eta);
+  double Tau_2016UL_AntiMu_postVFP(float eta);
+  double Tau_2017UL_AntiMu(float eta);
+  double Tau_2018UL_AntiMu(float eta);
+
+  //--------------------------------------------------------------------------
+  //Trigger efficiency:
+  float SingleLepTrigger_eff(int id, float pt, float eta);
+  //2016 combined
+  float TrigEff_2016_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2016_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2016_Ele27WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2016_Ele27WPTightGsf_Data(float pt, float eta);
+  //2016 preVFP
+  float TrigEff_2016preVFP_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2016preVFP_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2016preVFP_Ele27WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2016preVFP_Ele27WPTightGsf_Data(float pt, float eta);
+  //2016 postVFP
+  float TrigEff_2016postVFP_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2016postVFP_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2016postVFP_Ele27WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2016postVFP_Ele27WPTightGsf_Data(float pt, float eta);
+  //2017
+  float TrigEff_2017_IsoMu27_MC(float pt, float eta);
+  float TrigEff_2017_IsoMu27_Data(float pt, float eta);  
+  float TrigEff_2017_Ele32WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2017_Ele32WPTightGsf_Data(float pt, float eta);
+  //2018
+  float TrigEff_2018_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2018_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2018_Ele32WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2018_Ele32WPTightGsf_Data(float pt, float eta);
+  //--------------------------------------------------------------------------
+
 public:
   struct Hists {
     //Histograms are declared here.
     TH1F *nevt;
+    TH1F *evtweight[10];
     TH1F *hist[10];
     //Object level hists:
     TH1F *mu[10];TH1F *ele[10];TH1F *llep[10];

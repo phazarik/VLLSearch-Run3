@@ -14,6 +14,13 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
+//Corrections:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -97,6 +104,17 @@ Bool_t AnaScript::Process(Long64_t entry)
   nEvtTotal++;
   h.nevt->Fill(0);
 
+  //Let's plot some flags/triiger which are used later.
+  h.hist[0]->Fill(*Flag_goodVertices);
+  h.hist[1]->Fill(*Flag_globalSuperTightHalo2016Filter);
+  h.hist[2]->Fill(*Flag_HBHENoiseFilter);
+  h.hist[3]->Fill(*Flag_EcalDeadCellTriggerPrimitiveFilter);
+  h.hist[4]->Fill(*Flag_BadPFMuonFilter);
+  h.hist[5]->Fill(*HLT_IsoMu24);
+  h.hist[6]->Fill(*HLT_IsoMu27);
+  h.hist[7]->Fill(*HLT_Ele27_WPTight_Gsf);
+  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);
+  
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2017 = (_year==2017 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2016 = (_year==2016 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -110,26 +128,22 @@ Bool_t AnaScript::Process(Long64_t entry)
     triggerRes=true; //Always true for MC
 
     if(_data==1){
-      trigger2018 = (_year==2018 ? (_lep==1 ? *HLT_IsoMu24==1 : _lep==0 && *HLT_Ele32_WPTight_Gsf) : 1);
-      //trigger2017 = (_year==2017 ? (_lep==1 ? *HLT_IsoMu27==1 : _lep==0 && (*HLT_Ele32_WPTight_Gsf||*HLT_Ele32_WPTight_Gsf_L1DoubleEG)) : 1);
-      trigger2017 = (_year==2017 ? (_lep==1 ? *HLT_IsoMu27==1 : _lep==0 && (*HLT_Ele32_WPTight_Gsf)) : 1);
-      trigger2016 = (_year==2016 ? (_lep==1 ? (*HLT_IsoMu24==1) : _lep==0 && *HLT_Ele27_WPTight_Gsf) : 1);
-           
-      triggerRes = trigger2018 && trigger2017 && trigger2016;
-      //triggerRes = true;
+      triggerRes=false;
+      bool muon_trigger = false;
+      bool electron_trigger = false;
+      if     (_year==2016) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
+      else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
+      else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
+
+      //Muons are preferrred over electrons.
+      //For the electron dataset, pick up only those events which do not fire a Muon trigger.
+      //Otherwise there will be overcounting.
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);      
     }
+    
     if(triggerRes){
       nEvtTrigger++; //only triggered events
       h.nevt->Fill(2);
-
-      //------------------------------------------------------
-      // Applying corrections like SF, trigger efficiency etc.
-      //------------------------------------------------------
-      evtwt = 1.0; //Default value
-      if(_data==0){
-	//Apply corrections on MC
-	evtwt = 1.0;
-      }
 
       //###################
       //Gen particle block
@@ -222,8 +236,54 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
       }
 
+      //_______________________________________________________________________________________________________
+      
+      // Applying corrections like SF, trigger efficiency etc. to the MC
       //_______________________________________________________________________________________________________      
-      //       Analysis block
+
+
+      evtwt = 1.0; //Default value
+      if(_data==0){
+
+	float scalefactor = 1.0;
+	float triggeff = 1.0;
+	
+	//Apply corrections on MC
+	if((int)LightLepton.size()>=3){ //3L or more
+	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
+	  float lep2SF = LeptonIDSF(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
+	  scalefactor = lep0SF * lep1SF * lep2SF;
+
+	  float e1=SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  float e2=SingleLepTrigger_eff(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
+	  float e3=SingleLepTrigger_eff(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
+	  triggeff=1-((1-e1)*(1-e2)*(1-e3));
+	}
+	else if((int)LightLepton.size()==2){ //2L exclusive
+	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
+	  scalefactor = lep0SF * lep1SF;
+	  
+	  float e1=SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  float e2=SingleLepTrigger_eff(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
+	  triggeff=1-((1-e1)*(1-e2));
+	}
+	else if((int)LightLepton.size()==1){//1L events:
+	  scalefactor = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	  triggeff = SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
+	}
+
+	evtwt = scalefactor * triggeff;
+
+	h.evtweight[0]->Fill(scalefactor);
+	h.evtweight[1]->Fill(triggeff);
+	h.evtweight[2]->Fill(evtwt);
+      }
+     
+      //_______________________________________________________________________________________________________
+      
+      //                         Analysis block
       //_______________________________________________________________________________________________________
 
 
