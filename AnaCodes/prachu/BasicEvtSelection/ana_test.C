@@ -12,10 +12,20 @@ void ana_test(int sample=0)
   //               Choose the sample you want to run over                     //
   //--------------------------------------------------------------------------//
 
-  if(sample==0){//Data
+  if(sample==-1){//EGamma data
+    chain->Add("/home/work/alaha1/public/RunII_ULSamples/2018/UL2018Data/EGamma/EGamma_A/EGamma_2018A_116.root");
+    hstfilename = "test_outputs/hst_data_egamma.root";
+    sumfilename = "test_outputs/sum_data_egamma.txt";
+    m_selec.SetData(1); //0 - running over MC, 1 - running over Data
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(0); //0-electron dataset, 1-muon dataset
+  }
+
+  if(sample==0){//SingleMuon Data
     chain->Add("/home/work/alaha1/public/RunII_ULSamples/2018/UL2018Data/SingleMuon/SingleMuon_A/SingleMuon_2018A_6.root");
     hstfilename = "test_outputs/hst_data_singlemuon.root";
-    sumfilename = "test_outputs/sum_data_signalmuon.txt";
+    sumfilename = "test_outputs/sum_data_singlemuon.txt";
     m_selec.SetData(1); //0 - running over MC, 1 - running over Data
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
