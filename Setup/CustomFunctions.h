@@ -44,3 +44,36 @@ bool AnaScript::clean_from_array(Particle target, vector<Particle> array, float 
   if(dRmin < dRcut) result = false;
   return result;
 }
+
+TString AnaScript::ParticleName(int id){
+  TString name = "--";
+  bool leptons = 11<=fabs(id) && fabs(id)<=18;
+  bool neutrinos = leptons && id%2 ==0;
+  bool quarks = fabs(id) <= 8;
+
+  if(id == 0) name = "--";
+  else if(quarks)       name = "q";
+  else if(fabs(id)==11 || fabs(id)==12) name = "e";
+  else if(fabs(id)==13 || fabs(id)==14) name = "mu";
+  else if(fabs(id)==15 || fabs(id)==16) name = "tau";
+  else if(fabs(id)==17 || fabs(id)==18) name = "vll";
+  //bosons
+  else if(id==21) name = "pho";
+  else if(id==22) name = "glu";
+  else if(id==23) name = "Z";
+  else if(id==24) name = "W+";
+  else if(id==-24) name = "W-";
+  else if(id==25) name = "H";
+  else if(id > 100) name = "had";
+  
+  //Additional:
+  if(neutrinos) name = "nu_"+name;
+  if(quarks && id>0) name = name+"+";
+  if(quarks && id<0) name = name+"-";
+  if(leptons && id>0 && fabs(id%2) == 1) name = name+"-";
+  if(leptons && id<0 && fabs(id%2) == 1) name = name+"+";
+
+  if(fabs(id) > 10000) name = "--";
+
+  return name;
+}

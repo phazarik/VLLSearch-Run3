@@ -21,6 +21,8 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
+//Sepcific studies:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -291,6 +293,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       if(true){
 	nEvtPass++;
 	h.nevt->Fill(3);
+
+	if(_data==0) MakeSignalPlots(1.0);
       }  
 
       

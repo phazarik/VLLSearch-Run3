@@ -59,5 +59,25 @@ void AnaScript::BookHistograms(){
   h.bjet[2] = new TH1F("allbjet_eta","allbjet_eta",200,-4,4);
   h.bjet[3] = new TH1F("allbjet_phi","allbjet_phi",200,-4,4);
   for(int i=0; i<4; i++)h.bjet[i]->Sumw2();
-  
+
+  //SignalStudy:
+  h.sig[0] = new TH1F("genPart_pdgId_all", "genPart_pdgId_all", 2000, -1000, 1000);
+  h.sig[1] = new TH1F("vll_daugher_id", "vll_daugher_id", 60, -30, 30);
+  h.sig[2] = new TH1F("vlnu_daugher_id", "vlnu_daugher_id", 60, -30, 30);
+
+  h.vll[0] = new TH1F("nvll",         "nvll",          10, 0, 10);
+  h.vll[1] = new TH1F("allvll_pt",    "allvll_pt",   1000,0,1000);
+  h.vll[2] = new TH1F("allvll_eta",   "allvll_eta",     200,-4,4);
+  h.vll[3] = new TH1F("allvll_phi",   "allvll_phi",     200,-4,4);
+  h.vll[4] = new TH1F("allvll_mass",  "allvll_mass", 2500,0,2500);
+  h.vll[5] = new TH1F("allvll_charge","allvll_charge",    6,-3,3);
+  h.vll[6] = new TH1F("allvll_decay", "allvll_decay",    5, 0, 5);
+
+  h.vln[0] = new TH1F("nvlnu",         "nvllnu",         10, 0, 10);
+  h.vln[1] = new TH1F("allvlnu_pt",    "allvlnu_pt",   1000,0,1000);
+  h.vln[2] = new TH1F("allvlnu_eta",   "allvlnu_eta",     200,-4,4);
+  h.vln[3] = new TH1F("allvlnu_phi",   "allvlnu_phi",     200,-4,4);
+  h.vln[4] = new TH1F("allvlnu_mass",  "allvlnu_mass", 2500,0,2500);
+  h.vln[5] = new TH1F("allvlnu_charge","allvlnu_charge",    6,-3,3);
+  h.vln[6] = new TH1F("allvlnu_decay", "allvlnu_decay",    5, 0, 5);
 }

@@ -442,6 +442,10 @@ public :
   void createJets();
   void createGenLightLeptons();
 
+  //For specific studies:
+  void MakeSignalPlots(float wt);
+  TString ParticleName(int pdgid);
+
   //--------------------------------------------------------------------------
   //Correction functions:
   double LeptonIDSF(int id, float pt, float eta);;
@@ -535,9 +539,12 @@ public:
     TH1F *evtweight[10];
     TH1F *hist[10];
     //Object level hists:
-    TH1F *mu[10];TH1F *ele[10];TH1F *llep[10];
+    TH1F *mu[10]; TH1F *ele[10]; TH1F *llep[10];
     TH1F *pho[10];TH1F *tau[10];
     TH1F *jet[10];TH1F *bjet[10];
+    //For spcific studies:
+    TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[10];
+    
   };
   struct Particle {
     TLorentzVector v;
@@ -551,6 +558,9 @@ public:
     float sip3d;
     float reliso03;
     float reliso04;
+    vector<int> dauind; //indices of the daughters (GenPart only)
+    vector<int> dauid; //pdgid of the daughters (GenPart only)
+    int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
   };
 
   //Functions that involve the 'Particle' type objects:
@@ -572,6 +582,7 @@ private:
   TString _era;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
+  vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
 
   //Counters:

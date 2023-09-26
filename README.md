@@ -25,6 +25,6 @@
 ### Suggestions to contributors:
 - If you are a contributor, make your own branch. I will merge them later when the analysis takes shape.
 -  Keep your codes inside `./AnaCodes/username/`
-- Please consult me before changing anything in the `./Setup` folder. (except for BookHistograms())
+- Please consult me before changing anything in the `./Setup` folder. (except for `BookHistograms()`)
 - Feel free to change anything inside the `./CondorSetup` folder depending on what you want to do and how you are organizing the files.
 -  Right now the codes are designed to work with nanoAOD version 9 (while developing the analysis framework), which are produced using  `CMSSW_10_3_1`. You are recommended to work in this environment to avoid compatibility issues. We will shift to a newer version later.
