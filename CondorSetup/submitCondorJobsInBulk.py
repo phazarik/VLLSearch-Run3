@@ -30,7 +30,7 @@ year = 2018
 process_signal = True
 skim = False
 condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
-dumpdir = "/home/work/phazarik1/work/temp/test"
+dumpdir = "/home/work/phazarik1/work/CondorDump"
 script = "/home/work/phazarik1/work/Analysis-Run3/CondorSetup/runana.C"
 
 #_____________________________________________________________
