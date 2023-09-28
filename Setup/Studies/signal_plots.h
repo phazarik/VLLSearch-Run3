@@ -31,9 +31,14 @@ void AnaScript::MakeSignalPlots(float wt){
     temp.status = GenPart_status[i];
     temp.ind = i;
     temp.pdgid = GenPart_pdgId[i];
-    temp.momid= MotherID(i,GenPart_genPartIdxMother[i]);
+    //temp.momid= MotherID(i,GenPart_genPartIdxMother[i]);
+    temp.momid = GenPart_pdgId[GenPart_genPartIdxMother[i]]; //Not fixing the mother right now
 
     h.sig[0]->Fill(GenPart_pdgId[i], wt);
+
+    bool mother_is_Z = (temp.momid == 23);
+    bool mother_is_W = (fabs(temp.momid) == 24);
+    bool not_its_own_mother = (temp.momid != temp.pdgid); //To avoid overcounting
 
     //Finding daughters:
     vector<int> daughter_ind, daughter_id;
@@ -41,10 +46,18 @@ void AnaScript::MakeSignalPlots(float wt){
 
     for(unsigned int j=0; j< (*nGenPart); j++){
       float id = GenPart_pdgId[j];
+      //float momid = GenPart_pdgId[GenPart_genPartIdxMother[i]];
       float momid = MotherID(j,GenPart_genPartIdxMother[j]);
-      if(momid == GenPart_pdgId[i]){ //If mother of the j-th particle is the i-th particle, 
-	daughter_ind.push_back(j); //Then the particle at j-th index is a daughter.
-	daughter_id.push_back(id);
+      //remove identical daughetrs:
+      bool unique_daughter = true;
+      if(momid == GenPart_pdgId[i]){ //If mother of the j-th particle is the i-th particle,
+	for(int k=0; k<(int)daughter_id.size(); k++){
+	  if(id == daughter_id.at(k)) unique_daughter = false;
+	}
+	if(unique_daughter){
+	  daughter_ind.push_back(j); //Then the particle at j-th index is a daughter.
+	  daughter_id.push_back(id);
+	}
       }
     }
     temp.dauind = daughter_ind;
@@ -59,9 +72,6 @@ void AnaScript::MakeSignalPlots(float wt){
       else if(fabs(temp.dauid[j]) == 25) temp.decaymode = 3; //H
     }
     
-    bool mother_is_Z = (temp.momid == 23);
-    bool mother_is_W = (fabs(temp.momid) == 24);
-    bool not_its_own_mother = (temp.momid != temp.pdgid);
     
     if(fabs(temp.pdgid) == 17 && not_its_own_mother){
       if(temp.pdgid == 17) temp.charge = -1;
@@ -76,6 +86,9 @@ void AnaScript::MakeSignalPlots(float wt){
       vlnu.push_back(temp);
     }
   }
+
+  SortPt(vllep);
+  SortPt(vlnu);
   //---------------------------------------------------
 
   if(nEvtTotal == test_event){
@@ -84,6 +97,14 @@ void AnaScript::MakeSignalPlots(float wt){
       cout<<"Daughters of the leading VLL = ";
       for(int i=0; i<(int)vllep.at(0).dauid.size(); i++){
 	cout<<ParticleName(vllep.at(0).dauid[i])<<", ";
+      }
+      cout<<endl;
+    }
+    cout<<"nVNu = "<<(int)vlnu.size()<<endl;
+    if((int)vlnu.size()>0){
+      cout<<"Daughters of the leading VLNu = ";
+      for(int i=0; i<(int)vlnu.at(0).dauid.size(); i++){
+	cout<<ParticleName(vlnu.at(0).dauid[i])<<", ";
       }
       cout<<endl;
     }
@@ -117,5 +138,10 @@ void AnaScript::MakeSignalPlots(float wt){
       h.vln[6] -> Fill(vlnu.at(i).decaymode);
     }
   }
+
+  //----------------------------------------------
+  // Associated production: nvll = 1 && nvlnu = 1
+  //----------------------------------------------
+  
     
 }

@@ -9,8 +9,8 @@ using namespace std;
 void plotmaker(TString plotname, int nbins, TString target_model, TString target_flavor);
 
 void make_overlay(){
-  TString target_model = "VLLD";
-  TString target_flavor = "mu";
+  TString target_model = "VLLS";
+  TString target_flavor = "ele";
 
   struct plots{
     TString name;
