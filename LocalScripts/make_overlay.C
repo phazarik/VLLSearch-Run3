@@ -9,8 +9,8 @@ using namespace std;
 void plotmaker(TString plotname, int nbins, TString target_model, TString target_flavor);
 
 void make_overlay(){
-  TString target_model = "VLLS";
-  TString target_flavor = "ele";
+  TString target_model = "VLLD";
+  TString target_flavor = "mu";
 
   struct plots{
     TString name;
@@ -27,6 +27,7 @@ void make_overlay(){
     {.name = "allvll_mass",     .nbins = 1},
     {.name = "allvll_charge",   .nbins = 1},
     {.name = "allvll_decay",    .nbins = 1},
+    {.name = "allvll_daughters",.nbins = 1},
     {.name = "nvlnu",           .nbins = 1},
     {.name = "allvlnu_pt",      .nbins = 20},
     {.name = "allvlnu_eta",     .nbins = 5},
@@ -34,6 +35,10 @@ void make_overlay(){
     {.name = "allvlnu_mass",    .nbins = 1},
     {.name = "allvlnu_charge",  .nbins = 1},
     {.name = "allvlnu_decay",   .nbins = 1},
+    {.name = "allvlnu_daughters",.nbins = 1},
+    {.name = "finalstates_for_LL",.nbins = 1},
+    {.name = "finalstates_for_LN",.nbins = 1},
+    {.name = "finalstates_for_NN",.nbins = 1},
   };
   
   for(int i=0; i<(int)plot.size(); i++){

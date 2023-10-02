@@ -1,7 +1,14 @@
-import os, sys
+import os, sys, argparse
 
-indir = "hst_signal_Sept26"
-date = '2023-09-26'
+parser=argparse.ArgumentParser()
+parser.add_argument('--jobname',type=str, required=True, help='AnalysisName: Such as VLL2018_Mar1_v0')
+parser.add_argument('--date',type=str, required=True, help='In the format : YYYY-MM-DD')
+parser.add_argument('--dryrun' ,type=bool,required=False,help='Check If everything is correct before submitting')
+args=parser.parse_args()
+
+indir = args.jobname
+date = args.date #'2023-10-02'
+dryrun = args.dryrun
 
 indict = {
     "VLLS":{
@@ -80,19 +87,29 @@ for model, flavors in indict.items():
                     #Add hst files together into one file.
                     process = f'hadd {infile} {foldername}/*.root'
                     cleanup = f'rm -rf {foldername}/*_data.root'
-                    os.system(process)
-                    os.system(cleanup)
+                    if dryrun == True:
+                        print(process)
+                        print(cleanup)
+                    else:
+                        os.system(process)
+                        os.system(cleanup)
                 else :
                     if files[0].endswith('_data.root'):
                         process = f'mv {foldername}/*_data.root {infile}'
-                        os.system(process)
+                        if dryrun == True:
+                            print(process)
+                        else:
+                            os.system(process)
 
+                if dryrun == True: break
                 mkdir = 'mkdir -p input_files'
                 if os.path.exists(infile):
                     main = f'cp {infile} input_files/hst_{model}_{flav}_{mass}.root'
-                    #print(main)
-                    os.system(mkdir)
-                    os.system(main)
+                    if dryrun == True:
+                        print(main)
+                    else:
+                        os.system(mkdir)
+                        os.system(main)
                 else:
                     print(f'Not found : {infile}')
         #break
