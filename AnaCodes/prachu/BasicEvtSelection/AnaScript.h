@@ -441,6 +441,7 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void EventSelection();
 
   //For specific studies:
   void MakeSignalPlots(float wt);
@@ -543,7 +544,8 @@ public:
     TH1F *pho[10];TH1F *tau[10];
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
-    TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[10];
+    TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
+    //Production modes and final states:
     
   };
   struct Particle {
@@ -587,6 +589,12 @@ private:
 
   //Counters:
   int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass;
+  int n2l, n2l_2e0mu, n2l_1e1mu, n2l_0e2mu;
+  int n3l, n3l_3e0mu, n3l_2e1mu, n3l_1e2mu, n3l_0e3mu;
+  int n4l;
+
+  //FinalStates:
+  bool evt_2L_exclusive, evt_3L_exclusive, evt_4L_inclusive;
 
   time_t start, end;
 

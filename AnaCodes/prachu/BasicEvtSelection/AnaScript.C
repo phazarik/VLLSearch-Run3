@@ -12,6 +12,7 @@ using namespace std;
 //Including the header files:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/BookHistograms.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/EventSelection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
 //Corrections:
@@ -38,6 +39,11 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtRan = 0;
   nEvtTrigger=0;
   nEvtPass=0;
+
+  //Counters:
+  n2l=0; n2l_2e0mu=0; n2l_1e1mu=0; n2l_0e2mu=0;
+  n3l=0; n3l_3e0mu=0; n3l_2e1mu=0; n3l_1e2mu=0; n3l_0e3mu=0;
+  n4l=0;
 
   _HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
@@ -294,7 +300,11 @@ Bool_t AnaScript::Process(Long64_t entry)
 	nEvtPass++;
 	h.nevt->Fill(3);
 
-	if(_data==0) MakeSignalPlots(1.0);
+	EventSelection();
+	
+	if(_data==0){
+	  MakeSignalPlots(1.0);
+	}
       }  
 
       

@@ -64,7 +64,7 @@ TString AnaScript::ParticleName(int id){
   else if(id==24) name = "W+";
   else if(id==-24) name = "W-";
   else if(id==25) name = "H";
-  else if(id > 100) name = "had";
+  else if(fabs(id > 100)) name = "had";
   
   //Additional:
   if(neutrinos) name = "nu_"+name;

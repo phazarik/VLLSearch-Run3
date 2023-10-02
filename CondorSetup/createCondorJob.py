@@ -176,7 +176,7 @@ else : print("Error: Give correct argument to the debug string!")
 ######################
 
 #All the condor files are dumped in the following folder after they are used.
-dumpjobs = "previous_jobs/"+timestamp+"/"+samplename
+dumpjobs = "previous_jobs/"+timestamp+"/"+jobname+"/"+samplename
 print('condor dump : '+dumpjobs+"/"+condorfile)
 os.system("mkdir -p "+dumpjobs)
 os.system("mv "+condorfile+" "+dumpjobs+"/.")

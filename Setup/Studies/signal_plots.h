@@ -120,8 +120,8 @@ void AnaScript::MakeSignalPlots(float wt){
     h.vll[4]->Fill( vllep.at(i).v.M(),   wt);
     h.vll[5]->Fill( vllep.at(i).charge,  wt);
     for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
-      h.sig[1] -> Fill(vllep.at(i).dauid[j]); //j-th daugher of the i-th particle
       h.vll[6] -> Fill(vllep.at(i).decaymode);
+      h.vll[7] -> Fill(vllep.at(i).dauid[j]); //j-th daugher of the i-th particle
     }
   }
 
@@ -134,14 +134,41 @@ void AnaScript::MakeSignalPlots(float wt){
     h.vln[4]->Fill( vlnu.at(i).v.M(),   wt);
     h.vln[5]->Fill( vlnu.at(i).charge,  wt);
     for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
-      h.sig[2] -> Fill(vlnu.at(i).dauid[j]); //j-th daugher of the i-th particle
       h.vln[6] -> Fill(vlnu.at(i).decaymode);
+      h.vln[7] -> Fill(vlnu.at(i).dauid[j]); //j-th daugher of the i-th particle
     }
   }
 
-  //----------------------------------------------
-  // Associated production: nvll = 1 && nvlnu = 1
-  //----------------------------------------------
-  
+  //---------------------------------------
+  // Investigating the feynman diagrams
+  //---------------------------------------
+  int nvll = (int)vllep.size();
+  int nvlnu = (int)vlnu.size();
+  bool pair_production_L = false;
+  bool pair_production_N = false;
+  bool associated_production = false;
+  if(nvll==2 && nvlnu == 0)      pair_production_L = true;
+  else if(nvll==1 && nvlnu == 1) associated_production = true;
+  else if(nvll==0 && nvlnu == 2) pair_production_N = true;
+
+  if(pair_production_L){
+    h.sig[1]->Fill((int)0, wt);                           //All events for LL mode.
+    if(evt_2L_exclusive) h.sig[1]->Fill((int)1, wt);      //2L  events for LL mode.
+    else if(evt_3L_exclusive) h.sig[1]->Fill((int)2, wt); //3L  events for LL mode.
+    else if(evt_4L_inclusive) h.sig[1]->Fill((int)3, wt); //4L+ events for LL mode.
+  }
+  else if(associated_production){
+    h.sig[2]                          ->Fill((int)0, wt); //All events for LN mode.
+    if(evt_2L_exclusive)      h.sig[2]->Fill((int)1, wt); //2L  events for LN mode.
+    else if(evt_3L_exclusive) h.sig[2]->Fill((int)2, wt); //3L  events for LN mode.
+    else if(evt_4L_inclusive) h.sig[2]->Fill((int)3, wt); //4L+ events for LN mode.
+  }
+  else if(pair_production_N){
+    h.sig[3]                          ->Fill((int)0, wt); //All events for NN mode.
+    if(evt_2L_exclusive)      h.sig[3]->Fill((int)1, wt); //2L  events for NN mode.
+    else if(evt_3L_exclusive) h.sig[3]->Fill((int)2, wt); //3L  events for NN mode.
+    else if(evt_4L_inclusive) h.sig[3]->Fill((int)3, wt); //4L+ events for NN mode.
+  }
+
     
 }
