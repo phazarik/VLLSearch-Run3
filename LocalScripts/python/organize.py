@@ -78,7 +78,7 @@ plots = ['allvll_decay']
 for model, flavors in indict.items():
     for flav, masses in flavors.items():
         for mass, parameters in masses.items():
-            foldername = f'hists/{indir}/{model}_{flav}_{mass}_{date}'
+            foldername = f'../hists/{indir}/{model}_{flav}_{mass}_{date}'
             files = os.listdir(foldername)
             if len(files) == 0 : print(f'Files not found : {model}_{flav}_{mass}')
             else :
