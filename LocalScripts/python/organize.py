@@ -102,9 +102,13 @@ for model, flavors in indict.items():
                             os.system(process)
 
                 if dryrun == True: break
-                mkdir = 'mkdir -p input_files'
+                mkdir = 'mkdir -p ../input_files'
                 if os.path.exists(infile):
-                    main = f'cp {infile} input_files/hst_{model}_{flav}_{mass}.root'
+                    outfile = f'../input_files/hst_{model}_{flav}_{mass}.root'
+                    if os.path.exists(outfile):
+                        print(f'Removing alreading existing file - {outfile} ... ')
+                        if dryrun != True : os.system(f'rm -rf outfile')
+                    main = f'cp {infile} ../input_files/hst_{model}_{flav}_{mass}.root'
                     if dryrun == True:
                         print(main)
                     else:
