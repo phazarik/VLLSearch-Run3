@@ -594,7 +594,7 @@ private:
   int n4l;
 
   //FinalStates:
-  bool evt_2L_exclusive, evt_3L_exclusive, evt_4L_inclusive;
+  bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
 
   time_t start, end;
 

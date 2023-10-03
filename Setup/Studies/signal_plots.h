@@ -152,22 +152,34 @@ void AnaScript::MakeSignalPlots(float wt){
   else if(nvll==0 && nvlnu == 2) pair_production_N = true;
 
   if(pair_production_L){
-    h.sig[1]->Fill((int)0, wt);                           //All events for LL mode.
-    if(evt_2L_exclusive) h.sig[1]->Fill((int)1, wt);      //2L  events for LL mode.
-    else if(evt_3L_exclusive) h.sig[1]->Fill((int)2, wt); //3L  events for LL mode.
-    else if(evt_4L_inclusive) h.sig[1]->Fill((int)3, wt); //4L+ events for LL mode.
+    h.sig[1]                       ->Fill((int)0, wt); //All events
+    if(evt_1L0J)           h.sig[1]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[1]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[1]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[1]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[1]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[1]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[1]->Fill((int)7, wt); //4L+ events
   }
   else if(associated_production){
-    h.sig[2]                          ->Fill((int)0, wt); //All events for LN mode.
-    if(evt_2L_exclusive)      h.sig[2]->Fill((int)1, wt); //2L  events for LN mode.
-    else if(evt_3L_exclusive) h.sig[2]->Fill((int)2, wt); //3L  events for LN mode.
-    else if(evt_4L_inclusive) h.sig[2]->Fill((int)3, wt); //4L+ events for LN mode.
+    h.sig[2]                       ->Fill((int)0, wt); //All events
+    if(evt_1L0J)           h.sig[2]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[2]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[2]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[2]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[2]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[2]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[2]->Fill((int)7, wt); //4L+ events
   }
   else if(pair_production_N){
-    h.sig[3]                          ->Fill((int)0, wt); //All events for NN mode.
-    if(evt_2L_exclusive)      h.sig[3]->Fill((int)1, wt); //2L  events for NN mode.
-    else if(evt_3L_exclusive) h.sig[3]->Fill((int)2, wt); //3L  events for NN mode.
-    else if(evt_4L_inclusive) h.sig[3]->Fill((int)3, wt); //4L+ events for NN mode.
+    h.sig[3]                       ->Fill((int)0, wt); //All events
+    if(evt_1L0J)           h.sig[3]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[3]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[3]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[3]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[3]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[3]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[3]->Fill((int)7, wt); //4L+ events
   }
 
     

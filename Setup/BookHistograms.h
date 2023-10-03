@@ -82,9 +82,9 @@ void AnaScript::BookHistograms(){
   h.vln[7] = new TH1F("allvlnu_daughers", "allvll_daughers", 100, -50, 50);
 
   // VLL pair production final states:
-  h.sig[1] = new TH1F("finalstates_for_LL", "finalstates for LL", 5, 0, 5);
-  h.sig[2] = new TH1F("finalstates_for_LN", "finalstates for LN", 5, 0, 5);
-  h.sig[3] = new TH1F("finalstates_for_NN", "finalstates for NN", 5, 0, 5);
+  h.sig[1] = new TH1F("finalstates_for_LL", "finalstates for LL", 10, 0, 10);
+  h.sig[2] = new TH1F("finalstates_for_LN", "finalstates for LN", 10, 0, 10);
+  h.sig[3] = new TH1F("finalstates_for_NN", "finalstates for NN", 10, 0, 10);
 
   //###############
   // Final states:
