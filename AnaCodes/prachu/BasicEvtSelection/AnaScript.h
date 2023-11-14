@@ -429,6 +429,7 @@ public :
   void SetYear(int year){_year = year;}
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
+  void SetFlag(TString flag){_flag=flag;}
 
   void BookHistograms();
 
@@ -578,10 +579,10 @@ private:
   const char *_HstFileName;
   const char *_SumFileName;
   int _verbosity,_exclude,_sample;
-  int _data, _lep, _year,_mcwt;
+  int _data, _lep, _year, _mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi,evwt,prob,evtwt,prob1,puppimetpt,puppimetphi;
-  TString _era;
+  TString _era, _flag;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;

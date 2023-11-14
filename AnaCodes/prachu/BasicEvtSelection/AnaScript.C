@@ -48,6 +48,8 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   _HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
+
+  if(_flag=="doublet") cout<<"Removing invalid VLLD decay modes ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()
@@ -301,8 +303,8 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.nevt->Fill(3);
 
 	EventSelection();
-	
-	if(_data==0){
+
+	if(_data==0){	  
 	  MakeSignalPlots(1.0);
 	}
       }  

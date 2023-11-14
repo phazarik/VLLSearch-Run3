@@ -3,8 +3,7 @@
 #include <TFile.h>
 void ana_test(int sample=0)
 {
-  const char *hstfilename, *sumfilename;
-  
+  const char *hstfilename, *sumfilename; 
   TChain *chain = new TChain("Events");
   AnaScript m_selec;//declared an instance of our class.
   
@@ -20,6 +19,7 @@ void ana_test(int sample=0)
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(0); //0-electron dataset, 1-muon dataset
+    m_selec.SetFlag(""); //flag == "" by default. It does nothing.
   }
 
   if(sample==0){//SingleMuon Data
@@ -30,6 +30,7 @@ void ana_test(int sample=0)
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(1); //0-electron dataset, 1-muon dataset
+    m_selec.SetFlag("");
   }
   
   else if(sample==1){//Drell-Yan
@@ -40,6 +41,7 @@ void ana_test(int sample=0)
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
+    m_selec.SetFlag("");
   }
 
   else if(sample==800){//Signal
@@ -50,6 +52,7 @@ void ana_test(int sample=0)
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
+    m_selec.SetFlag("doublet"); //flag=="doublet" removes invalid decay modes from VLLD files.
   }
 
   std::cout<<"Output files are "<<hstfilename<<" and "<<sumfilename<<std::endl;

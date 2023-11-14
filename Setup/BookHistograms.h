@@ -16,6 +16,7 @@ void AnaScript::BookHistograms(){
   h.hist[6] = new TH1F("HLT_IsoMu27", "HLT_IsoMu27", 5, 0, 5);
   h.hist[7] = new TH1F("HLT_Ele27_WPTight_Gsf", "HLT_Ele27_WPTight_Gsf", 5, 0, 5);
   h.hist[8] = new TH1F("HLT_Ele32_WPTight_Gsf", "HLT_Ele32_WPTight_Gsf", 5, 0, 5);
+  h.hist[9] = new TH1F("Flag_ValidDecayMode", "Flag_ValidDecayMode (0=bad, 1=good)", 5, 0, 5);
   
   //############################################
   //Object level plots: (before event selection)
