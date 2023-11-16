@@ -86,6 +86,7 @@ void AnaScript::BookHistograms(){
   h.sig[1] = new TH1F("finalstates_for_LL", "finalstates for LL", 10, 0, 10);
   h.sig[2] = new TH1F("finalstates_for_LN", "finalstates for LN", 10, 0, 10);
   h.sig[3] = new TH1F("finalstates_for_NN", "finalstates for NN", 10, 0, 10);
+  h.sig[4] = new TH1F("finalstates_incldecay", "finalstates for inclusive decaymode", 10, 0, 10);
 
   //###############
   // Final states:

@@ -54,6 +54,9 @@ void ana_test(int sample=0)
     m_selec.SetLep(1);
     m_selec.SetFlag("doublet"); //flag=="doublet" removes invalid decay modes from VLLD files.
   }
+  else{
+    cout<<"Invalid argument!"<<endl;
+  }
 
   std::cout<<"Output files are "<<hstfilename<<" and "<<sumfilename<<std::endl;
   m_selec.SetHstFileName(hstfilename);

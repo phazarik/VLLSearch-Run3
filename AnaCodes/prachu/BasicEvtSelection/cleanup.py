@@ -1,4 +1,8 @@
-import os, sys
+import os, sys, argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--all', action='store_true', help='removes all the output root files in test_outputs')
+args = parser.parse_args()
 
 junk = [
     "*~",
@@ -7,6 +11,8 @@ junk = [
     "*#",
     "*d"
 ]
+
+if args.all : junk.append("test_outputs/*")
 
 print("Running the following commands ...")
 for item in junk:

@@ -133,15 +133,15 @@ void AnaScript::MakeSignalPlots(float wt){
       }
     }
   }
+
+  if(bad_event) h.hist[9]->Fill(0);//Counting invalid events.
+  else h.hist[9]->Fill(1);
+  
   //The singlet models are fine.
   //###################################################
 
-  //Only plot if it's a valid event:
-  if(bad_event) h.hist[9]->Fill(0);//Counting invalid events.
-  else {
-    h.hist[9]->Fill(1);
-  
-    //Basic plots for Vector like lepton:
+  //Basic plots for Vector like lepton:
+  if(!bad_event){
     h.vll[0]->Fill((int)vllep.size());
     for(int i=0; i<(int)vllep.size(); i++){
       h.vll[1]->Fill( vllep.at(i).v.Pt(),  wt);
@@ -168,49 +168,60 @@ void AnaScript::MakeSignalPlots(float wt){
 	h.vln[7] -> Fill(vlnu.at(i).dauid[j]); //j-th daugher of the i-th particle
       }
     }
-
-    //---------------------------------------
-    // Investigating the feynman diagrams
-    //---------------------------------------
-    int nvll = (int)vllep.size();
-    int nvlnu = (int)vlnu.size();
-    bool pair_production_L = false;
-    bool pair_production_N = false;
-    bool associated_production = false;
-    if(nvll==2 && nvlnu == 0)      pair_production_L = true;
-    else if(nvll==1 && nvlnu == 1) associated_production = true;
-    else if(nvll==0 && nvlnu == 2) pair_production_N = true;
-
-    if(pair_production_L){
-      h.sig[1]                       ->Fill((int)0, wt); //All events
-      if(evt_1L0J)           h.sig[1]->Fill((int)1, wt); //1L0J events
-      else if(evt_1L1J)      h.sig[1]->Fill((int)2, wt); //1L1J events
-      else if(evt_1L2J_incl) h.sig[1]->Fill((int)3, wt); //1L2J+ events
-      else if(evt_2LOS)      h.sig[1]->Fill((int)4, wt); //2LOS events
-      else if(evt_2LSS)      h.sig[1]->Fill((int)5, wt); //2LSS events
-      else if(evt_3L)        h.sig[1]->Fill((int)6, wt); //3L events
-      else if(evt_4L_incl)   h.sig[1]->Fill((int)7, wt); //4L+ events
-    }
-    else if(associated_production){
-      h.sig[2]                       ->Fill((int)0, wt); //All events
-      if(evt_1L0J)           h.sig[2]->Fill((int)1, wt); //1L0J events
-      else if(evt_1L1J)      h.sig[2]->Fill((int)2, wt); //1L1J events
-      else if(evt_1L2J_incl) h.sig[2]->Fill((int)3, wt); //1L2J+ events
-      else if(evt_2LOS)      h.sig[2]->Fill((int)4, wt); //2LOS events
-      else if(evt_2LSS)      h.sig[2]->Fill((int)5, wt); //2LSS events
-      else if(evt_3L)        h.sig[2]->Fill((int)6, wt); //3L events
-      else if(evt_4L_incl)   h.sig[2]->Fill((int)7, wt); //4L+ events
-    }
-    else if(pair_production_N){
-      h.sig[3]                       ->Fill((int)0, wt); //All events
-      if(evt_1L0J)           h.sig[3]->Fill((int)1, wt); //1L0J events
-      else if(evt_1L1J)      h.sig[3]->Fill((int)2, wt); //1L1J events
-      else if(evt_1L2J_incl) h.sig[3]->Fill((int)3, wt); //1L2J+ events
-      else if(evt_2LOS)      h.sig[3]->Fill((int)4, wt); //2LOS events
-      else if(evt_2LSS)      h.sig[3]->Fill((int)5, wt); //2LSS events
-      else if(evt_3L)        h.sig[3]->Fill((int)6, wt); //3L events
-      else if(evt_4L_incl)   h.sig[3]->Fill((int)7, wt); //4L+ events
-    }
   }//!bad_event
-    
+
+  //---------------------------------------
+  // Investigating the feynman diagrams
+  //---------------------------------------
+  int nvll = (int)vllep.size();
+  int nvlnu = (int)vlnu.size();
+  bool pair_production_L = false;
+  bool pair_production_N = false;
+  bool associated_production = false;
+  if(nvll==2 && nvlnu == 0 && !bad_event)      pair_production_L = true;
+  else if(nvll==1 && nvlnu == 1 && !bad_event) associated_production = true;
+  else if(nvll==0 && nvlnu == 2 && !bad_event) pair_production_N = true;
+
+  if(pair_production_L){
+    h.sig[1]                       ->Fill((int)0, wt); //All events
+    if(evt_1L0J)           h.sig[1]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[1]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[1]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[1]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[1]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[1]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[1]->Fill((int)7, wt); //4L+ events
+  }
+  else if(associated_production){
+    h.sig[2]                       ->Fill((int)0, wt); //All events
+    if(evt_1L0J)           h.sig[2]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[2]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[2]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[2]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[2]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[2]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[2]->Fill((int)7, wt); //4L+ events
+  }
+  else if(pair_production_N){
+    h.sig[3]                       ->Fill((int)0, wt); //All events
+    if(evt_1L0J)           h.sig[3]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[3]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[3]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[3]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[3]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[3]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[3]->Fill((int)7, wt); //4L+ events
+  }
+  //Counting events in the final state, irrespective of the intermediate decay modes:
+  if(!bad_event){
+    h.sig[4]                       ->Fill((int)0, wt); //All events, excluding the bad ones
+    if(evt_1L0J)           h.sig[4]->Fill((int)1, wt); //1L0J events
+    else if(evt_1L1J)      h.sig[4]->Fill((int)2, wt); //1L1J events
+    else if(evt_1L2J_incl) h.sig[4]->Fill((int)3, wt); //1L2J+ events
+    else if(evt_2LOS)      h.sig[4]->Fill((int)4, wt); //2LOS events
+    else if(evt_2LSS)      h.sig[4]->Fill((int)5, wt); //2LSS events
+    else if(evt_3L)        h.sig[4]->Fill((int)6, wt); //3L events
+    else if(evt_4L_incl)   h.sig[4]->Fill((int)7, wt); //4L+ events
+  }
+  
 }

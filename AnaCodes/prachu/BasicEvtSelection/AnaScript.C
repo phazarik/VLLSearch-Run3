@@ -185,6 +185,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       Tau.clear();
       Jet.clear();
       bJet.clear();
+      LooseLepton.clear();
       
       createLightLeptons();
       createPhotons();

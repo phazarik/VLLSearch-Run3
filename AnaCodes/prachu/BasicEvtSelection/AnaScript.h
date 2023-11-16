@@ -587,6 +587,7 @@ private:
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
+  vector<Particle> LooseLepton; //Loose objects
 
   //Counters:
   int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass;
