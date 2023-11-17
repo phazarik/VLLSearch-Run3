@@ -119,14 +119,16 @@ void AnaScript::MakeSignalPlots(float wt){
   //In the Doublet model:
   //if(strcmp(_Flag, "doublet") == 0){
   if(_flag=="doublet"){ //for VLLD files
-    //a) The neutral particle cannot decay to a H or a Z
+    //a) The neutral particle cannot decay to H,nu or Z,nu.
+    //   I am flagging out the Higgs(25) and the Z(23)
     for(int i=0; i<(int)vlnu.size(); i++){
       for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
 	if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
 	else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
       }
     }
-    //b) The lepton cannot decay to a W:
+    //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
+    //   I am flagging out the W(24)
     for(int i=0; i<(int)vllep.size(); i++){
       for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
 	if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
