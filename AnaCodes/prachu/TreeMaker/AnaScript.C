@@ -305,8 +305,6 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Event selection:
       if(true){
-	nEvtPass++;
-	h.nevt->Fill(3);
 
 	EventSelection();
 
