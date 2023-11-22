@@ -16,6 +16,7 @@ void AnaScript::EventSelection(){
   
   if(evt_trigger){
 
+    /*
     //Selecting events in the order 4L>3L>2L
     if((int)LightLepton.size()>=4)      evt_4L_incl   = true;
     else if((int)LightLepton.size()==3) evt_3L        = true;
@@ -27,9 +28,8 @@ void AnaScript::EventSelection(){
       if ((int)Jet.size()>=2)       evt_1L2J_incl = true;
       else if((int)Jet.size()==0)   evt_1L0J      = true;
       else if ((int)Jet.size()==1)  evt_1L1J      = true;     
-    }
+      }*/
 
-    /*
     //Selecting events in the reverse order:
     if((int)LightLepton.size()==1){
       if((int)Jet.size()==0)            evt_1L0J      = true;
@@ -41,7 +41,7 @@ void AnaScript::EventSelection(){
       else evt_2LSS = true;
     }
     else if((int)LightLepton.size()==3) evt_3L        = true;
-    else if((int)LightLepton.size()>=4) evt_4L_incl   = true;*/
+    else if((int)LightLepton.size()>=4) evt_4L_incl   = true;
 
   }//trigger
 

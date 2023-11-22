@@ -1,6 +1,4 @@
 # VLL Search in Run3 dataset
->Note : The condor submission scripts need to be customized later depending on how we wish to keep the input files. Also, right now the C script has relative paths to the header files. Change those to absolute paths before submitting condor jobs. Also, the skimmer keeps all the branches, just does not fill them. This is done to avoid compatibility issues with the header file.
-
 ### Organizational structure:
 ```.
 ├── AnaCodes
@@ -14,14 +12,19 @@
 │
 ├── CondorSetup
 │   ├── createCondorJob.py          -> Submits job for only one sample (folder)
-│   ├── runJobsCondor_simulation.sh ->The auto-generated shell script that runs in condor
+│   ├── runJobsCondor_simulation.sh -> The auto-generated shell script that runs in condor
 │   ├── runana.C                    -> It picks the anaCond.C and feeds it the necessary inputs.
 │   └── submitCondorJobsInBulk.py   -> Submits condor job for all samples.
 │
 ├── InputJsons -> Contains information about input files.
 └── Setup      -> Contains all the extra header files used by AnaScript.C
 ```
-
+### Keep in mind:
+- The condor submission scripts need to be customized later depending on how you wish to keep the input files. 
+- The relative paths to the header files in the C script are needed to be replaced with absolute paths before generating the library and submitting condor jobs.
+- The skimmer keeps all the branches, just does not fill them. This is done to avoid compatibility issues with the header file.
+- The tree-maker is used to analyze specific final states. It stores all the event-level variables in a `TTree`, which is to be read by a python script for NN training and plotting.
+ 
 ### Suggestions to contributors:
 - If you are a contributor, make your own branch. I will merge them later when the analysis takes shape.
 -  Keep your codes inside `./AnaCodes/username/`
