@@ -608,8 +608,32 @@ private:
   time_t start, end;
 
   //For treemaker:
-  //TTree *mytree = new TTree("Events", "Events");
+  void InitializeBranches(TTree *tree);
   TTree *mytree;
+  UInt_t  nlep;  //[0,20<,UInt5_t>]
+  UInt_t  njet;  //[0,20<,UInt5_t>]
+  UInt_t  nbjet;  //[0,20<,UInt5_t>]
+  Float_t lep0_pt;  //[0,1500<,Float32_t>]
+  Float_t lep0_eta;  //[-6,6<,Float32_t>]
+  Float_t lep0_phi;  //[-6,6<,Float32_t>]
+  Float_t lep0_mt;  //[0,1500<,Float32_t>]
+  Float_t lep1_pt;  //[0,1500<,Float32_t>]
+  Float_t lep1_eta;  //[-6,6<,Float32_t>]
+  Float_t lep1_phi;  //[-6,6<,Float32_t>]
+  Float_t lep1_mt;  //[0,1500<,Float32_t>]
+  Float_t ll_pt;  //[0,1500<,Float32_t>]
+  Float_t ll_mass;  //[0,1500<,Float32_t>]
+  Float_t ll_deta;  //[0,6<,Float32_t>]
+  Float_t ll_dphi;  //[0,6<,Float32_t>]
+  Float_t ll_dR;  //[0,6<,Float32_t>]
+  Float_t ptratio;  //[0,1<,Float32_t>]
+  Float_t HT;  //[0,1500<,Float32_t>]
+  Float_t ST;  //[0,1500<,Float32_t>]
+  Float_t STfrac;  //[0,1<,Float32_t>]
+  Float_t dphi_metlep0;  //[0,6<,Float32_t>]
+  Float_t dphi_metlep1;  //[0,6<,Float32_t>]
+  Float_t dphi_metlep_max;  //[0,6<,Float32_t>]
+  Float_t dphi_metlep_min;  //[0,6<,Float32_t>]  
 
   ClassDef(AnaScript,0);
 
@@ -640,6 +664,8 @@ void AnaScript::Init(TTree *tree)
   _TreeFile->SetCompressionSettings(209);
   
   mytree = new TTree("myEvents", "myEvents");
+  InitializeBranches(mytree);
+  //mytree->Branch("nlep",&nlep);
   //mytree = tree->CloneTree(0);
   //mytree->SetBranchStatus("*", 0);
 
