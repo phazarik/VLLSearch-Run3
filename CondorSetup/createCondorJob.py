@@ -22,9 +22,10 @@ samplename = sys.argv[4] # input name (eg: DYJetsToLL_M50)
 data       = sys.argv[5] # "0" = mC, "1" = data
 year       = sys.argv[6]
 lep        = sys.argv[7] #"el" = electron dataset, "mu" = muon dataset
-scriptname = sys.argv[8]
-skim_str   = sys.argv[9]
-debug_str  = sys.argv[10]
+flag       = sys.argv[8] # customizable string flag
+scriptname = sys.argv[9]
+skim_str   = sys.argv[10]
+debug_str  = sys.argv[11]
 #For the old setup:
 #era = 'Z'
 #mc = 'wz'
@@ -77,7 +78,7 @@ runScript=SCRIPTDIR+"/runJobsCondor_simulation.sh"
 os.system("touch "+runScript)
 os.system("chmod a+x "+runScript)
 
-arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\"\)' #raw string
+arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\"\)' #raw string
 #arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #for the old setup
 processline = 'root -q -b -l '+scriptname+arguments
 
@@ -139,7 +140,7 @@ for filename in input_files:
             "output = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
             "error = "+LOGDIR+"//$(Cluster)_data_"+filename+".err",
             "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
-            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep),
+            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag),
             #"arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(era)+" "+str(mc),#for the old setup
             "queue",
             ""
@@ -176,7 +177,7 @@ else : print("Error: Give correct argument to the debug string!")
 ######################
 
 #All the condor files are dumped in the following folder after they are used.
-dumpjobs = "previous_jobs/"+timestamp+"/"+samplename
+dumpjobs = "previous_jobs/"+timestamp+"/"+jobname+"/"+samplename
 print('condor dump : '+dumpjobs+"/"+condorfile)
 os.system("mkdir -p "+dumpjobs)
 os.system("mv "+condorfile+" "+dumpjobs+"/.")

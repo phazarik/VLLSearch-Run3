@@ -23,14 +23,14 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 //Sepcific studies:
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker/TreeMakerHelper.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
   TString option = GetOption();
 }
 
-void AnaScript::SlaveBegin(TTree * /*tree*/)
+void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 {
   time(&start);
 
@@ -45,16 +45,19 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n3l=0; n3l_3e0mu=0; n3l_2e1mu=0; n3l_1e2mu=0; n3l_0e3mu=0;
   n4l=0;
 
-  _HstFile = new TFile(_HstFileName,"recreate");
+  //Call the function to book the histograms we declared in Hists.
   BookHistograms();
-
+  
   if(_flag=="doublet") cout<<"Removing invalid VLLD decay modes ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()
 {
-  _HstFile->Write();
-  _HstFile->Close();
+  //_HstFile->Write();
+  //_HstFile->Close();
+
+  mytree->Write();
+  _TreeFile->Close();
 
   float goodevtfrac = ((float)nEvtRan)/((float)nEvtTotal);
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
@@ -111,8 +114,9 @@ Bool_t AnaScript::Process(Long64_t entry)
   else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
 
   nEvtTotal++;
-  h.nevt->Fill(0);
+  //h.nevt->Fill(0);
 
+  /*
   //Let's plot some flags/triiger which are used later.
   h.hist[0]->Fill(*Flag_goodVertices);
   h.hist[1]->Fill(*Flag_globalSuperTightHalo2016Filter);
@@ -122,7 +126,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   h.hist[5]->Fill(*HLT_IsoMu24);
   h.hist[6]->Fill(*HLT_IsoMu27);
   h.hist[7]->Fill(*HLT_Ele27_WPTight_Gsf);
-  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);
+  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);*/
   
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2017 = (_year==2017 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -132,7 +136,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
   if(GoodEvt){
     nEvtRan++; //only good events
-    h.nevt->Fill(1);
+    //h.nevt->Fill(1);
 
     triggerRes=true; //Always true for MC
 
@@ -152,7 +156,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events
-      h.nevt->Fill(2);
+      //h.nevt->Fill(2);
 
       //###################
       //Gen particle block
@@ -199,6 +203,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       SortPt(Jet);
       SortPt(bJet);
 
+      /*
       //Basic object-level plots:
       //ELectrons
       h.ele[0]->Fill((int)Electron.size());
@@ -244,7 +249,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evtwt);
 	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evtwt);
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
-      }
+	}*/
 
       //_______________________________________________________________________________________________________
       
@@ -298,17 +303,26 @@ Bool_t AnaScript::Process(Long64_t entry)
 
 
       //Event selection:
-      EventSelection();
-      
-      if(evt_2LSS){
-	nEvtPass++;
-	h.nevt->Fill(3);	
-	
-	if(_data==0){	  
-	  MakeSignalPlots(1.0);
+      if(true){
+
+	EventSelection();
+
+	//For a particular final state, fillup the tree.
+	//Edit the funtion while changing the final state,
+	//otherwise it will give a segmentation error.
+
+	if(evt_2LSS){
+	  
+	  //UInt_t nlep;
+	  //nlep = (UInt_t)LightLepton.size();
+	  //mytree->Branch("nlep", &nlep);
+	  
+	  FillTree(mytree);	  
+	  mytree->Fill();
 	}
+
       }  
-      
+
       
     }//TriggeredEvts
   }//GoodEvt

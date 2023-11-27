@@ -30,7 +30,7 @@ year = 2018
 process_signal = True
 skim = False
 condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
-dumpdir = "/home/work/phazarik1/work/temp/test"
+dumpdir = "/home/work/phazarik1/work/CondorDump"
 script = "/home/work/phazarik1/work/Analysis-Run3/CondorSetup/runana.C"
 
 #_____________________________________________________________
@@ -69,9 +69,13 @@ for item in condorsamples:
                 indir = val['samplepath']
                 data = str(val['data'])
                 lep = 'mu'
-                if samplegroup == 'EGamma' : lep = 'el'
+                flag = 'flag'
 
-                arguments = f'{jobname} {indir} {dumpdir} {sample} {data} {year} {lep} {script} {skim} {debug}'
+                #Corrections on the parameters based on which sample it is:
+                if sample.startswith('VLLD') : flag = 'doublet'
+                if samplegroup == 'EGamma' : lep  = 'el'
+
+                arguments = f'{jobname} {indir} {dumpdir} {sample} {data} {year} {lep} {flag} {script} {skim} {debug}'
                 processline = 'python3 createCondorJob.py '+arguments
 
                 if dryrun == True : print(processline)

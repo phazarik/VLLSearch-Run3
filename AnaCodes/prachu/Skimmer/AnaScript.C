@@ -9,11 +9,20 @@
 using namespace std;
 
 //Including the header files:
-#include "../../../Setup/BookHistograms.h"
-#include "../../../Setup/CustomFunctions.h"
-#include "../../../Setup/ProduceGenCollection.h"
-#include "../../../Setup/ProduceRecoCollection.h"
-#include "skimmerHelper.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/BookHistograms.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/EventSelection.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
+//Corrections:
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
+//For skimmer:
+#include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/skimmerHelper.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -30,19 +39,20 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtTrigger=0;
   nEvtSkim=0;//for skimmer
 
-  _HstFile = new TFile(_HstFileName,"recreate");
+  //_HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
-  BookHistograms();
+  //BookHistograms();
 
-  //for skimmer
+  //For skimmer:
+  //The following keep only the branches mentioned in skimmerHelper.h 
   //tree->SetBranchStatus("*",0);
   //ActivateBranch(tree);
 }
 
 void AnaScript::SlaveTerminate()
 {
-  _HstFile->Write();
-  _HstFile->Close();
+  //_HstFile->Write();
+  //_HstFile->Close();
 
   //for skimmer
   skimTree->Write();
@@ -99,11 +109,11 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   //Verbosity determines the number of processed events after which
   //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
+  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
 
   nEvtTotal++;
-  h.nevt->Fill(0);
+  //h.nevt->Fill(0);
 
   ReadBranch();//for skimmer
 
@@ -115,39 +125,51 @@ Bool_t AnaScript::Process(Long64_t entry)
 
   if(GoodEvt){
     nEvtRan++; //only good events
-    h.nevt->Fill(1);
+    //h.nevt->Fill(1);
 
     triggerRes=true; //Always true for MC
 
     if(_data==1){
-      trigger2018 = (_year==2018 ? (_lep==1 ? *HLT_IsoMu24==1 : _lep==0 && *HLT_Ele32_WPTight_Gsf) : 1);
-      //trigger2017 = (_year==2017 ? (_lep==1 ? *HLT_IsoMu27==1 : _lep==0 && (*HLT_Ele32_WPTight_Gsf||*HLT_Ele32_WPTight_Gsf_L1DoubleEG)) : 1);
-      trigger2017 = (_year==2017 ? (_lep==1 ? *HLT_IsoMu27==1 : _lep==0 && (*HLT_Ele32_WPTight_Gsf)) : 1);
-      trigger2016 = (_year==2016 ? (_lep==1 ? (*HLT_IsoMu24==1) : _lep==0 && *HLT_Ele27_WPTight_Gsf) : 1);
-           
-      triggerRes = trigger2018 && trigger2017 && trigger2016;
-      //triggerRes = true;
+      
+      triggerRes=false;
+      bool muon_trigger = false;
+      bool electron_trigger = false;
+      if     (_year==2016) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
+      else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
+      else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
+      //Muons are preferrred over electrons.
+      //For the electron dataset, pick up only those events which do not fire a Muon trigger.
+      //Otherwise there will be overcounting.
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);  
     }
+    
     if(triggerRes){
       nEvtTrigger++; //only triggered events
-      h.nevt->Fill(2);
+      //h.nevt->Fill(2);
 
       //###################
       //Gen particle block
       //###################
 
-      /*
       genMuon.clear();
+      genElectron.clear();
+      genLightLepton.clear();
 
+      /*
       if(_data==0){
 	createGenLightLeptons();
 	SortPt(genMuon);
+	SortPt(genElectron);
+	SortPt(genLightLepton);
 	//Make gen-level plots here.
 	}*/
 
       //###################
       //Reco particle block
       //###################
+      
+      metpt = *PuppiMET_pt;
+      metphi = *PuppiMET_phi;
       
       Muon.clear();
       Electron.clear();
@@ -156,11 +178,12 @@ Bool_t AnaScript::Process(Long64_t entry)
       Tau.clear();
       Jet.clear();
       bJet.clear();
+      LooseLepton.clear();
       
       createLightLeptons();
-      //createPhotons();
-      //createTaus();
-      //createJets();
+      createPhotons();
+      createTaus();
+      createJets();
 
       SortPt(Muon);
       SortPt(Electron);
@@ -170,6 +193,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       SortPt(Jet);
       SortPt(bJet);
 
+      /*
       //Basic object-level plots:
       //ELectrons
       h.ele[0]->Fill((int)Electron.size());
@@ -214,16 +238,27 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[1]->Fill(bJet.at(i).v.Pt());
 	h.bjet[2]->Fill(bJet.at(i).v.Eta());
 	h.bjet[3]->Fill(bJet.at(i).v.Phi());
-      }
+	}*/
 
       //_______________________________________________________________________________________________________
       
       //Skimmer
       //_______________________________________________________________________________________________________
 
-      if((int)Muon.size() > 2){
-	nEvtSkim++;
-	skimTree->Fill();
+      //Event selection:
+      if(true){ //Any addional cuts, if needed, can be applied here.
+
+	EventSelection();
+
+	//For a particular final state, fillup the tree.
+	//Edit the funtion while changing the final state,
+	//otherwise it will give a segmentation error.
+
+	if(evt_2LSS){
+	  nEvtSkim++;
+	  skimTree->Fill();
+	}
+
       }
       
     }//TriggeredEvts

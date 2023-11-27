@@ -6,4 +6,6 @@
 *pyc
 *#
 *txt
+*png
 CondorSetup/previous_jobs/
+*.ipynb_checkpoints

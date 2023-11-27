@@ -27,6 +27,7 @@
 #include "TString.h"
 #include <bitset>
 #include <time.h>
+//#include <RtypesCore.h>
 
 
 class AnaScript : public TSelector {
@@ -422,6 +423,7 @@ public :
   //User defined functions are declared here
   void SetHstFileName(const char *HstFileName){ _HstFileName = HstFileName;}
   void SetSumFileName(const char *SumFileName){ _SumFileName = SumFileName;}
+  void SetTreeFileName(const char *TreeFileName){ _TreeFileName = TreeFileName;}
   void SetSample(int sample){_sample=sample;}
   void SetLep(int lep){_lep=lep;}
   void SetVerbose(int verbose){ _verbosity = verbose; }
@@ -430,7 +432,6 @@ public :
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
-
 
   void BookHistograms();
 
@@ -444,12 +445,101 @@ public :
   void createJets();
   void createGenLightLeptons();
   void EventSelection();
+
+  //For specific studies:
+  void MakeSignalPlots(float wt);
   TString ParticleName(int pdgid);
 
-  //for skimmer:
-  void SetSkimFileName(const char *SkimFileName){ _SkimFileName = SkimFileName;}
-  void ReadBranch();
-  void ActivateBranch(TTree *t);
+  //For tree-maker:
+  void FillTree(TTree *tree);
+  void AddAndCompressBranch(TBranch *br);
+  void InitializeBranches(TTree *tree);
+
+  //--------------------------------------------------------------------------
+  //Correction functions:
+  double LeptonIDSF(int id, float pt, float eta);;
+  double Electron2016SF(float pt, float eta);
+  double Electron2017SF(float pt, float eta);
+  double Electron2018SF(float pt, float eta);
+  double Muon2016SF(float pt, float eta);
+  double Muon2017SF(float pt, float eta);
+  double Muon2018SF(float pt, float eta);
+  double Tau2016SF(float pt, float eta);
+  double Tau2017SF(float pt, float eta);
+  double Tau2018SF(float pt, float eta);
+
+  //Electron Reco scale factors:
+  double Electron_2016UL_Reco_preVFP(float pt, float eta);
+  double Electron_2016UL_Reco_postVFP(float pt, float eta);
+  double Electron_2017UL_Reco(float pt, float eta);
+  double Electron_2018UL_Reco(float pt, float eta);
+  //Electron IDIso scale factors:
+  double Electron_2016UL_IDIso_preVFP(float pt, float eta);
+  double Electron_2016UL_IDIso_postVFP(float pt, float eta);
+  double Electron_2017UL_IDIso(float pt, float eta);
+  double Electron_2018UL_IDIso(float pt, float eta);
+
+  //Muon Reco scale factors:
+  double Muon_2016UL_Reco_preVFP(float pt, float eta);
+  double Muon_2016UL_Reco_postVFP(float pt, float eta);
+  double Muon_2017UL_Reco(float pt, float eta);
+  double Muon_2018UL_Reco(float pt, float eta);
+  //Muon ID scale factors:
+  double Muon_2016UL_ID_preVFP(float pt, float eta);
+  double Muon_2016UL_ID_postVFP(float pt, float eta);
+  double Muon_2017UL_ID(float pt, float eta);
+  double Muon_2018UL_ID(float pt, float eta);
+  //Muon Iso scale factors:
+  double Muon_2016UL_Iso_preVFP(float pt, float eta);
+  double Muon_2016UL_Iso_postVFP(float pt, float eta);
+  double Muon_2017UL_Iso(float pt, float eta);
+  double Muon_2018UL_Iso(float pt, float eta);
+
+  //Tau AntiJet scale factors:
+  double Tau_2016UL_AntiJet_preVFP(float pt);
+  double Tau_2016UL_AntiJet_postVFP(float pt);
+  double Tau_2017UL_AntiJet(float pt);
+  double Tau_2018UL_AntiJet(float pt);
+  //Tau AntiEle scale factors:
+  double Tau_2016UL_AntiEle_preVFP(float eta);
+  double Tau_2016UL_AntiEle_postVFP(float eta);
+  double Tau_2017UL_AntiEle(float eta);
+  double Tau_2018UL_AntiEle(float eta);
+  //Tau AntiMu scale factors:
+  double Tau_2016UL_AntiMu_preVFP(float eta);
+  double Tau_2016UL_AntiMu_postVFP(float eta);
+  double Tau_2017UL_AntiMu(float eta);
+  double Tau_2018UL_AntiMu(float eta);
+
+  //--------------------------------------------------------------------------
+  //Trigger efficiency:
+  float SingleLepTrigger_eff(int id, float pt, float eta);
+  //2016 combined
+  float TrigEff_2016_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2016_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2016_Ele27WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2016_Ele27WPTightGsf_Data(float pt, float eta);
+  //2016 preVFP
+  float TrigEff_2016preVFP_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2016preVFP_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2016preVFP_Ele27WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2016preVFP_Ele27WPTightGsf_Data(float pt, float eta);
+  //2016 postVFP
+  float TrigEff_2016postVFP_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2016postVFP_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2016postVFP_Ele27WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2016postVFP_Ele27WPTightGsf_Data(float pt, float eta);
+  //2017
+  float TrigEff_2017_IsoMu27_MC(float pt, float eta);
+  float TrigEff_2017_IsoMu27_Data(float pt, float eta);  
+  float TrigEff_2017_Ele32WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2017_Ele32WPTightGsf_Data(float pt, float eta);
+  //2018
+  float TrigEff_2018_IsoMu24_MC(float pt, float eta);
+  float TrigEff_2018_IsoMu24_Data(float pt, float eta);
+  float TrigEff_2018_Ele32WPTightGsf_MC(float pt, float eta);
+  float TrigEff_2018_Ele32WPTightGsf_Data(float pt, float eta);
+  //--------------------------------------------------------------------------
 
 public:
   struct Hists {
@@ -458,11 +548,12 @@ public:
     TH1F *evtweight[10];
     TH1F *hist[10];
     //Object level hists:
-    TH1F *mu[10];TH1F *ele[10];TH1F *llep[10];
+    TH1F *mu[10]; TH1F *ele[10]; TH1F *llep[10];
     TH1F *pho[10];TH1F *tau[10];
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
+    
   };
   struct Particle {
     TLorentzVector v;
@@ -494,8 +585,7 @@ private:
   const char *_HstFileName;
   const char *_SumFileName;
   int _verbosity,_exclude,_sample;
-  int nEvtTotal,nEvtRan,nEvtTrigger;
-  int _data, _lep, _year,_mcwt;
+  int _data, _lep, _year, _mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi,evwt,prob,evtwt,prob1,puppimetpt,puppimetphi;
   TString _era, _flag;
@@ -505,16 +595,48 @@ private:
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
   vector<Particle> LooseLepton; //Loose objects
 
+  //Counters:
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass;
+  int n2l, n2l_2e0mu, n2l_1e1mu, n2l_0e2mu;
+  int n3l, n3l_3e0mu, n3l_2e1mu, n3l_1e2mu, n3l_0e3mu;
+  int n4l;
+
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
 
   time_t start, end;
 
-  //for skimmer
-  const char *_SkimFileName;
-  int nEvtSkim;
-  TTree *tree,*skimTree;
-  TFile *_SkimFile;
+  //For treemaker:
+  const char *_TreeFileName;
+  TFile *_TreeFile;
+  TTree *mytree;
+
+  //The variables to be put in the root files are global.
+  //They should be decalred here.
+  UInt_t  nlep;  //[0,20<,UInt5_t>]
+  UInt_t  njet;  //[0,20<,UInt5_t>]
+  UInt_t  nbjet;  //[0,20<,UInt5_t>]
+  Float_t lep0_pt;  //[0,1500<,Float32_t>]
+  Float_t lep0_eta;  //[-6,6<,Float32_t>]
+  Float_t lep0_phi;  //[-6,6<,Float32_t>]
+  Float_t lep0_mt;  //[0,1500<,Float32_t>]
+  Float_t lep1_pt;  //[0,1500<,Float32_t>]
+  Float_t lep1_eta;  //[-6,6<,Float32_t>]
+  Float_t lep1_phi;  //[-6,6<,Float32_t>]
+  Float_t lep1_mt;  //[0,1500<,Float32_t>]
+  Float_t ll_pt;  //[0,1500<,Float32_t>]
+  Float_t ll_mass;  //[0,1500<,Float32_t>]
+  Float_t ll_deta;  //[0,6<,Float32_t>]
+  Float_t ll_dphi;  //[0,6<,Float32_t>]
+  Float_t ll_dR;  //[0,6<,Float32_t>]
+  Float_t ptratio;  //[0,1<,Float32_t>]
+  Float_t HT;  //[0,1500<,Float32_t>]
+  Float_t ST;  //[0,1500<,Float32_t>]
+  Float_t STfrac;  //[0,1<,Float32_t>]
+  Float_t dphi_metlep0;  //[0,6<,Float32_t>]
+  Float_t dphi_metlep1;  //[0,6<,Float32_t>]
+  Float_t dphi_metlep_max;  //[0,6<,Float32_t>]
+  Float_t dphi_metlep_min;  //[0,6<,Float32_t>]  
 
   ClassDef(AnaScript,0);
 
@@ -538,9 +660,16 @@ void AnaScript::Init(TTree *tree)
   else if(_data == 1)         //If the input file is data, activate fReader_Data
     fReader_Data .SetTree(tree);
 
-  //for skimmer
-  _SkimFile = new TFile(_SkimFileName,"recreate");
-  skimTree = tree->CloneTree(0);
+  //for treemaker
+  _TreeFile = new TFile(_TreeFileName, "RECREATE");
+  _TreeFile->SetCompressionAlgorithm(2);
+  _TreeFile->SetCompressionLevel(9);
+  _TreeFile->SetCompressionSettings(209);
+  
+  mytree = new TTree("myEvents", "myEvents");
+  InitializeBranches(mytree);
+
+  
 }
 
 Bool_t AnaScript::Notify()

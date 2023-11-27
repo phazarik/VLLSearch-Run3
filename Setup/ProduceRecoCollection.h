@@ -17,15 +17,17 @@ void AnaScript::createLightLeptons(){
 
     
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4; 
-    //Loose cuts on muons:
-    bool passcut_loosemuon = ptetacut && Muon_pfRelIso04_all[i]<0.30 && Muon_looseId[i];
-    //Medium cuts on muons:
     bool promptmuon = fabs(Muon_dxy[i])<0.05 && fabs(Muon_dz[i])<0.1;
-    bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i];
+    //bool passcut_loosemuon = ptetacut && Muon_pfRelIso04_all[i]<0.30 && Muon_looseId[i];
+    bool passcut_loosemuon = ptetacut && promptmuon && Muon_looseId[i] && Muon_pfRelIso03_all[i]<0.30;
+    bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i] && Muon_pfRelIso03_all[i]<0.15;
 
     if(passcut_mediummuon){
       Muon.push_back(temp);
       LightLepton.push_back(temp);
+    }
+    else if(passcut_loosemuon){
+      LooseLepton.push_back(temp);
     }
   }//for muons
 
@@ -50,12 +52,15 @@ void AnaScript::createLightLeptons(){
 	isprompt = true;
     }
     bool passcut_looseele = ptetacut && Electron_cutBased[i]>1;
-    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons;
+    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 0.15;
 
     if(passcut_mediumele){
       Electron.push_back(temp);
       LightLepton.push_back(temp);
-    }   
+    }
+    else if(passcut_looseele){
+      LooseLepton.push_back(temp);
+    }
   }//For electrons
   
 } 
@@ -125,8 +130,8 @@ void AnaScript::createJets(){
     temp.v.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
     temp.ind = i;
 
-    bool ptetacut = temp.v.Pt()>20 && fabs(temp.v.Eta())<2.4;
-    bool cleaned_from_leptons = clean_from_array(temp, LightLepton, 0.5);
+    bool ptetacut = temp.v.Pt()>30 && fabs(temp.v.Eta())<2.4;
+    bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.5);
     bool cleaned_from_taus = clean_from_array(temp, Tau, 0.5);
     bool jetID = _year == 2016 ? Jet_jetId[i]>=1 : Jet_jetId[i]>=2; //if 2016, >=1; else >=2
     bool passcut = ptetacut && cleaned_from_leptons && cleaned_from_taus && jetID;

@@ -4,7 +4,6 @@
 // For taus : antiEle, antiMu and antiJet
 // For electrons, ID and Iso are together.
 // Final SF = product of the different types of ScaleFactors.
-// Sources : ScaleFactors_2016UL.h 
 //#####################################################################################################
 
 //Main:
