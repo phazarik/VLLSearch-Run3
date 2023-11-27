@@ -30,7 +30,7 @@ void AnaScript::Begin(TTree * /*tree*/)
   TString option = GetOption();
 }
 
-void AnaScript::SlaveBegin(TTree * /*tree*/)
+void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 {
   time(&start);
 
@@ -46,7 +46,8 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n4l=0;
 
   //_HstFile = new TFile(_HstFileName,"recreate");
-  _TreeFile = new TFile(_TreeFileName,"recreate");
+  // _TreeFile = new TFile(_TreeFileName, "RECREATE", "", 1);
+  //_TreeFile->SetCompressionSettings("lz4");
 
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
@@ -113,12 +114,13 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   //Verbosity determines the number of processed events after which
   //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
+  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
 
   nEvtTotal++;
-  h.nevt->Fill(0);
+  //h.nevt->Fill(0);
 
+  /*
   //Let's plot some flags/triiger which are used later.
   h.hist[0]->Fill(*Flag_goodVertices);
   h.hist[1]->Fill(*Flag_globalSuperTightHalo2016Filter);
@@ -128,7 +130,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   h.hist[5]->Fill(*HLT_IsoMu24);
   h.hist[6]->Fill(*HLT_IsoMu27);
   h.hist[7]->Fill(*HLT_Ele27_WPTight_Gsf);
-  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);
+  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);*/
   
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2017 = (_year==2017 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -138,7 +140,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
   if(GoodEvt){
     nEvtRan++; //only good events
-    h.nevt->Fill(1);
+    //h.nevt->Fill(1);
 
     triggerRes=true; //Always true for MC
 
@@ -158,7 +160,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events
-      h.nevt->Fill(2);
+      //h.nevt->Fill(2);
 
       //###################
       //Gen particle block
@@ -205,6 +207,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       SortPt(Jet);
       SortPt(bJet);
 
+      /*
       //Basic object-level plots:
       //ELectrons
       h.ele[0]->Fill((int)Electron.size());
@@ -250,7 +253,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evtwt);
 	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evtwt);
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
-      }
+	}*/
 
       //_______________________________________________________________________________________________________
       
@@ -314,8 +317,12 @@ Bool_t AnaScript::Process(Long64_t entry)
 
 	if(evt_2LSS){
 	  
-	  FillTree(mytree);
-
+	  //UInt_t nlep;
+	  //nlep = (UInt_t)LightLepton.size();
+	  //mytree->Branch("nlep", &nlep);
+	  
+	  FillTree(mytree);	  
+	  mytree->Fill();
 	}
 
       }  

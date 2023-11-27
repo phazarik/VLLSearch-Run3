@@ -27,6 +27,7 @@
 #include "TString.h"
 #include <bitset>
 #include <time.h>
+//#include <RtypesCore.h>
 
 
 class AnaScript : public TSelector {
@@ -451,6 +452,7 @@ public :
 
   //For tree-maker:
   void FillTree(TTree *tree);
+  void AddAndCompressBranch(TBranch *br);
 
   //--------------------------------------------------------------------------
   //Correction functions:
@@ -605,7 +607,9 @@ private:
 
   time_t start, end;
 
-  TTree *mytree = new TTree("Events", "Events");
+  //For treemaker:
+  //TTree *mytree = new TTree("Events", "Events");
+  TTree *mytree;
 
   ClassDef(AnaScript,0);
 
@@ -630,7 +634,15 @@ void AnaScript::Init(TTree *tree)
     fReader_Data .SetTree(tree);
 
   //for treemaker
-  //_TreeFile = new TFile(_TreeFileName,"recreate");
+  _TreeFile = new TFile(_TreeFileName, "RECREATE");
+  _TreeFile->SetCompressionAlgorithm(2);
+  _TreeFile->SetCompressionLevel(9);
+  _TreeFile->SetCompressionSettings(209);
+  
+  mytree = new TTree("myEvents", "myEvents");
+  //mytree = tree->CloneTree(0);
+  //mytree->SetBranchStatus("*", 0);
+
   
 }
 
