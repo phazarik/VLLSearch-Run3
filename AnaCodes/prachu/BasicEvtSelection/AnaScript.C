@@ -46,7 +46,6 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n4l=0;
 
   _HstFile = new TFile(_HstFileName,"recreate");
-  //Call the function to book the histograms we declared in Hists.
   BookHistograms();
 
   if(_flag=="doublet") cout<<"Removing invalid VLLD decay modes ..."<<endl;
@@ -108,8 +107,8 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   //Verbosity determines the number of processed events after which
   //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
+  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
 
   nEvtTotal++;
   h.nevt->Fill(0);
@@ -299,17 +298,17 @@ Bool_t AnaScript::Process(Long64_t entry)
 
 
       //Event selection:
-      if(true){
+      EventSelection();
+      
+      if(evt_2LSS){
 	nEvtPass++;
-	h.nevt->Fill(3);
-
-	EventSelection();
-
+	h.nevt->Fill(3);	
+	
 	if(_data==0){	  
 	  MakeSignalPlots(1.0);
 	}
       }  
-
+      
       
     }//TriggeredEvts
   }//GoodEvt

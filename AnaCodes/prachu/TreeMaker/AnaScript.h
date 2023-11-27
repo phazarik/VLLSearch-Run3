@@ -453,6 +453,7 @@ public :
   //For tree-maker:
   void FillTree(TTree *tree);
   void AddAndCompressBranch(TBranch *br);
+  void InitializeBranches(TTree *tree);
 
   //--------------------------------------------------------------------------
   //Correction functions:
@@ -552,7 +553,6 @@ public:
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
-    //Production modes and final states:
     
   };
   struct Particle {
@@ -581,10 +581,9 @@ protected:
 
 private:
   //Global variables go here. Make them global only if necessary.
-  TFile *_HstFile, *_TreeFile;
+  TFile *_HstFile;
   const char *_HstFileName;
   const char *_SumFileName;
-  const char *_TreeFileName;
   int _verbosity,_exclude,_sample;
   int _data, _lep, _year, _mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
@@ -608,8 +607,12 @@ private:
   time_t start, end;
 
   //For treemaker:
-  void InitializeBranches(TTree *tree);
+  const char *_TreeFileName;
+  TFile *_TreeFile;
   TTree *mytree;
+
+  //The variables to be put in the root files are global.
+  //They should be decalred here.
   UInt_t  nlep;  //[0,20<,UInt5_t>]
   UInt_t  njet;  //[0,20<,UInt5_t>]
   UInt_t  nbjet;  //[0,20<,UInt5_t>]
@@ -665,9 +668,6 @@ void AnaScript::Init(TTree *tree)
   
   mytree = new TTree("myEvents", "myEvents");
   InitializeBranches(mytree);
-  //mytree->Branch("nlep",&nlep);
-  //mytree = tree->CloneTree(0);
-  //mytree->SetBranchStatus("*", 0);
 
   
 }

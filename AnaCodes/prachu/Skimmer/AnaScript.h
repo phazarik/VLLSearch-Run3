@@ -429,6 +429,8 @@ public :
   void SetYear(int year){_year = year;}
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
+  void SetFlag(TString flag){_flag=flag;}
+
 
   void BookHistograms();
 
@@ -441,6 +443,8 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void EventSelection();
+  TString ParticleName(int pdgid);
 
   //for skimmer:
   void SetSkimFileName(const char *SkimFileName){ _SkimFileName = SkimFileName;}
@@ -451,11 +455,14 @@ public:
   struct Hists {
     //Histograms are declared here.
     TH1F *nevt;
+    TH1F *evtweight[10];
     TH1F *hist[10];
     //Object level hists:
     TH1F *mu[10];TH1F *ele[10];TH1F *llep[10];
     TH1F *pho[10];TH1F *tau[10];
     TH1F *jet[10];TH1F *bjet[10];
+    //For spcific studies:
+    TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
   };
   struct Particle {
     TLorentzVector v;
@@ -469,6 +476,9 @@ public:
     float sip3d;
     float reliso03;
     float reliso04;
+    vector<int> dauind; //indices of the daughters (GenPart only)
+    vector<int> dauid; //pdgid of the daughters (GenPart only)
+    int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
   };
 
   //Functions that involve the 'Particle' type objects:
@@ -488,10 +498,15 @@ private:
   int _data, _lep, _year,_mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi,evwt,prob,evtwt,prob1,puppimetpt,puppimetphi;
-  TString _era;
+  TString _era, _flag;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
+  vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
+  vector<Particle> LooseLepton; //Loose objects
+
+  //FinalStates:
+  bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
 
   time_t start, end;
 

@@ -45,10 +45,6 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
   n3l=0; n3l_3e0mu=0; n3l_2e1mu=0; n3l_1e2mu=0; n3l_0e3mu=0;
   n4l=0;
 
-  //_HstFile = new TFile(_HstFileName,"recreate");
-  // _TreeFile = new TFile(_TreeFileName, "RECREATE", "", 1);
-  //_TreeFile->SetCompressionSettings("lz4");
-
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
   

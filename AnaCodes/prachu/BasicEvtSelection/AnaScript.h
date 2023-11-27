@@ -546,7 +546,6 @@ public:
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
-    //Production modes and final states:
     
   };
   struct Particle {
