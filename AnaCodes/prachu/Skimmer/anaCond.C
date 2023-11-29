@@ -1,15 +1,20 @@
 //#########################################################################################################
-//Instead of the regular ana.C, this anaCond.C is sent to the condor job.
-//It requires the arguments like input and output filenames and some other parameters.
-//This driver script is run using runana.C, which uses gROOT to run this from outside the root terminal.
+// Instead of the regular ana.C, this anaCond.C is sent to the condor job.
+// It still requires the library to be loaded by doing .L *.so beforehand.
+// It takes input and output filenames and some other parameters as arguments.
+// This driver script is run using runana.C, which uses gROOT to run this from outside the root terminal.
 //#########################################################################################################
+
+//Execution line : .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test.root", "0", "2018", "mu", "flag")
+//OR
+// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet")
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
 //#include <boost/lexical_cast.hpp>// for lexical_cast()
 
-void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep)
+void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag)
 {
   //Description of the parameters:
   //1. ifname : Input file name with full path.
@@ -19,7 +24,7 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   //5. lep    : If muon dataset, lep=1, if electron dataset, lep=0
 
   gROOT->Time();
-  const char *hstfilename;
+  const char *skimfilename;
   TChain *chain = new TChain("Events");
   AnaScript m_selec;
 
@@ -30,10 +35,10 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   if(!manual) input += "/*.root"; //This makes sure that the input filenames always end with .root
   chain->Add(input);
   
-  hstfilename = ofname;  
+  skimfilename = ofname;  
 
   //SetHstFileName:
-  m_selec.SetHstFileName(hstfilename);
+  m_selec.SetSkimFileName(skimfilename);
 
   //SetVerbose:
   m_selec.SetVerbose(1);
@@ -55,6 +60,9 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   m_selec.SetLep(1);
   if(lep=="el") m_selec.SetLep(0);
   if(lep=="mu") m_selec.SetLep(1);
+
+  //Set the additional flag:
+  m_selec.SetFlag(flag);
   
   chain->Process(&m_selec);
   gROOT->Time();
