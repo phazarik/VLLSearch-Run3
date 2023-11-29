@@ -28,10 +28,16 @@ debug  = args.debug #for debugging the condor-script
 #Global parameters:
 year = 2018
 process_signal = True
-skim = False
 condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-script = "/home/work/phazarik1/work/Analysis-Run3/CondorSetup/runana.C"
+
+mode = "skim" #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+codedir = None
+if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection"
+elif mode == "skim" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer"
+elif mode == "tree" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker"
+else : print("Error while selecting mode! Options: 'hist', 'skim', 'tree'.")
+#Note: You can manually set the code directory here.
 
 #_____________________________________________________________
 #
@@ -75,7 +81,7 @@ for item in condorsamples:
                 if sample.startswith('VLLD') : flag = 'doublet'
                 if samplegroup == 'EGamma' : lep  = 'el'
 
-                arguments = f'{jobname} {indir} {dumpdir} {sample} {data} {year} {lep} {flag} {script} {skim} {debug}'
+                arguments = f'{jobname} {indir} {dumpdir} {sample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
                 processline = 'python3 createCondorJob.py '+arguments
 
                 if dryrun == True : print(processline)

@@ -23,8 +23,8 @@ data       = sys.argv[5] # "0" = mC, "1" = data
 year       = sys.argv[6]
 lep        = sys.argv[7] #"el" = electron dataset, "mu" = muon dataset
 flag       = sys.argv[8] # customizable string flag
-scriptname = sys.argv[9]
-skim_str   = sys.argv[10]
+codedir    = sys.argv[9]
+mode       = sys.argv[10]
 debug_str  = sys.argv[11]
 #For the old setup:
 #era = 'Z'
@@ -35,20 +35,22 @@ debug_str  = sys.argv[11]
 #                     DO NOT TOUCH BELOW
 #_____________________________________________________________
 
+scriptname = "/home/work/phazarik1/work/Analysis-Run3/CondorSetup/runana.C"
+
 if debug_str == "True" :   debug = True
 elif debug_str == "False": debug = False
 else : print("Error: Give correct argument to the debug string!")
 
-if skim_str == "True" :   skim = True
-elif skim_str == "False": skim = False
-else : print("Error: Give correct argument to the debug string!")
+libdir = None
+outputtag = None
+if   mode == "hist": outputtag = 'hst'
+elif mode == "skim": outputtag = 'skim'
+elif mode == "tree": outputtag = 'tree'
+else : print("Error while selecting mode! Options: 'hist', 'skim', 'tree'.")
 
 if debug == True : print('going in the createCondorJob.py script ...')
-print('debug mode = '+str(debug))
-print('skim mode = '+str(skim))
-
-outputtag = 'hst'
-if skim : outputtag = 'skim'
+print('debug = '+str(debug))
+print('mode = '+mode)
 
 #Setting output directories:
 INDIR = samplepath
@@ -78,8 +80,8 @@ runScript=SCRIPTDIR+"/runJobsCondor_simulation.sh"
 os.system("touch "+runScript)
 os.system("chmod a+x "+runScript)
 
-arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\"\)' #raw string
-#arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #for the old setup
+#arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\"\)' #raw string
+arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #with codedir
 processline = 'root -q -b -l '+scriptname+arguments
 
 list_of_instructions=[
@@ -92,6 +94,7 @@ list_of_instructions=[
     "eval `scramv1 runtime -sh`",
     processline
 ]
+
 with open(runScript, 'w') as file:
     for string in list_of_instructions:
         file.write(string + '\n')
@@ -133,14 +136,15 @@ for filename in input_files:
         if debug == True :
             print('file no : '+str(filecount))
             print('Input = '+INDIR+'/'+filename)
-            print('Output = '+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root\n")
+            print('Output = '+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root")
+            print('Code = '+codedir+"\n")
 
         #The following list (for each file) needs to be added to the condor file. 
         info_for_each_file = [
             "output = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
             "error = "+LOGDIR+"//$(Cluster)_data_"+filename+".err",
             "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
-            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag),
+            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag)+" "+codedir,
             #"arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(era)+" "+str(mc),#for the old setup
             "queue",
             ""
@@ -166,7 +170,8 @@ main_processline = "condor_submit "+condorfile
 print("\n______"+samplename+"______")
 print("Input directory : "+INDIR)
 print("Output directory: "+OUTDIR)
-print("Script :"+scriptname)
+print("Code directory: "+codedir)
+print("runana Script :"+scriptname)
 
 if debug == True : print('main processline = '+main_processline)
 elif debug == False : os.system("eval "+main_processline)

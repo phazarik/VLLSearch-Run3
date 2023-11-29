@@ -24,7 +24,7 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   //5. lep    : If muon dataset, lep=1, if electron dataset, lep=0
 
   gROOT->Time();
-  const char *hstfilename;
+  const char *treefilename;
   TChain *chain = new TChain("Events");
   AnaScript m_selec;
 
@@ -35,10 +35,10 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   if(!manual) input += "/*.root"; //This makes sure that the input filenames always end with .root
   chain->Add(input);
   
-  hstfilename = ofname;  
+  treefilename = ofname;  
 
   //SetHstFileName:
-  m_selec.SetHstFileName(hstfilename);
+  m_selec.SetTreeFileName(treefilename);
 
   //SetVerbose:
   m_selec.SetVerbose(1);

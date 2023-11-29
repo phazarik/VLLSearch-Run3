@@ -10,20 +10,20 @@
 using namespace std;
 
 //Including the header files:
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/BookHistograms.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection/BookHistograms.h"
+
+//DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/EventSelection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
-//Corrections:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
-//Sepcific studies:
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -303,11 +303,11 @@ Bool_t AnaScript::Process(Long64_t entry)
       if(evt_2LSS){
 	nEvtPass++;
 	h.nevt->Fill(3);	
-	
-	if(_data==0){	  
-	  MakeSignalPlots(1.0);
-	}
-      }  
+      }
+
+      if(_data==0){	  
+	MakeSignalPlots(1.0);
+      }
       
       
     }//TriggeredEvts

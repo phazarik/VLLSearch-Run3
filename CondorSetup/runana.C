@@ -6,10 +6,7 @@
 // While anaCond.C sits at the directory where the library is, runana.C can sit anywhere.
 //##############################################################################################
 
-//test command:
-//.x runana.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "/home/work/phazarik1/work/General-Analysis-template/AnaCodes/BasicEvtSelection/test_outputs/hst_dy_runana.root", "0", "2018", "1", "flag")
-
-//.x runana.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection/test_outputs/test_runana.root", "0", "2018", "1", "doublet")
+//.x runana.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection/test_outputs/test_runana.root", "0", "2018", "1", "doublet", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection")
 
 // I will add more parameters, if needed later.
 
@@ -18,17 +15,17 @@
 #include <TFile.h>
 #include <TString.h>
 
-void runana(TString ifname="input_file" , TString ofname="outputfile" , TString data="data", TString year="year", TString lep="lep", TString flag="flag"){
+void runana(TString ifname, TString ofname, TString data, TString year, TString lep, TString flag, TString codedir){
 
-  TString path_to_anaCond ="/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection";
+  //#######################
+  // DO NOT TOUCH ANYTHING
+  //#######################
+
+  TString path_to_anaCond = codedir;
   TString path_to_library =path_to_anaCond;
-
-  //TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\")";
-  TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\")"; //This is the line that is being executed. 
-
-  //cout<<"executing the following command:"<<endl;
-  //cout<<anastring<<endl;
-  
+  TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\")"; //This is the line that is being executed.   
   gSystem->Load(path_to_library+"/AnaScript_C.so");
   gROOT->ProcessLine(anastring);
+  std::cout<<"Output file: "<<ofname<<endl;
+
 }
