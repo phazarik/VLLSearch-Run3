@@ -444,6 +444,9 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void SortRecoObjects();
+  void SortGenObjects();
+  void SortVLL();
   void EventSelection();
 
   //For specific studies:
@@ -613,30 +616,33 @@ private:
 
   //The variables to be put in the root files are global.
   //They should be decalred here.
-  UInt_t  nlep;  //[0,20<,UInt5_t>]
-  UInt_t  njet;  //[0,20<,UInt5_t>]
-  UInt_t  nbjet;  //[0,20<,UInt5_t>]
-  Float_t lep0_pt;  //[0,1500<,Float32_t>]
-  Float_t lep0_eta;  //[-6,6<,Float32_t>]
-  Float_t lep0_phi;  //[-6,6<,Float32_t>]
-  Float_t lep0_mt;  //[0,1500<,Float32_t>]
-  Float_t lep1_pt;  //[0,1500<,Float32_t>]
-  Float_t lep1_eta;  //[-6,6<,Float32_t>]
-  Float_t lep1_phi;  //[-6,6<,Float32_t>]
-  Float_t lep1_mt;  //[0,1500<,Float32_t>]
-  Float_t ll_pt;  //[0,1500<,Float32_t>]
-  Float_t ll_mass;  //[0,1500<,Float32_t>]
-  Float_t ll_deta;  //[0,6<,Float32_t>]
-  Float_t ll_dphi;  //[0,6<,Float32_t>]
-  Float_t ll_dR;  //[0,6<,Float32_t>]
-  Float_t ptratio;  //[0,1<,Float32_t>]
-  Float_t HT;  //[0,1500<,Float32_t>]
-  Float_t ST;  //[0,1500<,Float32_t>]
-  Float_t STfrac;  //[0,1<,Float32_t>]
-  Float_t dphi_metlep0;  //[0,6<,Float32_t>]
-  Float_t dphi_metlep1;  //[0,6<,Float32_t>]
-  Float_t dphi_metlep_max;  //[0,6<,Float32_t>]
-  Float_t dphi_metlep_min;  //[0,6<,Float32_t>]  
+  UInt_t  nlep;
+  UInt_t  njet;
+  UInt_t  nbjet;
+  Float_t lep0_pt;
+  Float_t lep0_eta;
+  Float_t lep0_phi;
+  Float_t lep0_mt;
+  Float_t lep1_pt;
+  Float_t lep1_eta;
+  Float_t lep1_phi;
+  Float_t lep1_mt;
+  Float_t dilep_pt;
+  Float_t dilep_eta;
+  Float_t dilep_phi;
+  Float_t dilep_mass;
+  Float_t dilep_mt;
+  Float_t ll_deta;
+  Float_t ll_dphi;
+  Float_t ll_dR;
+  Float_t ll_ptratio;
+  Float_t HT;
+  Float_t ST;
+  Float_t STfrac;
+  Float_t dphi_metlep0;
+  Float_t dphi_metlep1;
+  Float_t dphi_metlep_max;
+  Float_t dphi_metlep_min;
 
   ClassDef(AnaScript,0);
 

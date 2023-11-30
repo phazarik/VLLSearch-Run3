@@ -442,6 +442,9 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void SortRecoObjects();
+  void SortGenObjects();
+  void SortVLL();
   void EventSelection();
   TString ParticleName(int pdgid);
 

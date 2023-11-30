@@ -87,8 +87,9 @@ void AnaScript::MakeSignalPlots(float wt){
     }
   }
 
-  SortPt(vllep);
-  SortPt(vlnu);
+  //SortPt(vllep);
+  //SortPt(vlnu);
+  SortVLL();
   
   //---------------------------------------------------
   //Counting daughters:
