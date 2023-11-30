@@ -151,9 +151,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       /*
       if(_data==0){
 	createGenLightLeptons();
-	SortPt(genMuon);
-	SortPt(genElectron);
-	SortPt(genLightLepton);
+	SortGenObjects();
 	//Make gen-level plots here.
 	}*/
 
@@ -178,13 +176,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       createTaus();
       createJets();
 
-      SortPt(Muon);
-      SortPt(Electron);
-      SortPt(LightLepton);
-      SortPt(Photon);
-      SortPt(Tau);
-      SortPt(Jet);
-      SortPt(bJet);
+      SortRecoObjects();
 
       /*
       //Basic object-level plots:
