@@ -90,28 +90,7 @@ void AnaScript::MakeSignalPlots(float wt){
   //SortPt(vllep);
   //SortPt(vlnu);
   SortVLL();
-  
-  //---------------------------------------------------
-  //Counting daughters:
 
-  if(nEvtTotal == test_event){
-    cout<<"nVLL = "<<(int)vllep.size()<<endl;
-    if((int)vllep.size()>0){
-      cout<<"Daughters of the leading VLL = ";
-      for(int i=0; i<(int)vllep.at(0).dauid.size(); i++){
-	cout<<ParticleName(vllep.at(0).dauid[i])<<", ";
-      }
-      cout<<endl;
-    }
-    cout<<"nVNu = "<<(int)vlnu.size()<<endl;
-    if((int)vlnu.size()>0){
-      cout<<"Daughters of the leading VLNu = ";
-      for(int i=0; i<(int)vlnu.at(0).dauid.size(); i++){
-	cout<<ParticleName(vlnu.at(0).dauid[i])<<", ";
-      }
-      cout<<endl;
-    }
-  }
 
   //###################################################
   //Flag out the invalid decay modes:
@@ -143,8 +122,48 @@ void AnaScript::MakeSignalPlots(float wt){
   //The singlet models are fine.
   //###################################################
 
+  int nvll = (int)vllep.size();
+  int nvlnu = (int)vlnu.size();
+  bool pair_production_L = false;
+  bool pair_production_N = false;
+  bool associated_production = false;
+  if(nvll==2 && nvlnu == 0 && !bad_event)      pair_production_L = true;
+  else if(nvll==1 && nvlnu == 1 && !bad_event) associated_production = true;
+  else if(nvll==0 && nvlnu == 2 && !bad_event) pair_production_N = true;
+
   //Basic plots for Vector like lepton:
   if(!bad_event){
+    
+    //---------------------------------------------------
+    //Counting daughters: Let's print-out the daughters first:
+    
+    if(nEvtTotal == test_event){
+      cout<<"nVLL = " <<nvll <<endl;
+      cout<<"nVLnu = "<<nvlnu<<endl;
+      if(pair_production_L){
+	cout<<"This is an LL type event."<<endl;
+	cout<<"Daughters of the leading VLL = ";
+	for(int i=0; i<(int)vllep.at(0).dauid.size(); i++) cout<<ParticleName(vllep.at(0).dauid[i])<<", "; cout<<endl;
+	cout<<"Daughters of the sub-leading VLL = ";
+	for(int i=0; i<(int)vllep.at(1).dauid.size(); i++) cout<<ParticleName(vllep.at(1).dauid[i])<<", "; cout<<endl;
+      }
+      else if(associated_production){
+	cout<<"This is an LN type event."<<endl;
+	cout<<"Daughters of the lepton = ";
+	for(int i=0; i<(int)vllep.at(0).dauid.size(); i++) cout<<ParticleName(vllep.at(0).dauid[i])<<", "; cout<<endl;
+	cout<<"Daughters of the neutrino = ";
+	for(int i=0; i<(int)vlnu.at(0).dauid.size(); i++) cout<<ParticleName(vlnu.at(0).dauid[i])<<", "; cout<<endl;
+      }
+      else if(associated_production){
+	cout<<"This is an MM type event."<<endl;
+	cout<<"Daughters of the leading N = ";
+	for(int i=0; i<(int)vlnu.at(0).dauid.size(); i++) cout<<ParticleName(vlnu.at(0).dauid[i])<<", "; cout<<endl;
+	cout<<"Daughters of the sub-leading N = ";
+	for(int i=0; i<(int)vlnu.at(1).dauid.size(); i++) cout<<ParticleName(vlnu.at(1).dauid[i])<<", "; cout<<endl;
+      }
+      cout<<"--------------------------------------------------\n"<<endl;
+    }//for a specific event.
+    
     h.vll[0]->Fill((int)vllep.size());
     for(int i=0; i<(int)vllep.size(); i++){
       h.vll[1]->Fill( vllep.at(i).v.Pt(),  wt);
@@ -176,14 +195,6 @@ void AnaScript::MakeSignalPlots(float wt){
   //---------------------------------------
   // Investigating the feynman diagrams
   //---------------------------------------
-  int nvll = (int)vllep.size();
-  int nvlnu = (int)vlnu.size();
-  bool pair_production_L = false;
-  bool pair_production_N = false;
-  bool associated_production = false;
-  if(nvll==2 && nvlnu == 0 && !bad_event)      pair_production_L = true;
-  else if(nvll==1 && nvlnu == 1 && !bad_event) associated_production = true;
-  else if(nvll==0 && nvlnu == 2 && !bad_event) pair_production_N = true;
 
   if(pair_production_L){
     h.sig[1]                       ->Fill((int)0, wt); //All events

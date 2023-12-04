@@ -27,11 +27,14 @@ debug  = args.debug #for debugging the condor-script
 
 #Global parameters:
 year = 2018
-process_signal = True
-condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
+process_signal = False
+#condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
+#condorsamples = ["DYJetsToLL", "SingleMuon", "TTW_TTWToLNu"]
+condorsamples = ["SingleMuon", "DYJetsToLL", "QCD_MuEnriched", "TTW"]
+
 dumpdir = "/home/work/phazarik1/work/CondorDump"
 
-mode = "skim" #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+mode = "hist" #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
 codedir = None
 if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection"
 elif mode == "skim" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer"
@@ -50,6 +53,8 @@ if dryrun == False: os.system('mkdir -p '+dumpdir)
 list_processed=[]
 
 if process_signal == True : jsonfile = '../InputJsons/signal_2018.json'
+else : jsonfile = '../InputJsons/all_2018.json'
+
 with open(jsonfile,'r') as infile:
     samplelist = json.load(infile)
 

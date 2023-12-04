@@ -129,14 +129,24 @@ for filename in input_files:
     if filename.endswith(".root"):
         filecount+=1
 
-        #For signal files:
-        if INDIR.split("/")[-1].startswith('VLL'):
-            ofile = outputtag+"_"+INDIR.split("/")[-1]+"_"+str(filecount)+".root"
+        #I am picking the output file name from the directory in which they are kept.
+        out_samplename = INDIR.split("/")[-2]
+        out_subsamplename = INDIR.split("/")[-1]
+
+        #Naming Scheme:
+        #outputtag_sample_subsample_filecount.root.
+        #Example: hst_SingleMuon_SingleMuonA_1.root
+        
+        #Exceptions: (removing extra "_" from the output names)
+        out_samplename = out_samplename.replace("_", "")
+        out_subsamplename = out_subsamplename.replace("_", "")
+        
+        ofile = outputtag+"_"+out_samplename+"_"+out_subsamplename+"_"+str(filecount)+".root"
 
         if debug == True :
             print('file no : '+str(filecount))
             print('Input = '+INDIR+'/'+filename)
-            print('Output = '+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root")
+            print('Output = '+OUTDIR+"//$(Cluster)_"+ofile)
             print('Code = '+codedir+"\n")
 
         #The following list (for each file) needs to be added to the condor file. 
