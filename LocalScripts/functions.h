@@ -80,8 +80,8 @@ vector<database> read_plots(vector<database>inputs, TString plotname){
     //cout<<filename<<endl;
     TFile *tfile = new TFile(filename);
     TH1F *histogram = (TH1F *)tfile->Get(plotname);
-    if(histogram == nullptr) cout<<"Histogram not found for "+inputs[i].model+"_"+inputs[i].flavor+"_M"+inputs[i].mass+".root";
-    else{
+    //if(histogram == nullptr) cout<<"Histogram not found for "+inputs[i].model+"_"+inputs[i].flavor+"_M"+inputs[i].mass+".root -- ";
+    if(histogram != nullptr){
       temp.model  = inputs[i].model;
       temp.flavor = inputs[i].flavor;
       temp.mass   = inputs[i].mass;
@@ -93,9 +93,19 @@ vector<database> read_plots(vector<database>inputs, TString plotname){
   return hists;
 }
 
+TCanvas *create_canvas(TString plotname){
+  TCanvas *c1 = new TCanvas(plotname,plotname,800,600);
+  c1->SetGrid();
+  c1->SetFrameLineWidth(2);
+  //c1->SetTopMargin(0.05);
+  c1->SetBottomMargin(0.12);
+  c1->SetLeftMargin(0.12);
+  c1->SetRightMargin(0.15);
+  return c1;
+}
+
 TLegend *create_legend(){
-  //TLegend *lg1 = new TLegend(0.85, 0.45, 0.75,0.86);
-  TLegend *lg1 = new TLegend(0.78, 0.40, 0.95, 0.88);
+  TLegend *lg1 = new TLegend(0.87, 0.45, 0.95, 0.90);
   lg1->SetTextFont(62);		
   lg1->SetFillStyle(0);
   lg1->SetBorderSize(0);
@@ -103,34 +113,28 @@ TLegend *create_legend(){
   return lg1;
 }
 
-void SetHistoStyle(TH1F *h, TString plotname, TString plottitle, int color){
+void SetHistoStyle(TH1F *h, TString xtitle, TString plottitle, int color){
   h->SetLineColor(color);
   h->SetLineWidth(2);
   h->SetMarkerStyle(20);
   h->SetMarkerSize(1.2);
-  h->SetTitle(plottitle);
-
+  h->SetTitle("");
   //Y-axis
+  //h->GetYaxis()->SetRangeUser(0, 1); //This is overruled by the tallest hist.
   h->GetYaxis()->SetTitle("Events (normalized)");
-  h->GetYaxis()->SetTitleFont(43);
-  h->GetYaxis()->SetTitleSize(18);
-  h->GetYaxis()->SetTitleOffset(1.7);
-  h->GetYaxis()->SetLabelFont(43);
-  h->GetYaxis()->SetLabelSize(15);
-  h->GetYaxis()->SetLabelOffset(0.02);
+  h->GetYaxis()->SetTitleSize(0.04);
+  h->GetYaxis()->SetTitleOffset(1.38);
   h->GetYaxis()->CenterTitle();
-  //h->GetYaxis()->SetTickLength(-0.02);
-
+  h->GetYaxis()->SetNdivisions(606);
+  h->GetYaxis()->SetLabelSize(0.04);
   //X-axis
-  h->GetXaxis()->SetTitle(plotname);
-  h->GetXaxis()->SetTitleFont(43);
-  h->GetXaxis()->SetTitleSize(18);
-  h->GetXaxis()->SetTitleOffset(1.5);
-  h->GetXaxis()->SetLabelFont(43);
-  h->GetXaxis()->SetLabelSize(15);
-  h->GetXaxis()->SetLabelOffset(0.02);
-  //h->GetXaxis()->CenterTitle();
-  //h->GetXaxis()->SetTickLength(-0.02);
+  h->GetXaxis()->SetTitle(xtitle);
+  h->GetXaxis()->SetTitleSize(0.04);
+  h->GetXaxis()->SetTitleOffset(1.15);
+  h->GetXaxis()->CenterTitle();
+  h->GetXaxis()->SetNdivisions(606);
+  //h->GetXaxis()->SetDecimals();
+  h->GetXaxis()->SetLabelSize(0.04);
 }
 
 bool ifexists(TString file_){
@@ -156,4 +160,33 @@ std::string todays_date(){
   // Remove trailing newline characters
   while(!result.empty() && (result.back() == '\n' || result.back() == '\r')) result.pop_back();
   return result;
+}
+
+void put_text(TString model, TString flavor){
+  
+  TText* cmsText = new TText(0.12, 0.93, "CMS");
+  cmsText->SetTextSize(0.06);
+  cmsText->SetNDC();
+  cmsText->SetTextFont(62); // Bold
+  cmsText->Draw();
+  
+  TText* preliminaryText = new TText(0.22, 0.93, "preliminary");
+  preliminaryText->SetTextSize(0.05);
+  preliminaryText->SetNDC();
+  preliminaryText->SetTextFont(52); // Italics
+  preliminaryText->Draw();
+
+  TString modeltext = model + " " + flavor;
+  TText* modelText = new TText(0.72, 0.93, modeltext);
+  modelText->SetTextSize(0.05);
+  modelText->SetNDC();
+  modelText->SetTextFont(42); // Bold
+  modelText->Draw();
+  /*
+  TLatex* latex = new TLatex(); 
+  latex->SetTextFont(42);
+  latex->SetTextSize(0.04);
+  latex->SetNDC();
+  latex->DrawLatex(0.71, 0.93, "(2018) 59.8 fb^{-1}");*/
+  
 }

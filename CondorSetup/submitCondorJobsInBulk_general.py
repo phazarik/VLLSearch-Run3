@@ -25,33 +25,30 @@ jobname= args.jobname
 test   = args.test  #submit from only one folder.
 debug  = args.debug #for debugging the condor-script
 
-#Global parameters:
+#################
+#Global settings:
+#################
 year = 2018
-process_signal = False
+#process_signal = True
+dumpdir = "/home/work/phazarik1/work/CondorDump"
+mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'normal'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
-if process_signal : condorsamples = ["VLLD_ele", "VLLD_mu", "VLLS_ele", "VLLS_mu"]
-else : condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "EGamma"]
-#condorsamples = ["DYJetsToLL", "SingleMuon", "TTW_TTWToLNu"]
-
-###################################
-# Pick which input files to run on
-###################################
-if process_signal == True : jsonfile = '../InputJsons/signal_2018.json'
-else : jsonfile = '../InputJsons/all_2018.json'
-#jsonfile = '../InputJsons/all_2018_2LSS.json'
-
-dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "skim" #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-
-nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec04"
+#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "EGamma", "VLLS", "VLLD"]
+condorsamples = ["DYJetsToLL", "SingleMuon", "EGamma", "VLLS"]
 
 #_____________________________________________________________
 #
 #                     DO NOT TOUCH BELOW
 #_____________________________________________________________
+
+jsonfile = '../InputJsons/sample_database.json'
+
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec04"
+else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None
 if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection"
@@ -74,34 +71,56 @@ print(f'\n\033[93mSubmitting condor jobs ...\033[0m')
 
 #Creating condor jobs for each process mentioned in the list:
 for item in condorsamples:
-    for samplegroup, groupvalue in samplelist.items():
-        if samplegroup == item: #The entry from the list must be identical to the key in the json file.
+    for sample, subs in samplelist.items():
+        if sample == item: #The entry from the list must be identical to the key in the json file.
 
-            list_processed.append(samplegroup)
+            list_processed.append(sample)
             print('\n----------------------------------------------')
-            print(f'\033[91m Submitting jobs for {samplegroup} \033[0m')
+            print(f'\033[91m Submitting jobs for {sample} \033[0m')
             print('----------------------------------------------')
 
-            #The following loop runs for individual samples.
-            #For example, samplegroup = 'DYJetsToLL', sample = 'M50' 
+            #The following loop runs for individual sub-samples.
+            #For example, sample = 'DYJetsToLL', sub-sample = 'M50' 
             #It runs 'createCondorJobs.py' for each sub-sample
-            for sample, val in groupvalue.items():
-                if samplegroup.startswith('VLL'): sample = samplegroup+'_'+sample
-                #indir = val['samplepath']
-                #indir = nanoAOD_path + 
-                #data = str(val['data'])
+            for subsample in subs:
+
+                #Dafult values of the parameters:
                 data = 0                
                 lep = 'mu'
                 flag = 'flag'
+                
+                input_path = nanoAOD_path
 
-                print(sample, val)
-                break
+                #Corrections for the nanoAOD sample storage scheme in our cluster:
+                if file_type != "skimmed" :
+                    input_path = input_path + '/' + sample
+                    if   sample == 'SingleMuon': input_path = nanoAOD_path + "/UL2018Data/SingleMuon"
+                    elif sample == 'EGamma':     input_path = nanoAOD_path + "/UL2018Data/EGamma"
+                    elif sample == 'VLLS' or sample == 'VLLD':
+                        if 'ele' in subsample:   input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample}/ele"
+                        elif 'mu' in subsample:  input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample}/mu"
+
+                list_dirs = os.listdir(input_path)
+                list_dirs = [s for s in list_dirs if '.tar' not in s] #filtering the list for .tar objects
+
+                #Idiot proofing, in case the directory does not contain the sample/subsample
+                if not any(subsample in s for s in list_dirs) :
+                    print(f"Error with {sample}_{subsample} : files not found!")
+                    print('replacing G with g in EGamma ..')
+                    subsample = subsample.replace('G', 'g')
+
+                #Setting the input directory
+                #The input directory is more fragmented in case of the regular nanoAOD files. 
+                indir = None
+                if file_type == 'skimmed' : indir = input_path + "/"+ next((f for f in list_dirs if sample in f and subsample in f), None)
+                else :                      indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
+                
                 #Corrections on the parameters based on which sample it is:
                 if sample.startswith('SingleMuon') or sample.startswith('EGamma') : data = 1
-                if sample.startswith('VLLD') : flag = 'doublet'
-                if samplegroup == 'EGamma' : lep  = 'el'
+                if sample.startswith('VLLD') :    flag = 'doublet'
+                if sample.startswith('EGamma') :  lep  = 'el'
 
-                arguments = f'{jobname} {indir} {dumpdir} {sample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
+                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
                 processline = 'python3 createCondorJob.py '+arguments
 
                 if dryrun == True : print(processline)

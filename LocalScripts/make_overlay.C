@@ -6,48 +6,49 @@
 #include "TString.h"
 #include "functions.h"
 using namespace std;
-void plotmaker(TString plotname, int nbins, TString target_model, TString target_flavor);
+void plotmaker(TString plotname, TString xtitle, int nbins, TString target_model, TString target_flavor);
 
 void make_overlay(){
-  TString target_model = "VLLD";
-  TString target_flavor = "mu";
+  TString target_model = "VLLS";
+  TString target_flavor = "ele";
 
   struct plots{
     TString name;
-    int nbins;   
+    int nbins=1;
+    TString xtitle="xtitle";
   };
 
   vector<plots> plot = {
     //{.name = "allvlnu_charge",  .nbins = 1},
     //{.name = "allvll_decay",    .nbins = 1},
-    {.name = "nvll",            .nbins = 1},
-    {.name = "allvll_pt",       .nbins = 20},
-    {.name = "allvll_eta",      .nbins = 5},
-    {.name = "allvll_phi",      .nbins = 5},
-    {.name = "allvll_mass",     .nbins = 1},
-    {.name = "allvll_charge",   .nbins = 1},
-    {.name = "allvll_decay",    .nbins = 1},
-    {.name = "allvll_daughters",.nbins = 1},
-    {.name = "nvlnu",           .nbins = 1},
-    {.name = "allvlnu_pt",      .nbins = 20},
-    {.name = "allvlnu_eta",     .nbins = 5},
-    {.name = "allvlnu_phi",     .nbins = 5},
-    {.name = "allvlnu_mass",    .nbins = 1},
-    {.name = "allvlnu_charge",  .nbins = 1},
-    {.name = "allvlnu_decay",   .nbins = 1},
-    {.name = "allvlnu_daughters",.nbins = 1},
-    {.name = "finalstates_for_LL",.nbins = 1},
-    {.name = "finalstates_for_LN",.nbins = 1},
-    {.name = "finalstates_for_NN",.nbins = 1},
+    {.name = "nvll",              .nbins = 1,  .xtitle="nLep"},
+    {.name = "allvll_pt",         .nbins = 20, .xtitle="Lep pT (GeV)"},
+    {.name = "allvll_eta",        .nbins = 5,  .xtitle="Lep eta"},
+    {.name = "allvll_phi",        .nbins = 5,  .xtitle="Lep phi"},
+    {.name = "allvll_mass",       .nbins = 1,  .xtitle="Lep mass (GeV)"},
+    {.name = "allvll_charge",     .nbins = 1,  .xtitle="Lep charge"},
+    {.name = "allvll_decay",      .nbins = 1,  .xtitle="Lep decaymodes (W, Z, H)"},
+    {.name = "allvll_daughters",  .nbins = 1,  .xtitle="Lep daughters (pdgId)"},
+    {.name = "nvlnu",             .nbins = 1,  .xtitle="nNu"},
+    {.name = "allvlnu_pt",        .nbins = 20, .xtitle="Nu pT (GeV)"},
+    {.name = "allvlnu_eta",       .nbins = 5,  .xtitle="Nu eta"},
+    {.name = "allvlnu_phi",       .nbins = 5,  .xtitle="Nu phi"},
+    {.name = "allvlnu_mass",      .nbins = 1,  .xtitle="Nu mass (GeV)"},
+    {.name = "allvlnu_charge",    .nbins = 1,  .xtitle="Nu charge"},
+    {.name = "allvlnu_decay",     .nbins = 1,  .xtitle="Nu decaymodes (W, Z, H)"},
+    {.name = "allvlnu_daughters", .nbins = 1,  .xtitle="Nu daughters (pdgId)"},
+    {.name = "finalstates_for_LL",.nbins = 1,  .xtitle="LL finalstates"},
+    {.name = "finalstates_for_LN",.nbins = 1,  .xtitle="LN finalstates"},
+    {.name = "finalstates_for_NN",.nbins = 1,  .xtitle="NN finalstates"}
   };
   
   for(int i=0; i<(int)plot.size(); i++){
-    plotmaker(plot[i].name, plot[i].nbins, target_model, target_flavor);
+    plotmaker(plot[i].name, plot[i].xtitle, plot[i].nbins, target_model, target_flavor);
     //break;
   }
 }
 
-void plotmaker(TString plotname, int nbins, TString target_model, TString target_flavor){
+void plotmaker(TString plotname, TString xtitle, int nbins, TString target_model, TString target_flavor){
   
   //Global settings:
   bool toSave = true;
@@ -65,7 +66,7 @@ void plotmaker(TString plotname, int nbins, TString target_model, TString target
     bool null = (hists[i].hist == nullptr);
     if(hists[i].model == target_model && hists[i].flavor == target_flavor && !null){
 
-      SetHistoStyle(hists[i].hist, plotname, plottitle, hists[i].color);
+      SetHistoStyle(hists[i].hist, xtitle, plottitle, hists[i].color);
       hists[i].hist->Scale(1/hists[i].hist->Integral());
       hists[i].hist->Rebin(nbins);
       TString name = "  M"+hists[i].mass;
@@ -85,7 +86,8 @@ void plotmaker(TString plotname, int nbins, TString target_model, TString target
   if(tallest != -1){ //Flag for null hists
 
     //Plotting:
-    TCanvas *c1 = new TCanvas(plotname,plotname,700,600);
+    TCanvas *c1 = create_canvas(plotname);
+    
     hists[tallest].hist->SetStats(0);
     hists[tallest].hist->Draw("hist");
     for(int i=0; i<(int)hists.size(); i++){
@@ -94,6 +96,7 @@ void plotmaker(TString plotname, int nbins, TString target_model, TString target
       }
     }
     lg1->Draw("same");
+    put_text(target_model, target_flavor);
 
     //Saving:
     if(toSave && tallest != -1){
