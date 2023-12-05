@@ -133,6 +133,10 @@ for filename in input_files:
         out_samplename = INDIR.split("/")[-2]
         out_subsamplename = INDIR.split("/")[-1]
 
+        if "VLL" in samplename:
+            out_samplename = INDIR.split("/")[-3]
+            out_subsamplename = INDIR.split("/")[-1].split("_")[-2]+INDIR.split("/")[-1].split("_")[-1]
+        
         #Naming Scheme:
         #outputtag_sample_subsample_filecount.root.
         #Example: hst_SingleMuon_SingleMuonA_1.root
@@ -142,7 +146,8 @@ for filename in input_files:
         out_subsamplename = out_subsamplename.replace("_", "")
         
         ofile = outputtag+"_"+out_samplename+"_"+out_subsamplename+"_"+str(filecount)+".root"
-
+        #print(ofile)
+        
         if debug == True :
             print('file no : '+str(filecount))
             print('Input = '+INDIR+'/'+filename)
