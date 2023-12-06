@@ -41,9 +41,13 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtPass=0;
 
   //Counters:
-  n2l=0; n2l_2e0mu=0; n2l_1e1mu=0; n2l_0e2mu=0;
-  n3l=0; n3l_3e0mu=0; n3l_2e1mu=0; n3l_1e2mu=0; n3l_0e3mu=0;
   n4l=0;
+  n3l=0;
+  n2lss=0;
+  n2los=0;
+  n1l2j=0;
+  n1l1j=0;
+  n1l0j=0;
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -67,11 +71,20 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
+
+  cout<<"Event counts:"<<endl;
+  cout<<"4L   = "<<n4l<<endl;
+  cout<<"3L   = "<<n3l<<endl;
+  cout<<"2LSS = "<<n2lss<<endl;
+  cout<<"2LOS = "<<n2los<<endl;
+  cout<<"1L2J = "<<n1l2j<<endl;
+  cout<<"1L1J = "<<n1l1j<<endl;
+  cout<<"1L0J = "<<n1l0j<<endl;
   
   time(&end);
 
   double time_taken = double(end-start);
-  cout<<"Time taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
+  cout<<"\nTime taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
   cout<<"sec"<<endl;
 }
 
@@ -107,8 +120,8 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   //Verbosity determines the number of processed events after which
   //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  if(_verbosity==0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
+  else if(_verbosity>0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
 
   nEvtTotal++;
   h.nevt->Fill(0);
@@ -191,6 +204,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
+      /*
       //Basic object-level plots:
       //ELectrons
       h.ele[0]->Fill((int)Electron.size());
@@ -237,7 +251,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evtwt);
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
       }
-
+      */
       //_______________________________________________________________________________________________________
       
       // Applying corrections like SF, trigger efficiency etc. to the MC
@@ -297,9 +311,10 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.nevt->Fill(3);	
       }
 
+      /*
       if(_data==0){	  
 	MakeSignalPlots(1.0);
-      }
+	}*/
       
       
     }//TriggeredEvts
