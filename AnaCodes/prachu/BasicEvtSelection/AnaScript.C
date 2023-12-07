@@ -24,6 +24,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -85,7 +86,7 @@ void AnaScript::SlaveTerminate()
 
   double time_taken = double(end-start);
   cout<<"\nTime taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
-  cout<<"sec"<<endl;
+  cout<<" sec \n"<<endl;
 }
 
 void AnaScript::Terminate()
@@ -120,8 +121,8 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   //Verbosity determines the number of processed events after which
   //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%100000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
+  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
 
   nEvtTotal++;
   h.nevt->Fill(0);
@@ -252,50 +253,6 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
       }
       */
-      //_______________________________________________________________________________________________________
-      
-      // Applying corrections like SF, trigger efficiency etc. to the MC
-      //_______________________________________________________________________________________________________      
-
-
-      evtwt = 1.0; //Default value
-      if(_data==0){
-
-	float scalefactor = 1.0;
-	float triggeff = 1.0;
-	
-	//Apply corrections on MC
-	if((int)LightLepton.size()>=3){ //3L or more
-	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  float lep2SF = LeptonIDSF(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
-	  scalefactor = lep0SF * lep1SF * lep2SF;
-
-	  float e1=SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float e2=SingleLepTrigger_eff(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  float e3=SingleLepTrigger_eff(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
-	  triggeff=1-((1-e1)*(1-e2)*(1-e3));
-	}
-	else if((int)LightLepton.size()==2){ //2L exclusive
-	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  scalefactor = lep0SF * lep1SF;
-	  
-	  float e1=SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float e2=SingleLepTrigger_eff(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  triggeff=1-((1-e1)*(1-e2));
-	}
-	else if((int)LightLepton.size()==1){//1L events:
-	  scalefactor = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  triggeff = SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	}
-
-	evtwt = scalefactor * triggeff;
-
-	h.evtweight[0]->Fill(scalefactor);
-	h.evtweight[1]->Fill(triggeff);
-	h.evtweight[2]->Fill(evtwt);
-      }
      
       //_______________________________________________________________________________________________________
       
@@ -303,18 +260,17 @@ Bool_t AnaScript::Process(Long64_t entry)
       //_______________________________________________________________________________________________________
 
 
-      //Event selection:
       EventSelection();
+      evt_wt = getEventWeight();
       
-      if(evt_2LSS){
+      if(evt_2LSS && evt_trigger){
 	nEvtPass++;
 	h.nevt->Fill(3);	
       }
-
-      /*
-      if(_data==0){	  
+      
+      if(_data==0 && evt_trigger){	  
 	MakeSignalPlots(1.0);
-	}*/
+      }
       
       
     }//TriggeredEvts

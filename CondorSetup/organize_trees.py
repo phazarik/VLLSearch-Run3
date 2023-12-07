@@ -20,7 +20,10 @@ test   = args.test
 INDIR = '/home/work/phazarik1/work/CondorDump/output/'+jobname
 DUMP = '/home/work/phazarik1/work/Trees_2LSS/'+datestamp
 
-if test == False: os.system(f'mkdir -p {DUMP}')
+if test == False:
+    print('Creating/cleaning-up the dump diretory:')
+    os.system(f'mkdir -p {DUMP}')
+    os.system(f'rm -rf {DUMP}/*')
 
 jsonfile = '../InputJsons/sample_database.json'
 with open(jsonfile,'r') as infile:
@@ -35,20 +38,25 @@ for sample, subs in sampledict.items():
     for subsample in subs:
 
         if any((sample in s) or (subsample in s) for s in listdirs) : list_processed.append(sample)
-        
-        folder = INDIR + '/' + next((s for s in listdirs if (sample in s) or (subsample in s)), None)
+
+        subfolder = next((s for s in listdirs if (sample in s) and (subsample in s)), None)
+        if subfolder == None :
+            print(f'File not found for {sample} {subsample}')
+            continue
+            
+        folder = INDIR + '/' + subfolder 
         files = os.listdir(folder)
 
         processline = f'hadd -f {DUMP}/tree_{sample}_{subsample}.root {folder}/*.root'
         print('\nExecuting : ' +processline)
 
-        if test == True : break #for subsample
+        if test == True : continue #for subsample
         else :
             os.system(processline)
             print(f'tree created for {sample} {subsample}\n')
             count = count +1
 
-    if test == True : break #for sample
+    if test == True : continue #break #for sample
 
 end_time = time.time()
 time_taken = end_time-start_time
