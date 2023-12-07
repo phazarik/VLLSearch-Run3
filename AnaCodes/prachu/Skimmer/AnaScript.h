@@ -499,7 +499,7 @@ private:
   int nEvtTotal,nEvtRan,nEvtTrigger;
   int _data, _lep, _year,_mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
-  float metpt, metphi,evwt,prob,evtwt,prob1,puppimetpt,puppimetphi;
+  float metpt, metphi;
   TString _era, _flag;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
@@ -507,8 +507,13 @@ private:
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
   vector<Particle> LooseLepton; //Loose objects
 
+  //Counters:
+  int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
+
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
+  bool evt_trigger;
+  float evt_wt;
 
   time_t start, end;
 

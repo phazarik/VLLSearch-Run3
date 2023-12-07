@@ -65,6 +65,28 @@ void ana_test(int sample=0)
     m_selec.SetLep(1);
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
   }
+
+  else if(sample==100){//Signal
+    chain->Add("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/ele/VLLS_ele_M100/*.root");
+    hstfilename = "test_outputs/hst_vlls_ele_100.root";
+    sumfilename = "test_outputs/sum_vlls_ele_100.txt";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+  }
+
+  else if(sample==101){//Signal
+    chain->Add("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLS/mu/VLLS_mu_M100/*.root");
+    hstfilename = "test_outputs/hst_vlls_mu_100.root";
+    sumfilename = "test_outputs/sum_vlls_mu_100.txt";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+  }
   
   else{
     cout<<"Invalid argument!"<<endl;

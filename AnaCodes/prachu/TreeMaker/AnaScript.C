@@ -24,7 +24,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
-
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -42,9 +42,13 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
   nEvtPass=0;
 
   //Counters:
-  n2l=0; n2l_2e0mu=0; n2l_1e1mu=0; n2l_0e2mu=0;
-  n3l=0; n3l_3e0mu=0; n3l_2e1mu=0; n3l_1e2mu=0; n3l_0e3mu=0;
   n4l=0;
+  n3l=0;
+  n2lss=0;
+  n2los=0;
+  n1l2j=0;
+  n1l1j=0;
+  n1l0j=0;
 
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
@@ -71,12 +75,21 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
+
+  cout<<"Event counts:"<<endl;
+  cout<<"4L   = "<<n4l<<endl;
+  cout<<"3L   = "<<n3l<<endl;
+  cout<<"2LSS = "<<n2lss<<endl;
+  cout<<"2LOS = "<<n2los<<endl;
+  cout<<"1L2J = "<<n1l2j<<endl;
+  cout<<"1L1J = "<<n1l1j<<endl;
+  cout<<"1L0J = "<<n1l0j<<endl;
   
   time(&end);
 
   double time_taken = double(end-start);
-  cout<<"Time taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
-  cout<<"sec"<<endl;
+  cout<<"\nTime taken by the programe is = "<<fixed<<time_taken<<setprecision(5);
+  cout<<" sec \n"<<endl;
 }
 
 void AnaScript::Terminate()
@@ -248,75 +261,25 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
 	}*/
 
-      //_______________________________________________________________________________________________________
-      
-      // Applying corrections like SF, trigger efficiency etc. to the MC
-      //_______________________________________________________________________________________________________      
-
-
-      evtwt = 1.0; //Default value
-      if(_data==0){
-
-	float scalefactor = 1.0;
-	float triggeff = 1.0;
-	
-	//Apply corrections on MC
-	if((int)LightLepton.size()>=3){ //3L or more
-	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  float lep2SF = LeptonIDSF(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
-	  scalefactor = lep0SF * lep1SF * lep2SF;
-
-	  float e1=SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float e2=SingleLepTrigger_eff(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  float e3=SingleLepTrigger_eff(LightLepton.at(2).id, LightLepton.at(2).v.Pt(), LightLepton.at(2).v.Eta());
-	  triggeff=1-((1-e1)*(1-e2)*(1-e3));
-	}
-	else if((int)LightLepton.size()==2){ //2L exclusive
-	  float lep0SF = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float lep1SF = LeptonIDSF(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  scalefactor = lep0SF * lep1SF;
-	  
-	  float e1=SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  float e2=SingleLepTrigger_eff(LightLepton.at(1).id, LightLepton.at(1).v.Pt(), LightLepton.at(1).v.Eta());
-	  triggeff=1-((1-e1)*(1-e2));
-	}
-	else if((int)LightLepton.size()==1){//1L events:
-	  scalefactor = LeptonIDSF(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	  triggeff = SingleLepTrigger_eff(LightLepton.at(0).id, LightLepton.at(0).v.Pt(), LightLepton.at(0).v.Eta());
-	}
-
-	evtwt = scalefactor * triggeff;
-
-	h.evtweight[0]->Fill(scalefactor);
-	h.evtweight[1]->Fill(triggeff);
-	h.evtweight[2]->Fill(evtwt);
-      }
      
       //_______________________________________________________________________________________________________
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
+      //Selecting the events [THIS HAS TO BE DONE FIRST]      
+      EventSelection();
+      evt_wt = getEventWeight();
 
-      //Event selection:
-      if(true){
-
-	EventSelection();
+      
+      if(evt_2LSS && evt_trigger){ 
 
 	//For a particular final state, fillup the tree.
 	//Edit the funtion while changing the final state,
 	//otherwise it will give a segmentation error.
-
-	if(evt_2LSS){
-	  
-	  //UInt_t nlep;
-	  //nlep = (UInt_t)LightLepton.size();
-	  //mytree->Branch("nlep", &nlep);
-	  
-	  FillTree(mytree);	  
-	  mytree->Fill();
-	}
+	
+	FillTree(mytree);	  
+	mytree->Fill();
 
       }  
 

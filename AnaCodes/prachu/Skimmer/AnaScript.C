@@ -32,6 +32,15 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtTrigger=0;
   nEvtSkim=0;//for skimmer
 
+  //Counters:
+  n4l=0;
+  n3l=0;
+  n2lss=0;
+  n2los=0;
+  n1l2j=0;
+  n1l1j=0;
+  n1l0j=0;
+
   //_HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
   //BookHistograms();
@@ -62,12 +71,21 @@ void AnaScript::SlaveTerminate()
   cout<<"Total Triggered events = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvents left after skimming = "<<nEvtSkim<<" ("<<skimevtfrac*100<<" %)"<<endl;//for skimmer
   cout<<"---------------------------------------------"<<endl;
+
+  cout<<"Event counts:"<<endl;
+  cout<<"4L   = "<<n4l<<endl;
+  cout<<"3L   = "<<n3l<<endl;
+  cout<<"2LSS = "<<n2lss<<endl;
+  cout<<"2LOS = "<<n2los<<endl;
+  cout<<"1L2J = "<<n1l2j<<endl;
+  cout<<"1L1J = "<<n1l1j<<endl;
+  cout<<"1L0J = "<<n1l0j<<endl;
   
   time(&end);
 
   double time_taken = double(end-start);
-  cout<<"Time taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
-  cout<<"sec"<<endl;
+  cout<<"\nTime taken by the programe is = "<<fixed<<time_taken<<setprecision(5);
+  cout<<" sec \n"<<endl;
 }
 
 void AnaScript::Terminate()
@@ -230,21 +248,18 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Skimmer
       //_______________________________________________________________________________________________________
 
-      //Event selection:
-      if(true){ //Any addional cuts, if needed, can be applied here.
+      
+      EventSelection();
+	
+      //For a particular final state, fillup the tree.
+      //Edit the funtion while changing the final state,
+      //otherwise it will give a segmentation error.
 
-	EventSelection();
-
-	//For a particular final state, fillup the tree.
-	//Edit the funtion while changing the final state,
-	//otherwise it will give a segmentation error.
-
-	if(evt_2LSS){
-	  nEvtSkim++;
-	  skimTree->Fill();
-	}
-
+      if(evt_2LSS && evt_trigger){
+	nEvtSkim++;
+	skimTree->Fill();
       }
+
       
     }//TriggeredEvts
   }//GoodEvt

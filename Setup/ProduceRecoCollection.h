@@ -11,22 +11,20 @@ void AnaScript::createLightLeptons(){
     temp.id = -13*Muon_charge[i];
     temp.ind = i;
     temp.charge = Muon_charge[i];
-    temp.sip3d = Muon_sip3d[i];
+    temp.sip3d  = Muon_sip3d[i];
     temp.reliso03 = Muon_pfRelIso03_all[i];
     temp.reliso04 = Muon_pfRelIso04_all[i];
-
     
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4; 
     bool promptmuon = fabs(Muon_dxy[i])<0.05 && fabs(Muon_dz[i])<0.1;
-    //bool passcut_loosemuon = ptetacut && Muon_pfRelIso04_all[i]<0.30 && Muon_looseId[i];
-    bool passcut_loosemuon = ptetacut && promptmuon && Muon_looseId[i] && Muon_pfRelIso03_all[i]<0.30;
+    bool passcut_loosemuon  = ptetacut && promptmuon && Muon_looseId[i]  && Muon_pfRelIso03_all[i]<0.30;
     bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i] && Muon_pfRelIso03_all[i]<0.15;
 
     if(passcut_mediummuon){
       Muon.push_back(temp);
       LightLepton.push_back(temp);
     }
-    else if(passcut_loosemuon){
+    if(passcut_loosemuon){
       LooseLepton.push_back(temp);
     }
   }//for muons
@@ -51,14 +49,14 @@ void AnaScript::createLightLeptons(){
       if(fabs(Electron_dxy[i])<0.1 && fabs(Electron_dz[i])<0.2)
 	isprompt = true;
     }
-    bool passcut_looseele = ptetacut && Electron_cutBased[i]>1;
+    bool passcut_looseele  = ptetacut && isprompt && Electron_cutBased[i]>1;
     bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 0.15;
 
     if(passcut_mediumele){
       Electron.push_back(temp);
       LightLepton.push_back(temp);
     }
-    else if(passcut_looseele){
+    if(passcut_looseele){
       LooseLepton.push_back(temp);
     }
   }//For electrons
@@ -113,7 +111,7 @@ void AnaScript::createTaus(){
     temp.charge = Tau_charge[i];
 
     bool ptetacut = temp.v.Pt()>20 && fabs(temp.v.Eta())<2.3;
-    bool cleaned_from_leptons = clean_from_array(temp, LightLepton, 0.5);
+    bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.5);
     bool DeepTauID= Tau_idDeepTau2017v2p1VSe[i]>15 && Tau_idDeepTau2017v2p1VSmu[i]>3 && Tau_idDeepTau2017v2p1VSjet[i]>127;
     bool passcut = ptetacut && DeepTauID && cleaned_from_leptons && fabs(Tau_dz[i]<0.2);
 
