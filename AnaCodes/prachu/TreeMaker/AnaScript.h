@@ -444,6 +444,7 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void createSignalArrays();
   void SortRecoObjects();
   void SortGenObjects();
   void SortVLL();
@@ -600,13 +601,16 @@ private:
   vector<Particle> LooseLepton; //Loose objects
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
 
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
   bool evt_trigger;
   float evt_wt;
+
+  //For signal:
+  bool bad_event;
 
   time_t start, end;
 

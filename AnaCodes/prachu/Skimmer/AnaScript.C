@@ -30,7 +30,8 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtTotal = 0;
   nEvtRan = 0;
   nEvtTrigger=0;
-  nEvtSkim=0;//for skimmer
+  nEvtSkim=0; //for skimmer
+  nEvtBad=0; //Events flagged out because of invalid decay
 
   //Counters:
   n4l=0;
@@ -40,6 +41,9 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n1l2j=0;
   n1l1j=0;
   n1l0j=0;
+
+  evt_wt = 1.0;
+  bad_event = false;
 
   //_HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
@@ -63,13 +67,15 @@ void AnaScript::SlaveTerminate()
   float goodevtfrac = ((float)nEvtRan)/((float)nEvtTotal);
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
   float skimevtfrac = ((float)nEvtSkim)/((float)nEvtTotal);//for skimmer
+  float badevtfrac  = ((float)nEvtBad)/((float)nEvtTotal);//for VLLD
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
-  cout<<"Total events = "<<nEvtTotal<<endl;
-  cout<<"Total events ran = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
-  cout<<"Total Triggered events = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
-  cout<<"nEvents left after skimming = "<<nEvtSkim<<" ("<<skimevtfrac*100<<" %)"<<endl;//for skimmer
+  cout<<"nEvtTotal = "<<nEvtTotal<<endl;
+  cout<<"nEvtRan = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtSkim = "<<nEvtSkim<<" ("<<skimevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
 
   cout<<"Event counts:"<<endl;
@@ -165,13 +171,51 @@ Bool_t AnaScript::Process(Long64_t entry)
       genMuon.clear();
       genElectron.clear();
       genLightLepton.clear();
+      vllep.clear();
+      vlnu.clear();
 
-      /*
+      bad_event = false;
+
       if(_data==0){
 	createGenLightLeptons();
 	SortGenObjects();
+	
+	createSignalArrays();
+	SortVLL();
+	
+	//Correcting the Doublet model (flagging out the invalid decays)
+	if(_flag=="doublet"){ //for VLLD files
+	  
+	  //a) The neutral particle cannot decay to H,nu or Z,nu.
+	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
+	  //cout<<"----"<<endl;
+	  for(int i=0; i<(int)vlnu.size(); i++){
+	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
+	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
+	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
+	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
+	    }
+	    //cout<<""<<endl;
+	  }
+	  //if(bad_event) cout<<"bad"<<endl;
+	  //else cout<<"good"<<endl;
+	  //cout<<"----"<<endl;
+	  
+	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
+	  // I am flagging out the events with W(24) as daughetrs of L
+	  for(int i=0; i<(int)vllep.size(); i++){
+	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
+	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
+	    }
+	  }
+	}
+	
 	//Make gen-level plots here.
-	}*/
+
+      }
+
+      //Counting bad events:
+      if(bad_event) nEvtBad++;
 
       //###################
       //Reco particle block
@@ -196,6 +240,12 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
+      //----------------------------------------------------------------
+      //Event-selection is done right after creating the object arrays.
+      //evt_wt is also calculated alongwith.
+      //This is done before any plotting.
+      EventSelection();
+      //----------------------------------------------------------------
       /*
       //Basic object-level plots:
       //ELectrons
@@ -248,14 +298,14 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Skimmer
       //_______________________________________________________________________________________________________
 
+      //NOTES:	
+      //1. For a particular final state, fillup the tree.
+      //   Edit the funtion while changing the final state,
+      //   otherwise it will give a segmentation error.
+      //2. Don't make plots; it will give segmentation error.
+      //   Comment out the hist->Fill() in the createSignalArrays() function
       
-      EventSelection();
-	
-      //For a particular final state, fillup the tree.
-      //Edit the funtion while changing the final state,
-      //otherwise it will give a segmentation error.
-
-      if(evt_2LSS && evt_trigger){
+      if(evt_2LSS && evt_trigger){	
 	nEvtSkim++;
 	skimTree->Fill();
       }
