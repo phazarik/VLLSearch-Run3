@@ -40,6 +40,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtRan = 0;
   nEvtTrigger=0;
   nEvtPass=0;
+  nEvtBad=0; 
 
   //Counters:
   n4l=0;
@@ -49,6 +50,9 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n1l2j=0;
   n1l1j=0;
   n1l0j=0;
+
+  evt_wt = 1.0;
+  bad_event = false;
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -64,6 +68,7 @@ void AnaScript::SlaveTerminate()
   float goodevtfrac = ((float)nEvtRan)/((float)nEvtTotal);
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
   float passevtfrac = ((float)nEvtPass)/((float)nEvtTotal);
+  float badevtfrac  = ((float)nEvtBad)/((float)nEvtTotal);//for VLLD
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
@@ -71,6 +76,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtRan = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
 
   cout<<"Event counts:"<<endl;
@@ -148,7 +154,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++; //only good events
     h.nevt->Fill(1);
 
-    triggerRes=true; //Always true for MC
+    triggerRes=true; //default, always true for MC
 
     if(_data==1){
       triggerRes=false;
@@ -175,13 +181,56 @@ Bool_t AnaScript::Process(Long64_t entry)
       genMuon.clear();
       genElectron.clear();
       genLightLepton.clear();
+      vllep.clear();
+      vlnu.clear();
 
+      bad_event = false;
+      
       if(_data==0){
 	createGenLightLeptons();
         SortGenObjects();
+	//SortPt(genMuon);
+	//SortPt(genElectron);
+	//SortPt(genLightLepton);
+	
+	createSignalArrays();
+	SortVLL();
+
+	//Correcting the Doublet model (flagging out the invalid decays)
+	if(_flag=="doublet"){ //for VLLD files
+	  bad_event = false;
+	  //a) The neutral particle cannot decay to H,nu or Z,nu.
+	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
+	  //cout<<"----"<<endl;
+	  for(int i=0; i<(int)vlnu.size(); i++){
+	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
+	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
+	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
+	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
+	    }
+	    //cout<<""<<endl;
+	  }
+	  //if(bad_event) cout<<"bad"<<endl;
+	  //else cout<<"good"<<endl;
+	  //cout<<"----"<<endl;
+	  
+	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
+	  // I am flagging out the events with W(24) as daughetrs of L
+	  for(int i=0; i<(int)vllep.size(); i++){
+	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
+	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
+	    }
+	  }
+	}
+  
 	//Make gen-level plots here.
+	
       }
 
+      //Counting bad events:
+      if(bad_event) nEvtBad++;
+
+      
       //###################
       //Reco particle block
       //###################
@@ -205,71 +254,89 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
+      //----------------------------------------------------------------
+      //Event-selection is done right after creating the object arrays.
+      //evt_wt is also calculated alongwith.
+      //This is done before any plotting.
+      EventSelection();
+      evt_wt = getEventWeight();
+      //----------------------------------------------------------------
       /*
       //Basic object-level plots:
       //ELectrons
       h.ele[0]->Fill((int)Electron.size());
       for(int i=0; i<(int)Electron.size(); i++){
-	h.ele[1]->Fill(Electron.at(i).v.Pt(), evtwt);
-	h.ele[2]->Fill(Electron.at(i).v.Eta(), evtwt);
-	h.ele[3]->Fill(Electron.at(i).v.Phi(), evtwt);
-	h.ele[4]->Fill(Electron.at(i).reliso03, evtwt);
+	h.ele[1]->Fill(Electron.at(i).v.Pt(), evt_wt);
+	h.ele[2]->Fill(Electron.at(i).v.Eta(), evt_wt);
+	h.ele[3]->Fill(Electron.at(i).v.Phi(), evt_wt);
+	h.ele[4]->Fill(Electron.at(i).reliso03, evt_wt);
       }
       //Muons
       h.mu[0]->Fill((int)Muon.size());
       for(int i=0; i<(int)Muon.size(); i++){
-	h.mu[1]->Fill(Muon.at(i).v.Pt(), evtwt);
-	h.mu[2]->Fill(Muon.at(i).v.Eta(), evtwt);
-	h.mu[3]->Fill(Muon.at(i).v.Phi(), evtwt);
-	h.mu[4]->Fill(Muon.at(i).reliso03, evtwt);
+	h.mu[1]->Fill(Muon.at(i).v.Pt(), evt_wt);
+	h.mu[2]->Fill(Muon.at(i).v.Eta(), evt_wt);
+	h.mu[3]->Fill(Muon.at(i).v.Phi(), evt_wt);
+	h.mu[4]->Fill(Muon.at(i).reliso03, evt_wt);
       }
       //Photons
       h.pho[0]->Fill((int)Photon.size());
       for(int i=0; i<(int)Photon.size(); i++){
-	h.pho[1]->Fill(Photon.at(i).v.Pt(), evtwt);
-	h.pho[2]->Fill(Photon.at(i).v.Eta(), evtwt);
-	h.pho[3]->Fill(Photon.at(i).v.Phi(), evtwt);
-	h.pho[4]->Fill(Photon.at(i).reliso03, evtwt);
+	h.pho[1]->Fill(Photon.at(i).v.Pt(), evt_wt);
+	h.pho[2]->Fill(Photon.at(i).v.Eta(), evt_wt);
+	h.pho[3]->Fill(Photon.at(i).v.Phi(), evt_wt);
+	h.pho[4]->Fill(Photon.at(i).reliso03, evt_wt);
       }
       //Taus
       h.tau[0]->Fill((int)Tau.size());
       for(int i=0; i<(int)Tau.size(); i++){
-	h.tau[1]->Fill(Tau.at(i).v.Pt(), evtwt);
-	h.tau[2]->Fill(Tau.at(i).v.Eta(), evtwt);
-	h.tau[3]->Fill(Tau.at(i).v.Phi(), evtwt);
+	h.tau[1]->Fill(Tau.at(i).v.Pt(), evt_wt);
+	h.tau[2]->Fill(Tau.at(i).v.Eta(), evt_wt);
+	h.tau[3]->Fill(Tau.at(i).v.Phi(), evt_wt);
       }
       //Jets
       h.jet[0]->Fill((int)Jet.size());
       for(int i=0; i<(int)Jet.size(); i++){
-	h.jet[1]->Fill(Jet.at(i).v.Pt(), evtwt);
-	h.jet[2]->Fill(Jet.at(i).v.Eta(), evtwt);
-	h.jet[3]->Fill(Jet.at(i).v.Phi(), evtwt);
+	h.jet[1]->Fill(Jet.at(i).v.Pt(), evt_wt);
+	h.jet[2]->Fill(Jet.at(i).v.Eta(), evt_wt);
+	h.jet[3]->Fill(Jet.at(i).v.Phi(), evt_wt);
       }
       //bJets
       h.bjet[0]->Fill((int)bJet.size());
       for(int i=0; i<(int)bJet.size(); i++){
-	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evtwt);
-	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evtwt);
-	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
-      }
-      */
+	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evt_wt);
+	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evt_wt);
+	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evt_wt);
+	}*/
      
       //_______________________________________________________________________________________________________
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
-
-
-      EventSelection();
-      evt_wt = getEventWeight();
       
+	  
       if(evt_2LSS && evt_trigger){
 	nEvtPass++;
 	h.nevt->Fill(3);	
       }
       
-      if(_data==0 && evt_trigger){	  
-	MakeSignalPlots(1.0);
+      if(_data==0){
+
+	if(bad_event) h.hist[9]->Fill(0);//Counting invalid events.
+	else h.hist[9]->Fill(1);
+	
+	//Counting signal events before passing the trigger:
+	//Rest of them are being filled in signal_plots.h
+	if(!bad_event){
+	  float wt = 1.0;
+	  h.sig[1]->Fill((int)0, wt); //All events
+	  h.sig[2]->Fill((int)0, wt); //All events
+	  h.sig[3]->Fill((int)0, wt); //All events
+	  h.sig[4]->Fill((int)0, wt); //All events
+	}
+	
+	if(evt_trigger) MakeSignalPlots(evt_wt);
+
       }
       
       

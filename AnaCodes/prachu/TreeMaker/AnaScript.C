@@ -40,6 +40,7 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
   nEvtRan = 0;
   nEvtTrigger=0;
   nEvtPass=0;
+  nEvtBad=0; //Events flagged out because of invalid decay
 
   //Counters:
   n4l=0;
@@ -49,6 +50,9 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
   n1l2j=0;
   n1l1j=0;
   n1l0j=0;
+
+  evt_wt = 1.0;
+  bad_event = false;
 
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
@@ -67,6 +71,7 @@ void AnaScript::SlaveTerminate()
   float goodevtfrac = ((float)nEvtRan)/((float)nEvtTotal);
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
   float passevtfrac = ((float)nEvtPass)/((float)nEvtTotal);
+  float badevtfrac  = ((float)nEvtBad)/((float)nEvtTotal);//for VLLD
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
@@ -74,6 +79,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtRan = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
 
   cout<<"Event counts:"<<endl;
@@ -179,7 +185,11 @@ Bool_t AnaScript::Process(Long64_t entry)
       genMuon.clear();
       genElectron.clear();
       genLightLepton.clear();
+      vllep.clear();
+      vlnu.clear();
 
+      bad_event = false;
+      
       if(_data==0){
 	createGenLightLeptons();
 	SortPt(genMuon);
@@ -187,8 +197,41 @@ Bool_t AnaScript::Process(Long64_t entry)
 	SortPt(genLightLepton);
 
 	SortGenObjects();
+
+	createSignalArrays();
+	SortVLL();
+
+	//Correcting the Doublet model (flagging out the invalid decays)
+	if(_flag=="doublet"){ //for VLLD files
+	  
+	  //a) The neutral particle cannot decay to H,nu or Z,nu.
+	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
+	  //cout<<"----"<<endl;
+	  for(int i=0; i<(int)vlnu.size(); i++){
+	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
+	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
+	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
+	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
+	    }
+	    //cout<<""<<endl;
+	  }
+	  //if(bad_event) cout<<"bad"<<endl;
+	  //else cout<<"good"<<endl;
+	  //cout<<"----"<<endl;
+	  
+	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
+	  // I am flagging out the events with W(24) as daughetrs of L
+	  for(int i=0; i<(int)vllep.size(); i++){
+	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
+	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
+	    }
+	  }
+	}
 	//Make gen-level plots here.
       }
+
+      //Counting bad events:
+      if(bad_event) nEvtBad++;
 
       //###################
       //Reco particle block
@@ -212,6 +255,14 @@ Bool_t AnaScript::Process(Long64_t entry)
       createJets();
 
       SortRecoObjects();
+
+      //----------------------------------------------------------------
+      //Event-selection is done right after creating the object arrays.
+      //evt_wt is also calculated alongwith.
+      //This is done before any plotting.
+      EventSelection();
+      evt_wt = getEventWeight();
+      //----------------------------------------------------------------
 
       /*
       //Basic object-level plots:
@@ -266,13 +317,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
-
-      //Selecting the events [THIS HAS TO BE DONE FIRST]      
-      EventSelection();
-      evt_wt = getEventWeight();
-
-      
-      if(evt_2LSS && evt_trigger){ 
+ 
+      if(evt_2LSS && evt_trigger && !bad_event){ 
 
 	//For a particular final state, fillup the tree.
 	//Edit the funtion while changing the final state,

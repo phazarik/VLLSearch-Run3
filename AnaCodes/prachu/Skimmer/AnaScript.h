@@ -442,6 +442,7 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void createSignalArrays();
   void SortRecoObjects();
   void SortGenObjects();
   void SortVLL();
@@ -496,7 +497,7 @@ private:
   const char *_HstFileName;
   const char *_SumFileName;
   int _verbosity,_exclude,_sample;
-  int nEvtTotal,nEvtRan,nEvtTrigger;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtBad;
   int _data, _lep, _year,_mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi;
@@ -514,6 +515,9 @@ private:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
   bool evt_trigger;
   float evt_wt;
+
+  //For signal:
+  bool bad_event;
 
   time_t start, end;
 
