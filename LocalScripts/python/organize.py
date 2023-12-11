@@ -79,6 +79,12 @@ for model, flavors in indict.items():
     for flav, masses in flavors.items():
         for mass, parameters in masses.items():
             foldername = f'../hists/{indir}/{model}_{flav}_{mass}_{date}'
+
+            folder_exists = os.path.exists(foldername)
+            if not folder_exists:
+                print(f'Skipping non-existent directory for {model}_{flav}_{mass} ...')
+                continue
+
             files = os.listdir(foldername)
             if len(files) == 0 : print(f'Files not found : {model}_{flav}_{mass}')
             else :

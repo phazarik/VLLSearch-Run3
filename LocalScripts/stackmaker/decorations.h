@@ -2,14 +2,8 @@
 #define DECORATIONS_H
 
 TCanvas *create_canvas(TString plotname, float width, float height){
+  //Note: Canvas settings are overruled by Pad settings.
   TCanvas *c1 = new TCanvas(plotname,plotname,width,height);
-  c1->SetGrid();
-  c1->SetFrameLineWidth(2);
-  /*
-  c1->SetTopMargin(0.05);
-  c1->SetBottomMargin(0.12);
-  c1->SetLeftMargin(0.12);
-  c1->SetRightMargin(0.18);*/
   return c1;
 }
 
@@ -18,9 +12,12 @@ TPad *create_mainPad(double x1, double y1, double x2, double y2){
   pad->SetLeftMargin(0.1);
   pad->SetRightMargin(0.25);
   pad->SetTopMargin(0.09);
-  pad->SetBottomMargin(0.12);
+  pad->SetBottomMargin(0.1);
   pad->SetTickx(1);
   pad->SetTicky(1);
+  pad->SetGrid();
+  pad->SetFrameLineWidth(2);
+  pad->SetLogy(1);
   return pad;
 }
 
@@ -28,10 +25,12 @@ TPad *create_ratioPad(double x1, double y1, double x2, double y2){
   TPad *pad = new TPad("", "", x1, y1, x2, y2);
   pad->SetLeftMargin(0.1);
   pad->SetRightMargin(0.25);
-  pad->SetTopMargin(0.09);
-  pad->SetBottomMargin(0.12);
+  pad->SetTopMargin(0.01);
+  pad->SetBottomMargin(0.35);
   pad->SetTickx(1);
   pad->SetTicky(1);
+  pad->SetGrid();
+  pad->SetFrameLineWidth(2);
   return pad;
 }
 
@@ -45,7 +44,14 @@ TLegend *create_legend(double x1, double y1, double x2, double y2){
   return lg1;
 }
 
-void SetHistoStyle(TH1F *h, TString xtitle, TString plottitle, int color){
+void SetLegendEntry(TLegend *lg, TH1F *hist){
+  TString yield = Form("%d", (int)hist->Integral());
+  TString name  = hist->GetName();
+  TString text  = name + " [" + yield + "]";
+  lg->AddEntry(hist, text, "f");
+}
+
+void SetHistoStyle(TH1F *h, int color){
   h->SetLineColor(color);
   h->SetLineWidth(2);
   h->SetMarkerStyle(20);
@@ -55,28 +61,55 @@ void SetHistoStyle(TH1F *h, TString xtitle, TString plottitle, int color){
   //h->GetYaxis()->SetRangeUser(0, 1); //This is overruled by the tallest hist.
   h->GetYaxis()->SetTitle("Events");
   h->GetYaxis()->SetTitleSize(0.04);
-  h->GetYaxis()->SetTitleOffset(1.38);
+  h->GetYaxis()->SetTitleOffset(1.10);
   h->GetYaxis()->CenterTitle();
   h->GetYaxis()->SetNdivisions(606);
   h->GetYaxis()->SetLabelSize(0.04);
+  h->GetYaxis()->CenterTitle(true);
   //X-axis
-  h->GetXaxis()->SetTitle(xtitle);
+  h->GetXaxis()->SetTitle("");
   h->GetXaxis()->SetTitleSize(0.04);
   h->GetXaxis()->SetTitleOffset(1.15);
   h->GetXaxis()->CenterTitle();
   h->GetXaxis()->SetNdivisions(606);
   //h->GetXaxis()->SetDecimals();
-  h->GetXaxis()->SetLabelSize(0.04);
+  h->GetXaxis()->SetLabelSize(0); //intead of 0.4
+  h->GetXaxis()->CenterTitle(false);
+}
+
+void SetRatioStyle(TH1F *srb, TString name){
+  srb->SetStats(0);
+  //Decorating srb:
+  srb->SetLineColor(kBlack);
+  srb->SetLineWidth(2);
+  srb->SetMarkerStyle(20);
+  srb->SetMarkerSize(1.2);
+  srb->SetTitle("");
+  //Y-axis
+  srb->GetYaxis()->SetTitle("S/sqrt{B}");
+  srb->GetYaxis()->SetTitleSize(0.13);
+  srb->GetYaxis()->CenterTitle(true);
+  srb->GetYaxis()->SetTitleOffset(0.30);
+  srb->GetYaxis()->SetNdivisions(3, kTRUE);
+  srb->GetYaxis()->SetLabelSize(0.13);
+  srb->GetYaxis()->SetLabelOffset(0.008);
+  //srb->GetYaxis()->SetRangeUser(0, 1);
+  //X-axis
+  srb->GetXaxis()->SetTitle(name);
+  srb->GetXaxis()->SetTitleSize(0.16);
+  srb->GetXaxis()->SetTitleOffset(1.00);
+  srb->GetXaxis()->SetLabelSize(0.13);
+  srb->GetXaxis()->SetLabelOffset(0.008);
 }
 
 void put_text(){
-  TText* cmsText = new TText(0.12, 0.93, "CMS");
+  TText* cmsText = new TText(0.10, 0.93, "CMS");
   cmsText->SetTextSize(0.06);
   cmsText->SetNDC();
   cmsText->SetTextFont(62); // Bold
   cmsText->Draw();
   
-  TText* preliminaryText = new TText(0.22, 0.93, "preliminary");
+  TText* preliminaryText = new TText(0.18, 0.93, "preliminary");
   preliminaryText->SetTextSize(0.05);
   preliminaryText->SetNDC();
   preliminaryText->SetTextFont(52); // Italics
@@ -86,7 +119,9 @@ void put_text(){
   latex->SetTextFont(42);
   latex->SetTextSize(0.04);
   latex->SetNDC();
-  latex->DrawLatex(0.71, 0.93, "(2018) 59.8 fb^{-1}");  
+  latex->DrawLatex(0.61, 0.93, "(2018) 59.8 fb^{-1}");  
 }
+
+
 
 #endif // DECORATIONS_H

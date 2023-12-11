@@ -11,10 +11,15 @@ extern float xmax;
 
 void SetLastBinAsOverflow(TH1F *hst){    
   int lastBin = hst->GetNbinsX();
-  double lastBinContent = hst->GetBinContent(lastBin);
-  double lastBinError = hst->GetBinError(lastBin);
+  double content  = hst->GetBinContent(lastBin);
+  double error    = hst->GetBinError(lastBin);
   double overflow = hst->GetBinContent(lastBin + 1);
-  hst->SetBinContent(lastBin, lastBinContent + overflow);
+
+  double updated_content = content+overflow;
+  double updated_error = std::sqrt(error*error + overflow*overflow);
+  
+  hst->SetBinContent(lastBin, updated_content);
+  hst->SetBinError(lastBin, updated_error);
 }
 
 bool file_exists(TString filename){
@@ -48,16 +53,14 @@ TH1F *get_hist(
   for (int i=0; i < nevt; i++) { 
     tree->GetEntry(i);
     hst->Fill(branchData);
-  }    
+  }
 
   //Tweaking the histogram:
-  //SetLastBinAsOverflow(hst);
+  SetLastBinAsOverflow(hst);
   hst->Scale(59800/lumi);
 
-  cout<<"Success reading : "<<sample<<" "<<subsample<<endl;
-  cout<<"Integral = "<<hst->Integral()<<endl;
-
   if(!hst) cout<<"Warning : nullhist for "<<sample<<"_"<<subsample<<endl;
+  else cout<<"Histogram ready for "<<sample<<"_"<<subsample<<endl;
 
   //To avoid memory leak, I am deleting the file as well as the hst.
   //Before that, I am cloning and returning a different hist. 
@@ -92,10 +95,11 @@ std::string todays_date(){
   return result;
 }
 
-TH1F* merge_and_decorate(vector<TH1F*>sample, TString var, TString name, int color) {
+TH1F* merge_and_decorate(vector<TH1F*>sample, TString samplename, int color) {
   TH1F *hist = (TH1F *)sample[0]->Clone();
   for(int i=1; i<(int)sample.size(); i++) hist->Add(sample[i]);
-  SetHistoStyle(hist, var, name, color);
+  SetHistoStyle(hist, color);
+  hist->SetName(samplename);
   return hist;
 }
 
@@ -103,7 +107,7 @@ bool compareHists(const TH1F* a, const TH1F* b) {
     return a->Integral() < b->Integral();
 }
 
-void setFillColorFromLineColor(THStack *stack) {
+void SetFillColorFromLineColor(THStack *stack) {
   TList *histList = stack->GetHists();
   TIter next(histList);
   TObject *obj;
@@ -115,6 +119,26 @@ void setFillColorFromLineColor(THStack *stack) {
       hist->SetLineColor(kBlack);
     }
   }
+}
+
+TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
+  //First, get a sum of all the backgrounds:
+  TH1F *rootb = (TH1F *)bkg[0]->Clone(); rootb->Reset();
+  for(int i=0; i<(int)bkg.size(); i++) rootb->Add(bkg[i]);
+  //Taking the square root:
+  for(int bin=0; bin<rootb->GetNbinsX(); bin++){
+    double val = rootb->GetBinContent(bin);
+    double err = rootb->GetBinError(bin);
+    rootb->SetBinContent(bin, std::sqrt(val));
+    rootb->SetBinError(bin, err/(2.0*std::sqrt(val)));
+  }
+  TH1F * srb = (TH1F *)sig->Clone("copy");
+  if(!rootb){
+    cout<<"Error: Background is null!"<<endl;
+    srb = nullptr;
+  }
+  else srb->Divide(rootb);
+  return srb;
 }
 
 #endif // SETTINGS_H
