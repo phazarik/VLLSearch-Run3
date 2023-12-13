@@ -1,6 +1,8 @@
 #ifndef DECORATIONS_H
 #define DECORATIONS_H
 
+extern float globalSbyB;
+
 TCanvas *create_canvas(TString plotname, float width, float height){
   //Note: Canvas settings are overruled by Pad settings.
   TCanvas *c1 = new TCanvas(plotname,plotname,width,height);
@@ -40,7 +42,11 @@ TLegend *create_legend(double x1, double y1, double x2, double y2){
   lg1->SetTextFont(62);		
   lg1->SetFillStyle(0);
   lg1->SetBorderSize(0);
-  lg1->SetTextSize(0.025);
+  lg1->SetTextSize(0.03);
+  //Put globalSbyB as legend header:
+  //TMathText *mathText = new TMathText(0.0, 0.0, Form("Global S/#sqrt{B} = %.2f", globalSbyB));
+  lg1->SetHeader(Form("Global S/#sqrt{B} = %.2f", globalSbyB));
+  
   return lg1;
 }
 
@@ -71,7 +77,7 @@ void SetHistoStyle(TH1F *h, int color){
   h->GetXaxis()->SetTitleSize(0.04);
   h->GetXaxis()->SetTitleOffset(1.15);
   h->GetXaxis()->CenterTitle();
-  h->GetXaxis()->SetNdivisions(606);
+  //h->GetXaxis()->SetNdivisions(606);
   //h->GetXaxis()->SetDecimals();
   h->GetXaxis()->SetLabelSize(0); //intead of 0.4
   h->GetXaxis()->CenterTitle(false);
