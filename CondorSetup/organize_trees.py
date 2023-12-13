@@ -47,7 +47,7 @@ for sample, subs in sampledict.items():
         folder = INDIR + '/' + subfolder 
         files = os.listdir(folder)
 
-        processline = f'hadd -f {DUMP}/tree_{sample}_{subsample}.root {folder}/*.root'
+        processline = f'hadd -fk {DUMP}/tree_{sample}_{subsample}.root {folder}/*.root'
         print('\nExecuting : ' +processline)
 
         if test == True : continue #for subsample

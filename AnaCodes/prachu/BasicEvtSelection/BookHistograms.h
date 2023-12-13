@@ -22,6 +22,7 @@ void AnaScript::BookHistograms(){
   //Object level plots: (before event selection)
   //############################################
   //Electrons:
+  /*
   h.ele[0] = new TH1F("nElectrons","nElectrons",10,0,10);
   h.ele[1] = new TH1F("allele_pt","allele_pt",500,0,500);
   h.ele[2] = new TH1F("allele_eta","allele_eta",200,-4,4);
@@ -59,11 +60,11 @@ void AnaScript::BookHistograms(){
   h.bjet[1] = new TH1F("allbjet_pt","allbjet_pt",500,0,500);
   h.bjet[2] = new TH1F("allbjet_eta","allbjet_eta",200,-4,4);
   h.bjet[3] = new TH1F("allbjet_phi","allbjet_phi",200,-4,4);
-  for(int i=0; i<4; i++)h.bjet[i]->Sumw2();
+  for(int i=0; i<4; i++)h.bjet[i]->Sumw2();*/
 
   //SignalStudy:
+  /*
   h.sig[0] = new TH1F("genPart_pdgId_all", "genPart_pdgId_all", 2000, -1000, 1000);
- 
   h.vll[0] = new TH1F("nvll",         "nvll",          10, 0, 10);
   h.vll[1] = new TH1F("allvll_pt",    "allvll_pt",   1000,0,1000);
   h.vll[2] = new TH1F("allvll_eta",   "allvll_eta",     200,-4,4);
@@ -80,7 +81,7 @@ void AnaScript::BookHistograms(){
   h.vln[4] = new TH1F("allvlnu_mass",  "allvlnu_mass", 2500,0,2500);
   h.vln[5] = new TH1F("allvlnu_charge","allvlnu_charge",    6,-3,3);
   h.vln[6] = new TH1F("allvlnu_decay", "allvlnu_decay",    5, 0, 5);
-  h.vln[7] = new TH1F("allvlnu_daughers", "allvll_daughers", 100, -50, 50);
+  h.vln[7] = new TH1F("allvlnu_daughers", "allvll_daughers", 100, -50, 50);*/
 
   // VLL pair production final states:
   h.sig[1] = new TH1F("finalstates_for_LL", "finalstates for LL", 10, 0, 10);
@@ -88,8 +89,46 @@ void AnaScript::BookHistograms(){
   h.sig[3] = new TH1F("finalstates_for_NN", "finalstates for NN", 10, 0, 10);
   h.sig[4] = new TH1F("finalstates_incldecay", "finalstates for inclusive decaymode", 10, 0, 10);
 
-  //###############
+  //##############
   // Final states:
-  //###############
+  //##############
 
+  h.evt2LSS[0]  = new TH1F("nlep", "nlep", 10, 0, 10);
+  h.evt2LSS[1]  = new TH1F("njet", "njet", 10, 0, 10);
+  h.evt2LSS[2]  = new TH1F("nbjet", "nbjet", 10, 0, 10);
+
+  h.evt2LSS[3]  = new TH1F("lep0_pt",  "lep0_pt",  500, 0, 500);
+  h.evt2LSS[4]  = new TH1F("lep0_eta", "lep0_eta", 200, -4, 4);
+  h.evt2LSS[5]  = new TH1F("lep0_phi", "lep0_phi", 200, -4, 4);
+  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 100, 0, 0.2);
+  h.evt2LSS[7]  = new TH1F("lep0_mt",  "lep0_mt",  500, 0, 500);
+
+  h.evt2LSS[8]  = new TH1F("lep1_pt",  "lep1_pt",  500, 0, 500);
+  h.evt2LSS[9]  = new TH1F("lep1_eta", "lep1_eta", 200, -4, 4);
+  h.evt2LSS[10] = new TH1F("lep1_phi", "lep1_phi", 200, -4, 4);
+  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 100, 0, .02);
+  h.evt2LSS[12] = new TH1F("lep1_mt",  "lep1_mt",  500, 0, 500);
+
+  h.evt2LSS[13] = new TH1F("dilep_pt",  "dilep_pt",  500, 0, 500);
+  h.evt2LSS[14] = new TH1F("dilep_eta", "dilep_eta", 200, -10, 10);
+  h.evt2LSS[15] = new TH1F("dilep_phi", "dilep_phi", 200, -4, 4);
+  h.evt2LSS[16] = new TH1F("dilep_mass","dilep_mass",500, 0, 500);
+  h.evt2LSS[17] = new TH1F("dilep_mt",  "dilep_mt",  500, 0, 500);
+  h.evt2LSS[18] = new TH1F("dilep_deta", "dilep_deta", 200, 0, 6);
+  h.evt2LSS[19] = new TH1F("dilep_dphi", "dilep_dphi", 200, 0, 6);
+  h.evt2LSS[20] = new TH1F("dilep_dR",   "dilep_dR",   200, 0, 6);
+  h.evt2LSS[21] = new TH1F("dilep_ptratio","dilep_ptratio",200, 0, 1);
+
+  h.evt2LSS[22] = new TH1F("HT", "HT", 500, 0, 500);
+  h.evt2LSS[23] = new TH1F("ST", "ST", 500, 0, 500);
+  h.evt2LSS[24] = new TH1F("STfrac", "STfrac", 200, 0, 1.1); //For nJet-==0, STfrac=1
+  
+  h.evt2LSS[25] = new TH1F("dphi_metlep0",    "dilep_metlep0",    200, 0, 4);
+  h.evt2LSS[26] = new TH1F("dphi_metlep1",    "dilep_metlep1",    200, 0, 4);
+  h.evt2LSS[27] = new TH1F("dphi_metdilep",   "dilep_metdilep",   200, 0, 4);
+  h.evt2LSS[28] = new TH1F("dphi_metlep_max", "dilep_metlep_max", 200, 0, 4);
+  h.evt2LSS[29] = new TH1F("dphi_metlep_min", "dilep_metlep_min", 200, 0, 4);
+
+  for(int i=0; i<30; i++) h.evt2LSS[i]->Sumw2();
+  
 }

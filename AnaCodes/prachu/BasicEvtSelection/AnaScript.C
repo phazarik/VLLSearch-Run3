@@ -11,6 +11,7 @@ using namespace std;
 
 //Including the header files:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection/BookHistograms.h"
 
 //DON'T CHANGE THE FOLLOWING:
@@ -263,7 +264,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //----------------------------------------------------------------
       /*
       //Basic object-level plots:
-      //ELectrons
+      //Electrons
       h.ele[0]->Fill((int)Electron.size());
       for(int i=0; i<(int)Electron.size(); i++){
 	h.ele[1]->Fill(Electron.at(i).v.Pt(), evt_wt);
@@ -317,7 +318,8 @@ Bool_t AnaScript::Process(Long64_t entry)
 	  
       if(evt_2LSS && evt_trigger){
 	nEvtPass++;
-	h.nevt->Fill(3);	
+	h.nevt->Fill(3);
+	Make_evt2LSS_plots(evt_wt);
       }
       
       if(_data==0){
@@ -335,7 +337,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	  h.sig[4]->Fill((int)0, wt); //All events
 	}
 	
-	if(evt_trigger) MakeSignalPlots(evt_wt);
+	//if(evt_trigger) MakeSignalPlots(evt_wt);
 
       }
       

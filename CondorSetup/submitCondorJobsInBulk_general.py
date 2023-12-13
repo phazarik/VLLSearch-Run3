@@ -31,14 +31,14 @@ debug  = args.debug #for debugging the condor-script
 year = 2018
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'normal'     #Options: 'normal', 'skimmed'
+mode = "tree"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
-#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "EGamma", "VLLS", "VLLD"]
-condorsamples = ["VLLS", "VLLD"]
+condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "VLLS", "VLLD"]
+#condorsamples = ["VLLS", "VLLD"]
 
 #_____________________________________________________________
 #
@@ -47,7 +47,7 @@ condorsamples = ["VLLS", "VLLD"]
 
 jsonfile = '../InputJsons/sample_database.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec04"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11"
 else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None
