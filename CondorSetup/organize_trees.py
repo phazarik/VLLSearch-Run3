@@ -15,7 +15,7 @@ parser.add_argument('--test'   ,type=bool,required=False, default=False, help='C
 
 args=parser.parse_args()
 jobname= args.jobname #Example : 'tree_2LSS_Dec05'
-test   = args.test
+test   = args.test 
 
 INDIR = '/home/work/phazarik1/work/CondorDump/output/'+jobname
 DUMP = '/home/work/phazarik1/work/Trees_2LSS/'+datestamp

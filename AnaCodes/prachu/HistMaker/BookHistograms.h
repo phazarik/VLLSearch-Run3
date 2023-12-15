@@ -4,6 +4,7 @@ void AnaScript::BookHistograms(){
   h.evtweight[0] = new TH1F("wt_SF","Reco-ID-Iso Scale Factor",200,0,2);
   h.evtweight[1] = new TH1F("wt_trigger","Trigger Scale Factor",200,0,2);
   h.evtweight[2] = new TH1F("wt_evt","Event weight",200,0,2);
+  h.evtweight[3] = new TH1F("wt_lumi","LumiScale",1000,0,1000);
   //for(int i=0; i<3; i++)h.evtweight[i]->Sumw2();
 
   //Checking the triggers:

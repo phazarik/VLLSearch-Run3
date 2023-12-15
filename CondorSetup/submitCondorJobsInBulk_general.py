@@ -29,9 +29,10 @@ debug  = args.debug #for debugging the condor-script
 #Global settings:
 #################
 year = 2018
+lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "tree"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
 file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 
 #################################
@@ -45,13 +46,14 @@ condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "
 #                     DO NOT TOUCH BELOW
 #_____________________________________________________________
 
-jsonfile = '../InputJsons/sample_database.json'
+#jsonfile = '../InputJsons/sample_database.json'
+jsonfile = '../InputJsons/lumidata_2018.json'
 
 if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11"
 else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None
-if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection"
+if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker"
 elif mode == "skim" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer"
 elif mode == "tree" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker"
 else : print("Error while selecting mode! Options: 'hist', 'skim', 'tree'.")
@@ -82,12 +84,13 @@ for item in condorsamples:
             #The following loop runs for individual sub-samples.
             #For example, sample = 'DYJetsToLL', sub-sample = 'M50' 
             #It runs 'createCondorJobs.py' for each sub-sample
-            for subsample in subs:
+            for subsample, val in subs.items():
 
                 #Dafult values of the parameters:
                 data = 0                
                 lep = 'mu'
                 flag = 'flag'
+                lumi = val
                 
                 input_path = nanoAOD_path
 
@@ -120,13 +123,14 @@ for item in condorsamples:
                 if sample.startswith('VLLD') :    flag = 'doublet'
                 if sample.startswith('EGamma') :  lep  = 'el'
 
-                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
+                #arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
+                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug} {lumi}'
                 processline = 'python3 createCondorJob.py '+arguments
 
                 if dryrun == True : print(processline)
                 else: os.system(processline)
-
-                if test == True: break #only for one subsample
+            
+                if test==True : break #only for one sub-sample
 
         if test==True : break #only for one sample
 
@@ -139,6 +143,6 @@ print('-------------------------------------------------------------------------
 print('\033[93mSummary:\033[0m')
 print(f'\033[93mSamples : {list_processed}\033[0m')
 print(f'\033[93mjobname : {jobname}\033[0m')
-print(f'\033[93mOutput directory (hst files): {dumpdir}\033[0m')
+print(f'\033[93mOutput directory: {dumpdir}/output/{jobname}\033[0m')
 print(f'\033[93mtime taken : {time_taken:.2f} seconds\033[0m')
 print('-------------------------------------------------------------------------------\n')

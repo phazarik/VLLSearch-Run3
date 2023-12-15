@@ -26,6 +26,7 @@ flag       = sys.argv[8] # customizable string flag
 codedir    = sys.argv[9]
 mode       = sys.argv[10]
 debug_str  = sys.argv[11]
+lumi       = sys.argv[12]
 #For the old setup:
 #era = 'Z'
 #mc = 'wz'
@@ -81,7 +82,9 @@ os.system("touch "+runScript)
 os.system("chmod a+x "+runScript)
 
 #arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\"\)' #raw string
-arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #with codedir
+#arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #with codedir
+arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\",\"$8\"\)' #with codedir, lumi
+
 processline = 'root -q -b -l '+scriptname+arguments
 
 list_of_instructions=[
@@ -154,13 +157,12 @@ for filename in input_files:
             print('Output = '+OUTDIR+"//$(Cluster)_"+ofile)
             print('Code = '+codedir+"\n")
 
-        #The following list (for each file) needs to be added to the condor file. 
+        #The following list (for each file) needs to be added to the condor file.
         info_for_each_file = [
             "output = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
             "error = "+LOGDIR+"//$(Cluster)_data_"+filename+".err",
-            "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
-            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag)+" "+codedir,
-            #"arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_"+str(filecount)+".root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(era)+" "+str(mc),#for the old setup
+            "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".log",
+            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag)+" "+codedir+" "+str(lumi),
             "queue",
             ""
         ]

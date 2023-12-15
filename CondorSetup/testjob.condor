@@ -1,0 +1,12 @@
+universe = vanilla
+Requirements = (Arch == "X86_64")
+Executable = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/runJobsCondor_simulation.sh
+should_transfer_files = YES
+Notification=never
+
+
+output = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.out
+error = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.err
+log = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.log
+arguments = /home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M10to50_2023-12-11/100655_skim_DYJetsToLL_M10to50_83.root_data.root /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.root 0 2018 mu flag /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker 5925.522
+queue
