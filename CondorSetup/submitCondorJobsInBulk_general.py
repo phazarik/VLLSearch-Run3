@@ -38,8 +38,8 @@ file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "VLLS", "VLLD"]
-#condorsamples = ["VLLS", "VLLD"]
+#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "VLLS", "VLLD"]
+condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
 
 #_____________________________________________________________
 #
@@ -74,7 +74,9 @@ print(f'\n\033[93mSubmitting condor jobs ...\033[0m')
 #Creating condor jobs for each process mentioned in the list:
 for item in condorsamples:
     for sample, subs in samplelist.items():
+        #print(f'Checking ... {item} and {sample}')
         if sample == item: #The entry from the list must be identical to the key in the json file.
+            #print(f'Match found : {sample}')
 
             list_processed.append(sample)
             print('\n----------------------------------------------')
@@ -93,7 +95,7 @@ for item in condorsamples:
                 lumi = val
                 
                 input_path = nanoAOD_path
-
+                
                 #Corrections for the nanoAOD sample storage scheme in our cluster:
                 if file_type != "skimmed" :
                     input_path = input_path + '/' + sample
@@ -115,8 +117,23 @@ for item in condorsamples:
                 #Setting the input directory
                 #The input directory is more fragmented in case of the regular nanoAOD files. 
                 indir = None
-                if file_type == 'skimmed' : indir = input_path + "/"+ next((f for f in list_dirs if sample in f and subsample in f), None)
-                else :                      indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
+                if file_type == 'skimmed' :
+                    try: indir = input_path + "/"+ next((f for f in list_dirs if sample in f and subsample in f), None)
+                    except :
+                        print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
+                        continue
+                else :
+                    try : indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
+                    except :
+                        print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
+                        continue
+
+                #Skip if indir is empty:
+                exists = os.path.exists(indir)
+                empty  = len(os.listdir(indir)) == 0
+                if empty or not exists:
+                    print(f'\033[91mWarning : SKipping empty folder : {indir}')
+                    continue
                 
                 #Corrections on the parameters based on which sample it is:
                 if sample.startswith('SingleMuon') or sample.startswith('EGamma') : data = 1
