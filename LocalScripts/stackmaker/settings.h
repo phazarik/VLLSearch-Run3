@@ -53,6 +53,7 @@ void DisplayText(TString text, int color){
 // Reading the branches into histograms and scaling them appropriately
 //--------------------------------------------------------------------
 
+/*
 TH1F *get_hist(
 	       const TString& var,
 	       const TString& sample,
@@ -74,7 +75,7 @@ TH1F *get_hist(
   TFile *file = new TFile(filename, "READ");
 
   //Event-wise filtering:
-  /*
+  
   TTree *tree = (TTree *)file->Get("myEvents");
   if(!tree) DisplayText("Tree not found for file : "+filename, 31);
   Float_t lep0_pt; tree->SetBranchAddress("lep0_pt", &lep0_pt);
@@ -99,7 +100,7 @@ TH1F *get_hist(
       myvar = *varMap[var];
       hst->Fill(myvar);
     }
-    }*/
+    }
 
   //Alternative filtering:
   TTree *intree = (TTree *)file->Get("myEvents");
@@ -131,8 +132,40 @@ TH1F *get_hist(
   delete hst;
 
   return result;
-}
+  }*/
 
+TH1F *get_hist(
+	       const TString& var,
+	       const TString& sample,
+	       const TString& subsample,
+	       const float& lumi
+	       ){
+
+  //Accessing the hist:
+  TString filename = input_path+"/"+"hst_"+sample+"_"+subsample+".root";
+  if(!file_exists(filename)){
+    DisplayText("Not found: "+filename, 31); //31 is the ANSI color code for red
+    return nullptr;
+  }
+  TFile *file = new TFile(filename, "READ");
+  TH1F *hst = (TH1F *)file->Get(var);
+  if(!hst){
+    DisplayText("Hist not found for "+filename, 31);
+    return nullptr;
+  }
+  
+  float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
+
+  //Tweaking the histogram:
+  hst->Scale(59800/lumi);
+  SetLastBinAsOverflow(hst);
+  hst->GetXaxis()->SetRangeUser(xmin, xmax);
+  hst->Rebin(rebin);
+
+  cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
+
+  return hst;
+}
 //--------------------------------------
 //Other functions used by the main code:
 //--------------------------------------

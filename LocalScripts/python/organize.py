@@ -10,7 +10,7 @@ indir = args.jobname
 date = args.date #'2023-10-02'
 dryrun = args.dryrun
 
-indict = {
+signaldict = {
     "VLLS":{
         "ele":{
             "M100":{},
@@ -73,7 +73,10 @@ indict = {
     }
 }
 
-plots = ['allvll_decay']
+#plots = ['allvll_decay']
+#import json
+#with open('../../InputJsons/lumidata_2018.json', 'r') as file: json_data = json.load(file)
+indict = signaldict
 
 for model, flavors in indict.items():
     for flav, masses in flavors.items():
