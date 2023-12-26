@@ -14,7 +14,7 @@ test    = args.test
 dryrun  = args.dryrun
 DUMP    = 'input_files'
 
-if not dryrun : os.system(f'mkdir -p DUMP')
+if not dryrun : os.system(f'mkdir -p {DUMP}')
 
 with open('../InputJsons/lumidata_2018.json', 'r') as file: json_data = json.load(file)
 indict = json_data

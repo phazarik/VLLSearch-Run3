@@ -10,6 +10,7 @@ extern float xmin;
 extern float xmax;
 extern int rebin;
 extern float globalSbyB;
+extern float globalObsbyExp;
 
 //The following function are used by get_hist()
 extern TTree* GetFilteredTree(TTree *intree); //defined in the main code
@@ -157,12 +158,12 @@ TH1F *get_hist(
   float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
 
   //Tweaking the histogram:
-  hst->Scale(59800/lumi);
+  if(sample != "SingleMuon" || sample != "EGamma") hst->Scale(59800/lumi);
   SetLastBinAsOverflow(hst);
   hst->GetXaxis()->SetRangeUser(xmin, xmax);
   hst->Rebin(rebin);
 
-  cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
+  //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
 
   return hst;
 }
@@ -253,5 +254,55 @@ TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
   
   return srb;
 }
+
+TH1F *GetRatio(TH1F *data, vector<TH1F*> bkg){
+  //First, get a sum of all the backgrounds:
+  TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
+  for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
+  TH1F *ratio = (TH1F *)data->Clone("copy");
+  if(!allbkg){
+    cout<<"Error: Background is null!"<<endl;
+    ratio = nullptr;
+  }
+  else ratio->Divide(allbkg);
+
+  //calculating global ratio:
+  float nobs = data->Integral();
+  float nbkg = 0; for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
+  globalObsbyExp = nobs/nbkg;
+
+  return ratio;
+}
+
+TGraphErrors *GetUncertainty(TH1F* hist){
+  //Returns a TGraph containing uncertainties per bin on a hist.
+  
+  //Preparing the points:
+  int nBins = hist->GetNbinsX();
+  Double_t x[nBins];
+  Double_t y[nBins];
+  Double_t ex[nBins];
+  Double_t ey[nBins];
+  for (int i = 0; i < nBins; i++) {
+    int bin = i+1;
+    Double_t nevt = hist->GetBinContent(bin);
+    Double_t binlow = hist->GetBinLowEdge(bin);
+    Double_t binhi  = binlow + hist->GetBinWidth(bin);
+    Double_t nevtErr= hist->GetBinError(bin);
+    x[i]  = (binlow+binhi)/2;
+    ex[i] = (binhi-binlow)/2;
+    y[i]  = 1;
+    ey[i] = 0; if(nevt !=0) ey[i] = nevtErr/nevt;
+    //cout<<bin<<"\t"<<x[i]<<"\t"<<y[i]<<"\t"<<ex[i]<<"\t"<<ey[i]<<endl;
+  }
+
+  TGraphErrors *err = new TGraphErrors(nBins, x, y, ex, ey);
+  //Decoration:
+  err->SetMarkerStyle(0);
+  err->SetFillColor(kGray+1);
+  err->SetLineColor(kGray+1);
+  err->SetFillStyle(3001);
+  return err;
+} 
 
 #endif // SETTINGS_H

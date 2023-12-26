@@ -13,6 +13,7 @@
 #include "TCanvas.h"
 #include "TCut.h"
 #include "TMathText.h"
+#include "TLine.h"
 #include "settings.h"
 #include "decorations.h"
 using namespace std;
@@ -26,10 +27,12 @@ float xmax;
 int rebin;
 //Being used by decorations.h
 float globalSbyB;
+float globalObsbyExp;
 //Others:
 bool toSave;
 bool toLog;
 bool toOverlayData;
+bool toZoom;
 TString tag; //Additional info while saving the plots
 
 void plot(TString var, TString name);
@@ -49,7 +52,8 @@ void makestack(){
   globalSbyB = 0;
   toSave = false;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
+  toZoom = false; //forcefully zooms on the x axis.
   tag = "";
 
   struct plotdata {
@@ -63,8 +67,8 @@ void makestack(){
 
   vector<plotdata> p = {
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
-    {.var="lep0_pt", .name="Leading lepton pT (GeV)",    200, 0, 200, 20},
-    {.var="lep1_pt", .name="SubLeading lepton pT (GeV)", 200, 0, 200, 20},
+    {.var="lep0_pt", .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
+    {.var="lep1_pt", .name="SubLeading lepton pT (GeV)", 200, 0, 200, 10},
   };
 
   for(int i=0; i<(int)p.size(); i++){
@@ -75,7 +79,7 @@ void makestack(){
     xmax  = p[i].xmax;
     rebin = p[i].rebin;
     plot(var, name);
-    break;
+    //break;
   }
 
   //Done!
@@ -170,6 +174,12 @@ void plot(TString var, TString name){
     get_hist(var, "ZZ", "ZZTo2Q2Nu",  4405016.452),
     get_hist(var, "ZZ", "ZZTo4L",    74330566.038),
   };
+  vector<TH1F *>Data={
+    get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
+    get_hist(var, "SingleMuon", "SingleMuon_B", 59800),
+    get_hist(var, "SingleMuon", "SingleMuon_C", 59800),
+    get_hist(var, "SingleMuon", "SingleMuon_D", 59800),
+  };
   
   //DisplayText("Reading done.", 33);
 
@@ -186,6 +196,7 @@ void plot(TString var, TString name){
   TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
   TH1F *hst_wz    = merge_and_decorate(WZ,    "WZ",        kGreen-9);
   TH1F *hst_zz    = merge_and_decorate(ZZ,    "ZZ",        kGreen-10);
+  TH1F *hst_data  = merge_and_decorate(Data,  "Data",      kBlack);
 
   SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");
   SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");
@@ -213,30 +224,69 @@ void plot(TString var, TString name){
   //It should alywas be drawn first.
   TH1F *dummy = (TH1F *)bkg[0]->Clone(); dummy->Reset();
   dummy->GetYaxis()->SetTitle("Events");
-  dummy->GetYaxis()->SetRangeUser(1, 10E6);
+  dummy->GetYaxis()->SetRangeUser(0.1, 10E6);
+  if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
   dummy->SetStats(0);
   dummy->Draw("hist");
 
   //Now draw the rest.
+  if(toOverlayData) hst_data->Draw("ep same");
   stack->Draw("hist same");
   sig_eled_100->Draw("hist same");
   sig_eles_100->Draw("hist same");
-  
+  if(toOverlayData) hst_data->Draw("ep same");
 
   ratioPad->cd();
-  TH1F *ratio = GetSbyRootB(sig_eles_100, bkg); //This also calculates globalSbyB
-  SetRatioStyle(ratio, name);
-  ratio->Draw("ep");
+  TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); //This also calculates globalSbyB
+  TH1F *ratio = GetRatio(hst_data, bkg);
+  SetRatioStyle(sbyrb, name); SetRatioStyle(ratio, name);
+  ratio->GetYaxis()->SetTitle("obs/exp");
+  ratio->GetYaxis()->SetRangeUser(0, 2.2);
+  if(toZoom){
+    sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
+    ratio->GetXaxis()->SetRangeUser(xmin, xmax);
+  }
 
+  if(toOverlayData){
+    //Setting up a horizontal line on the ratiopad:
+    float xlow  = ratio->GetXaxis()->GetBinLowEdge(1);
+    float xhigh = ratio->GetXaxis()->GetBinUpEdge(ratio->GetNbinsX());
+    TLine *line = new TLine(xlow, 1, xhigh, 1);
+    line->SetLineColor(kRed);
+    line->SetLineWidth(2);
+    
+    //Calculating the uncertainty on the background in each bin:
+    TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
+    for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
+    TGraphErrors *err = GetUncertainty(allbkg);
+    err->GetYaxis()->SetNdivisions(5, kTRUE);
+    err->SetStats(0);
+    if(toZoom) err->GetXaxis()->SetRangeUser(xmin, xmax);
+
+    //Drawing everything in the proper order:
+    ratio->Draw("ep"); //Inheriting the settings from the ratio hist.
+    err->Draw("SAME P E2");
+    line->Draw("same");
+    ratio->Draw("ep same"); //I want the ratio to be on top.
+
+  }
+  
+  else   sbyrb->Draw("ep");
+  
   mainPad->cd();
   put_text();
 
-  TLegend *lg = create_legend(0.76, 0.50, 0.95, 0.90);
+  TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
+  if(toOverlayData) SetLegendEntry(lg, hst_data);
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
   SetLegendEntry(lg, sig_eled_100);
   SetLegendEntry(lg, sig_eles_100);
-  lg->SetHeader(("Global S/sqrt{B} = " + to_string(globalSbyB)).c_str());
+  TString legendheader = ("Global S/sqrt{B} = " + to_string(globalSbyB)).c_str();
+  if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
+  lg->SetHeader(legendheader);
   lg->Draw();
+
+  DisplayText("Made plot for "+var, 0);
 
   //Make a new folder and put all the plots there:
   TString date_stamp  = todays_date();
@@ -250,7 +300,7 @@ void plot(TString var, TString name){
     delete sig_eled_100;
     delete sig_eles_100;
     delete stack;
-    delete ratio;
+    //delete ratio;
     for(auto p : bkg){delete p;} bkg.clear();
   }
 }

@@ -2,6 +2,7 @@
 #define DECORATIONS_H
 
 extern float globalSbyB;
+extern float globalObsbyExp;
 
 TCanvas *create_canvas(TString plotname, float width, float height){
   //Note: Canvas settings are overruled by Pad settings.
