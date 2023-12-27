@@ -52,7 +52,7 @@ void makestack(){
   globalSbyB = 0;
   toSave = false;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
   tag = "";
 
@@ -67,8 +67,37 @@ void makestack(){
 
   vector<plotdata> p = {
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
-    {.var="lep0_pt", .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
-    {.var="lep1_pt", .name="SubLeading lepton pT (GeV)", 200, 0, 200, 10},
+    {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
+    /*
+    {.var="nlep", .name="number of leptons", 10, 0, 10, 1},
+    {.var="njet", .name="number of jets",    10, 0, 10, 1},
+    {.var="nbjet", .name="number of bjets",  10, 0, 10, 1},
+    {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
+    {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  10},
+    {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  10},
+    {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 10},
+    {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 10},
+    {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  10},
+    {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  10},
+    {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 10},
+    {.var="dilep_pt",  .name="Dilep pT (GeV)",    200, 0, 200, 10},
+    {.var="dilep_eta", .name="Dilep eta",         200, -4, 4,  10},
+    {.var="dilep_phi", .name="Dilep phi",         200, -4, 4,  10},
+    {.var="dilep_mass",.name="Dilep mass (GeV)",  200, 0, 200, 10},
+    {.var="dilep_mt",  .name="Dilep mT (GeV)",    200, 0, 200, 10},
+    {.var="dilep_deta", .name="deta(lep0, lep1)", 200, 0, 6,   10},
+    {.var="dilep_dphi", .name="dphi(lep0, lep1)", 200, 0, 6,   10},
+    {.var="dilep_dR",   .name="dR(lep0, lep1)",   200, 0, 6,   10},
+    {.var="dilep_ptratio",.name="pT1/pT0",        200, 0, 1, 10},
+    
+    {.var="HT", .name="HT (GeV)",       200, 0, 200, 10},
+    {.var="ST", .name="HT+LT (GeV)",    200, 0, 200, 10},
+    {.var="STfrac", .name="LT/(HT+LT)", 200, 0, 1.2, 10},
+    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",    200, 0, 4, 10},
+    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",    200, 0, 4, 10},
+    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",   200, 0, 4, 10},
+    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)", 200, 0, 4, 10},
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)", 200, 0, 4, 10},*/
   };
 
   for(int i=0; i<(int)p.size(); i++){
@@ -232,8 +261,8 @@ void plot(TString var, TString name){
   //Now draw the rest.
   if(toOverlayData) hst_data->Draw("ep same");
   stack->Draw("hist same");
-  sig_eled_100->Draw("hist same");
-  sig_eles_100->Draw("hist same");
+  sig_eled_100->Draw("HIST same");
+  sig_eles_100->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
 
   ratioPad->cd();
