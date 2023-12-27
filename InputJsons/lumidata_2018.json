@@ -39,6 +39,9 @@
     "TTW":{
 	"TTWToLNu":48627268.5
     },
+    "TTZ":{
+	"TTZToLL":393271344.40
+    },
     "WW":{
 	"WWTo1L1Nu2Q":787485.589,
 	"WWTo4Q"     :773049.853
@@ -103,5 +106,11 @@
 	"SingleMuon_B":59800,
 	"SingleMuon_C":59800,
 	"SingleMuon_D":59800
+    },
+    "EGamma":{
+	"EGamma_A":59800,
+	"EGamma_B":59800,
+	"EGamma_C":59800,
+	"EGamma_D":59800
     }
 }

@@ -6,7 +6,9 @@
 //#########################################################################################################
 
 //Execution line :
-// .x anaCond.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "", 30321.155)
+// .x anaCond.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "30321.155")
+//OR
+// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "ele", "doublet", "7439522.46")
 
 #include <TROOT.h>
 #include <TChain.h>

@@ -5,16 +5,16 @@
 // This driver script is run using runana.C, which uses gROOT to run this from outside the root terminal.
 //#########################################################################################################
 
-//Execution line : .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test.root", "0", "2018", "mu", "flag")
+//Execution line : .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test.root", "0", "2018", "mu", "flag", "whatever")
 //OR
-// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet")
+// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "whatever")
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
 //#include <boost/lexical_cast.hpp>// for lexical_cast()
 
-void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag)
+void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag, TString lumi)
 {
   //Description of the parameters:
   //1. ifname : Input file name with full path.
@@ -22,6 +22,7 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   //3. data   : 0, or 1 depedning on whether 'ifname' is MC or data.
   //4. year   : Which year of data taking. (affects trigger paths and efficiencies)
   //5. lep    : If muon dataset, lep=1, if electron dataset, lep=0
+  //6. flag   : Mention "doublet" for the corrections to be applied. Else, keep it as "flag"
 
   gROOT->Time();
   const char *skimfilename;
