@@ -32,14 +32,15 @@ year = 2018
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'skimmed'     #Options: 'normal', 'skimmed'
+mode = "skim"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'normal'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
-#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "WW", "WZ", "ZZ", "SingleMuon", "VLLS", "VLLD"]
-condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
+condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
+#condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
+#condorsamples = ["QCD_EMEnriched"]
 
 #_____________________________________________________________
 #
@@ -101,9 +102,8 @@ for item in condorsamples:
                     input_path = input_path + '/' + sample
                     if   sample == 'SingleMuon': input_path = nanoAOD_path + "/UL2018Data/SingleMuon"
                     elif sample == 'EGamma':     input_path = nanoAOD_path + "/UL2018Data/EGamma"
-                    elif sample == 'VLLS' or sample == 'VLLD':
-                        if 'ele' in subsample:   input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample}/ele"
-                        elif 'mu' in subsample:  input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample}/mu"
+                    elif 'VLLS' in sample or 'VLLD' in sample:
+                        input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample.split('_')[0]}/{sample.split('_')[1]}"
 
                 list_dirs = os.listdir(input_path)
                 list_dirs = [s for s in list_dirs if '.tar' not in s] #filtering the list for .tar objects
