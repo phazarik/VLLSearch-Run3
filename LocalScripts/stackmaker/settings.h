@@ -201,11 +201,21 @@ TH1F* merge_and_decorate(vector<TH1F*>sample, TString samplename, int color) {
     }
   }
   //Add all the non-null entry to the clone:
-  for(int i=0; i<(int)sample.size(); i++){if(sample[i]) hist->Add(sample[i]);}
-  SetHistoStyle(hist, color);
-  hist->SetName(samplename);
+  bool allnull = true;
+  for(int i=0; i<(int)sample.size(); i++){
+    if(sample[i]){
+      allnull = false;
+      hist->Add(sample[i]);
+    }
+  }
 
-  if(hist) return hist;
+  if(allnull) DisplayText("Null warning : Remove "+samplename, 33);
+  
+  if(hist) {
+    SetHistoStyle(hist, color);
+    hist->SetName(samplename);
+    return hist;
+  }
   else return nullptr;
 }
 
@@ -221,6 +231,7 @@ void SetFillColorFromLineColor(THStack *stack) {
   while ((obj = next())) {
     if (obj->InheritsFrom("TH1")) {
       TH1 *hist = static_cast<TH1*>(obj);
+      //if(!hist) DisplayText("Warning: nullptr for "+(TString *)hist->GetName(), 31);
       hist->SetFillColor(hist->GetLineColor());
       hist->SetLineColor(kBlack);
     }
@@ -250,7 +261,7 @@ TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
   float nbkg = 0; for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
   float sqrtB = sqrt(nbkg);
   globalSbyB = nsig/sqrtB;
-  cout<<"Global S/sqrt{B} = "<<globalSbyB<<endl;
+  cout<<"Global significance = "<<globalSbyB<<endl;
   
   return srb;
 }
@@ -297,6 +308,7 @@ TGraphErrors *GetUncertainty(TH1F* hist){
   }
 
   TGraphErrors *err = new TGraphErrors(nBins, x, y, ex, ey);
+  //if(!err) DisplayText("Warning: nullptr for "+err->GetName(), 31);
   //Decoration:
   err->SetMarkerStyle(0);
   err->SetFillColor(kGray+1);

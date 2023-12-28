@@ -24,8 +24,13 @@ for sample, subdict in indict.items():
         #print(sample, subsample, lumi)
         
         indir = f'hists/{jobname}/{sample}_{subsample}_{date}'
-        nonempty = os.path.exists(indir)
-        if not nonempty: continue
+        pathexists = os.path.exists(indir)
+        if not pathexists: continue
+        list_of_files = os.listdir(indir)
+        nonempty = len(list_of_files) > 0
+        if not nonempty:
+            print(f'Skipping empty directory: {indir}')
+            continue
         #os.system(f'ls {ifname}')
 
         ofname = f'{DUMP}/hst_{sample}_{subsample}.root'

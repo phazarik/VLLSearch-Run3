@@ -52,9 +52,9 @@ void makestack(){
   globalSbyB = 0;
   toSave = false;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "";
+  tag = "_qcdregion";
 
   struct plotdata {
     TString var;
@@ -76,10 +76,12 @@ void makestack(){
     {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  10},
     {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  10},
     {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 10},
+    {.var="lep0_iso",  .name="Leading lepton reliso03",    1000, 0, 10, 20},    
     {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 10},
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  10},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  10},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 10},
+    {.var="lep1_iso",  .name="SubLeading lepton reliso03",    1000, 0, 10, 20},
     {.var="dilep_pt",  .name="Dilep pT (GeV)",    200, 0, 200, 10},
     {.var="dilep_eta", .name="Dilep eta",         200, -4, 4,  10},
     {.var="dilep_phi", .name="Dilep phi",         200, -4, 4,  10},
@@ -89,7 +91,7 @@ void makestack(){
     {.var="dilep_dphi", .name="dphi(lep0, lep1)", 200, 0, 6,   10},
     {.var="dilep_dR",   .name="dR(lep0, lep1)",   200, 0, 6,   10},
     {.var="dilep_ptratio",.name="pT1/pT0",        200, 0, 1, 10},
-    
+    *//*
     {.var="HT", .name="HT (GeV)",       200, 0, 200, 10},
     {.var="ST", .name="HT+LT (GeV)",    200, 0, 200, 10},
     {.var="STfrac", .name="LT/(HT+LT)", 200, 0, 1.2, 10},
@@ -161,7 +163,7 @@ void plot(TString var, TString name){
     get_hist(var, "QCD_MuEnriched", "600to800",  2060827.812),
     get_hist(var, "QCD_MuEnriched", "800to1000", 11337379.457),
 
-    get_hist(var, "QCD_EMEnriched", "15to20", 5.96666541),
+    //get_hist(var, "QCD_EMEnriched", "15to20", 5.96666541),
   };
   vector<TH1F *>WJets = {
     get_hist(var, "HTbinnedWJets", "70to100",    52100.910),
@@ -221,17 +223,18 @@ void plot(TString var, TString name){
   TH1F *hst_wjets = merge_and_decorate(WJets, "WJets",     kGray+1);
   TH1F *hst_st    = merge_and_decorate(ST,    "SingleTop", kCyan-7);
   TH1F *hst_ttbar = merge_and_decorate(TTBar, "TTBar",     kAzure+1);
-  TH1F *hst_ttw   = merge_and_decorate(TTW,   "TTW",       kAzure+2);
-  TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
+  //TH1F *hst_ttw   = merge_and_decorate(TTW,   "TTW",       kAzure+2);
+  //TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
   TH1F *hst_wz    = merge_and_decorate(WZ,    "WZ",        kGreen-9);
   TH1F *hst_zz    = merge_and_decorate(ZZ,    "ZZ",        kGreen-10);
   TH1F *hst_data  = merge_and_decorate(Data,  "Data",      kBlack);
 
-  SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");
-  SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");
+  if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");}
+  if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
   //Defining the background collection:
-  vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_ttw, hst_ww, hst_wz, hst_zz};
+  //vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_ttw, hst_ww, hst_wz, hst_zz};
+  vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_wz, hst_zz};
 
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
@@ -261,22 +264,30 @@ void plot(TString var, TString name){
   //Now draw the rest.
   if(toOverlayData) hst_data->Draw("ep same");
   stack->Draw("hist same");
-  sig_eled_100->Draw("HIST same");
-  sig_eles_100->Draw("HIST same");
+  if(sig_eled_100) sig_eled_100->Draw("HIST same");
+  if(sig_eles_100) sig_eles_100->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
 
   ratioPad->cd();
-  TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); //This also calculates globalSbyB
-  TH1F *ratio = GetRatio(hst_data, bkg);
-  SetRatioStyle(sbyrb, name); SetRatioStyle(ratio, name);
-  ratio->GetYaxis()->SetTitle("obs/exp");
-  ratio->GetYaxis()->SetRangeUser(0, 2.2);
-  if(toZoom){
-    sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
-    ratio->GetXaxis()->SetRangeUser(xmin, xmax);
-  }
 
+  //SoverB
+  globalSbyB = 0;
+  if(sig_eles_100){
+    TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
+    sbyrb->GetYaxis()->SetTitle("S/sqrtB");
+    if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
+    if(!toOverlayData) sbyrb->Draw("ep");
+  }
+  
+  //obs/exp
+  globalObsbyExp =0;
   if(toOverlayData){
+    TH1F *ratio = GetRatio(hst_data, bkg);
+    SetRatioStyle(ratio, name);
+    ratio->GetYaxis()->SetTitle("obs/exp");
+    ratio->GetYaxis()->SetRangeUser(0, 2.2);
+    if(toZoom) ratio->GetXaxis()->SetRangeUser(xmin, xmax);
+  
     //Setting up a horizontal line on the ratiopad:
     float xlow  = ratio->GetXaxis()->GetBinLowEdge(1);
     float xhigh = ratio->GetXaxis()->GetBinUpEdge(ratio->GetNbinsX());
@@ -297,10 +308,7 @@ void plot(TString var, TString name){
     err->Draw("SAME P E2");
     line->Draw("same");
     ratio->Draw("ep same"); //I want the ratio to be on top.
-
   }
-  
-  else   sbyrb->Draw("ep");
   
   mainPad->cd();
   put_text();
@@ -308,9 +316,9 @@ void plot(TString var, TString name){
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
   if(toOverlayData) SetLegendEntry(lg, hst_data);
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
-  SetLegendEntry(lg, sig_eled_100);
-  SetLegendEntry(lg, sig_eles_100);
-  TString legendheader = ("Global S/sqrt{B} = " + to_string(globalSbyB)).c_str();
+  if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
+  if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
+  TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
   if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
   lg->SetHeader(legendheader);
   lg->Draw();
