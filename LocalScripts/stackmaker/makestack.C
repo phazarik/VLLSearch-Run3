@@ -50,11 +50,11 @@ void makestack(){
   //input_path = "../trees/2023-12-13";
   input_path = "../input_files";
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "_qcdregion";
+  tag = "_signf_DY";
 
   struct plotdata {
     TString var;
@@ -67,8 +67,8 @@ void makestack(){
 
   vector<plotdata> p = {
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
-    {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
-    /*
+    //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
+    
     {.var="nlep", .name="number of leptons", 10, 0, 10, 1},
     {.var="njet", .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet", .name="number of bjets",  10, 0, 10, 1},
@@ -91,7 +91,7 @@ void makestack(){
     {.var="dilep_dphi", .name="dphi(lep0, lep1)", 200, 0, 6,   10},
     {.var="dilep_dR",   .name="dR(lep0, lep1)",   200, 0, 6,   10},
     {.var="dilep_ptratio",.name="pT1/pT0",        200, 0, 1, 10},
-    *//*
+    /*
     {.var="HT", .name="HT (GeV)",       200, 0, 200, 10},
     {.var="ST", .name="HT+LT (GeV)",    200, 0, 200, 10},
     {.var="STfrac", .name="LT/(HT+LT)", 200, 0, 1.2, 10},
@@ -189,6 +189,9 @@ void plot(TString var, TString name){
   vector<TH1F *>TTW ={
     get_hist(var, "TTW", "TTWToLNu", 48627268.5)
   };
+  vector<TH1F *>TTZ ={
+    get_hist(var, "TTZ", "TTZToLL", 107659472.141)
+  };
   vector<TH1F *>WW={
     get_hist(var, "WW", "WWTo1L1Nu2Q", 787485.589),
     get_hist(var, "WW", "WWTo2L2Nu",   901172.227),
@@ -223,8 +226,9 @@ void plot(TString var, TString name){
   TH1F *hst_wjets = merge_and_decorate(WJets, "WJets",     kGray+1);
   TH1F *hst_st    = merge_and_decorate(ST,    "SingleTop", kCyan-7);
   TH1F *hst_ttbar = merge_and_decorate(TTBar, "TTBar",     kAzure+1);
-  //TH1F *hst_ttw   = merge_and_decorate(TTW,   "TTW",       kAzure+2);
-  //TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
+  TH1F *hst_ttw   = merge_and_decorate(TTW,   "TTW",       kAzure+2);
+  TH1F *hst_ttz   = merge_and_decorate(TTZ,   "TTZ",       kAzure+3);
+  TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
   TH1F *hst_wz    = merge_and_decorate(WZ,    "WZ",        kGreen-9);
   TH1F *hst_zz    = merge_and_decorate(ZZ,    "ZZ",        kGreen-10);
   TH1F *hst_data  = merge_and_decorate(Data,  "Data",      kBlack);
@@ -233,8 +237,8 @@ void plot(TString var, TString name){
   if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
   //Defining the background collection:
-  //vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_ttw, hst_ww, hst_wz, hst_zz};
-  vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_wz, hst_zz};
+  vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_ttw, hst_ttz, hst_ww, hst_wz, hst_zz};
+  //vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_wz, hst_zz};
 
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
@@ -273,8 +277,9 @@ void plot(TString var, TString name){
   //SoverB
   globalSbyB = 0;
   if(sig_eles_100){
-    TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
-    sbyrb->GetYaxis()->SetTitle("S/sqrtB");
+    //TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
+    TH1F *sbyrb = GetSbyRootB(hst_dy, bkg); SetRatioStyle(sbyrb, name);
+    sbyrb->GetYaxis()->SetTitle("DY/sqrtB");
     if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
     if(!toOverlayData) sbyrb->Draw("ep");
   }
