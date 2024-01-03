@@ -54,7 +54,19 @@ void AnaScript::Make_evt2LSS_plots(float wt){
 
   bool qcd_CR = nbjet==0 && dilep_mass > 50 && dphi_metdilep < 1.5;
   bool qcd_VR = nbjet==0 && dilep_mass > 50 && dphi_metdilep > 1.5;
-  bool event_selection = true;
+  bool event_selection = qcd_CR;
+
+  //------------------------
+  // QCD scaling in HT bins:
+  //------------------------
+  float qcdscale = 1; //default
+  if(HT < 50)                 qcdscale = 0.1414586;
+  else if (HT<=50  && HT<100) qcdscale = 0.0552467;
+  else if (HT<=100 && HT<150) qcdscale = 0.0351217;
+  else if (HT<=150 && HT<200) qcdscale = 0.0296351;
+  else if (HT<=200 && HT<250) qcdscale = 0.0264910;
+  else                        qcdscale = 0.0175513;
+  if(_flag == "qcd") wt = wt*qcdscale;
 
   //-----------
   // Plotting:
@@ -98,8 +110,8 @@ void AnaScript::Make_evt2LSS_plots(float wt){
     h.evt2LSS[28]->Fill(dphi_metlep_max, wt);
     h.evt2LSS[29]->Fill(dphi_metlep_min, wt);
 
-    h.evt2LSS[30]->Fill(metpt);
-    h.evt2LSS[31]->Fill(metphi);
+    h.evt2LSS[30]->Fill(metpt, wt);
+    h.evt2LSS[31]->Fill(metphi, wt);
     
   }
   

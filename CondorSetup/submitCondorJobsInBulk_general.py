@@ -40,7 +40,7 @@ file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 #################################
 condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
-#condorsamples = ["QCD_EMEnriched"]
+#condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
 
 #_____________________________________________________________
 #
@@ -138,6 +138,7 @@ for item in condorsamples:
                 #Corrections on the parameters based on which sample it is:
                 if sample.startswith('SingleMuon') or sample.startswith('EGamma') : data = 1
                 if sample.startswith('VLLD') :    flag = 'doublet'
+                if sample.startswith('QCD')  :    flag = 'qcd'
                 if sample.startswith('EGamma') :  lep  = 'el'
 
                 #arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'

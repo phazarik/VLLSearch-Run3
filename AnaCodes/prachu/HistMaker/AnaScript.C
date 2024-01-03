@@ -58,7 +58,8 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
 
-  if(_flag=="doublet") cout<<"Removing invalid VLLD decay modes ..."<<endl;
+  if(_flag=="doublet")  cout<<"Removing invalid VLLD decay modes ..."<<endl;
+  else if(_flag=="qcd") cout<<"Scaling QCD files ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()

@@ -118,6 +118,16 @@ void ana_test(int sample=0)
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
     m_selec.SetLumi(30321.155);
   }
+  else if(sample==998){//Testing skimmed version.
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28/QCD_MuEnriched_170to300_2023-12-28/*.root");
+    hstfilename = "test_outputs/hst_qcd_skimmed.root";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag("qcd"); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetLumi(10265.815);
+  }
   else if(sample==-999){//Testing skimmed version.
     chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28/SingleMuon_SingleMuon_A_2023-12-28/*.root");
     hstfilename = "test_outputs/hst_SingleMuonA_skimmed.root";
