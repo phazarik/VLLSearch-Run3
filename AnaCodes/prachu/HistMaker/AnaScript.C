@@ -324,7 +324,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Make_evt2LSS_plots(evt_wt);
       if(evt_2LSS && evt_trigger){
-	nEvtPass++;
+	//nEvtPass++;
 	h.nevt->Fill(3);
 	Make_evt2LSS_plots(evt_wt);
       }

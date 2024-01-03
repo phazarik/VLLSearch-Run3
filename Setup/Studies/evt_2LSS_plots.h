@@ -52,13 +52,15 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   // Deciding further event selections:
   //-----------------------------------
 
+  bool qcd_CR = nbjet==0 && dilep_mass > 50 && dphi_metdilep < 1.5;
+  bool qcd_VR = nbjet==0 && dilep_mass > 50 && dphi_metdilep > 1.5;
   bool event_selection = true;
-
 
   //-----------
   // Plotting:
   //-----------
   if(event_selection){
+    nEvtPass++;
     
     h.evt2LSS[0] ->Fill(nlep, wt);
     h.evt2LSS[1] ->Fill(njet, wt);
@@ -95,6 +97,9 @@ void AnaScript::Make_evt2LSS_plots(float wt){
     h.evt2LSS[27]->Fill(dphi_metdilep, wt);
     h.evt2LSS[28]->Fill(dphi_metlep_max, wt);
     h.evt2LSS[29]->Fill(dphi_metlep_min, wt);
+
+    h.evt2LSS[30]->Fill(metpt);
+    h.evt2LSS[31]->Fill(metphi);
     
   }
   

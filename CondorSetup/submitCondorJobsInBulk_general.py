@@ -32,13 +32,13 @@ year = 2018
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "skim"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'normal'     #Options: 'normal', 'skimmed'
+mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
+condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
 #condorsamples = ["QCD_EMEnriched"]
 
@@ -50,7 +50,7 @@ condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "SingleTop", "
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28"
 else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None

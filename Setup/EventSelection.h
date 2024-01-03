@@ -24,7 +24,9 @@ void AnaScript::EventSelection(){
     else if((int)LightLepton.size()==2){
 
       //customizing the lepton isolation criteria:
-      bool qcd_region = 1.0 < LightLepton.at(0).reliso03;
+      float dilep_mass = (LightLepton.at(0).v + LightLepton.at(1).v).M();
+      bool qcd_region = 0.25 < LightLepton.at(0).reliso03 && LightLepton.at(0).reliso03 < 1.0 && LightLepton.at(1).reliso03 > 0.15;
+      //qcd_region = qcd_region && (int)bJet.size()==0 && dilep_mass > 50; //Reducing other backgrounds.
 
       if(qcd_region){
 	if(LightLepton.at(0).charge == (-1)*LightLepton.at(1).charge) evt_2LOS = true;
