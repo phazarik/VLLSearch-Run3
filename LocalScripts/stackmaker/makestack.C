@@ -36,6 +36,26 @@ bool toOverlayData;
 bool toZoom;
 TString tag; //Additional info while saving the plots
 
+//Declaring ROOT objects here for memory management.
+TH1F *dummy;
+TH1F *sig_eles_100;
+TH1F *sig_eled_100;
+TH1F *hst_data;
+//TH1F *hst_smuon;
+//TH1F *hst_egamma;
+vector<TH1F*> bkg;
+THStack *bkgstack;
+TCanvas *canvas;
+TPad *mainPad;
+TPad *ratioPad;
+TH1F *sbyrb;
+TH1F *ratiohist;
+
+void reset_if_not_null(TH1F *hist){
+  if(hist != nullptr)
+    hist->Reset();
+}
+
 void plot(TString var, TString name);
 
 //------------------------------------------------
@@ -51,12 +71,12 @@ void makestack(){
   //input_path = "../trees/2023-12-13";
   input_path = "../input_files";
   globalSbyB = 0;
-  toSave = true;
+  toSave = false;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "_qcdVR";
-  QCDscale = 0.03681888;
+  tag = "_qcdCR_htscaled";
+  QCDscale = 1.2217294;//0.0355525;
 
   struct plotdata {
     TString var;
@@ -70,6 +90,7 @@ void makestack(){
   vector<plotdata> p = {
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
+    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 50},
     /*
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
@@ -89,7 +110,7 @@ void makestack(){
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  10},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 10},
     {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
-    
+    /*
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 10},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  10},
     {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  10},
@@ -103,9 +124,10 @@ void makestack(){
     {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 10},
     {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 10},
     {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 10},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 10},
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 10},*/
   };
 
+  int count = 0;
   for(int i=0; i<(int)p.size(); i++){
     TString var  = p[i].var;
     TString name = p[i].name;
@@ -114,6 +136,7 @@ void makestack(){
     xmax  = p[i].xmax;
     rebin = p[i].rebin;
     plot(var, name);
+    count ++;
     //break;
   }
 
@@ -121,9 +144,8 @@ void makestack(){
   time(&end);
 
   double time_taken = double(end-start);
-  TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\n";
+  TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\nNo of plots = "+to_string(count)+"\n";
   DisplayText(report, 33); //33 is the ANSI color code for yellow
-
 }
 
 //---------------------------------------------------------------
@@ -145,7 +167,10 @@ TTree* GetFilteredTree(TTree *intree){
 //-----------------------------------
 
 void plot(TString var, TString name){
-
+  bkg.clear();
+  TString date_stamp  = todays_date();
+  TString dump_folder = "plots/"+date_stamp+tag;
+  TString filename = dump_folder+"/"+var;
   //---------------------------------------------
   // Preparing the histograms:
   //---------------------------------------------
@@ -156,28 +181,35 @@ void plot(TString var, TString name){
     get_hist(var, "DYJetsToLL", "M50",    30321.155),
   };
   vector<TH1F *> QCD = {
-    get_hist(var, "QCD_MuEnriched", "20to30",    23.893),
-    get_hist(var, "QCD_MuEnriched", "30to50",    42.906),
-    get_hist(var, "QCD_MuEnriched", "50to80",    105.880),
-    get_hist(var, "QCD_MuEnriched", "80to120",   508.715),
-    get_hist(var, "QCD_MuEnriched", "120to170",  1802.854),
-    get_hist(var, "QCD_MuEnriched", "170to300",  10265.815),
-    get_hist(var, "QCD_MuEnriched", "300to470",  95249.242),
-    get_hist(var, "QCD_MuEnriched", "470to600",  656872.156),
+    get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
+    get_hist(var, "QCD_MuEnriched", "30to50",         42.906),
+    get_hist(var, "QCD_MuEnriched", "50to80",        105.880),
+    get_hist(var, "QCD_MuEnriched", "80to120",       508.715),
+    get_hist(var, "QCD_MuEnriched", "120to170",     1802.854),
+    get_hist(var, "QCD_MuEnriched", "170to300",    10265.815),
+    get_hist(var, "QCD_MuEnriched", "300to470",    95249.242),
+    get_hist(var, "QCD_MuEnriched", "470to600",   656872.156),
     get_hist(var, "QCD_MuEnriched", "600to800",  2060827.812),
-    get_hist(var, "QCD_MuEnriched", "800to1000", 11337379.457),
+    get_hist(var, "QCD_MuEnriched", "800to1000",11337379.457),
 
-    //get_hist(var, "QCD_EMEnriched", "15to20", 5.96666541),
+    get_hist(var, "QCD_EMEnriched", "15to20",      5.96666541),
+    get_hist(var, "QCD_EMEnriched", "20to30",      2.92664338),
+    get_hist(var, "QCD_EMEnriched", "30to50",      1.33001225),
+    get_hist(var, "QCD_EMEnriched", "50to80",      5.28031791),
+    get_hist(var, "QCD_EMEnriched", "80to120",    25.76427755),
+    get_hist(var, "QCD_EMEnriched", "120to170",  145.33569605),
+    get_hist(var, "QCD_EMEnriched", "170to300",  223.50433213),
+    get_hist(var, "QCD_EMEnriched", "300toInf", 2007.24094203),
   };
   vector<TH1F *>WJets = {
-    get_hist(var, "HTbinnedWJets", "70to100",    52100.910),
-    get_hist(var, "HTbinnedWJets", "100to200",   41127.174),
-    get_hist(var, "HTbinnedWJets", "200to400",   172265.183),
-    get_hist(var, "HTbinnedWJets", "400to600",   163821.083),
-    get_hist(var, "HTbinnedWJets", "600to800",   708793.021),
+    get_hist(var, "HTbinnedWJets", "70to100",      52100.910),
+    get_hist(var, "HTbinnedWJets", "100to200",     41127.174),
+    get_hist(var, "HTbinnedWJets", "200to400",    172265.183),
+    get_hist(var, "HTbinnedWJets", "400to600",    163821.083),
+    get_hist(var, "HTbinnedWJets", "600to800",    708793.021),
     get_hist(var, "HTbinnedWJets", "800to1200",  1481985.193),
     get_hist(var, "HTbinnedWJets", "1200to2500", 5602003.457),
-    get_hist(var, "HTbinnedWJets", "2500toInf",  79396214.989),
+    get_hist(var, "HTbinnedWJets", "2500toInf", 79396214.989),
   };
   vector<TH1F *>ST = {
     get_hist(var, "SingleTop", "s-channel_LeptonDecays",            5456748.098),
@@ -227,53 +259,57 @@ void plot(TString var, TString name){
   
   //DisplayText("Reading done.", 33);
 
-  TH1F *sig_eles_100 = get_hist(var, "VLLS", "ele_M100", 663355.82);
-  TH1F *sig_eled_100 = get_hist(var, "VLLD", "ele_M100", 8608.00);
+  sig_eles_100 = get_hist(var, "VLLS", "ele_M100", 663355.82);
+  sig_eled_100 = get_hist(var, "VLLD", "ele_M100", 8608.00);
   
-  //Merging the histograms from each samples:
-  TH1F *hst_qcd   = merge_and_decorate(QCD,   "QCD",       kYellow);
-  TH1F *hst_dy    = merge_and_decorate(DY,    "Drell-Yan", kRed-7);
-  TH1F *hst_wjets = merge_and_decorate(WJets, "WJets",     kGray+1);
-  TH1F *hst_st    = merge_and_decorate(ST,    "SingleTop", kCyan-7);
-  TH1F *hst_ttbar = merge_and_decorate(TTBar, "TTBar",     kAzure+1);
-  TH1F *hst_ttw   = merge_and_decorate(TTW,   "TTW",       kAzure+2);
-  TH1F *hst_ttz   = merge_and_decorate(TTZ,   "TTZ",       kAzure+3);
-  TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
-  TH1F *hst_wz    = merge_and_decorate(WZ,    "WZ",        kGreen-9);
-  TH1F *hst_zz    = merge_and_decorate(ZZ,    "ZZ",        kGreen-10);
+  //Merging the histograms from each samples and storing in a collection:
+  bkg = {
+    merge_and_decorate(QCD,   "QCD",       kYellow),
+    merge_and_decorate(DY,    "Drell-Yan", kRed-7),
+    merge_and_decorate(WJets, "WJets",     kGray+1),
+    merge_and_decorate(ST,    "SingleTop", kCyan-7),
+    merge_and_decorate(TTBar, "TTBar",     kAzure+1),
+    merge_and_decorate(TTW,   "TTW",       kAzure+2),
+    merge_and_decorate(TTZ,   "TTZ",       kAzure+3),
+    merge_and_decorate(WW,    "WW",        kGreen-3),
+    merge_and_decorate(WZ,    "WZ",        kGreen-9),
+    merge_and_decorate(ZZ,    "ZZ",        kGreen-10),
+  };
+  TH1F *hst_qcd = bkg[0];
+  
   TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon Data", kBlack);
   TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma Data",   kBlack);
 
-  TH1F *hst_data = (TH1F *)hst_smuon->Clone();
+  hst_data = (TH1F *)hst_smuon->Clone();
   hst_data->Add(hst_egamma);
   hst_data->SetName("Data (2018)");
 
   if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");}
   if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
-  //Defining the background collection:
-  vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_ttw, hst_ttz, hst_ww, hst_wz, hst_zz};
-  //vector<TH1F*> bkg = {hst_qcd, hst_dy, hst_wjets, hst_st, hst_ttbar, hst_wz, hst_zz};
+  //Caculating scale factors, since the histograms are ready:
+  GetBinwiseSF(var,hst_data, hst_qcd, bkg);
 
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
-  THStack *stack = new THStack("Stacked",var+";"+var+";Events");
-  for(int i=0; i<(int)bkg.size(); i++) stack->Add(bkg[i]);
-  SetFillColorFromLineColor(stack);
-  stack->SetTitle("");
+  bkgstack = new THStack("Stacked",var+";"+var+";Events");
+  for(int i=0; i<(int)bkg.size(); i++) bkgstack->Add(bkg[i]);
+  SetFillColorFromLineColor(bkgstack);
+  bkgstack->SetTitle("");
   
   //---------------------------------------------
   // Plotting:
   //---------------------------------------------
-  TCanvas *canvas = create_canvas(var, 800, 600);
-  TPad *mainPad  = create_mainPad(0, 0.22, 1, 1);     mainPad ->Draw();
-  TPad *ratioPad = create_ratioPad(0, 0.01, 1, 0.25); ratioPad->Draw();
+  canvas = create_canvas(var, filename, 800, 600);
+  mainPad  = create_mainPad(0, 0.22, 1, 1);     mainPad ->Draw();
+  ratioPad = create_ratioPad(0, 0.01, 1, 0.25); ratioPad->Draw();
   
   mainPad->cd();
 
   //Setting up a dummy hist to enforce certain things in the plot.
   //It should alywas be drawn first.
-  TH1F *dummy = (TH1F *)bkg[0]->Clone(); dummy->Reset();
+  //dummy->Reset();
+  dummy = (TH1F *)bkg[0]->Clone(); dummy->Reset(); 
   dummy->GetYaxis()->SetTitle("Events");
   dummy->GetYaxis()->SetRangeUser(0.1, 10E6);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
@@ -282,7 +318,7 @@ void plot(TString var, TString name){
 
   //Now draw the rest.
   if(toOverlayData) hst_data->Draw("ep same");
-  stack->Draw("hist same");
+  bkgstack->Draw("hist same");
   if(sig_eled_100) sig_eled_100->Draw("HIST same");
   if(sig_eles_100) sig_eles_100->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
@@ -292,7 +328,7 @@ void plot(TString var, TString name){
   //SoverB
   globalSbyB = 0;
   if(sig_eles_100){
-    TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
+    sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
     sbyrb->GetYaxis()->SetTitle("S/sqrtB");
     if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
     if(!toOverlayData) sbyrb->Draw("ep");
@@ -301,15 +337,15 @@ void plot(TString var, TString name){
   //obs/exp
   globalObsbyExp =0;
   if(toOverlayData){
-    TH1F *ratio = GetRatio(hst_data, bkg);
-    SetRatioStyle(ratio, name);
-    ratio->GetYaxis()->SetTitle("obs/exp");
-    ratio->GetYaxis()->SetRangeUser(0, 2.2);
-    if(toZoom) ratio->GetXaxis()->SetRangeUser(xmin, xmax);
+    ratiohist = GetRatio(hst_data, bkg);
+    SetRatioStyle(ratiohist, name);
+    ratiohist->GetYaxis()->SetTitle("obs/exp");
+    ratiohist->GetYaxis()->SetRangeUser(0, 2.2);
+    if(toZoom) ratiohist->GetXaxis()->SetRangeUser(xmin, xmax);
   
     //Setting up a horizontal line on the ratiopad:
-    float xlow  = ratio->GetXaxis()->GetBinLowEdge(1);
-    float xhigh = ratio->GetXaxis()->GetBinUpEdge(ratio->GetNbinsX());
+    float xlow  = ratiohist->GetXaxis()->GetBinLowEdge(1);
+    float xhigh = ratiohist->GetXaxis()->GetBinUpEdge(ratiohist->GetNbinsX());
     TLine *line = new TLine(xlow, 1, xhigh, 1);
     line->SetLineColor(kRed);
     line->SetLineWidth(2);
@@ -323,10 +359,10 @@ void plot(TString var, TString name){
     if(toZoom) err->GetXaxis()->SetRangeUser(xmin, xmax);
 
     //Drawing everything in the proper order:
-    ratio->Draw("ep"); //Inheriting the settings from the ratio hist.
+    ratiohist->Draw("ep"); //Inheriting the settings from the ratio hist.
     err->Draw("SAME P E2");
     line->Draw("same");
-    ratio->Draw("ep same"); //I want the ratio to be on top.
+    ratiohist->Draw("ep same"); //I want the ratio to be on top.
   }
   
   mainPad->cd();
@@ -350,18 +386,12 @@ void plot(TString var, TString name){
   DisplayText("Made plot for "+var, 0);
 
   //Make a new folder and put all the plots there:
-  TString date_stamp  = todays_date();
-  TString dump_folder = "plots/"+date_stamp+tag;
   if(toSave){
     createFolder(dump_folder);
-    canvas->SaveAs(dump_folder+"/"+var+".png");
+    canvas->SaveAs(filename+".png");
     canvas->Clear();
-    delete canvas;
-    delete lg;
-    delete sig_eled_100;
-    delete sig_eles_100;
-    delete stack;
-    //delete ratio;
-    for(auto p : bkg){delete p;} bkg.clear();
+    //delete canvas;
+    //delete lg;
+    //delete bkgstack;
   }
 }

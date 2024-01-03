@@ -4,9 +4,9 @@
 extern float globalSbyB;
 extern float globalObsbyExp;
 
-TCanvas *create_canvas(TString plotname, float width, float height){
+TCanvas *create_canvas(TString plotname, TString filename, float width, float height){
   //Note: Canvas settings are overruled by Pad settings.
-  TCanvas *c1 = new TCanvas(plotname,plotname,width,height);
+  TCanvas *c1 = new TCanvas(filename,plotname,width,height);
   return c1;
 }
 

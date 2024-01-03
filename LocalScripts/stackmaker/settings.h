@@ -161,8 +161,8 @@ TH1F *get_hist(
 
   //Tweaking the histogram:
   float datalumi = 59800; //pb^{-1}
-  if (sample == "QCD_MuEnriched") hst->Scale((datalumi/lumi)*QCDscale);
-  else if(sample != "SingleMuon" || sample != "EGamma") hst->Scale(datalumi/lumi);
+  if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
+  else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
     
   SetLastBinAsOverflow(hst);
   hst->GetXaxis()->SetRangeUser(xmin, xmax);
@@ -320,6 +320,49 @@ TGraphErrors *GetUncertainty(TH1F* hist){
   err->SetLineColor(kGray+1);
   err->SetFillStyle(3001);
   return err;
-} 
+}
+
+void GetBinwiseSF(TString var, TH1F *hst_data, TH1F *hst_qcd, vector<TH1F*>bkg){
+  if(var == "HT"){
+    DisplayText("\nScaleFactors in each HT bin:", 33);
+    cout<<"bin\tnData\tnQCD\tnOthers\tScaleFactor\tbin-range"<<endl;
+
+    //For each bin:
+    for(int bin=0; bin<(int)hst_qcd->GetNbinsX(); bin++){
+      float ndata = hst_data->GetBinContent(bin+1);
+      float nqcd  = hst_qcd ->GetBinContent(bin+1);
+      float nothers = 0;
+      float binxlow = hst_data->GetXaxis()->GetBinLowEdge(bin+1);
+      float binxup  = hst_data->GetXaxis()->GetBinUpEdge(bin+1);
+      for(int i=0; i<(int)bkg.size(); i++){
+	if(bkg[i]->GetName() == (TString)"QCD") continue;
+	else nothers = nothers + bkg[i]->GetBinContent(bin+1);
+      }
+      float sf_bin = 0; if(nqcd !=0) sf_bin = (ndata-nothers)/nqcd;
+      
+      cout<<bin+1<<"\t"<<(int)ndata<<"\t"<<(int)nqcd<<"\t"<<(int)nothers<<"\t";
+      cout<<fixed<<setprecision(7)<<sf_bin<<defaultfloat<<"\t";
+      cout<<binxlow<<"-"<<binxup<<endl;
+      
+    }
+
+    float nothers_total = 0;
+    for(int i=0; i<(int)bkg.size(); i++){
+      if(bkg[i]->GetName() == (TString)"QCD") continue;
+      else nothers_total = nothers_total + bkg[i]->Integral();
+    }
+
+    //Global:
+    float globalsf = 0;
+    if(hst_qcd->Integral()!=0) globalsf = (hst_data->Integral()-nothers_total)/hst_qcd->Integral();
+      
+    cout<<"Global\t";
+    cout<<(int)hst_data->Integral()<<"\t";
+    cout<<(int)hst_qcd ->Integral()<<"\t";
+    cout<<(int)nothers_total<<"\t";
+    cout<<fixed<<setprecision(7)<<globalsf<<defaultfloat<<"\t";
+    cout<<"all\n"<<endl;
+  }
+}
 
 #endif // SETTINGS_H

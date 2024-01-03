@@ -1,5 +1,7 @@
 import os, sys, argparse
 import json
+import time
+start_time = time.time()
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--jobname',type=str, required=True, help='Condor job name: Such as hist_2LSS_Dec13')
@@ -44,5 +46,23 @@ for sample, subdict in indict.items():
 
         if test : break #subsample loop
     if test : break #sample loop
-    
-print('Done!')
+
+end_time = time.time()
+time_taken = end_time-start_time
+
+print('\nDone!')
+def display_text(text, color):
+    # ANSI COLOR CODES:
+    # Black   = 30
+    # Red     = 31
+    # Green   = 32
+    # Yellow  = 33
+    # Blue    = 34
+    # Magenta = 35
+    # Cyan    = 36
+    # White   = 37
+    set_color = "\033[" + str(color) + "m"
+    print(set_color + text + "\033[0m")  # 0=default
+
+text_to_print = f'Time taken = {str(int(time_taken))} seconds.'
+display_text(text_to_print, 33)
