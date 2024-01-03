@@ -25,6 +25,7 @@ int nbins;
 float xmin;
 float xmax;
 int rebin;
+float QCDscale;
 //Being used by decorations.h
 float globalSbyB;
 float globalObsbyExp;
@@ -52,9 +53,10 @@ void makestack(){
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "_signf_DY";
+  tag = "_qcdVR";
+  QCDscale = 0.03681888;
 
   struct plotdata {
     TString var;
@@ -68,38 +70,40 @@ void makestack(){
   vector<plotdata> p = {
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
-    
-    {.var="nlep", .name="number of leptons", 10, 0, 10, 1},
-    {.var="njet", .name="number of jets",    10, 0, 10, 1},
-    {.var="nbjet", .name="number of bjets",  10, 0, 10, 1},
+    /*
+    {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
+    {.var="njet",     .name="number of jets",    10, 0, 10, 1},
+    {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
+    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 10},
+    {.var="ST",       .name="HT+LT (GeV)",    200, 0, 200, 10},
+    {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 10},
+    {.var="MET",      .name="MET (GeV)",    200, 0, 200, 10},
+    {.var="MET_phi",  .name="MET phi",    200, -4, 4, 10},
     {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
     {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  10},
     {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  10},
     {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 10},
-    {.var="lep0_iso",  .name="Leading lepton reliso03",    1000, 0, 10, 20},    
+    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},    
     {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 10},
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  10},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  10},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 10},
-    {.var="lep1_iso",  .name="SubLeading lepton reliso03",    1000, 0, 10, 20},
-    {.var="dilep_pt",  .name="Dilep pT (GeV)",    200, 0, 200, 10},
-    {.var="dilep_eta", .name="Dilep eta",         200, -4, 4,  10},
-    {.var="dilep_phi", .name="Dilep phi",         200, -4, 4,  10},
-    {.var="dilep_mass",.name="Dilep mass (GeV)",  200, 0, 200, 10},
-    {.var="dilep_mt",  .name="Dilep mT (GeV)",    200, 0, 200, 10},
-    {.var="dilep_deta", .name="deta(lep0, lep1)", 200, 0, 6,   10},
-    {.var="dilep_dphi", .name="dphi(lep0, lep1)", 200, 0, 6,   10},
-    {.var="dilep_dR",   .name="dR(lep0, lep1)",   200, 0, 6,   10},
-    {.var="dilep_ptratio",.name="pT1/pT0",        200, 0, 1, 10},
-    /*
-    {.var="HT", .name="HT (GeV)",       200, 0, 200, 10},
-    {.var="ST", .name="HT+LT (GeV)",    200, 0, 200, 10},
-    {.var="STfrac", .name="LT/(HT+LT)", 200, 0, 1.2, 10},
-    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",    200, 0, 4, 10},
-    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",    200, 0, 4, 10},
-    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",   200, 0, 4, 10},
-    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)", 200, 0, 4, 10},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)", 200, 0, 4, 10},*/
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
+    
+    {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 10},
+    {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  10},
+    {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  10},
+    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 10},
+    {.var="dilep_mt",        .name="Dilep mT (GeV)",    200, 0, 200, 10},
+    {.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   10},
+    {.var="dilep_dphi",      .name="dphi(lep0, lep1)",  200, 0, 6,   10},
+    {.var="dilep_dR",        .name="dR(lep0, lep1)",    200, 0, 6,   10},
+    {.var="dilep_ptratio",   .name="pT1/pT0",           200, 0, 1, 10},
+    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",   200, 0, 4, 10},
+    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 10},
+    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 10},
+    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 10},
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 10},
   };
 
   for(int i=0; i<(int)p.size(); i++){
@@ -117,7 +121,7 @@ void makestack(){
   time(&end);
 
   double time_taken = double(end-start);
-  TString report = "\nDone!!\nTime taken : "+to_string(time_taken)+" seconds.\n";
+  TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\n";
   DisplayText(report, 33); //33 is the ANSI color code for yellow
 
 }
@@ -208,11 +212,17 @@ void plot(TString var, TString name){
     get_hist(var, "ZZ", "ZZTo2Q2Nu",  4405016.452),
     get_hist(var, "ZZ", "ZZTo4L",    74330566.038),
   };
-  vector<TH1F *>Data={
+  vector<TH1F *>SingleMuon={
     get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
     get_hist(var, "SingleMuon", "SingleMuon_B", 59800),
     get_hist(var, "SingleMuon", "SingleMuon_C", 59800),
     get_hist(var, "SingleMuon", "SingleMuon_D", 59800),
+  };
+  vector<TH1F *>EGamma={
+    get_hist(var, "EGamma", "EGamma_A", 59800),
+    get_hist(var, "EGamma", "EGamma_B", 59800),
+    get_hist(var, "EGamma", "EGamma_C", 59800),
+    get_hist(var, "EGamma", "EGamma_D", 59800),
   };
   
   //DisplayText("Reading done.", 33);
@@ -231,7 +241,12 @@ void plot(TString var, TString name){
   TH1F *hst_ww    = merge_and_decorate(WW,    "WW",        kGreen-3);
   TH1F *hst_wz    = merge_and_decorate(WZ,    "WZ",        kGreen-9);
   TH1F *hst_zz    = merge_and_decorate(ZZ,    "ZZ",        kGreen-10);
-  TH1F *hst_data  = merge_and_decorate(Data,  "Data",      kBlack);
+  TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon Data", kBlack);
+  TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma Data",   kBlack);
+
+  TH1F *hst_data = (TH1F *)hst_smuon->Clone();
+  hst_data->Add(hst_egamma);
+  hst_data->SetName("Data (2018)");
 
   if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");}
   if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
@@ -277,9 +292,8 @@ void plot(TString var, TString name){
   //SoverB
   globalSbyB = 0;
   if(sig_eles_100){
-    //TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
-    TH1F *sbyrb = GetSbyRootB(hst_dy, bkg); SetRatioStyle(sbyrb, name);
-    sbyrb->GetYaxis()->SetTitle("DY/sqrtB");
+    TH1F *sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
+    sbyrb->GetYaxis()->SetTitle("S/sqrtB");
     if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
     if(!toOverlayData) sbyrb->Draw("ep");
   }
@@ -319,7 +333,12 @@ void plot(TString var, TString name){
   put_text();
 
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
-  if(toOverlayData) SetLegendEntry(lg, hst_data);
+  if(toOverlayData){
+    SetLegendEntry(lg, hst_data);
+    SetLegendEntry(lg, hst_smuon);
+    SetLegendEntry(lg, hst_egamma);
+  }
+
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
   if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
   if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);

@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include "decorations.h"
+#include <string>
 
 //Global variables being used by the class:
 extern TString input_path;
@@ -11,6 +12,7 @@ extern float xmax;
 extern int rebin;
 extern float globalSbyB;
 extern float globalObsbyExp;
+extern float QCDscale;
 
 //The following function are used by get_hist()
 extern TTree* GetFilteredTree(TTree *intree); //defined in the main code
@@ -158,7 +160,10 @@ TH1F *get_hist(
   float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
 
   //Tweaking the histogram:
-  if(sample != "SingleMuon" || sample != "EGamma") hst->Scale(59800/lumi);
+  float datalumi = 59800; //pb^{-1}
+  if (sample == "QCD_MuEnriched") hst->Scale((datalumi/lumi)*QCDscale);
+  else if(sample != "SingleMuon" || sample != "EGamma") hst->Scale(datalumi/lumi);
+    
   SetLastBinAsOverflow(hst);
   hst->GetXaxis()->SetRangeUser(xmin, xmax);
   hst->Rebin(rebin);
