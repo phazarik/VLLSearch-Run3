@@ -13,6 +13,7 @@ extern int rebin;
 extern float globalSbyB;
 extern float globalObsbyExp;
 extern float QCDscale;
+extern bool toZoom;
 
 //The following function are used by get_hist()
 extern TTree* GetFilteredTree(TTree *intree); //defined in the main code
@@ -165,7 +166,6 @@ TH1F *get_hist(
   else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
     
   SetLastBinAsOverflow(hst);
-  hst->GetXaxis()->SetRangeUser(xmin, xmax);
   hst->Rebin(rebin);
 
   //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
@@ -339,7 +339,7 @@ void GetBinwiseSF(TString var, TH1F *hst_data, TH1F *hst_qcd, vector<TH1F*>bkg){
 	else nothers = nothers + bkg[i]->GetBinContent(bin+1);
       }
       float sf_bin = 0; if(nqcd !=0) sf_bin = (ndata-nothers)/nqcd;
-      
+
       cout<<bin+1<<"\t"<<(int)ndata<<"\t"<<(int)nqcd<<"\t"<<(int)nothers<<"\t";
       cout<<fixed<<setprecision(7)<<sf_bin<<defaultfloat<<"\t";
       cout<<binxlow<<"-"<<binxup<<endl;

@@ -75,8 +75,8 @@ void makestack(){
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "_qcdCR_htscaled";
-  QCDscale = 1.2217294;//0.0355525;
+  tag = "_qcdCR_unscaled";
+  QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
     TString var;
@@ -89,8 +89,12 @@ void makestack(){
 
   vector<plotdata> p = {
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
+    //For histograms, nbins do not matter (already decided).
+    //It matters if the code is reading branches.
+    //Rebin can be overwritten inside the plot loop.
+    
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 50},
+    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     /*
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
@@ -167,6 +171,8 @@ TTree* GetFilteredTree(TTree *intree){
 //-----------------------------------
 
 void plot(TString var, TString name){
+  cout<<"Test : toZoom = "<<toZoom;
+  cout<<"\txmin, xmax = "<<xmin<<" "<<xmax<<endl;
   bkg.clear();
   TString date_stamp  = todays_date();
   TString dump_folder = "plots/"+date_stamp+tag;
