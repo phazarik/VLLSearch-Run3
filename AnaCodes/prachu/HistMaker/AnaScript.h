@@ -430,6 +430,7 @@ public :
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
+  void SetLumi(double lumi){_lumi=lumi;}
 
   void BookHistograms();
 
@@ -589,6 +590,7 @@ private:
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi;
   TString _era, _flag;
+  double _lumi;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;
@@ -602,7 +604,7 @@ private:
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
   bool evt_trigger;
-  float evt_wt;
+  double evt_wt;
 
   //For signal:
   bool bad_event;

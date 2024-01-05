@@ -12,7 +12,7 @@ using namespace std;
 //Including the header files:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection/BookHistograms.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
@@ -58,7 +58,8 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
 
-  if(_flag=="doublet") cout<<"Removing invalid VLLD decay modes ..."<<endl;
+  if(_flag=="doublet")  cout<<"Removing invalid VLLD decay modes ..."<<endl;
+  else if(_flag=="qcd") cout<<"Scaling QCD files ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()
@@ -80,7 +81,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
 
-  cout<<"Event counts:"<<endl;
+  cout<<"Event counts (raw):"<<endl;
   cout<<"4L   = "<<n4l<<endl;
   cout<<"3L   = "<<n3l<<endl;
   cout<<"2LSS = "<<n2lss<<endl;
@@ -88,6 +89,8 @@ void AnaScript::SlaveTerminate()
   cout<<"1L2J = "<<n1l2j<<endl;
   cout<<"1L1J = "<<n1l1j<<endl;
   cout<<"1L0J = "<<n1l0j<<endl;
+
+  cout<<"\nLumiScale = "<<59800/_lumi<<endl;
   
   time(&end);
 
@@ -314,12 +317,17 @@ Bool_t AnaScript::Process(Long64_t entry)
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
-      
-	  
+
+      //lumiscaling:
+      //if(_data == 2018)	evt_wt = evt_wt*(59800/_lumi);
+      double lumiscale = (59800/_lumi);
+      h.evtweight[3]->Fill(lumiscale);
+
+      //Make_evt2LSS_plots(evt_wt);
       if(evt_2LSS && evt_trigger){
-	nEvtPass++;
+	//nEvtPass++;
 	h.nevt->Fill(3);
-	Make_evt2LSS_plots(evt_wt);
+	Make_evt2LSS_plots(evt_wt); //This function is updating evt_wt for QCD
       }
       
       if(_data==0){

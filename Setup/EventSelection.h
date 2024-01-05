@@ -8,20 +8,33 @@ void AnaScript::EventSelection(){
   evt_2LSS      = false;
   evt_3L        = false;
   evt_4L_incl   = false;
-
   evt_trigger   = false;
 
+  bool all_leptons_isolated = true;
+  for(int i=0; i<(int)LightLepton.size(); i++){
+    if(LightLepton.at(i).reliso03 > 0.15) all_leptons_isolated = false;
+  }
+  
   //Flagging out the bad events from VLLD:
   if(!bad_event){
   
     //Selecting events in the order 4L>3L>2L
-    if((int)LightLepton.size()>3)        evt_4L_incl   = true;
-    else if((int)LightLepton.size()==3)  evt_3L        = true;
+    if((int)LightLepton.size()>3       && all_leptons_isolated)  evt_4L_incl = true;
+    else if((int)LightLepton.size()==3 && all_leptons_isolated)  evt_3L        = true;
     else if((int)LightLepton.size()==2){
-      if(LightLepton.at(0).charge == (-1)*LightLepton.at(1).charge) evt_2LOS = true;
-      else evt_2LSS = true;
+
+      //customizing the lepton isolation criteria:
+      float dilep_mass = (LightLepton.at(0).v + LightLepton.at(1).v).M();
+      bool qcd_region = 0.25 < LightLepton.at(0).reliso03 && LightLepton.at(0).reliso03 < 1.0 && LightLepton.at(1).reliso03 > 0.15;
+      //qcd_region = qcd_region && (int)bJet.size()==0 && dilep_mass > 50; //Reducing other backgrounds.
+
+      if(qcd_region){
+	if(LightLepton.at(0).charge == (-1)*LightLepton.at(1).charge) evt_2LOS = true;
+	else evt_2LSS = true;
+      }
+      
     }
-    else if((int)LightLepton.size()==1){
+    else if((int)LightLepton.size()==1 && all_leptons_isolated){
       if ((int)Jet.size()>1)        evt_1L2J_incl = true;
       else if ((int)Jet.size()==1)  evt_1L1J      = true;     
       else if((int)Jet.size()==0)   evt_1L0J      = true;

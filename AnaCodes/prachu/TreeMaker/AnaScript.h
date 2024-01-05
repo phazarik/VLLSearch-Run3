@@ -679,6 +679,7 @@ void AnaScript::Init(TTree *tree)
   
   mytree = new TTree("myEvents", "myEvents");
   InitializeBranches(mytree);
+  //mytree->SetAutoSave(1000);
 
   
 }

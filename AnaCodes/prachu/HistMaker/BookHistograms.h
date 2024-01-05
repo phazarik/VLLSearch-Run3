@@ -4,6 +4,7 @@ void AnaScript::BookHistograms(){
   h.evtweight[0] = new TH1F("wt_SF","Reco-ID-Iso Scale Factor",200,0,2);
   h.evtweight[1] = new TH1F("wt_trigger","Trigger Scale Factor",200,0,2);
   h.evtweight[2] = new TH1F("wt_evt","Event weight",200,0,2);
+  h.evtweight[3] = new TH1F("wt_lumi","LumiScale",3000,0,3000);
   //for(int i=0; i<3; i++)h.evtweight[i]->Sumw2();
 
   //Checking the triggers:
@@ -97,38 +98,41 @@ void AnaScript::BookHistograms(){
   h.evt2LSS[1]  = new TH1F("njet", "njet", 10, 0, 10);
   h.evt2LSS[2]  = new TH1F("nbjet", "nbjet", 10, 0, 10);
 
-  h.evt2LSS[3]  = new TH1F("lep0_pt",  "lep0_pt",  500, 0, 500);
-  h.evt2LSS[4]  = new TH1F("lep0_eta", "lep0_eta", 200, -4, 4);
-  h.evt2LSS[5]  = new TH1F("lep0_phi", "lep0_phi", 200, -4, 4);
-  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 100, 0, 0.2);
-  h.evt2LSS[7]  = new TH1F("lep0_mt",  "lep0_mt",  500, 0, 500);
+  h.evt2LSS[3]  = new TH1F("lep0_pt",  "lep0_pt",  50, 0, 500);
+  h.evt2LSS[4]  = new TH1F("lep0_eta", "lep0_eta", 100, -4, 4);
+  h.evt2LSS[5]  = new TH1F("lep0_phi", "lep0_phi", 100, -4, 4);
+  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 100, 0, 10);
+  h.evt2LSS[7]  = new TH1F("lep0_mt",  "lep0_mt",  50, 0, 500);
 
-  h.evt2LSS[8]  = new TH1F("lep1_pt",  "lep1_pt",  500, 0, 500);
-  h.evt2LSS[9]  = new TH1F("lep1_eta", "lep1_eta", 200, -4, 4);
-  h.evt2LSS[10] = new TH1F("lep1_phi", "lep1_phi", 200, -4, 4);
-  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 100, 0, 0.2);
-  h.evt2LSS[12] = new TH1F("lep1_mt",  "lep1_mt",  500, 0, 500);
+  h.evt2LSS[8]  = new TH1F("lep1_pt",  "lep1_pt",  50, 0, 500);
+  h.evt2LSS[9]  = new TH1F("lep1_eta", "lep1_eta", 100, -4, 4);
+  h.evt2LSS[10] = new TH1F("lep1_phi", "lep1_phi", 100, -4, 4);
+  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 100, 0, 10);
+  h.evt2LSS[12] = new TH1F("lep1_mt",  "lep1_mt",  50, 0, 500);
 
-  h.evt2LSS[13] = new TH1F("dilep_pt",  "dilep_pt",  500, 0, 500);
-  h.evt2LSS[14] = new TH1F("dilep_eta", "dilep_eta", 200, -10, 10);
-  h.evt2LSS[15] = new TH1F("dilep_phi", "dilep_phi", 200, -4, 4);
-  h.evt2LSS[16] = new TH1F("dilep_mass","dilep_mass",500, 0, 500);
-  h.evt2LSS[17] = new TH1F("dilep_mt",  "dilep_mt",  500, 0, 500);
-  h.evt2LSS[18] = new TH1F("dilep_deta", "dilep_deta", 200, 0, 6);
-  h.evt2LSS[19] = new TH1F("dilep_dphi", "dilep_dphi", 200, 0, 6);
-  h.evt2LSS[20] = new TH1F("dilep_dR",   "dilep_dR",   200, 0, 6);
-  h.evt2LSS[21] = new TH1F("dilep_ptratio","dilep_ptratio",200, 0, 1);
+  h.evt2LSS[13] = new TH1F("dilep_pt",  "dilep_pt",  50, 0, 500);
+  h.evt2LSS[14] = new TH1F("dilep_eta", "dilep_eta", 100, -10, 10);
+  h.evt2LSS[15] = new TH1F("dilep_phi", "dilep_phi", 100, -4, 4);
+  h.evt2LSS[16] = new TH1F("dilep_mass","dilep_mass",50, 0, 500);
+  h.evt2LSS[17] = new TH1F("dilep_mt",  "dilep_mt",  50, 0, 500);
+  h.evt2LSS[18] = new TH1F("dilep_deta", "dilep_deta", 100, 0, 6);
+  h.evt2LSS[19] = new TH1F("dilep_dphi", "dilep_dphi", 100, 0, 6);
+  h.evt2LSS[20] = new TH1F("dilep_dR",   "dilep_dR",   100, 0, 6);
+  h.evt2LSS[21] = new TH1F("dilep_ptratio","dilep_ptratio",100, 0, 1);
 
-  h.evt2LSS[22] = new TH1F("HT", "HT", 500, 0, 500);
-  h.evt2LSS[23] = new TH1F("ST", "ST", 500, 0, 500);
-  h.evt2LSS[24] = new TH1F("STfrac", "STfrac", 200, 0, 1.1); //For nJet-==0, STfrac=1
+  h.evt2LSS[22] = new TH1F("HT", "HT", 10, 0, 500);
+  h.evt2LSS[23] = new TH1F("ST", "ST", 50, 0, 500);
+  h.evt2LSS[24] = new TH1F("STfrac", "STfrac", 100, 0, 1.1); //For nJet-==0, STfrac=1
   
-  h.evt2LSS[25] = new TH1F("dphi_metlep0",    "dilep_metlep0",    200, 0, 4);
-  h.evt2LSS[26] = new TH1F("dphi_metlep1",    "dilep_metlep1",    200, 0, 4);
-  h.evt2LSS[27] = new TH1F("dphi_metdilep",   "dilep_metdilep",   200, 0, 4);
-  h.evt2LSS[28] = new TH1F("dphi_metlep_max", "dilep_metlep_max", 200, 0, 4);
-  h.evt2LSS[29] = new TH1F("dphi_metlep_min", "dilep_metlep_min", 200, 0, 4);
+  h.evt2LSS[25] = new TH1F("dphi_metlep0",    "dilep_metlep0",    100, 0, 4);
+  h.evt2LSS[26] = new TH1F("dphi_metlep1",    "dilep_metlep1",    100, 0, 4);
+  h.evt2LSS[27] = new TH1F("dphi_metdilep",   "dilep_metdilep",   100, 0, 4);
+  h.evt2LSS[28] = new TH1F("dphi_metlep_max", "dilep_metlep_max", 100, 0, 4);
+  h.evt2LSS[29] = new TH1F("dphi_metlep_min", "dilep_metlep_min", 100, 0, 4);
 
-  for(int i=0; i<30; i++) h.evt2LSS[i]->Sumw2();
+  h.evt2LSS[30] = new TH1F("MET", "MET", 50, 0, 500);
+  h.evt2LSS[31] = new TH1F("MET_phi", "MET_phi", 100, -4, 4);
+  
+  for(int i=0; i<32; i++) h.evt2LSS[i]->Sumw2();
   
 }

@@ -72,6 +72,27 @@ void ana_test(int sample=0)
     m_selec.SetLep(1);
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
   }
+
+  else if(sample==-2){//Testing skimmed version.
+    chain->Add("../Skimmer/test_outputs/*.root");
+    treefilename = "test_outputs/tree_from_skim.root";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+  }
+
+  //Testing on skim:
+  else if(sample==999){//Testing skimmed version.
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root");
+    treefilename = "test_outputs/tree_DYJetsToLL_skimmed.root";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+  }
   
   else{
     cout<<"Invalid argument!"<<endl;

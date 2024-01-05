@@ -63,6 +63,7 @@ void AnaScript::createGenLightLeptons(){
 void AnaScript::createSignalArrays(){
   //Creating signal arrays and flagging the bad events:
 
+  /*
   //Printing out the GenPart Array:
   int test_event = 100;
   if(nEvtTotal == test_event){
@@ -81,7 +82,7 @@ void AnaScript::createSignalArrays(){
       cout<<GenPart_status[i]<<endl;
     }
     cout<<"--------------------------------------------------\n"<<endl;
-  }
+    }*/
 
   for(unsigned int i=0; i< (*nGenPart); i++){
     Particle temp;
