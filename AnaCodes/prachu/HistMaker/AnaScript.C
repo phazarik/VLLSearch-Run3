@@ -327,7 +327,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       if(evt_2LSS && evt_trigger){
 	//nEvtPass++;
 	h.nevt->Fill(3);
-	Make_evt2LSS_plots(evt_wt);
+	Make_evt2LSS_plots(evt_wt); //This function is updating evt_wt for QCD
       }
       
       if(_data==0){

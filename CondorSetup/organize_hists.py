@@ -14,12 +14,9 @@ jobname = args.jobname
 date    = args.date #'2023-10-02'
 test    = args.test
 dryrun  = args.dryrun
-DUMP    = f'input_files/{jobname}'
+DUMP    = '/home/work/phazarik1/work/CondorDump/hadded/'+jobname
 
-if not dryrun :
-    os.system(f'mkdir -p {DUMP}')
-    print('Removing previous files ...')
-    os.system(f'rm -f {DUMP}/*')
+if not dryrun : os.system(f'mkdir -p {DUMP}')
 
 with open('../InputJsons/lumidata_2018.json', 'r') as file: json_data = json.load(file)
 indict = json_data
@@ -28,7 +25,7 @@ for sample, subdict in indict.items():
     for subsample, lumi in subdict.items():
         #print(sample, subsample, lumi)
         
-        indir = f'hists/{jobname}/{sample}_{subsample}_{date}'
+        indir = f'/home/work/phazarik1/work/CondorDump/output/{jobname}/{sample}_{subsample}_{date}'
         pathexists = os.path.exists(indir)
         if not pathexists: continue
         list_of_files = os.listdir(indir)

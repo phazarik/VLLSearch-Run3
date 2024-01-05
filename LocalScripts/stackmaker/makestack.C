@@ -69,13 +69,14 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  input_path = "../input_files";
+  TString jobname = "hist_2LSS_Jan05_nonIso";
+  input_path = "../input_files/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "_qcdCR_unscaled";
+  tag = "_nonIso";
   QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
@@ -93,42 +94,42 @@ void makestack(){
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
     
-    //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
+    //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 5},
+    //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     /*
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 10},
-    {.var="ST",       .name="HT+LT (GeV)",    200, 0, 200, 10},
-    {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 10},
-    {.var="MET",      .name="MET (GeV)",    200, 0, 200, 10},
-    {.var="MET_phi",  .name="MET phi",    200, -4, 4, 10},
-    {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 10},
-    {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  10},
-    {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  10},
-    {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 10},
-    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},    
-    {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 10},
-    {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  10},
-    {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  10},
-    {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 10},
-    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
-    /*
-    {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 10},
-    {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  10},
-    {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  10},
-    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 10},
-    {.var="dilep_mt",        .name="Dilep mT (GeV)",    200, 0, 200, 10},
-    {.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   10},
-    {.var="dilep_dphi",      .name="dphi(lep0, lep1)",  200, 0, 6,   10},
-    {.var="dilep_dR",        .name="dR(lep0, lep1)",    200, 0, 6,   10},
-    {.var="dilep_ptratio",   .name="pT1/pT0",           200, 0, 1, 10},
-    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",   200, 0, 4, 10},
-    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 10},
-    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 10},
-    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 10},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 10},*/
+    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
+    {.var="ST",       .name="HT+LT (GeV)",    200, 0, 200, 5},
+    {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 5},
+    {.var="MET",      .name="MET (GeV)",    200, 0, 200, 2},
+    {.var="MET_phi",  .name="MET phi",    200, -4, 4, 5},
+    {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 2},
+    {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  5},
+    {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  5},
+    {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 2},
+    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 2},    
+    {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 2},
+    {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  5},
+    {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
+    {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 2},*/
+    
+    {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
+    {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
+    {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  5},
+    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 2},
+    {.var="dilep_mt",        .name="Dilep mT (GeV)",    200, 0, 200, 2},
+    {.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   5},
+    {.var="dilep_dphi",      .name="dphi(lep0, lep1)",  200, 0, 6,   5},
+    {.var="dilep_dR",        .name="dR(lep0, lep1)",    200, 0, 6,   5},
+    {.var="dilep_ptratio",   .name="pT1/pT0",           200, 0, 1, 5},
+    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",   200, 0, 4, 5},
+    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 5},
+    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
+    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
   };
 
   int count = 0;
@@ -171,8 +172,11 @@ TTree* GetFilteredTree(TTree *intree){
 //-----------------------------------
 
 void plot(TString var, TString name){
-  cout<<"Test : toZoom = "<<toZoom;
-  cout<<"\txmin, xmax = "<<xmin<<" "<<xmax<<endl;
+
+  //rebin = 1; //overriding rebin
+  //cout<<"Test : toZoom = "<<toZoom;
+  //cout<<"\txmin, xmax = "<<xmin<<" "<<xmax<<endl;
+  
   bkg.clear();
   TString date_stamp  = todays_date();
   TString dump_folder = "plots/"+date_stamp+tag;
@@ -294,7 +298,7 @@ void plot(TString var, TString name){
   if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
   //Caculating scale factors, since the histograms are ready:
-  GetBinwiseSF(var,hst_data, hst_qcd, bkg);
+  if(toOverlayData) GetBinwiseSF(var,hst_data, hst_qcd, bkg);
 
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
@@ -395,7 +399,7 @@ void plot(TString var, TString name){
   if(toSave){
     createFolder(dump_folder);
     canvas->SaveAs(filename+".png");
-    canvas->Clear();
+    //canvas->Clear();
     //delete canvas;
     //delete lg;
     //delete bkgstack;
