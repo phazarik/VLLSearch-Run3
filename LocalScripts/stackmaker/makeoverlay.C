@@ -62,7 +62,7 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-void makestack(){
+void makeoverlay(){
 
   time_t start, end;
   time(&start);
@@ -72,7 +72,7 @@ void makestack(){
   TString jobname = "hist_2Lee_Jan09";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
@@ -157,20 +157,6 @@ void makestack(){
   double time_taken = double(end-start);
   TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\nNo of plots = "+to_string(count)+"\n";
   DisplayText(report, 33); //33 is the ANSI color code for yellow
-}
-
-//---------------------------------------------------------------
-// Event selection: Put cuts on the branches and filter the tree
-//---------------------------------------------------------------
-
-TTree* GetFilteredTree(TTree *intree){
-
-  //Define the branch cuts using TCut
-  TCut pt0cut = "lep0_pt > 35";
-
-  TCut cut = pt0cut; 
-  TTree *filtered_tree = intree->CopyTree(cut);
-  return filtered_tree;
 }
 
 //-----------------------------------
@@ -317,8 +303,8 @@ void plot(TString var, TString name){
   // Plotting:
   //---------------------------------------------
   canvas = create_canvas(var, filename, 800, 600);
-  mainPad  = create_mainPad(0, 0.22, 1, 1);     mainPad ->Draw();
-  ratioPad = create_ratioPad(0, 0.01, 1, 0.25); ratioPad->Draw();
+  mainPad  = create_mainPad(0, 0, 1, 1);     mainPad ->Draw();
+  //ratioPad = create_ratioPad(0, 0.01, 1, 0.25); ratioPad->Draw();
   
   mainPad->cd();
 
@@ -326,81 +312,43 @@ void plot(TString var, TString name){
   //It should alywas be drawn first.
   //dummy->Reset();
   dummy = (TH1F *)bkg[0]->Clone(); dummy->Reset(); 
-  dummy->GetYaxis()->SetTitle("Events");
-  dummy->GetYaxis()->SetRangeUser(0.1, 10E6);
+  dummy->GetYaxis()->SetTitle("Events (normalised)");
+  dummy->GetYaxis()->SetRangeUser(0, 1);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
+  dummy->GetXaxis()->SetTitle(name);
+  dummy->GetXaxis()->SetLabelSize(0.04);
   dummy->SetStats(0);
   dummy->Draw("hist");
 
-  //Now draw the rest.
-  if(toOverlayData) hst_data->Draw("ep same");
-  bkgstack->Draw("hist same");
-  if(sig_eled_100) sig_eled_100->Draw("HIST same");
-  if(sig_eles_100) sig_eles_100->Draw("HIST same");
-  if(toOverlayData) hst_data->Draw("ep same");
+  //Comparing shapes:
+  mainPad->SetLogy(0);
+  TH1F *hst_dy = get_hist(var, "DYJetsToLL", "M50",    30321.155);
+  SetHistoStyle(hst_dy, kRed-7);
+  hst_data->Scale(1/hst_data->Integral());
+  hst_dy->Scale(1/hst_dy->Integral());
+  hst_data->Draw("hist same");
+  hst_dy->Draw("hist same");
 
-  ratioPad->cd();
+  //Put text (text, x, y, style, size)
+  put_text("CMS", 0.10, 0.93, 62, 0.04);
+  put_text("preliminary", 0.18, 0.93, 52, 0.04);
+  put_text(tag+" events", 0.40, 0.93, 42, 0.04);
+  put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.03);
 
-  //SoverB
-  globalSbyB = 0;
-  if(sig_eles_100){
-    sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
-    sbyrb->GetYaxis()->SetTitle("S/sqrtB");
-    if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
-    if(!toOverlayData) sbyrb->Draw("ep");
-  }
-  
-  //obs/exp
-  globalObsbyExp =0;
+  TLegend *lg = create_legend(0.76, 0.35, 0.95, 0.90);
+  lg->SetTextSize(0.02);
   if(toOverlayData){
-    ratiohist = GetRatio(hst_data, bkg);
-    SetRatioStyle(ratiohist, name);
-    ratiohist->GetYaxis()->SetTitle("obs/exp");
-    ratiohist->GetYaxis()->SetRangeUser(0, 2.2);
-    if(toZoom) ratiohist->GetXaxis()->SetRangeUser(xmin, xmax);
-  
-    //Setting up a horizontal line on the ratiopad:
-    float xlow  = ratiohist->GetXaxis()->GetBinLowEdge(1);
-    float xhigh = ratiohist->GetXaxis()->GetBinUpEdge(ratiohist->GetNbinsX());
-    TLine *line = new TLine(xlow, 1, xhigh, 1);
-    line->SetLineColor(kRed);
-    line->SetLineWidth(2);
-    
-    //Calculating the uncertainty on the background in each bin:
-    TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
-    for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
-    TGraphErrors *err = GetUncertainty(allbkg);
-    err->GetYaxis()->SetNdivisions(5, kTRUE);
-    err->SetStats(0);
-    if(toZoom) err->GetXaxis()->SetRangeUser(xmin, xmax);
-
-    //Drawing everything in the proper order:
-    ratiohist->Draw("ep"); //Inheriting the settings from the ratio hist.
-    err->Draw("SAME P E2");
-    line->Draw("same");
-    ratiohist->Draw("ep same"); //I want the ratio to be on top.
-  }
-  
-  mainPad->cd();
-  
-  put_text("CMS", 0.10, 0.93, 62, 0.06);
-  put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_text(tag+" events", 0.40, 0.93, 42, 0.05);
-  put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
-
-  TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
-  if(toOverlayData){
-    SetLegendEntry(lg, hst_data);
+    //SetLegendEntry(lg, hst_data);
     SetLegendEntry(lg, hst_smuon);
     SetLegendEntry(lg, hst_egamma);
   }
 
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
-  if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
-  if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
-  TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
-  if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
-  lg->SetHeader(legendheader);
+  //if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
+  //if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
+  //TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
+  //if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
+  lg->SetHeader("");
   lg->Draw();
 
   DisplayText("Made plot for "+var, 0);
@@ -408,7 +356,7 @@ void plot(TString var, TString name){
   //Make a new folder and put all the plots there:
   if(toSave){
     createFolder(dump_folder);
-    canvas->SaveAs(filename+".png");
+    canvas->SaveAs(filename+"_overlay.png");
     //canvas->Clear();
     //delete canvas;
     //delete lg;
