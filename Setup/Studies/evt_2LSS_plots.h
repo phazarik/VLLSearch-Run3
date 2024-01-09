@@ -52,28 +52,33 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   // Deciding further event selections:
   //-----------------------------------
 
-  bool qcd_CR = nbjet==0 && dilep_mass > 50 && dphi_metdilep < 1.5;
-  bool qcd_VR = nbjet==0 && dilep_mass > 50 && dphi_metdilep > 1.5;
-  bool event_selection = true;
+  //For correcting QCD:
+  bool qcd_enhanced = nbjet==0 && lep0_pt > 50;
+  bool qcd_CR = qcd_enhanced && dilep_phi < 0;
+  bool qcd_VR = qcd_enhanced && dilep_phi > 0;
+
+  //Basic filtering of eventsL
+  bool basic_filtering = dilep_pt > 30 && fabs(dilep_eta) < 4;
+  
+  bool event_selection = basic_filtering;
 
   //------------------------
   // QCD scaling in HT bins:
   //------------------------
   double qcdscale = 1.0; //default
 
-  if(HT < 50)                 qcdscale = 0.1414586;
-  else if (50<=HT  && HT<100) qcdscale = 0.0552467;
-  else if (100<=HT && HT<150) qcdscale = 0.0351217;
-  else if (150<=HT && HT<200) qcdscale = 0.0296351;
-  else if (200<=HT && HT<250) qcdscale = 0.0264910;
-  else if (250<=HT && HT<300) qcdscale = 0.0180734;
-  else if (300<=HT && HT<350) qcdscale = 0.0202845;
-  else if (350<=HT && HT<400) qcdscale = 0.0205580;
-  else if (400<=HT && HT<450) qcdscale = 0.0181409;
-  else                        qcdscale = 0.0104532;
-  //else                        qcdscale = 0.0175513;
+  if(HT < 50)                 qcdscale = 0.0212517;
+  else if (50<=HT  && HT<100) qcdscale = 0.0485609;
+  else if (100<=HT && HT<150) qcdscale = 0.0745748;
+  else if (150<=HT && HT<200) qcdscale = 0.0303177;
+  else if (200<=HT && HT<250) qcdscale = 0.0225880;
+  else if (250<=HT && HT<300) qcdscale = 0.0179411;
+  else if (300<=HT && HT<350) qcdscale = 0.0118273;
+  else if (350<=HT && HT<400) qcdscale = 0.0151473;
+  else if (400<=HT && HT<450) qcdscale = 0.0103587;
+  else                        qcdscale = 0.0105359;
   
-  //if(_flag == "qcd") wt = wt*qcdscale;
+  if(_flag == "qcd") wt = wt*qcdscale;
 
   //-----------
   // Plotting:

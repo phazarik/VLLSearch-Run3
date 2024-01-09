@@ -69,14 +69,14 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2LSS_Jan05_nonIso";
+  TString jobname = "hist_2LSS_basic_Jan08";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
-  toSave = true;
+  toSave = false;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "_nonIso";
+  tag = "_beforeSR";
   QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
@@ -93,8 +93,8 @@ void makestack(){
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    
-    //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 5},
+    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},
+    //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     /*
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
@@ -115,7 +115,7 @@ void makestack(){
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
     {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 2},*/
-    
+    /*
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
     {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  5},
@@ -129,7 +129,7 @@ void makestack(){
     {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 5},
     {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
     {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},*/
   };
 
   int count = 0;
@@ -173,7 +173,7 @@ TTree* GetFilteredTree(TTree *intree){
 
 void plot(TString var, TString name){
 
-  //rebin = 1; //overriding rebin
+  rebin = 1; //overriding rebin
   //cout<<"Test : toZoom = "<<toZoom;
   //cout<<"\txmin, xmax = "<<xmin<<" "<<xmax<<endl;
   
@@ -287,8 +287,8 @@ void plot(TString var, TString name){
   };
   TH1F *hst_qcd = bkg[0];
   
-  TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon Data", kBlack);
-  TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma Data",   kBlack);
+  TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon", kBlack);
+  TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma",   kBlack);
 
   hst_data = (TH1F *)hst_smuon->Clone();
   hst_data->Add(hst_egamma);

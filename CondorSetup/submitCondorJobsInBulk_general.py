@@ -32,7 +32,7 @@ year = 2018
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+mode = "hist"             #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
 file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 
 #################################
@@ -50,7 +50,7 @@ condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriche
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08"
 else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None

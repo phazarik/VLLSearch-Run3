@@ -1,17 +1,21 @@
 import os, sys, argparse
 import json
 import time
+import datetime
+today = datetime.datetime.now()
+date = today.strftime('%Y-%m-%d')
+
 start_time = time.time()
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--jobname',type=str, required=True, help='Condor job name: Such as hist_2LSS_Dec13')
-parser.add_argument('--date',type=str, required=True, help='In the format : YYYY-MM-DD')
+parser.add_argument('--date',type=str, required=False, help='In the format : YYYY-MM-DD')
 parser.add_argument('--test' ,type=bool,required=False,help='Run for only one sample')
 parser.add_argument('--dryrun' ,type=bool,required=False,help='Check If everything is correct before running')
 args=parser.parse_args()
 
 jobname = args.jobname
-date    = args.date #'2023-10-02'
+if args.date: date = args.date
 test    = args.test
 dryrun  = args.dryrun
 DUMP    = '/home/work/phazarik1/work/CondorDump/hadded/'+jobname

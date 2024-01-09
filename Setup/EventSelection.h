@@ -14,6 +14,8 @@ void AnaScript::EventSelection(){
   for(int i=0; i<(int)LightLepton.size(); i++){
     if(LightLepton.at(i).reliso03 > 0.15) all_leptons_isolated = false;
   }
+
+  Float_t HT=0; for(Int_t i=0; i<(Int_t)Jet.size(); i++) HT = HT + Jet.at(i).v.Pt();
   
   //Flagging out the bad events from VLLD:
   if(!bad_event){
@@ -21,14 +23,14 @@ void AnaScript::EventSelection(){
     //Selecting events in the order 4L>3L>2L
     if((int)LightLepton.size()>3       && all_leptons_isolated)  evt_4L_incl = true;
     else if((int)LightLepton.size()==3 && all_leptons_isolated)  evt_3L        = true;
-    else if((int)LightLepton.size()==2){
+    else if((int)LightLepton.size()==2 && all_leptons_isolated){
 
-      //customizing the lepton isolation criteria:
-      float dilep_mass = (LightLepton.at(0).v + LightLepton.at(1).v).M();
-      bool qcd_region = 0.25 < LightLepton.at(0).reliso03 && LightLepton.at(0).reliso03 < 1.0 && LightLepton.at(1).reliso03 > 0.15;
-      //qcd_region = qcd_region && (int)bJet.size()==0 && dilep_mass > 50; //Reducing other backgrounds.
+      //Selecting a QCD enhanced region:
+      //bool qcd_region = 0.25 < LightLepton.at(0).reliso03 && LightLepton.at(0).reliso03 < 1.0 && LightLepton.at(1).reliso03 > 0.15;
+      //qcd_region = qcd_region && HT<500; //Putting a global HT cut
 
-      if(qcd_region){
+      //Putting a global HT cut
+      if(HT<500){
 	if(LightLepton.at(0).charge == (-1)*LightLepton.at(1).charge) evt_2LOS = true;
 	else evt_2LSS = true;
       }

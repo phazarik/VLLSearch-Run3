@@ -8,7 +8,7 @@
 using namespace std;
 void plotmaker(TString plotname, TString xtitle, int nbins, TString target_model, TString target_flavor);
 
-void make_overlay(){
+void make_overlay_signal(){
   TString target_model = "VLLS";
   TString target_flavor = "ele";
 

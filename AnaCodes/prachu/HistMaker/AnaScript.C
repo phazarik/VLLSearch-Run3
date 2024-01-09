@@ -54,6 +54,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
 
   evt_wt = 1.0;
   bad_event = false;
+  evt_trigger = false;
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -262,9 +263,12 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Event-selection is done right after creating the object arrays.
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
-      EventSelection();
-      evt_wt = getEventWeight();
+
+      EventSelection(); //This is where trigger is applied.
+      if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
+      else evt_wt = 1.0;
       //----------------------------------------------------------------
+
       /*
       //Basic object-level plots:
       //Electrons
