@@ -52,10 +52,15 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   // Deciding further event selections:
   //-----------------------------------
 
+  //For correcting QCD:
   bool qcd_enhanced = nbjet==0 && lep0_pt > 50;
   bool qcd_CR = qcd_enhanced && dilep_phi < 0;
   bool qcd_VR = qcd_enhanced && dilep_phi > 0;
-  bool event_selection = qcd_VR;
+
+  //Basic filtering of eventsL
+  bool basic_filtering = dilep_pt > 30 && fabs(dilep_eta) < 4;
+  
+  bool event_selection = basic_filtering;
 
   //------------------------
   // QCD scaling in HT bins:

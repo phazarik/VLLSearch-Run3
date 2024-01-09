@@ -109,7 +109,7 @@ void ana_test(int sample=0)
   
   //Testing on skim:
   else if(sample==999){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28/DYJetsToLL_M50_2023-12-28/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/DYJetsToLL_M50_2024-01-08/*.root");
     hstfilename = "test_outputs/hst_DYJetsToLL_M50_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetYear(2018);
@@ -119,7 +119,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(30321.155);
   }
   else if(sample==998){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28/QCD_MuEnriched_170to300_2023-12-28/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/QCD_MuEnriched_170to300_2024-01-08/*.root");
     hstfilename = "test_outputs/hst_qcd_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetYear(2018);
@@ -129,7 +129,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==-999){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_noniso_Dec28/SingleMuon_SingleMuon_A_2023-12-28/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/SingleMuon_SingleMuon_A_2024-01-08/*.root");
     hstfilename = "test_outputs/hst_SingleMuonA_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetYear(2018);
