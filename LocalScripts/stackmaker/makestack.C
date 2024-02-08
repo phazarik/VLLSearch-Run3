@@ -69,14 +69,15 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2Lee_Jan09";
+  //TString jobname = "hist_eeSSOnZ_DYenhanced_Jan31";
+  TString jobname = "hist_2Lmm_Jan09";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
   toSave = false;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "e-e";
+  tag = "test";
   QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
@@ -94,6 +95,9 @@ void makestack(){
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
     {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},
+    //{.var="onZ_ptbins", .name="onZ events",  5, 0, 5, 1},
+    //{.var="sideZ_ptbins", .name="sideband events",  5, 0, 5, 1},
+    //{.var="Flag_Zwindow", .name="onZ/offZ",  5, 0, 5, 1},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     /*
@@ -292,6 +296,7 @@ void plot(TString var, TString name){
     merge_and_decorate(ZZ,    "ZZ",        kGreen-10),
   };
   TH1F *hst_qcd = bkg[0];
+  //bkg[1]->Scale(0.0641216); //for ee type events
   
   TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon", kBlack);
   TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma",   kBlack);
@@ -304,8 +309,39 @@ void plot(TString var, TString name){
   if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
   //Caculating scale factors, since the histograms are ready:
-  if(toOverlayData) GetBinwiseSF(var,hst_data, hst_qcd, bkg);
+  //if(toOverlayData) GetBinwiseSF(var,hst_data, hst_qcd, bkg);
 
+  //Pritning out numbers for correcting the Z peak:
+  if(var == "onZ_ptbins"){
+    cout<<"\nnEvents onZ : (data vs DY)"<<endl;
+    for(int i=0; i<6; i++){
+      cout<<"bin"<<i<<"\t";
+      float ndata_i = hst_data->GetBinContent(i);
+      float ndy_i   = bkg[1]  ->GetBinContent(i);
+      cout<<ndata_i<<"\t"<<ndy_i<<endl;
+    }
+  }
+  else if(var == "sideZ_ptbins"){
+    cout<<"\nnEvents sidebandZ : (data vs DY)"<<endl;
+    for(int i=0; i<6; i++){
+      cout<<"bin"<<i<<"\t";
+      float ndata_i = hst_data->GetBinContent(i);
+      float ndy_i   = bkg[1]  ->GetBinContent(i);
+      cout<<ndata_i<<"\t"<<ndy_i<<endl;
+    }
+  }
+  else if(var == "Flag_Zwindow"){
+    cout<<"\nGlobal charge mismeasurement:"<<endl;
+    float ndatamisId = hst_data->GetBinContent(1) - hst_data->GetBinContent(3);
+    float ndymisId =   bkg[1]  ->GetBinContent(1) - bkg[1]  ->GetBinContent(3);
+    float othermisId = 0;
+    for(int i=0; i<(int)bkg.size(); i++) othermisId = othermisId + (bkg[i]->GetBinContent(1)-bkg[i]->GetBinContent(3));
+    othermisId = othermisId - ndymisId;
+    cout<<"Data misId nevents = "<< ndatamisId   <<endl;
+    cout<<"DY misId nevents = "<< ndymisId       <<endl;
+    cout<<"Global Scale = "<< ndatamisId/ndymisId<<endl;
+  }
+  
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
   bkgstack = new THStack("Stacked",var+";"+var+";Events");
@@ -385,7 +421,7 @@ void plot(TString var, TString name){
   
   put_text("CMS", 0.10, 0.93, 62, 0.06);
   put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_text(tag+" events", 0.40, 0.93, 42, 0.05);
+  put_text(tag+"", 0.40, 0.93, 42, 0.05);
   put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
 
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);

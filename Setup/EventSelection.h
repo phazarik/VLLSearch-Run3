@@ -10,6 +10,14 @@ void AnaScript::EventSelection(){
   evt_4L_incl   = false;
   evt_trigger   = false;
 
+  /*
+  float ele_ptcut = 27;
+  float mu_ptcut = 24;
+  if(_data == 2017){
+    ele_ptcut = 32;
+    mu_ptcut  = 27;
+    }*/
+
   bool all_leptons_isolated = true;
   for(int i=0; i<(int)LightLepton.size(); i++){
     if(LightLepton.at(i).reliso03 > 0.15) all_leptons_isolated = false;
@@ -32,7 +40,8 @@ void AnaScript::EventSelection(){
       //Putting a global HT cut
       if(HT<500){
 	if(LightLepton.at(0).charge == (-1)*LightLepton.at(1).charge) evt_2LOS = true;
-	else evt_2LSS = true;
+	else if(LightLepton.at(0).charge == LightLepton.at(1).charge) evt_2LSS = true;
+	else cout<<"2L events error : L1, L2 charge mismatch!"<<endl;
       }
       
     }

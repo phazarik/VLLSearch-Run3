@@ -18,7 +18,7 @@ void AnaScript::createLightLeptons(){
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4; 
     bool promptmuon = fabs(Muon_dxy[i])<0.05 && fabs(Muon_dz[i])<0.1;
     bool passcut_loosemuon  = ptetacut && promptmuon && Muon_looseId[i] && Muon_pfRelIso03_all[i]<0.30;
-    bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i];// && Muon_pfRelIso03_all[i]<0.15;
+    bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i] && Muon_pfRelIso04_all[i]<0.15; //warning
 
     if(passcut_mediummuon){
       Muon.push_back(temp);
@@ -50,7 +50,7 @@ void AnaScript::createLightLeptons(){
 	isprompt = true;
     }
     bool passcut_looseele  = ptetacut && isprompt && Electron_cutBased[i]>1;
-    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons; //&& Electron_pfRelIso03_all[i] < 0.15;
+    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 0.15;
 
     if(passcut_mediumele){
       Electron.push_back(temp);
@@ -127,17 +127,28 @@ void AnaScript::createJets(){
     Particle temp;
     temp.v.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
     temp.ind = i;
+    temp.btagscore = Jet_btagDeepFlavB[i];
 
     bool ptetacut = temp.v.Pt()>30 && fabs(temp.v.Eta())<2.4;
     bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.5);
+    bool cleaned_from_muons = clean_from_array(temp, Muon, 0.4);
     bool cleaned_from_taus = clean_from_array(temp, Tau, 0.5);
     bool jetID = _year == 2016 ? Jet_jetId[i]>=1 : Jet_jetId[i]>=2; //if 2016, >=1; else >=2
-    bool passcut = ptetacut && cleaned_from_leptons && cleaned_from_taus && jetID;
-
-    if(passcut){
+    //bool passcut = ptetacut && cleaned_from_leptons && cleaned_from_taus && jetID;
+    bool passcut = ptetacut && jetID; //warning
+    
+    if(passcut && cleaned_from_muons){
       Jet.push_back(temp);
-      if(Jet_btagDeepB[i]>0.4184) bJet.push_back(temp);
+      if(Jet_btagDeepB[i]>0.4184)     bJet.push_back(temp);
+      if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp);
+    }
+
+    bool forwardjets = temp.v.Pt()>40 && fabs(temp.v.Eta())<4.7;
+    if(forwardjets && cleaned_from_muons){
+      ForwardJet.push_back(temp);
+      if(Jet_btagDeepFlavB[i]>0.2783) ForwardMediumbJet.push_back(temp);
     }
     
   }
+
 }

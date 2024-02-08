@@ -139,3 +139,22 @@ TString AnaScript::ParticleName(int id){
 
   return name;
 }
+
+bool AnaScript::isMatchingWithGen(Particle reco, vector<Particle> gencollection){
+
+  //Let's initialize minimun dR with some large value.
+  float dR_min = 1000;
+  
+  //Looping over the gen-collection to minimize dR min
+  for(int i=0; i<(int)gencollection.size(); i++){
+    Particle gen = gencollection.at(i);
+    //Compare reco and gen only if their IDs match. (flavor and charge)
+    if(fabs(reco.id) == fabs(gen.id)){
+      float dR = reco.v.DeltaR(gen.v);
+      if(dR < dR_min) dR_min = dR;
+    }
+  }
+
+  if(dR_min < 0.4) return true;
+  else return false;
+}

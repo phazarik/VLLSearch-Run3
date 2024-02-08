@@ -59,6 +59,18 @@ void ana_test(int sample=0)
     m_selec.SetLumi(59800);
   }
 
+  else if(sample==3){//TTbarSemileptonic
+    chain->Add("/home/work/alaha1/public/RunII_ULSamples/2018/TTBar/TTToSemiLeptonic/NanoPost_TTToSemiLeptonic_TuneCP5_97.root");
+    hstfilename = "test_outputs/hst_ttbarsemi.root";
+    sumfilename = "test_outputs/sum_ttbarsemi.txt";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag("");
+    m_selec.SetLumi(59800);
+  }
+
   else if(sample==800){//Signal
     chain->Add("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root");
     hstfilename = "test_outputs/hst_vlld_ele_800.root";
@@ -115,7 +127,7 @@ void ana_test(int sample=0)
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
-    m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetFlag("dy"); //flag=="doublet" removes invalid decay modes from VLLD files.
     m_selec.SetLumi(30321.155);
   }
   else if(sample==998){//Testing skimmed version.
@@ -129,7 +141,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==-999){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/SingleMuon_SingleMuon_A_2024-01-08/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/EGamma_EGamma_A_2024-01-08/*.root");
     hstfilename = "test_outputs/hst_SingleMuonA_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetYear(2018);
