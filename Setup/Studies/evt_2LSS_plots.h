@@ -19,13 +19,15 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   Float_t lep0_phi = (Float_t)LightLepton.at(0).v.Phi();
   Float_t lep0_iso = (Float_t)LightLepton.at(0).reliso03;
   Float_t lep0_mt  = (Float_t)transv_mass(LightLepton.at(0).v.E(), LightLepton.at(0).v.Phi(), metpt, metphi);
+  int lep0_charge  = LightLepton.at(0).charge; 
   //Second lepton
   Float_t lep1_pt  = (Float_t)LightLepton.at(1).v.Pt();
   Float_t lep1_eta = (Float_t)LightLepton.at(1).v.Eta();
   Float_t lep1_phi = (Float_t)LightLepton.at(1).v.Phi();
   Float_t lep1_iso = (Float_t)LightLepton.at(1).reliso03;
   Float_t lep1_mt  = (Float_t)transv_mass(LightLepton.at(1).v.E(), LightLepton.at(1).v.Phi(), metpt, metphi);
-
+  int lep1_charge  = LightLepton.at(1).charge;
+  
   //Dilepton system:
   TLorentzVector dilep = LightLepton.at(0).v + LightLepton.at(1).v;
   Float_t dilep_pt   = (Float_t)dilep.Pt();
@@ -33,6 +35,7 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   Float_t dilep_phi  = (Float_t)dilep.Phi();
   Float_t dilep_mass = (Float_t)dilep.M();
   Float_t dilep_mt   = (Float_t)transv_mass(dilep.E(), dilep.Phi(), metpt, metphi);
+  int dilep_charge   = LightLepton.at(0).charge + LightLepton.at(1).charge;
   Float_t dilep_deta    = (Float_t)fabs(LightLepton.at(0).v.Eta() - LightLepton.at(1).v.Eta());
   Float_t dilep_dphi    = (Float_t)delta_phi(LightLepton.at(0).v.Phi(), LightLepton.at(1).v.Phi());
   Float_t dilep_dR      = (Float_t)LightLepton.at(0).v.DeltaR(LightLepton.at(1).v);
@@ -57,10 +60,59 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   bool qcd_CR = qcd_enhanced && dilep_phi < 0;
   bool qcd_VR = qcd_enhanced && dilep_phi > 0;
 
-  //Basic filtering of eventsL
+  //Basic filtering of events
   bool basic_filtering = dilep_pt > 30 && fabs(dilep_eta) < 4;
+
+  //Splitting into ee, emu and mumu:
+  bool evt_ee = false; bool evt_mm = false; bool evt_em = false;
+  if(fabs(LightLepton.at(0).id) == 11 && fabs(LightLepton.at(1).id) == 11)        evt_ee = true;
+  else if(fabs(LightLepton.at(0).id) == 13 && fabs(LightLepton.at(1).id) == 13)   evt_mm = true;
+  else if((fabs(LightLepton.at(0).id) == 13 && fabs(LightLepton.at(1).id) == 11)||
+	  (fabs(LightLepton.at(0).id) == 11 && fabs(LightLepton.at(1).id) == 13)) evt_em = true;
+
+  //--------------
+  //Correcting DY:
+  //--------------
+  double scale_dy = 1.0;
+  double scale_dy_ee = 1.0;
   
-  bool event_selection = basic_filtering;
+  bool inZwindow   = 76<dilep_mass && dilep_mass < 106;
+  bool inZsideband = (55<dilep_mass && dilep_mass<70) || (110<dilep_mass && dilep_mass<125);
+
+  if(evt_ee && nbjet==0){
+    
+    //Global scale calculation:
+    if(inZwindow)   h.hist[10]->Fill((int)0, wt); //onZ
+    else            h.hist[10]->Fill((int)1, wt); //offZ
+    if(inZsideband) h.hist[10]->Fill((int)2, wt); //sideband
+  
+
+    //pt binned scale calculation:
+    //Counting onZ and sidebandZ events in pT bins of the leading lepton.
+    if(lep0_pt<50){ //bin0
+      if(inZwindow)   h.hist[11]->Fill((int)0, wt); //onZ
+      if(inZsideband) h.hist[12]->Fill((int)0, wt); //sideband
+      scale_dy_ee = 0.0242;
+    }
+    else if(50<=lep0_pt && lep0_pt<100){ //bin1
+      if(inZwindow)   h.hist[11]->Fill((int)1, wt); //onZ
+      if(inZsideband) h.hist[12]->Fill((int)1, wt); //sideband
+      scale_dy_ee = 0.01875;
+    }
+    else if(100<=lep0_pt && lep0_pt<200){ //bin2
+      if(inZwindow)   h.hist[11]->Fill((int)2, wt); //onZ
+      if(inZsideband) h.hist[12]->Fill((int)2, wt); //sideband
+      scale_dy_ee = 0.01104;
+    }
+    else if(200<=lep0_pt){ //bin3
+      if(inZwindow)   h.hist[11]->Fill((int)3, wt); //onZ
+      if(inZsideband) h.hist[12]->Fill((int)3, wt); //sideband
+      scale_dy_ee = 0.01368;
+    }
+  }
+  
+  scale_dy = scale_dy_ee;
+  //if(_flag == "dy") wt = wt*scale_dy;
 
   //------------------------
   // QCD scaling in HT bins:
@@ -77,12 +129,13 @@ void AnaScript::Make_evt2LSS_plots(float wt){
   else if (350<=HT && HT<400) qcdscale = 0.0151473;
   else if (400<=HT && HT<450) qcdscale = 0.0103587;
   else                        qcdscale = 0.0105359;
-  
   if(_flag == "qcd") wt = wt*qcdscale;
 
   //-----------
   // Plotting:
   //-----------
+  bool event_selection = evt_ee && nbjet==0 && inZwindow;
+  
   if(event_selection){
     nEvtPass++;
     
@@ -124,6 +177,13 @@ void AnaScript::Make_evt2LSS_plots(float wt){
 
     h.evt2LSS[30]->Fill(metpt, wt);
     h.evt2LSS[31]->Fill(metphi, wt);
+
+    //Charge and ID check:
+    h.evt2LSS[32]->Fill(lep0_charge, wt);
+    h.evt2LSS[33]->Fill(lep1_charge, wt);
+    h.evt2LSS[34]->Fill(dilep_charge, wt);
+    h.evt2LSS[35]->Fill(fabs(LightLepton.at(0).id), wt);
+    h.evt2LSS[36]->Fill(fabs(LightLepton.at(1).id), wt);
     
   }
   
