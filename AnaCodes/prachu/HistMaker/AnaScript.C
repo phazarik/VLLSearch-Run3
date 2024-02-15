@@ -12,6 +12,7 @@ using namespace std;
 //Including the header files:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
@@ -53,6 +54,9 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n1l2j=0;
   n1l1j=0;
   n1l0j=0;
+  n2muss=0;
+  n2ess=0;
+  nemuss=0;
 
   //For Uttsavi
   nbasicpass=0;
@@ -99,9 +103,13 @@ void AnaScript::SlaveTerminate()
   cout<<"1L2J = "<<n1l2j<<endl;
   cout<<"1L1J = "<<n1l1j<<endl;
   cout<<"1L0J = "<<n1l0j<<endl;
+  
+  cout<<"2muSS = "<<n2muss<<endl;
+  cout<<"2eSS  = "<<n2ess<<endl;
+  cout<<"emuSS = "<<nemuss<<endl;
+  //cout<<"\nLumiScale = "<<59800/_lumi<<endl;
 
-  cout<<"\nLumiScale = "<<59800/_lumi<<endl;
-
+  /*
   cout<<"\nFor Uttsavi:"<<endl;
   float acc11 = ((float)nbasicpass)/((float)nEvtTotal);
   float acc12 = ((float)nadvancedpass)/((float)nEvtTotal);
@@ -113,6 +121,7 @@ void AnaScript::SlaveTerminate()
   cout<<"Events that pass Uttsavi's additional selections = "<<nadvancedpass<<" ("<<acc12<<")"<<endl;
   cout<<"Events that pass the basic event selection in the paper = "<<nbasicpass2<<" ("<<acc21<<")"<<endl;
   cout<<"Events that pass the additional selections in the paper = "<<nadvancedpass2<<" ("<<acc22<<")"<<endl;
+  */
   
   time(&end);
 
@@ -193,7 +202,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);      
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
+      //triggerRes = electron_trigger;
     }
     
     if(triggerRes){
@@ -286,8 +296,11 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //--------------------------------------------------------------------------
       //For Uttsavi:
-      MakePlotsForUttsavi();
+      //MakePlotsForUttsavi();
 
+      //Investigating 2muSS:
+      Make2muSSPlots();
+      
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.
       //evt_wt is also calculated alongwith.

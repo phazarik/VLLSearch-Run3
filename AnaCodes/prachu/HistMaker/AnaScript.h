@@ -454,6 +454,7 @@ public :
   void MakeSignalPlots(float wt);
   void Make_evt2LSS_plots(float wt);
   void Make_gen2LSS_plots(float wt);
+  void Make2muSSPlots();
   void MakePlotsForUttsavi();
   TString ParticleName(int pdgid);
 
@@ -557,6 +558,7 @@ public:
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
     TH1F *evt2LSS[50];
     TH1F *gen2LSS[50];
+    TH1F *evt2muSS[50];
     
   };
   struct Particle {
@@ -606,6 +608,7 @@ private:
   //Counters:
   int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
+  int n2muss, n2ess, nemuss;
   int nbasicpass, nadvancedpass, nbasicpass2, nadvancedpass2; //For Uttsavi
 
   //FinalStates:

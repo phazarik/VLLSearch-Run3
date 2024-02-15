@@ -244,7 +244,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Event-selection is done right after creating the object arrays.
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
-      EventSelection();
+      //EventSelection();
       //----------------------------------------------------------------
       /*
       //Basic object-level plots:
@@ -304,10 +304,19 @@ Bool_t AnaScript::Process(Long64_t entry)
       //   otherwise it will give a segmentation error.
       //2. Don't make plots; it will give segmentation error.
       //   Comment out the hist->Fill() in the createSignalArrays() function
-      
+
+      /*
       if(evt_2LSS && evt_trigger){	
 	nEvtSkim++;
 	skimTree->Fill();
+	}*/
+
+      //Skimming 2muSS events:
+      if((int)Muon.size()==2 && (int)Electron.size()==0){
+	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
+	  nEvtSkim++;
+	  skimTree->Fill();
+	}
       }
 
       

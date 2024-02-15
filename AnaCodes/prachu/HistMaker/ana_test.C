@@ -71,6 +71,18 @@ void ana_test(int sample=0)
     m_selec.SetLumi(59800);
   }
 
+  else if(sample==4){//TTbarDilep
+    chain->Add("/home/work/alaha1/public/RunII_ULSamples/2018/TTBar/TTTo2L2Nu/NanoPost_TTTo2L2Nu_TuneCP5_9.root");
+    hstfilename = "test_outputs/hst_ttbardilep.root";
+    sumfilename = "test_outputs/sum_ttbardilep.txt";
+    m_selec.SetData(0);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag("");
+    m_selec.SetLumi(59800);
+  }
+
   else if(sample==800){//Signal
     chain->Add("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root");
     hstfilename = "test_outputs/hst_vlld_ele_800.root";

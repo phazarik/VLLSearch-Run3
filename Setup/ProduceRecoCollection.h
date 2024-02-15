@@ -18,7 +18,7 @@ void AnaScript::createLightLeptons(){
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4; 
     bool promptmuon = fabs(Muon_dxy[i])<0.05 && fabs(Muon_dz[i])<0.1;
     bool passcut_loosemuon  = ptetacut && promptmuon && Muon_looseId[i] && Muon_pfRelIso03_all[i]<0.30;
-    bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i] && Muon_pfRelIso04_all[i]<0.15; //warning
+    bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i] && Muon_pfRelIso03_all[i]<0.15; //warning
 
     if(passcut_mediummuon){
       Muon.push_back(temp);
@@ -134,8 +134,8 @@ void AnaScript::createJets(){
     bool cleaned_from_muons = clean_from_array(temp, Muon, 0.4);
     bool cleaned_from_taus = clean_from_array(temp, Tau, 0.5);
     bool jetID = _year == 2016 ? Jet_jetId[i]>=1 : Jet_jetId[i]>=2; //if 2016, >=1; else >=2
-    //bool passcut = ptetacut && cleaned_from_leptons && cleaned_from_taus && jetID;
-    bool passcut = ptetacut && jetID; //warning
+    bool passcut = ptetacut && cleaned_from_leptons && cleaned_from_taus && jetID;
+    //bool passcut = ptetacut && jetID; //warning
     
     if(passcut && cleaned_from_muons){
       Jet.push_back(temp);
