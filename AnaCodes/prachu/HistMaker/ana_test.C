@@ -133,7 +133,7 @@ void ana_test(int sample=0)
   
   //Testing on skim:
   else if(sample==999){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/DYJetsToLL_M50_2024-01-08/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2muSS_QCDregion_Feb20/DYJetsToLL_M50_2024-02-20/*.root");
     hstfilename = "test_outputs/hst_DYJetsToLL_M50_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetYear(2018);
@@ -143,7 +143,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(30321.155);
   }
   else if(sample==998){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/QCD_MuEnriched_170to300_2024-01-08/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2muSS_QCDregion_Feb20/QCD_MuEnriched_170to300_2024-02-20/*.root");
     hstfilename = "test_outputs/hst_qcd_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetYear(2018);
@@ -153,16 +153,25 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==-999){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_IsoHT500_Jan08/EGamma_EGamma_A_2024-01-08/*.root");
-    hstfilename = "test_outputs/hst_SingleMuonA_skimmed.root";
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2muSS_QCDregion_Feb20/EGamma_EGamma_A_2024-02-20/*.root");
+    hstfilename = "test_outputs/hst_EGammaA_skimmed.root";
+    m_selec.SetData(1);
+    m_selec.SetYear(2018);
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(0);
+    m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetLumi(59800);
+  }
+  else if(sample==666){//Testing skimmed version.
+    chain->Add("/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/test_outputs/*.root");
+    hstfilename = "test_outputs/hst_local_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
     m_selec.SetLumi(59800);
-  }
-  
+ }
   else{
     cout<<"Invalid argument!"<<endl;
   }

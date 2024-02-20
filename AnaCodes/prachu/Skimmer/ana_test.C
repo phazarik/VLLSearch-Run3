@@ -25,7 +25,7 @@ void ana_test(int sample=1)
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
   }
   
-  if(sample==1){//Drell-Yan
+  else if(sample==1){//Drell-Yan
     chain->Add("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root");
     hstfilename = "test_outputs/hst_dy.root";
     sumfilename = "test_outputs/sum_dy.txt";

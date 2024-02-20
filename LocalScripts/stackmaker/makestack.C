@@ -34,7 +34,7 @@ bool toSave;
 bool toLog;
 bool toOverlayData;
 bool toZoom;
-TString tag; //Additional info while saving the plots
+TString tag, tag2; //Additional info while saving the plots
 
 //Declaring ROOT objects here for memory management.
 TH1F *dummy;
@@ -69,15 +69,15 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  //TString jobname = "hist_eeSSOnZ_DYenhanced_Jan31";
-  TString jobname = "hist_2Lmm_Jan09";
+  TString jobname = "hist_2muSS_QCDenhanced_Feb20";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "test";
+  tag = "2muSS_QCD_enhanced"; //Don't use special symbols (because this string is part of the folder name)
+  tag2 = "QCD enhanced region"; //This appears on the plot.
   QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
@@ -94,18 +94,18 @@ void makestack(){
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},
+    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},
     //{.var="onZ_ptbins", .name="onZ events",  5, 0, 5, 1},
     //{.var="sideZ_ptbins", .name="sideband events",  5, 0, 5, 1},
     //{.var="Flag_Zwindow", .name="onZ/offZ",  5, 0, 5, 1},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    /*
+    
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
     {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    {.var="ST",       .name="HT+LT (GeV)",    200, 0, 200, 5},
+    {.var="STvis",    .name="HT+LT (GeV)",    200, 0, 200, 5},
     {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 5},
     {.var="MET",      .name="MET (GeV)",    200, 0, 200, 2},
     {.var="MET_phi",  .name="MET phi",    200, -4, 4, 5},
@@ -113,13 +113,14 @@ void makestack(){
     {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  5},
     {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  5},
     {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 2},
-    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 2},    
+    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},    
     {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 2},
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  5},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
-    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 2},*/
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
     /*
+    {.var="ST",              .name="ST (GeV)",          200, 0, 200, 5},
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
     {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  5},
@@ -154,7 +155,7 @@ void makestack(){
     count ++;
     //break;
   }
-
+  
   //Done!
   time(&end);
 
@@ -309,7 +310,7 @@ void plot(TString var, TString name){
   if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
   //Caculating scale factors, since the histograms are ready:
-  //if(toOverlayData) GetBinwiseSF(var,hst_data, hst_qcd, bkg);
+  //if(toOverlayData && var=="HT") GetBinwiseSF(var,hst_data, hst_qcd, bkg);
 
   //Pritning out numbers for correcting the Z peak:
   if(var == "onZ_ptbins"){
@@ -371,7 +372,7 @@ void plot(TString var, TString name){
   //Now draw the rest.
   if(toOverlayData) hst_data->Draw("ep same");
   bkgstack->Draw("hist same");
-  if(sig_eled_100) sig_eled_100->Draw("HIST same");
+  //if(sig_eled_100) sig_eled_100->Draw("HIST same");
   if(sig_eles_100) sig_eles_100->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
 
@@ -421,7 +422,7 @@ void plot(TString var, TString name){
   
   put_text("CMS", 0.10, 0.93, 62, 0.06);
   put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_text(tag+"", 0.40, 0.93, 42, 0.05);
+  put_text(tag2+"", 0.35, 0.93, 42, 0.04);
   put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
 
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
@@ -432,7 +433,7 @@ void plot(TString var, TString name){
   }
 
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
-  if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
+  //if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
   if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
   TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
   if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();

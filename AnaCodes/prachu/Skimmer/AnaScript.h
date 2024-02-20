@@ -555,6 +555,8 @@ void AnaScript::Init(TTree *tree)
   //for skimmer
   _SkimFile = new TFile(_SkimFileName,"recreate");
   skimTree = tree->CloneTree(0);
+  //skimTree->Reset();
+  
 }
 
 Bool_t AnaScript::Notify()
