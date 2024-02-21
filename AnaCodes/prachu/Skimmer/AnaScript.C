@@ -22,7 +22,7 @@ void AnaScript::Begin(TTree * /*tree*/)
   TString option = GetOption();
 }
 
-void AnaScript::SlaveBegin(TTree * /*tree*/)
+void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 {
   time(&start);
 
@@ -48,6 +48,9 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   //_HstFile = new TFile(_HstFileName,"recreate");
   //Call the function to book the histograms we declared in Hists.
   //BookHistograms();
+
+  _SkimFile = new TFile(_SkimFileName,"recreate");
+  skimTree = tree->CloneTree(0);
 
   //For skimmer:
   //The following keep only the branches mentioned in skimmerHelper.h 
@@ -132,7 +135,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   nEvtTotal++;
   //h.nevt->Fill(0);
 
-  ReadBranch();//for skimmer
+  //ReadBranch();//for skimmer
 
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2017 = (_year==2017 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -244,7 +247,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Event-selection is done right after creating the object arrays.
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
-      EventSelection();
+      //EventSelection();
       //----------------------------------------------------------------
       /*
       //Basic object-level plots:
@@ -304,14 +307,36 @@ Bool_t AnaScript::Process(Long64_t entry)
       //   otherwise it will give a segmentation error.
       //2. Don't make plots; it will give segmentation error.
       //   Comment out the hist->Fill() in the createSignalArrays() function
-      
+
+      /*
       if(evt_2LSS && evt_trigger){	
 	nEvtSkim++;
 	skimTree->Fill();
+	}*/
+
+      //Skimming 2muSS events:
+      bool keep_this_event = false;
+      bool allmuons_nonisolated = true;
+      bool allmuons_isolated = true;
+      for(int i=0; i<(int)Muon.size(); i++){
+	if(Muon.at(i).reliso03 <= 0.15) allmuons_nonisolated = false;
+	else allmuons_isolated = false;
       }
+	
+      if((int)Muon.size()==2 && (int)Electron.size()==0 && allmuons_nonisolated && (int)bJet.size()==0){
+	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
+	  nEvtSkim++;
+	  keep_this_event = true;
+	}
+      }
+      if(keep_this_event) skimTree->Fill();
 
       
     }//TriggeredEvts
   }//GoodEvt
+  //skimTree->Reset();
+  
+
+ 
   return kTRUE;
 }

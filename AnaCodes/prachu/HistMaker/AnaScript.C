@@ -12,7 +12,10 @@ using namespace std;
 //Including the header files:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/signal_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
@@ -51,6 +54,15 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   n1l2j=0;
   n1l1j=0;
   n1l0j=0;
+  n2muss=0;
+  n2ess=0;
+  nemuss=0;
+
+  //For Uttsavi
+  nbasicpass=0;
+  nadvancedpass=0;
+  nbasicpass2=0;
+  nadvancedpass2=0;
 
   evt_wt = 1.0;
   bad_event = false;
@@ -61,6 +73,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
 
   if(_flag=="doublet")  cout<<"Removing invalid VLLD decay modes ..."<<endl;
   else if(_flag=="qcd") cout<<"Scaling QCD files ..."<<endl;
+  else if(_flag=="dy") cout<<"Scaling DY files ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()
@@ -90,8 +103,25 @@ void AnaScript::SlaveTerminate()
   cout<<"1L2J = "<<n1l2j<<endl;
   cout<<"1L1J = "<<n1l1j<<endl;
   cout<<"1L0J = "<<n1l0j<<endl;
+  
+  cout<<"2muSS = "<<n2muss<<endl;
+  cout<<"2eSS  = "<<n2ess<<endl;
+  cout<<"emuSS = "<<nemuss<<endl;
+  //cout<<"\nLumiScale = "<<59800/_lumi<<endl;
 
-  cout<<"\nLumiScale = "<<59800/_lumi<<endl;
+  /*
+  cout<<"\nFor Uttsavi:"<<endl;
+  float acc11 = ((float)nbasicpass)/((float)nEvtTotal);
+  float acc12 = ((float)nadvancedpass)/((float)nEvtTotal);
+  float acc21 = ((float)nbasicpass2)/((float)nEvtTotal);
+  float acc22 = ((float)nadvancedpass2)/((float)nEvtTotal);
+
+  cout<<"nEvtTotal (in the input nanoAOD) = "<<nEvtTotal<<endl;
+  cout<<"Events that pass Uttsavi's basic event selection = "<<nbasicpass<<" ("<<acc11<<")"<<endl;
+  cout<<"Events that pass Uttsavi's additional selections = "<<nadvancedpass<<" ("<<acc12<<")"<<endl;
+  cout<<"Events that pass the basic event selection in the paper = "<<nbasicpass2<<" ("<<acc21<<")"<<endl;
+  cout<<"Events that pass the additional selections in the paper = "<<nadvancedpass2<<" ("<<acc22<<")"<<endl;
+  */
   
   time(&end);
 
@@ -172,7 +202,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);      
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
+      //triggerRes = electron_trigger;
     }
     
     if(triggerRes){
@@ -251,6 +282,10 @@ Bool_t AnaScript::Process(Long64_t entry)
       Jet.clear();
       bJet.clear();
       LooseLepton.clear();
+      //For Uttsavi:
+      ForwardJet.clear();
+      MediumbJet.clear();
+      ForwardMediumbJet.clear();
       
       createLightLeptons();
       createPhotons();
@@ -259,6 +294,13 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
+      //--------------------------------------------------------------------------
+      //For Uttsavi:
+      //MakePlotsForUttsavi();
+
+      //Investigating 2muSS:
+      Make2muSSPlots();
+      
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.
       //evt_wt is also calculated alongwith.
@@ -322,6 +364,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
+      /*
       //lumiscaling:
       //if(_data == 2018)	evt_wt = evt_wt*(59800/_lumi);
       double lumiscale = (59800/_lumi);
@@ -332,6 +375,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	//nEvtPass++;
 	h.nevt->Fill(3);
 	Make_evt2LSS_plots(evt_wt); //This function is updating evt_wt for QCD
+	if(_data==0) Make_gen2LSS_plots(evt_wt);
       }
       
       if(_data==0){
@@ -351,7 +395,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	
 	//if(evt_trigger) MakeSignalPlots(evt_wt);
 
-      }
+	}*/
       
       
     }//TriggeredEvts

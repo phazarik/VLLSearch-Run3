@@ -575,11 +575,13 @@ public:
     vector<int> dauind; //indices of the daughters (GenPart only)
     vector<int> dauid; //pdgid of the daughters (GenPart only)
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
+    float btagscore;
   };
 
   //Functions that involve the 'Particle' type objects:
   void SortPt(vector<Particle> part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
+  bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
   
 protected:
   Hists h;
@@ -598,6 +600,7 @@ private:
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
+  vector<Particle> ForwardJet, MediumbJet, ForwardMediumbJet;
   vector<Particle> LooseLepton; //Loose objects
 
   //Counters:

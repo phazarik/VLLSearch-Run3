@@ -214,7 +214,10 @@ TH1F* merge_and_decorate(vector<TH1F*>sample, TString samplename, int color) {
     }
   }
 
-  if(allnull) DisplayText("Null warning : Remove "+samplename, 33);
+  if(allnull){
+    DisplayText("Null warning : All "+samplename+" hists are null!", 33);
+    return nullptr;
+  }
   
   if(hist) {
     SetHistoStyle(hist, color);

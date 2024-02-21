@@ -34,12 +34,11 @@ bool toSave;
 bool toLog;
 bool toOverlayData;
 bool toZoom;
-TString tag, tag2; //Additional info while saving the plots
+TString tag; //Additional info while saving the plots
 
 //Declaring ROOT objects here for memory management.
 TH1F *dummy;
 TH1F *sig_eles_100;
-TH1F *sig_eles_750;
 TH1F *sig_eled_100;
 TH1F *hst_data;
 //TH1F *hst_smuon;
@@ -63,22 +62,21 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-void makestack(){
+void makeoverlay(){
 
   time_t start, end;
   time(&start);
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2muSS_WR_Feb21";
+  TString jobname = "hist_2Lee_Jan09";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_basic"; //Don't use special symbols (because this string is part of the folder name)
-  tag2 = "2muSS basic"; //This appears on the plot.
+  tag = "e-e";
   QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
@@ -96,9 +94,6 @@ void makestack(){
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
     {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},
-    //{.var="onZ_ptbins", .name="onZ events",  5, 0, 5, 1},
-    //{.var="sideZ_ptbins", .name="sideband events",  5, 0, 5, 1},
-    //{.var="Flag_Zwindow", .name="onZ/offZ",  5, 0, 5, 1},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     /*
@@ -106,7 +101,7 @@ void makestack(){
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
     {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    {.var="STvis",    .name="HT+LT (GeV)",    200, 0, 200, 5},
+    {.var="ST",       .name="HT+LT (GeV)",    200, 0, 200, 5},
     {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 5},
     {.var="MET",      .name="MET (GeV)",    200, 0, 200, 2},
     {.var="MET_phi",  .name="MET phi",    200, -4, 4, 5},
@@ -114,14 +109,13 @@ void makestack(){
     {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  5},
     {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  5},
     {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 2},
-    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},    
+    {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 2},    
     {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 2},
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  5},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
-    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 2},*/
     /*
-    {.var="ST",              .name="ST (GeV)",          200, 0, 200, 5},
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
     {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  5},
@@ -156,27 +150,13 @@ void makestack(){
     count ++;
     //break;
   }
-  
+
   //Done!
   time(&end);
 
   double time_taken = double(end-start);
   TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\nNo of plots = "+to_string(count)+"\n";
   DisplayText(report, 33); //33 is the ANSI color code for yellow
-}
-
-//---------------------------------------------------------------
-// Event selection: Put cuts on the branches and filter the tree
-//---------------------------------------------------------------
-
-TTree* GetFilteredTree(TTree *intree){
-
-  //Define the branch cuts using TCut
-  TCut pt0cut = "lep0_pt > 35";
-
-  TCut cut = pt0cut; 
-  TTree *filtered_tree = intree->CopyTree(cut);
-  return filtered_tree;
 }
 
 //-----------------------------------
@@ -281,9 +261,8 @@ void plot(TString var, TString name){
   
   //DisplayText("Reading done.", 33);
 
-  sig_eles_100 = get_hist(var, "VLLS", "ele_M100",    663355.82);
-  sig_eles_750 = nullptr;//get_hist(var, "VLLS", "ele_M750", 254269230.77);
-  sig_eled_100 = get_hist(var, "VLLD", "ele_M100",      8608.00);
+  sig_eles_100 = get_hist(var, "VLLS", "ele_M100", 663355.82);
+  sig_eled_100 = get_hist(var, "VLLD", "ele_M100", 8608.00);
   
   //Merging the histograms from each samples and storing in a collection:
   bkg = {
@@ -299,53 +278,20 @@ void plot(TString var, TString name){
     merge_and_decorate(ZZ,    "ZZ",        kGreen-10),
   };
   TH1F *hst_qcd = bkg[0];
-  //bkg[1]->Scale(0.0641216); //for ee type events
   
   TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon", kBlack);
   TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma",   kBlack);
 
   hst_data = (TH1F *)hst_smuon->Clone();
-  if(hst_egamma) hst_data->Add(hst_egamma);
+  hst_data->Add(hst_egamma);
   hst_data->SetName("Data (2018)");
 
   if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");}
-  if(sig_eles_750) {SetHistoStyle(sig_eles_750, kRed+2); sig_eles_750->SetName("VLLS ele M750");}
-  if(sig_eled_100) {SetHistoStyle(sig_eled_100, kRed+2); sig_eled_100->SetName("VLLD ele M100");}
+  if(sig_eled_100) {SetHistoStyle(sig_eled_100, kBlue); sig_eled_100->SetName("VLLD ele M100");}
 
   //Caculating scale factors, since the histograms are ready:
-  //if(toOverlayData && var=="HT") GetBinwiseSF(var,hst_data, hst_qcd, bkg);
+  if(toOverlayData) GetBinwiseSF(var,hst_data, hst_qcd, bkg);
 
-  //Pritning out numbers for correcting the Z peak:
-  if(var == "onZ_ptbins"){
-    cout<<"\nnEvents onZ : (data vs DY)"<<endl;
-    for(int i=0; i<6; i++){
-      cout<<"bin"<<i<<"\t";
-      float ndata_i = hst_data->GetBinContent(i);
-      float ndy_i   = bkg[1]  ->GetBinContent(i);
-      cout<<ndata_i<<"\t"<<ndy_i<<endl;
-    }
-  }
-  else if(var == "sideZ_ptbins"){
-    cout<<"\nnEvents sidebandZ : (data vs DY)"<<endl;
-    for(int i=0; i<6; i++){
-      cout<<"bin"<<i<<"\t";
-      float ndata_i = hst_data->GetBinContent(i);
-      float ndy_i   = bkg[1]  ->GetBinContent(i);
-      cout<<ndata_i<<"\t"<<ndy_i<<endl;
-    }
-  }
-  else if(var == "Flag_Zwindow"){
-    cout<<"\nGlobal charge mismeasurement:"<<endl;
-    float ndatamisId = hst_data->GetBinContent(1) - hst_data->GetBinContent(3);
-    float ndymisId =   bkg[1]  ->GetBinContent(1) - bkg[1]  ->GetBinContent(3);
-    float othermisId = 0;
-    for(int i=0; i<(int)bkg.size(); i++) othermisId = othermisId + (bkg[i]->GetBinContent(1)-bkg[i]->GetBinContent(3));
-    othermisId = othermisId - ndymisId;
-    cout<<"Data misId nevents = "<< ndatamisId   <<endl;
-    cout<<"DY misId nevents = "<< ndymisId       <<endl;
-    cout<<"Global Scale = "<< ndatamisId/ndymisId<<endl;
-  }
-  
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
   bkgstack = new THStack("Stacked",var+";"+var+";Events");
@@ -357,8 +303,8 @@ void plot(TString var, TString name){
   // Plotting:
   //---------------------------------------------
   canvas = create_canvas(var, filename, 800, 600);
-  mainPad  = create_mainPad(0, 0.22, 1, 1);     mainPad ->Draw();
-  ratioPad = create_ratioPad(0, 0.01, 1, 0.25); ratioPad->Draw();
+  mainPad  = create_mainPad(0, 0, 1, 1);     mainPad ->Draw();
+  //ratioPad = create_ratioPad(0, 0.01, 1, 0.25); ratioPad->Draw();
   
   mainPad->cd();
 
@@ -366,83 +312,43 @@ void plot(TString var, TString name){
   //It should alywas be drawn first.
   //dummy->Reset();
   dummy = (TH1F *)bkg[0]->Clone(); dummy->Reset(); 
-  dummy->GetYaxis()->SetTitle("Events");
-  dummy->GetYaxis()->SetRangeUser(0.1, 10E6);
+  dummy->GetYaxis()->SetTitle("Events (normalised)");
+  dummy->GetYaxis()->SetRangeUser(0, 1);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
+  dummy->GetXaxis()->SetTitle(name);
+  dummy->GetXaxis()->SetLabelSize(0.04);
   dummy->SetStats(0);
   dummy->Draw("hist");
 
-  //Now draw the rest.
-  if(toOverlayData) hst_data->Draw("ep same");
-  bkgstack->Draw("hist same");
-  if(sig_eled_100) sig_eled_100->Draw("HIST same");
-  if(sig_eles_100) sig_eles_100->Draw("HIST same");
-  if(sig_eles_750) sig_eles_750->Draw("HIST same");
-  if(toOverlayData) hst_data->Draw("ep same");
+  //Comparing shapes:
+  mainPad->SetLogy(0);
+  TH1F *hst_dy = get_hist(var, "DYJetsToLL", "M50",    30321.155);
+  SetHistoStyle(hst_dy, kRed-7);
+  hst_data->Scale(1/hst_data->Integral());
+  hst_dy->Scale(1/hst_dy->Integral());
+  hst_data->Draw("hist same");
+  hst_dy->Draw("hist same");
 
-  ratioPad->cd();
+  //Put text (text, x, y, style, size)
+  put_text("CMS", 0.10, 0.93, 62, 0.04);
+  put_text("preliminary", 0.18, 0.93, 52, 0.04);
+  put_text(tag+" events", 0.40, 0.93, 42, 0.04);
+  put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.03);
 
-  //SoverB
-  globalSbyB = 0;
-  if(sig_eles_100){
-    sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
-    sbyrb->GetYaxis()->SetTitle("S/sqrtB");
-    if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
-    if(!toOverlayData) sbyrb->Draw("ep");
-  }
-  
-  //obs/exp
-  globalObsbyExp =0;
+  TLegend *lg = create_legend(0.76, 0.35, 0.95, 0.90);
+  lg->SetTextSize(0.02);
   if(toOverlayData){
-    ratiohist = GetRatio(hst_data, bkg);
-    SetRatioStyle(ratiohist, name);
-    ratiohist->GetYaxis()->SetTitle("obs/exp");
-    ratiohist->GetYaxis()->SetRangeUser(0, 2.2);
-    if(toZoom) ratiohist->GetXaxis()->SetRangeUser(xmin, xmax);
-  
-    //Setting up a horizontal line on the ratiopad:
-    float xlow  = ratiohist->GetXaxis()->GetBinLowEdge(1);
-    float xhigh = ratiohist->GetXaxis()->GetBinUpEdge(ratiohist->GetNbinsX());
-    TLine *line = new TLine(xlow, 1, xhigh, 1);
-    line->SetLineColor(kRed);
-    line->SetLineWidth(2);
-    
-    //Calculating the uncertainty on the background in each bin:
-    TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
-    for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
-    TGraphErrors *err = GetUncertainty(allbkg);
-    err->GetYaxis()->SetNdivisions(5, kTRUE);
-    err->SetStats(0);
-    if(toZoom) err->GetXaxis()->SetRangeUser(xmin, xmax);
-
-    //Drawing everything in the proper order:
-    ratiohist->Draw("ep"); //Inheriting the settings from the ratio hist.
-    err->Draw("SAME P E2");
-    line->Draw("same");
-    ratiohist->Draw("ep same"); //I want the ratio to be on top.
-  }
-  
-  mainPad->cd();
-  
-  put_text("CMS", 0.10, 0.93, 62, 0.06);
-  put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_text(tag2+"", 0.4, 0.93, 42, 0.04);
-  put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
-
-  TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
-  if(toOverlayData){
-    SetLegendEntry(lg, hst_data);
-    if(hst_smuon)  SetLegendEntry(lg, hst_smuon);
-    if(hst_egamma) SetLegendEntry(lg, hst_egamma);
+    //SetLegendEntry(lg, hst_data);
+    SetLegendEntry(lg, hst_smuon);
+    SetLegendEntry(lg, hst_egamma);
   }
 
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
-  if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
-  if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
-  if(sig_eles_750) SetLegendEntry(lg, sig_eles_750);
-  TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
-  if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
-  lg->SetHeader(legendheader);
+  //if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
+  //if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
+  //TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
+  //if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
+  lg->SetHeader("");
   lg->Draw();
 
   DisplayText("Made plot for "+var, 0);
@@ -450,7 +356,7 @@ void plot(TString var, TString name){
   //Make a new folder and put all the plots there:
   if(toSave){
     createFolder(dump_folder);
-    canvas->SaveAs(filename+".png");
+    canvas->SaveAs(filename+"_overlay.png");
     //canvas->Clear();
     //delete canvas;
     //delete lg;

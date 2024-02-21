@@ -109,26 +109,20 @@ void SetRatioStyle(TH1F *srb, TString name){
   srb->GetXaxis()->SetLabelOffset(0.008);
 }
 
-void put_text(){
-  TText* cmsText = new TText(0.10, 0.93, "CMS");
-  cmsText->SetTextSize(0.06);
-  cmsText->SetNDC();
-  cmsText->SetTextFont(62); // Bold
-  cmsText->Draw();
-  
-  TText* preliminaryText = new TText(0.18, 0.93, "preliminary");
-  preliminaryText->SetTextSize(0.05);
-  preliminaryText->SetNDC();
-  preliminaryText->SetTextFont(52); // Italics
-  preliminaryText->Draw();
-  
-  TLatex* latex = new TLatex(); 
-  latex->SetTextFont(42);
-  latex->SetTextSize(0.04);
-  latex->SetNDC();
-  latex->DrawLatex(0.61, 0.93, "(2018) 59.8 fb^{-1}");  
+void put_text(TString text, float x, float y, int style, float size){
+  TText* t = new TText(x, y, text);
+  t->SetTextSize(size);
+  t->SetNDC();
+  t->SetTextFont(style); // Bold
+  t->Draw();
 }
 
-
+void put_latex_text(TString text, float x, float y, int style, float size){
+  TLatex* latex = new TLatex(); 
+  latex->SetTextFont(style);
+  latex->SetTextSize(size);
+  latex->SetNDC();
+  latex->DrawLatex(x, y, text);  
+}
 
 #endif // DECORATIONS_H

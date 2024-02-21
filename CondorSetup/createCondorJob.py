@@ -49,9 +49,11 @@ elif mode == "skim": outputtag = 'skim'
 elif mode == "tree": outputtag = 'tree'
 else : print("Error while selecting mode! Options: 'hist', 'skim', 'tree'.")
 
-if debug == True : print('going in the createCondorJob.py script ...')
-print('debug = '+str(debug))
-print('mode = '+mode)
+if debug == True :
+    print('going in the createCondorJob.py script ...')
+    print('debug = '+str(debug))
+    print('mode = '+mode)
+    print('flag = '+flag)
 
 #Setting output directories:
 INDIR = samplepath

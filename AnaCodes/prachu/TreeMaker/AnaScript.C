@@ -317,7 +317,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
- 
+
+      /*
       if(evt_2LSS && evt_trigger && !bad_event){ 
 
 	//For a particular final state, fillup the tree.
@@ -327,8 +328,14 @@ Bool_t AnaScript::Process(Long64_t entry)
 	FillTree(mytree);	  
 	mytree->Fill();
 
-      }  
-
+	} */
+      if((int)Muon.size()==2 && (int)Electron.size()==0){
+	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
+	  FillTree(mytree);	  
+	  mytree->Fill();
+	}
+      }
+      
       
     }//TriggeredEvts
   }//GoodEvt

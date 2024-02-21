@@ -453,6 +453,9 @@ public :
   //For specific studies:
   void MakeSignalPlots(float wt);
   void Make_evt2LSS_plots(float wt);
+  void Make_gen2LSS_plots(float wt);
+  void Make2muSSPlots();
+  void MakePlotsForUttsavi();
   TString ParticleName(int pdgid);
 
   //--------------------------------------------------------------------------
@@ -546,7 +549,7 @@ public:
     //Histograms are declared here.
     TH1F *nevt;
     TH1F *evtweight[10];
-    TH1F *hist[10];
+    TH1F *hist[50];
     //Object level hists:
     TH1F *mu[10]; TH1F *ele[10]; TH1F *llep[10];
     TH1F *pho[10];TH1F *tau[10];
@@ -554,6 +557,8 @@ public:
     //For spcific studies:
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
     TH1F *evt2LSS[50];
+    TH1F *gen2LSS[50];
+    TH1F *evt2muSS[50];
     
   };
   struct Particle {
@@ -571,11 +576,13 @@ public:
     vector<int> dauind; //indices of the daughters (GenPart only)
     vector<int> dauid; //pdgid of the daughters (GenPart only)
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
+    float btagscore;
   };
 
   //Functions that involve the 'Particle' type objects:
   void SortPt(vector<Particle> part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
+  bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
   
 protected:
   Hists h;
@@ -595,11 +602,14 @@ private:
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
+  vector<Particle> ForwardJet, MediumbJet, ForwardMediumbJet; //for uttsavi
   vector<Particle> LooseLepton; //Loose objects
 
   //Counters:
   int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
+  int n2muss, n2ess, nemuss;
+  int nbasicpass, nadvancedpass, nbasicpass2, nadvancedpass2; //For Uttsavi
 
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
