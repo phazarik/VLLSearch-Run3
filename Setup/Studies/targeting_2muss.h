@@ -74,14 +74,21 @@ void AnaScript::Make2muSSPlots(){
     Float_t dphi_metlep_max = (Float_t)max(dphi_metlep0, dphi_metlep1);
     Float_t dphi_metlep_min = (Float_t)min(dphi_metlep0, dphi_metlep1);
 
-    //bool basic_filtering = dilep_pt>30 && fabs(dilep_eta)<4 && HT<500;
+    //Booleans for selecting QCD enhanced region:
     bool lep0_is_noniso = 0.25 < lep0_iso && lep0_iso < 1.0;
     bool lep1_is_noniso = 0.25 < lep1_iso && lep1_iso < 1.0;
     bool QCD_enhanced_region = HT<400 && lep0_is_noniso && lep1_is_noniso && njet<3;
     bool QCD_CR = QCD_enhanced_region && dphi_metdilep <= 1.5;
     bool QCD_VR = QCD_enhanced_region && dphi_metdilep > 1.5;
+    
+    bool WR = HT<400 && dilep_mass>15; //Working Region
+    bool event_selection = WR;
 
-    bool event_selection = QCD_CR;
+    //Defining signal region:
+    bool SR = WR && nbjet==0;
+    
+    //Correcting TTbar:
+    bool ttbar_CR = WR && nbjet>0;
 
     //------------------------
     // QCD scaling in HT bins:
