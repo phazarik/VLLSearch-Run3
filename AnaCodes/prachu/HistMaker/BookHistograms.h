@@ -106,13 +106,13 @@ void AnaScript::BookHistograms(){
   h.evt2LSS[3]  = new TH1F("lep0_pt",  "lep0_pt",  50, 0, 500);
   h.evt2LSS[4]  = new TH1F("lep0_eta", "lep0_eta", 100, -4, 4);
   h.evt2LSS[5]  = new TH1F("lep0_phi", "lep0_phi", 100, -4, 4);
-  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 200, 0, 0.2);
+  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 200, 0, 1);
   h.evt2LSS[7]  = new TH1F("lep0_mt",  "lep0_mt",  50, 0, 500);
 
   h.evt2LSS[8]  = new TH1F("lep1_pt",  "lep1_pt",  50, 0, 500);
   h.evt2LSS[9]  = new TH1F("lep1_eta", "lep1_eta", 100, -4, 4);
   h.evt2LSS[10] = new TH1F("lep1_phi", "lep1_phi", 100, -4, 4);
-  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 200, 0, 0.2);
+  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 200, 0, 1);
   h.evt2LSS[12] = new TH1F("lep1_mt",  "lep1_mt",  50, 0, 500);
 
   h.evt2LSS[13] = new TH1F("dilep_pt",  "dilep_pt",  50, 0, 500);
@@ -125,7 +125,7 @@ void AnaScript::BookHistograms(){
   h.evt2LSS[20] = new TH1F("dilep_dR",   "dilep_dR",   100, 0, 6);
   h.evt2LSS[21] = new TH1F("dilep_ptratio","dilep_ptratio",100, 0, 1);
 
-  h.evt2LSS[22] = new TH1F("HT", "HT", 10, 0, 500);
+  h.evt2LSS[22] = new TH1F("HT", "HT", 20, 0, 500);
   h.evt2LSS[23] = new TH1F("STvis", "STvis", 50, 0, 500);
   h.evt2LSS[24] = new TH1F("STfrac", "STfrac", 100, 0, 1.1); //For nJet-==0, STfrac=1
   

@@ -202,7 +202,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger); //The union of two sets.
+      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
       //triggerRes = electron_trigger;
     }
     

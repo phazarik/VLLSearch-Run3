@@ -74,15 +74,16 @@ void AnaScript::Make2muSSPlots(){
     Float_t dphi_metlep_max = (Float_t)max(dphi_metlep0, dphi_metlep1);
     Float_t dphi_metlep_min = (Float_t)min(dphi_metlep0, dphi_metlep1);
 
-    //Booleans for selecting QCD enhanced region:
-    bool lep0_is_noniso = 0.25 < lep0_iso && lep0_iso < 1.0;
-    bool lep1_is_noniso = 0.25 < lep1_iso && lep1_iso < 1.0;
-    bool QCD_enhanced_region = HT<400 && lep0_is_noniso && lep1_is_noniso && njet<3;
-    bool QCD_CR = QCD_enhanced_region && dphi_metdilep <= 1.5;
-    bool QCD_VR = QCD_enhanced_region && dphi_metdilep > 1.5;
+    //Booleans to get rid of bad events:
+    bool exclude_low_stat_and_resonance = HT<500 && fabs(dilep_eta) < 4 && dilep_mass>15;
+    bool baseline = exclude_low_stat_and_resonance && lep0_iso<0.15;
     
-    bool WR = HT<400 && dilep_mass>15; //Working Region
-    bool event_selection = WR;
+    //Booleans for selecting QCD enhanced region:
+    bool lep0_is_noniso = 0.15 < lep0_iso && lep0_iso < 0.50;
+    bool lep1_is_noniso = 0.15 < lep1_iso && lep1_iso < 0.50;
+    bool QCD_enhanced_region = exclude_low_stat_and_resonance && njet<3 && metpt<150 && nbjet==0 && lep0_iso<0.15 && lep1_is_noniso;
+    
+    bool WR = exclude_low_stat_and_resonance && lep0_iso<0.15 && lep1_iso<0.15; //Working Region: both leptons are isolated.
 
     //Defining signal region:
     bool SR = WR && nbjet==0;
@@ -90,35 +91,28 @@ void AnaScript::Make2muSSPlots(){
     //Correcting TTbar:
     bool ttbar_CR = WR && nbjet>0;
 
+    //Final event selection that used in the plots:
+    bool event_selection = true;
+
     //------------------------
     // QCD scaling in HT bins:
     //------------------------
     double qcdscale = 1.0; //default
 
-    //Old QCD scale factors from December, 2023
     /*
-    if(HT < 50)                 qcdscale = 0.0212517;
-    else if (50<=HT  && HT<100) qcdscale = 0.0485609;
-    else if (100<=HT && HT<150) qcdscale = 0.0745748;
-    else if (150<=HT && HT<200) qcdscale = 0.0303177;
-    else if (200<=HT && HT<250) qcdscale = 0.0225880;
-    else if (250<=HT && HT<300) qcdscale = 0.0179411;
-    else if (300<=HT && HT<350) qcdscale = 0.0118273;
-    else if (350<=HT && HT<400) qcdscale = 0.0151473;
-    else if (400<=HT && HT<450) qcdscale = 0.0103587;
-    else                        qcdscale = 0.0105359;*/
+    //QCD SF in fine bins of HT (March 03, 2024), iso:0.15-0.5
+    if(HT < 25)                qcdscale = 0.0758239;
+    else if(25<=HT && HT<50)   qcdscale = 0.0429989;
+    else if(50<=HT && HT<75)   qcdscale = 0.0445088;
+    else if(75<=HT && HT<100)  qcdscale = 0.0325026;
+    else if(100<=HT && HT<125) qcdscale = 0.0429582;
+    else if(125<=HT && HT<150) qcdscale = 0.0257563;
+    else if(150<=HT && HT<200) qcdscale = 0.0325779;
+    else if(200<=HT && HT<300) qcdscale = 0.0375289;
+    else if(300<=HT && HT<500) qcdscale = 0.0032895;
+    if(_flag == "qcd") wt = wt*qcdscale;*/
 
-    //QCD SF calculated for 2muSS events: (Feb 20, 2024)
-    if(HT < 50)                 qcdscale = 0.0276494;
-    else if (50<=HT  && HT<100) qcdscale = 0.0184277;
-    else if (100<=HT && HT<150) qcdscale = 0.0165316;
-    else if (150<=HT && HT<200) qcdscale = 0.0093090;
-    else if (200<=HT && HT<250) qcdscale = 0.0121394;
-    else if (250<=HT && HT<300) qcdscale = 0.0149898;
-    else if (300<=HT && HT<350) qcdscale = 0.0160703;
-    else                        qcdscale = 0.0151990;
-  
-    if(_flag == "qcd") wt = wt*qcdscale;
+    wt = 1.0;
 
     if(event_selection){
       h.nevt->Fill(3);
