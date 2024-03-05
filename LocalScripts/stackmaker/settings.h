@@ -172,6 +172,11 @@ TH1F *get_hist(
 
   return hst;
 }
+
+void removeNullPointers(std::vector<TH1F*>& vec) {
+  vec.erase(std::remove(vec.begin(), vec.end(), nullptr), vec.end());
+}
+
 //--------------------------------------
 //Other functions used by the main code:
 //--------------------------------------
@@ -366,6 +371,20 @@ void GetBinwiseSF(TString var, TH1F *hst_data, TH1F *hst_qcd, vector<TH1F*>bkg){
     cout<<fixed<<setprecision(7)<<globalsf<<defaultfloat<<"\t";
     cout<<"all\n"<<endl;
   }
+}
+
+Double_t GetStatUncertainty(TH1F *hist){
+  Double_t uncertainty = 0.0;
+  if(hist){//Carry on the calculation if the hist is non null.
+    Double_t original_N = hist->GetEntries();
+    Double_t scaled_N = hist->Integral();
+    Double_t original_err = sqrt(original_N);
+    if(original_N !=0 ){
+      Double_t frac_err = original_err/original_N;
+      uncertainty = frac_err * scaled_N;
+    }
+  }
+  return uncertainty;
 }
 
 #endif // SETTINGS_H
