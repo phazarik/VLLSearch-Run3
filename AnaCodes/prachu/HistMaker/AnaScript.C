@@ -15,13 +15,15 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/EventSelection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
+
+//Corrections
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
@@ -29,6 +31,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_2018_DeepJet_MediumWP.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -307,9 +310,9 @@ Bool_t AnaScript::Process(Long64_t entry)
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
 
-      EventSelection(); //This is where trigger is applied.
-      if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
-      else evt_wt = 1.0;
+      //EventSelection(); //This is where trigger is applied.
+      //if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
+      //else evt_wt = 1.0;
       //----------------------------------------------------------------
 
       /*

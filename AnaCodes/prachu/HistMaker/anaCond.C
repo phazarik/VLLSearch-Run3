@@ -6,9 +6,9 @@
 //#########################################################################################################
 
 //Execution line :
-// .x anaCond.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "30321.155")
+// .x anaCond.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "dy", "30321.155", "DYJetsToLL_M50")
 //OR
-// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "ele", "doublet", "7439522.46")
+// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "ele", "doublet", "7439522.46", "VLLD_ele_M800")
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -17,7 +17,7 @@
 #include <string>
 //#include <boost/lexical_cast.hpp>// for lexical_cast()
 
-void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag, TString lumi)
+void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag, TString lumi, TString samplename)
 {
   //Description of the parameters:
   //1. ifname : Input file name with full path.
@@ -64,8 +64,9 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   if(lep=="el") m_selec.SetLep(0);
   if(lep=="mu") m_selec.SetLep(1);
 
-  //Set the additional flag:
+  //Set the additional flags:
   m_selec.SetFlag(flag);
+  m_selec.SetSampleName(samplename);
 
   //Set lumi:
   //double lumival = lumi.Atof();

@@ -360,6 +360,9 @@ public :
   //btagWeight
   TTreeReaderValue<Float_t> btagWeight_CSVV2 =    {fReader_MC, "btagWeight_CSVV2"};
   TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};
+
+  //Jetflavor:
+   TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
   
   //_________________________________________________________________________
   
@@ -431,6 +434,7 @@ public :
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
   void SetLumi(double lumi){_lumi=lumi;}
+  void SetSampleName(TString samplename){_samplename=samplename;}
 
   void BookHistograms();
 
@@ -577,12 +581,22 @@ public:
     vector<int> dauid; //pdgid of the daughters (GenPart only)
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
     float btagscore;
+    int hadronflavor;
   };
 
   //Functions that involve the 'Particle' type objects:
   void SortPt(vector<Particle> part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
+  //--------------------------------------------------------------------------
+  //Corrections on bJets:
+  float bTagEff2016 (vector<Particle>Jet);
+  float bTagEff2017 (vector<Particle>Jet);
+  float bTagEff2018 (vector<Particle>Jet);
+  double getScaleFactors_bTagJets_MedWP_UL18(float eta, float pt);
+  double getScaleFactors_cTagJets_Mis_UL18(float eta, float pt);
+  double getScaleFactors_LightTagJets_Mis_UL18(float eta, float pt);
+  //--------------------------------------------------------------------------
   
 protected:
   Hists h;
@@ -596,7 +610,7 @@ private:
   int _data, _lep, _year, _mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi;
-  TString _era, _flag;
+  TString _era, _flag, _samplename;
   double _lumi;
 
   vector<Particle> genMuon, genElectron, genLightLepton;

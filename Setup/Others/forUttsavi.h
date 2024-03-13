@@ -26,9 +26,6 @@ void AnaScript::MakePlotsForUttsavi(){
   for(int i=0; i<(int)ForwardJet.size()-1; i++){
     for(int j=i+1; j<(int)ForwardJet.size(); j++){
       if(ForwardJet[i].v.Pt() < ForwardJet[j].v.Pt() ) swap(ForwardJet.at(i), ForwardJet.at(j));}}
-  for(int i=0; i<(int)MediumbJet.size()-1; i++){
-    for(int j=i+1; j<(int)MediumbJet.size(); j++){
-      if(MediumbJet[i].v.Pt() < MediumbJet[j].v.Pt() ) swap(MediumbJet.at(i), MediumbJet.at(j));}}
   for(int i=0; i<(int)ForwardMediumbJet.size()-1; i++){
     for(int j=i+1; j<(int)ForwardMediumbJet.size(); j++){
       if(ForwardMediumbJet[i].v.Pt() < ForwardMediumbJet[j].v.Pt() ) swap(ForwardMediumbJet.at(i), ForwardMediumbJet.at(j));}}

@@ -21,14 +21,28 @@ void AnaScript::Make2muSSPlots(){
   if(basic_evt_selection){
     n2muss++;
 
-    //Calculating event weight:
-    double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-    double sf1 = Muon_2018UL_Reco(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-    double scalefactor = sf0*sf1;
-    double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-    double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-    double triggereff = 1-((1-ef0)*(1-ef1));
-    double wt = scalefactor*triggereff;
+    //Calculating event weights:
+    double wt = 1.0;
+    double scalefactor = 1.0;
+    double triggereff = 1.0;
+    double bjeteff = 1.0;
+    if(_data==0){
+      double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
+      double sf1 = Muon_2018UL_Reco(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
+      scalefactor = sf0*sf1;
+      double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
+      double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
+      triggereff = 1-((1-ef0)*(1-ef1));
+      wt = scalefactor*triggereff;
+      //Corrections for Jets:
+      double jeteff = 1.0;
+      if(_year == 2018) bjeteff = bTagEff2018(Jet);
+      wt = wt*bjeteff;
+    }
+    h.evtweight[0]->Fill(scalefactor);
+    h.evtweight[1]->Fill(triggereff);
+    h.evtweight[2]->Fill(bjeteff);
+    h.evtweight[3]->Fill(wt);
 
     //cout<<"Testing 2mu events"<<endl;
 
@@ -36,7 +50,7 @@ void AnaScript::Make2muSSPlots(){
     //Counts:
     UInt_t nlep  = (UInt_t)Muon.size();
     UInt_t njet  = (UInt_t)Jet.size();
-    UInt_t nbjet = (UInt_t)bJet.size();
+    UInt_t nbjet = (UInt_t)MediumbJet.size();
 
     //Object-level variables: First lepton
     Float_t lep0_pt  = (Float_t)Muon.at(0).v.Pt();
@@ -75,44 +89,45 @@ void AnaScript::Make2muSSPlots(){
     Float_t dphi_metlep_min = (Float_t)min(dphi_metlep0, dphi_metlep1);
 
     //Booleans to get rid of bad events:
-    bool exclude_low_stat_and_resonance = HT<500 && fabs(dilep_eta) < 4 && dilep_mass>15;
-    bool baseline = exclude_low_stat_and_resonance && lep0_iso<0.15;
+    bool baseline = dilep_mass>20 && lep0_iso<0.10;
+    bool exclude_low_stat = fabs(dilep_eta)<3 && (0.4<dilep_dR && dilep_dR<4.0) && metpt>20 && STfrac<0.8 && HT<500;
+    baseline = baseline && exclude_low_stat;
     
     //Booleans for selecting QCD enhanced region:
-    bool lep0_is_noniso = 0.15 < lep0_iso && lep0_iso < 0.50;
-    bool lep1_is_noniso = 0.15 < lep1_iso && lep1_iso < 0.50;
-    bool QCD_enhanced_region = exclude_low_stat_and_resonance && njet<3 && metpt<150 && nbjet==0 && lep0_iso<0.15 && lep1_is_noniso;
+    bool QCD_enhanced_region = baseline && exclude_low_stat && nbjet==0 && njet<2 && (0.15<lep1_iso && lep1_iso<0.50);
+    bool QCD_CR = QCD_enhanced_region && metphi<0;
+    bool QCD_VR = QCD_enhanced_region && metphi>=0;
     
-    bool WR = exclude_low_stat_and_resonance && lep0_iso<0.15 && lep1_iso<0.15; //Working Region: both leptons are isolated.
+    bool WR = baseline && exclude_low_stat && lep1_iso<0.15; //Working Region: both leptons are isolated.
 
     //Defining signal region:
-    bool SR = WR && nbjet==0;
+    //bool SR = WR && nbjet==0;
     
     //Correcting TTbar:
     bool ttbar_CR = WR && nbjet>0;
 
     //Final event selection that used in the plots:
-    bool event_selection = true;
+    bool event_selection = baseline;
 
     //------------------------
     // QCD scaling in HT bins:
     //------------------------
     double qcdscale = 1.0; //default
 
+    //QCD SF in fine bins of HT (March 07, 2024), subleading iso:0.20-0.50
     /*
-    //QCD SF in fine bins of HT (March 03, 2024), iso:0.15-0.5
-    if(HT < 25)                qcdscale = 0.0758239;
-    else if(25<=HT && HT<50)   qcdscale = 0.0429989;
-    else if(50<=HT && HT<75)   qcdscale = 0.0445088;
-    else if(75<=HT && HT<100)  qcdscale = 0.0325026;
-    else if(100<=HT && HT<125) qcdscale = 0.0429582;
-    else if(125<=HT && HT<150) qcdscale = 0.0257563;
-    else if(150<=HT && HT<200) qcdscale = 0.0325779;
-    else if(200<=HT && HT<300) qcdscale = 0.0375289;
-    else if(300<=HT && HT<500) qcdscale = 0.0032895;
+    if(HT < 25)                qcdscale = 0.2814977;
+    else if(25<=HT && HT<50)   qcdscale = 0.3189403;
+    else if(50<=HT && HT<75)   qcdscale = 0.4316772;
+    else if(75<=HT && HT<100)  qcdscale = 0.7809550;
+    else if(100<=HT && HT<125) qcdscale = 0.3491072;
+    else if(125<=HT && HT<150) qcdscale = 0.3042732;
+    else if(150<=HT && HT<200) qcdscale = 0.1994921;
+    else if(200<=HT && HT<250) qcdscale = 0.7897220;
+    else if(250<=HT)           qcdscale = 0.5625;
     if(_flag == "qcd") wt = wt*qcdscale;*/
 
-    wt = 1.0;
+    if(_data==1) wt = 1.0;
 
     if(event_selection){
       h.nevt->Fill(3);

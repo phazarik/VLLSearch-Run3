@@ -128,6 +128,8 @@ void AnaScript::createJets(){
     temp.v.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
     temp.ind = i;
     temp.btagscore = Jet_btagDeepFlavB[i];
+    if(_data==0) temp.hadronflavor = Jet_hadronFlavour[i];
+    else temp.hadronflavor = 999;
 
     bool ptetacut = temp.v.Pt()>30 && fabs(temp.v.Eta())<2.4;
     bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.5);
@@ -139,8 +141,8 @@ void AnaScript::createJets(){
     
     if(passcut && cleaned_from_muons){
       Jet.push_back(temp);
-      if(Jet_btagDeepB[i]>0.4184)     bJet.push_back(temp);
-      if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp);
+      if(Jet_btagDeepB[i]>0.4184)     bJet.push_back(temp); //2018
+      if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp); //2018
     }
 
     bool forwardjets = temp.v.Pt()>40 && fabs(temp.v.Eta())<4.7;

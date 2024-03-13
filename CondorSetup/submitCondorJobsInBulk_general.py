@@ -50,7 +50,8 @@ condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriche
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Feb19"
+#if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2muSS_QCDregion_Feb20"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Mar05_Baseline"
 else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None
@@ -141,6 +142,11 @@ for item in condorsamples:
                 if sample.startswith('QCD')  :    flag = 'qcd'
                 if sample.startswith('DY')   :    flag = 'dy'
                 if sample.startswith('EGamma') :  lep  = 'el'
+                if sample.startswith('EGamma') :  flag = 'egamma'
+
+                #Setting MC weights for jet-tagging:
+                mcwt = -1
+                
 
                 #arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
                 arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug} {lumi}'
