@@ -12,6 +12,7 @@ extern float xmax;
 extern int rebin;
 extern float globalSbyB;
 extern float globalObsbyExp;
+extern float globalObsbyExpErr;
 extern float QCDscale;
 extern bool toZoom;
 
@@ -251,6 +252,20 @@ void SetFillColorFromLineColor(THStack *stack) {
   }
 }
 
+Double_t GetStatUncertainty(TH1F *hist){
+  Double_t uncertainty = 0.0;
+  if(hist){//Carry on the calculation if the hist is non null.
+    Double_t original_N = hist->GetEntries();
+    Double_t scaled_N = hist->Integral();
+    Double_t original_err = sqrt(original_N);
+    if(original_N !=0 ){
+      Double_t frac_err = original_err/original_N;
+      uncertainty = frac_err * scaled_N;
+    }
+  }
+  return uncertainty;
+}
+
 TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
   //First, get a sum of all the backgrounds:
   TH1F *rootb = (TH1F *)bkg[0]->Clone(); rootb->Reset();
@@ -274,7 +289,7 @@ TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
   float nbkg = 0; for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
   float sqrtB = sqrt(nbkg);
   globalSbyB = nsig/sqrtB;
-  cout<<"Global significance = "<<globalSbyB<<endl;
+  //cout<<"Global significance = "<<globalSbyB<<endl;
   
   return srb;
 }
@@ -292,9 +307,13 @@ TH1F *GetRatio(TH1F *data, vector<TH1F*> bkg){
 
   //calculating global ratio:
   float nobs = data->Integral();
-  float nbkg = 0; for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
+  float nbkg = 0;  for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
   globalObsbyExp = nobs/nbkg;
-
+  float nobserr_frac = GetStatUncertainty(data)/nobs;
+  float nbkgerr_frac = GetStatUncertainty(allbkg)/nbkg;
+  float sumsqerr =  nobserr_frac*nobserr_frac + nbkgerr_frac*nbkgerr_frac;
+  globalObsbyExpErr = globalObsbyExp*sqrt(sumsqerr);
+  
   return ratio;
 }
 
@@ -372,19 +391,4 @@ void GetBinwiseSF(TString var, TH1F *hst_data, TH1F *hst_qcd, vector<TH1F*>bkg){
     cout<<"all\n"<<endl;
   }
 }
-
-Double_t GetStatUncertainty(TH1F *hist){
-  Double_t uncertainty = 0.0;
-  if(hist){//Carry on the calculation if the hist is non null.
-    Double_t original_N = hist->GetEntries();
-    Double_t scaled_N = hist->Integral();
-    Double_t original_err = sqrt(original_N);
-    if(original_N !=0 ){
-      Double_t frac_err = original_err/original_N;
-      uncertainty = frac_err * scaled_N;
-    }
-  }
-  return uncertainty;
-}
-
 #endif // SETTINGS_H
