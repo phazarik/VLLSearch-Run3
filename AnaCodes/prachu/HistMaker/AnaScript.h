@@ -610,10 +610,10 @@ public:
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
   //--------------------------------------------------------------------------
   //Corrections on bJets:
-  double bTagEff2016preVFP (vector<Particle>Jet, double tweak);
-  double bTagEff2016postVFP (vector<Particle>Jet, double tweak);
-  double bTagEff2017 (vector<Particle>Jet, double tweak);
-  double bTagEff2018 (vector<Particle>Jet, double tweak);
+  //double bTagEff2016preVFP (vector<Particle>Jet, double tweak);
+  //double bTagEff2016postVFP (vector<Particle>Jet, double tweak);
+  double bTagEff_UL2017 (vector<Particle>Jet, double tweak);
+  double bTagEff_UL2018 (vector<Particle>Jet, double tweak);
   //--------------------------------------------------------------------------
   
 protected:

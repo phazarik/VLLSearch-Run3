@@ -32,7 +32,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_2018_DeepJet_MediumWP.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
