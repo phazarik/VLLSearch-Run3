@@ -14,14 +14,17 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/EventSelection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
+
+//Corrections
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
@@ -29,6 +32,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -67,6 +71,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   evt_wt = 1.0;
   bad_event = false;
   evt_trigger = false;
+  _campaign = "UL18";
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -202,7 +207,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger); //The union of two sets.
+      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
       //triggerRes = electron_trigger;
     }
     
@@ -281,10 +287,10 @@ Bool_t AnaScript::Process(Long64_t entry)
       Tau.clear();
       Jet.clear();
       bJet.clear();
+      MediumbJet.clear();
       LooseLepton.clear();
       //For Uttsavi:
       ForwardJet.clear();
-      MediumbJet.clear();
       ForwardMediumbJet.clear();
       
       createLightLeptons();
@@ -300,15 +306,16 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Investigating 2muSS:
       Make2muSSPlots();
+      MakebJetSFPlots();
       
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
 
-      EventSelection(); //This is where trigger is applied.
-      if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
-      else evt_wt = 1.0;
+      //EventSelection(); //This is where trigger is applied.
+      //if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
+      //else evt_wt = 1.0;
       //----------------------------------------------------------------
 
       /*

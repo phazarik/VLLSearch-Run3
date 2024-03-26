@@ -29,6 +29,7 @@ float QCDscale;
 //Being used by decorations.h
 float globalSbyB;
 float globalObsbyExp;
+float globalObsbyExpErr;
 //Others:
 bool toSave;
 bool toLog;
@@ -70,15 +71,15 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2muSS_WR_Feb21";
+  TString jobname = "hist_2muSS_Mar13_baseline";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_basic"; //Don't use special symbols (because this string is part of the folder name)
-  tag2 = "2muSS basic"; //This appears on the plot.
+  tag = "2muSS_baseline_withdata"; //Don't use special symbols (because this string is part of the folder name)
+  tag2 = "2muSS baseline"; //This appears on the plot.
   QCDscale = 1;//1.2217294;//0.0355525;
 
   struct plotdata {
@@ -95,13 +96,14 @@ void makestack(){
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},
-    //{.var="onZ_ptbins", .name="onZ events",  5, 0, 5, 1},
-    //{.var="sideZ_ptbins", .name="sideband events",  5, 0, 5, 1},
-    //{.var="Flag_Zwindow", .name="onZ/offZ",  5, 0, 5, 1},
+    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},,
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    /*
+    //{.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},
+    //{.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
+    //{.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   5},
+    //{.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
+    
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
@@ -119,7 +121,7 @@ void makestack(){
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  5},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
-    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
     /*
     {.var="ST",              .name="ST (GeV)",          200, 0, 200, 5},
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
@@ -136,12 +138,6 @@ void makestack(){
     {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
     {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
     {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},*/
-    /*
-    {.var="charge_lep0", .name="Leading Lepton charge", 10, -5, 5, 1},
-    {.var="charge_lep1", .name="SubLeading Lepton charge", 10, -5, 5, 1},
-    {.var="charge_dilep", .name="Dilep charge", 10, -5, 5, 1},
-    {.var="id_lep0", .name="Leading Lepton ID", 5, 10, 15, 1},
-    {.var="id_lep1", .name="SubLeading Lepton ID", 5, 10, 15, 1},*/
   };
 
   int count = 0;
@@ -202,7 +198,7 @@ void plot(TString var, TString name){
     get_hist(var, "DYJetsToLL", "M10to50", 5925.522),
     get_hist(var, "DYJetsToLL", "M50",    30321.155),
   };
-  vector<TH1F *> QCD = {
+  vector<TH1F *> QCD = {    
     get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
     get_hist(var, "QCD_MuEnriched", "30to50",         42.906),
     get_hist(var, "QCD_MuEnriched", "50to80",        105.880),
@@ -215,7 +211,7 @@ void plot(TString var, TString name){
     get_hist(var, "QCD_MuEnriched", "800to1000",11337379.457),
 
     get_hist(var, "QCD_EMEnriched", "15to20",      5.96666541),
-    get_hist(var, "QCD_EMEnriched", "20to30",      2.92664338),
+    get_hist(var, "QCD_EMEnriched", "20to30",      2.92664338), //weird low stat bin
     get_hist(var, "QCD_EMEnriched", "30to50",      1.33001225),
     get_hist(var, "QCD_EMEnriched", "50to80",      5.28031791),
     get_hist(var, "QCD_EMEnriched", "80to120",    25.76427755),
@@ -281,25 +277,32 @@ void plot(TString var, TString name){
   
   //DisplayText("Reading done.", 33);
 
-  sig_eles_100 = get_hist(var, "VLLS", "ele_M100",    663355.82);
-  sig_eles_750 = nullptr;//get_hist(var, "VLLS", "ele_M750", 254269230.77);
-  sig_eled_100 = get_hist(var, "VLLD", "ele_M100",      8608.00);
+  sig_eles_100 = nullptr;//get_hist(var, "VLLS", "mu_M100",    657832.10);
+  sig_eles_750 = get_hist(var, "VLLS", "mu_M125", 1316553.24);
+  sig_eled_100 = nullptr;//get_hist(var, "VLLD", "mu_M100",      8689.91);
   
   //Merging the histograms from each samples and storing in a collection:
   bkg = {
-    merge_and_decorate(QCD,   "QCD",       kYellow),
-    merge_and_decorate(DY,    "Drell-Yan", kRed-7),
-    merge_and_decorate(WJets, "WJets",     kGray+1),
-    merge_and_decorate(ST,    "SingleTop", kCyan-7),
-    merge_and_decorate(TTBar, "TTBar",     kAzure+1),
-    merge_and_decorate(TTW,   "TTW",       kAzure+2),
-    merge_and_decorate(TTZ,   "TTZ",       kAzure+3),
-    merge_and_decorate(WW,    "WW",        kGreen-3),
-    merge_and_decorate(WZ,    "WZ",        kGreen-9),
-    merge_and_decorate(ZZ,    "ZZ",        kGreen-10),
+    merge_and_decorate(QCD,   "QCD",   kYellow),
+    merge_and_decorate(DY,    "DY",    kRed-7),
+    merge_and_decorate(WJets, "WJets", kGray+1),
+    merge_and_decorate(ST,    "ST",    kCyan-7),
+    merge_and_decorate(TTBar, "TTBar", kAzure+1),
+    merge_and_decorate(TTW,   "TTW",   kAzure+2),
+    merge_and_decorate(TTZ,   "TTZ",   kAzure+3),
+    merge_and_decorate(WW,    "WW",    kGreen-3),
+    merge_and_decorate(WZ,    "WZ",    kGreen-9),
+    merge_and_decorate(ZZ,    "ZZ",    kGreen-10),
   };
+
+  //Remove null pointers:
+  std::vector<TH1F*> nulls_removed;
+  for(size_t i = 0; i < bkg.size(); ++i){
+    if (bkg[i] != nullptr) nulls_removed.push_back(bkg[i]);
+  }
+  bkg = nulls_removed;
+  
   TH1F *hst_qcd = bkg[0];
-  //bkg[1]->Scale(0.0641216); //for ee type events
   
   TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon", kBlack);
   TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma",   kBlack);
@@ -308,44 +311,10 @@ void plot(TString var, TString name){
   if(hst_egamma) hst_data->Add(hst_egamma);
   hst_data->SetName("Data (2018)");
 
-  if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);  sig_eles_100->SetName("VLLS ele M100");}
-  if(sig_eles_750) {SetHistoStyle(sig_eles_750, kRed+2); sig_eles_750->SetName("VLLS ele M750");}
-  if(sig_eled_100) {SetHistoStyle(sig_eled_100, kRed+2); sig_eled_100->SetName("VLLD ele M100");}
+  if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);   sig_eles_100->SetName("VLLS mu M100");}
+  if(sig_eles_750) {SetHistoStyle(sig_eles_750, kRed+2); sig_eles_750->SetName("VLLS mu M125");}
+  if(sig_eled_100) {SetHistoStyle(sig_eled_100, kRed+2); sig_eled_100->SetName("VLLD mu M100");}
 
-  //Caculating scale factors, since the histograms are ready:
-  //if(toOverlayData && var=="HT") GetBinwiseSF(var,hst_data, hst_qcd, bkg);
-
-  //Pritning out numbers for correcting the Z peak:
-  if(var == "onZ_ptbins"){
-    cout<<"\nnEvents onZ : (data vs DY)"<<endl;
-    for(int i=0; i<6; i++){
-      cout<<"bin"<<i<<"\t";
-      float ndata_i = hst_data->GetBinContent(i);
-      float ndy_i   = bkg[1]  ->GetBinContent(i);
-      cout<<ndata_i<<"\t"<<ndy_i<<endl;
-    }
-  }
-  else if(var == "sideZ_ptbins"){
-    cout<<"\nnEvents sidebandZ : (data vs DY)"<<endl;
-    for(int i=0; i<6; i++){
-      cout<<"bin"<<i<<"\t";
-      float ndata_i = hst_data->GetBinContent(i);
-      float ndy_i   = bkg[1]  ->GetBinContent(i);
-      cout<<ndata_i<<"\t"<<ndy_i<<endl;
-    }
-  }
-  else if(var == "Flag_Zwindow"){
-    cout<<"\nGlobal charge mismeasurement:"<<endl;
-    float ndatamisId = hst_data->GetBinContent(1) - hst_data->GetBinContent(3);
-    float ndymisId =   bkg[1]  ->GetBinContent(1) - bkg[1]  ->GetBinContent(3);
-    float othermisId = 0;
-    for(int i=0; i<(int)bkg.size(); i++) othermisId = othermisId + (bkg[i]->GetBinContent(1)-bkg[i]->GetBinContent(3));
-    othermisId = othermisId - ndymisId;
-    cout<<"Data misId nevents = "<< ndatamisId   <<endl;
-    cout<<"DY misId nevents = "<< ndymisId       <<endl;
-    cout<<"Global Scale = "<< ndatamisId/ndymisId<<endl;
-  }
-  
   //Sorting the collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
   bkgstack = new THStack("Stacked",var+";"+var+";Events");
@@ -353,6 +322,42 @@ void plot(TString var, TString name){
   SetFillColorFromLineColor(bkgstack);
   bkgstack->SetTitle("");
   
+  //----------------------------------------------------------------------------
+  //ON SCREEN DISPLAYS:
+  //Caculating scale factors, since the histograms are ready:
+  if(toOverlayData && var=="HT") GetBinwiseSF(var,hst_data, hst_qcd, bkg);
+  //Displaying yield with error:
+  if(var=="HT"){
+    DisplayText("Yields with uncertainty:", 33);
+    if(toOverlayData){
+      cout<<fixed<<setprecision(2);
+      cout<<"Data\t";
+      cout<<hst_data->Integral()<<" ± "<<GetStatUncertainty(hst_data);
+      cout<<fixed<<setprecision(5);
+      cout<<"\t (SF= "<<hst_data->Integral()/hst_data->GetEntries()<<" )";
+      cout<<defaultfloat<<endl;
+    }
+    Double_t sum_bkg = 0;
+    Double_t sum_bkg_sqerr = 0;
+    for(int i=(int)bkg.size()-1; i>=0; i--){
+      cout<<fixed<<setprecision(2);
+      cout<<bkg[i]->GetName()<<"\t";
+      cout<<bkg[i]->Integral()<<"\\pm"<<GetStatUncertainty(bkg[i]);
+      cout<<fixed<<setprecision(5);
+      cout<<"\t (SF= "<<bkg[i]->Integral()/bkg[i]->GetEntries()<<" )";
+      cout<<defaultfloat<<endl;
+      sum_bkg += bkg[i]->Integral();
+      sum_bkg_sqerr += pow(GetStatUncertainty(bkg[i]), 2);
+    }
+    cout<<fixed<<setprecision(2);
+    cout<<"Total background = "<<sum_bkg<<" ± "<<sqrt(sum_bkg_sqerr)<<"\n";
+    if(sig_eles_100) cout<<"Signal = "<<sig_eles_100->Integral()<<" ± "<<GetStatUncertainty(sig_eles_100)<<endl;
+    if(sig_eles_750) cout<<"Signal = "<<sig_eles_750->Integral()<<" ± "<<GetStatUncertainty(sig_eles_750)<<endl;
+    cout<<defaultfloat<<endl;
+  } 
+  //-----------------------------------------------------------------------------
+  
+
   //---------------------------------------------
   // Plotting:
   //---------------------------------------------
@@ -384,8 +389,11 @@ void plot(TString var, TString name){
 
   //SoverB
   globalSbyB = 0;
-  if(sig_eles_100){
-    sbyrb = GetSbyRootB(sig_eles_100, bkg); SetRatioStyle(sbyrb, name);
+  sbyrb = nullptr;
+  if     (sig_eles_100) sbyrb = GetSbyRootB(sig_eles_100, bkg);
+  else if(sig_eles_750) sbyrb = GetSbyRootB(sig_eles_750, bkg);
+  if(sbyrb){
+    SetRatioStyle(sbyrb, name);
     sbyrb->GetYaxis()->SetTitle("S/sqrtB");
     if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
     if(!toOverlayData) sbyrb->Draw("ep");
@@ -426,7 +434,7 @@ void plot(TString var, TString name){
   
   put_text("CMS", 0.10, 0.93, 62, 0.06);
   put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_text(tag2+"", 0.4, 0.93, 42, 0.04);
+  put_text(tag2+"", 0.35, 0.93, 42, 0.04);
   put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
 
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
@@ -441,7 +449,11 @@ void plot(TString var, TString name){
   if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
   if(sig_eles_750) SetLegendEntry(lg, sig_eles_750);
   TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
-  if(toOverlayData) legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
+  if(toOverlayData){
+    legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();
+    cout<<defaultfloat<<"Obs/Exp = "<<globalObsbyExp<<" ± "<<globalObsbyExpErr<<"\n"<<endl;
+  }
+  else cout<<legendheader<<"\n"<<endl; 
   lg->SetHeader(legendheader);
   lg->Draw();
 

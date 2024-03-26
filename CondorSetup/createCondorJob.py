@@ -85,7 +85,8 @@ os.system("chmod a+x "+runScript)
 
 #arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\"\)' #raw string
 #arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\"\)' #with codedir
-arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\",\"$8\"\)' #with codedir, lumi
+#arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\",\"$8\"\)' #with codedir, lumi
+arguments = r'\(\"$1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6\",\"$7\",\"$8\",\"$9\"\)' #with codedir, lumi, samplename
 
 processline = 'root -q -b -l '+scriptname+arguments
 
@@ -164,7 +165,7 @@ for filename in input_files:
             "output = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
             "error = "+LOGDIR+"//$(Cluster)_data_"+filename+".err",
             "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".log",
-            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag)+" "+codedir+" "+str(lumi),
+            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag)+" "+codedir+" "+str(lumi)+" "+samplename,
             "queue",
             ""
         ]

@@ -6,9 +6,11 @@
 // While anaCond.C sits at the directory where the library is, runana.C can sit anywhere.
 //##############################################################################################
 
-//.x runana.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection/test_outputs/test_runana.root", "0", "2018", "1", "doublet", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/BasicEvtSelection")
+//.x runana.C("/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Mar05_Baseline/DYJetsToLL_M50_2024-03-05/*.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/test_outputs/test_runana.root", "0", "2018", "1", "dy", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker", "30321.155", "DYJetsToLL_M50")
 //OR
-//.x runana.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/test_outputs/test_runana.root", "0", "2018", "1", "flag", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker", "30321.155")
+//.x runana.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/test_outputs/test_runana.root", "0", "2018", "1", "dy", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer", "30321.155", "DYJetsToLL_M50")
+//OR
+//.x runana.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker/test_outputs/test_runana.root", "0", "2018", "1", "dy", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker", "30321.155", "DYJetsToLL_M50")
 
 // I will add more parameters, if needed later.
 
@@ -17,7 +19,7 @@
 #include <TFile.h>
 #include <TString.h>
 
-void runana(TString ifname, TString ofname, TString data, TString year, TString lep, TString flag, TString codedir, TString lumi){
+void runana(TString ifname, TString ofname, TString data, TString year, TString lep, TString flag, TString codedir, TString lumi, TString samplename){
 
   //#######################
   // DO NOT TOUCH ANYTHING
@@ -25,8 +27,9 @@ void runana(TString ifname, TString ofname, TString data, TString year, TString 
 
   TString path_to_anaCond = codedir;
   TString path_to_library =path_to_anaCond;
-  //TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\")"; //This is the line that is being executed.
-  TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\",\""+lumi+"\")"; //This is the line that is being executed.   
+  //TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\")";
+  TString anastring = ".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\",\""+lumi+"\",\""+samplename+"\")"; //This is the line that is being executed.
+
   gSystem->Load(path_to_library+"/AnaScript_C.so");
   gROOT->ProcessLine(anastring);
   std::cout<<"Output file: "<<ofname<<endl;

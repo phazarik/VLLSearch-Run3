@@ -5,16 +5,16 @@
 // This driver script is run using runana.C, which uses gROOT to run this from outside the root terminal.
 //#########################################################################################################
 
-//Execution line : .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test.root", "0", "2018", "mu", "flag", "whatever")
+//Execution line : .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test.root", "0", "2018", "mu", "flag", "59800", "DYJetsToLL_M50")
 //OR
-// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "whatever")
+// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "59800", "DYJetsToLL_M50")
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
 //#include <boost/lexical_cast.hpp>// for lexical_cast()
 
-void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag, TString lumi)
+void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag, TString lumi, TString samplename)
 {
   //Description of the parameters:
   //1. ifname : Input file name with full path.
@@ -63,6 +63,14 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
 
   //Set the additional flag:
   m_selec.SetFlag(flag);
+  m_selec.SetSampleName(samplename);
+
+  /*
+  //Set lumi:
+  //double lumival = lumi.Atof();
+  std::string lumistring(lumi.Data()); 
+  double lumival = std::stod(lumistring);
+  m_selec.SetLumi(lumival);*/
   
   chain->Process(&m_selec);
   gROOT->Time();

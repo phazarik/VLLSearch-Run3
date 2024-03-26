@@ -360,6 +360,9 @@ public :
   //btagWeight
   TTreeReaderValue<Float_t> btagWeight_CSVV2 =    {fReader_MC, "btagWeight_CSVV2"};
   TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};
+
+  //Jetflavor:
+   TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
   
   //_________________________________________________________________________
   
@@ -431,6 +434,7 @@ public :
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
   void SetLumi(double lumi){_lumi=lumi;}
+  void SetSampleName(TString samplename){_samplename=samplename;}
 
   void BookHistograms();
 
@@ -455,6 +459,7 @@ public :
   void Make_evt2LSS_plots(float wt);
   void Make_gen2LSS_plots(float wt);
   void Make2muSSPlots();
+  void MakebJetSFPlots();
   void MakePlotsForUttsavi();
   TString ParticleName(int pdgid);
 
@@ -543,6 +548,23 @@ public :
   float TrigEff_2018_Ele32WPTightGsf_MC(float pt, float eta);
   float TrigEff_2018_Ele32WPTightGsf_Data(float pt, float eta);
   //--------------------------------------------------------------------------
+  //For correcting bJets:
+  //2016 preVFP:
+  double getScaleFactors_bTagJets_MedWP_UL2016preVFP(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL2016preVFP(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL2016preVFP(float eta, float pt, double tweak);
+  //2016 postVFP
+  double getScaleFactors_bTagJets_MedWP_UL2016postVFP(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL2016postVFP(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL2016postVFP(float eta, float pt, double tweak);
+  //2017
+  double getScaleFactors_bTagJets_MedWP_UL17(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL17(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL17(float eta, float pt, double tweak);
+  //2018
+  double getScaleFactors_bTagJets_MedWP_UL18(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL18(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL18(float eta, float pt, double tweak);
 
 public:
   struct Hists {
@@ -559,6 +581,8 @@ public:
     TH1F *evt2LSS[50];
     TH1F *gen2LSS[50];
     TH1F *evt2muSS[50];
+    TH1F *btagsf[10];
+    TH2F *bJets[5],*cJets[5],*lJets[5];
     
   };
   struct Particle {
@@ -577,12 +601,20 @@ public:
     vector<int> dauid; //pdgid of the daughters (GenPart only)
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
     float btagscore;
+    int hadronflavor;
   };
 
   //Functions that involve the 'Particle' type objects:
   void SortPt(vector<Particle> part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
+  //--------------------------------------------------------------------------
+  //Corrections on bJets:
+  //double bTagEff2016preVFP (vector<Particle>Jet, double tweak);
+  //double bTagEff2016postVFP (vector<Particle>Jet, double tweak);
+  double bTagEff_UL2017 (vector<Particle>Jet, double tweak);
+  double bTagEff_UL2018 (vector<Particle>Jet, double tweak);
+  //--------------------------------------------------------------------------
   
 protected:
   Hists h;
@@ -596,13 +628,14 @@ private:
   int _data, _lep, _year, _mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi;
-  TString _era, _flag;
+  TString _era, _flag, _samplename, _campaign;
   double _lumi;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
-  vector<Particle> ForwardJet, MediumbJet, ForwardMediumbJet; //for uttsavi
+  vector<Particle> MediumbJet;
+  vector<Particle> ForwardJet, ForwardMediumbJet; //for uttsavi
   vector<Particle> LooseLepton; //Loose objects
 
   //Counters:

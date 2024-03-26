@@ -34,6 +34,10 @@ void AnaScript::SortRecoObjects(){
   for(int i=0; i<(int)bJet.size()-1; i++){
     for(int j=i+1; j<(int)bJet.size(); j++){
       if(bJet[i].v.Pt() < bJet[j].v.Pt() ) swap(bJet.at(i), bJet.at(j));}}
+  //MediumbJets:
+  for(int i=0; i<(int)MediumbJet.size()-1; i++){
+    for(int j=i+1; j<(int)MediumbJet.size(); j++){
+      if(MediumbJet[i].v.Pt() < MediumbJet[j].v.Pt() ) swap(MediumbJet.at(i), MediumbJet.at(j));}}
   //LooseLeptons:
   for(int i=0; i<(int)LooseLepton.size()-1; i++){
     for(int j=i+1; j<(int)LooseLepton.size(); j++){

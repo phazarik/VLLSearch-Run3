@@ -7,5 +7,6 @@
 *#
 *txt
 *png
+*zip
 CondorSetup/previous_jobs/
 *.ipynb_checkpoints

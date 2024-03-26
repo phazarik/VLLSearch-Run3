@@ -160,7 +160,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);  
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
+      if(_flag == "egamma" && muon_trigger) triggerRes = false;
     }
     
     if(triggerRes){
@@ -316,19 +317,24 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Skimming 2muSS events:
       bool keep_this_event = false;
-      bool allmuons_nonisolated = true;
-      bool allmuons_isolated = true;
+      bool muons_with_large_reliso = false;
       for(int i=0; i<(int)Muon.size(); i++){
-	if(Muon.at(i).reliso03 <= 0.15) allmuons_nonisolated = false;
-	else allmuons_isolated = false;
+	if(Muon.at(i).reliso03 > 1.0) muons_with_large_reliso = true; //we don't want these.
       }
 	
-      if((int)Muon.size()==2 && (int)Electron.size()==0 && allmuons_nonisolated && (int)bJet.size()==0){
-	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
+      if((int)Muon.size()==2 && (int)Electron.size()==0){
+
+	bool reject_low_resonances = (Muon.at(0).v + Muon.at(1).v).M() > 15;
+	bool samesign = Muon.at(0).charge == Muon.at(1).charge;
+	bool ptcut = Muon.at(0).v.Pt()>26;
+	
+	bool basic_cuts = samesign && ptcut && reject_low_resonances;
+	if(basic_cuts && !muons_with_large_reliso){
 	  nEvtSkim++;
 	  keep_this_event = true;
 	}
       }
+      
       if(keep_this_event) skimTree->Fill();
 
       

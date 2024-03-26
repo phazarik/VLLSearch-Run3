@@ -3,8 +3,9 @@ void AnaScript::BookHistograms(){
   h.nevt = new TH1F("nEvents", "0-nEvtTotal, 1-nEvtRan, 2-nEvtTrigger, 3-nEvtPass, 4-nEvtPass(wt)",5,0,5); //h.nevt->Sumw2();
   h.evtweight[0] = new TH1F("wt_SF","Reco-ID-Iso Scale Factor",200,0,2);
   h.evtweight[1] = new TH1F("wt_trigger","Trigger Scale Factor",200,0,2);
-  h.evtweight[2] = new TH1F("wt_evt","Event weight",200,0,2);
-  h.evtweight[3] = new TH1F("wt_lumi","LumiScale",3000,0,3000);
+  h.evtweight[2] = new TH1F("wt_bjet","bJet weight",200,0,2);
+  h.evtweight[3] = new TH1F("wt_evt","Event weight",200,0,2);
+  h.evtweight[4] = new TH1F("wt_lumi","LumiScale",3000,0,3000);
   //for(int i=0; i<3; i++)h.evtweight[i]->Sumw2();
 
   //Checking the triggers:
@@ -106,13 +107,13 @@ void AnaScript::BookHistograms(){
   h.evt2LSS[3]  = new TH1F("lep0_pt",  "lep0_pt",  50, 0, 500);
   h.evt2LSS[4]  = new TH1F("lep0_eta", "lep0_eta", 100, -4, 4);
   h.evt2LSS[5]  = new TH1F("lep0_phi", "lep0_phi", 100, -4, 4);
-  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 200, 0, 0.2);
+  h.evt2LSS[6]  = new TH1F("lep0_iso", "lep0_iso", 200, 0, 1);
   h.evt2LSS[7]  = new TH1F("lep0_mt",  "lep0_mt",  50, 0, 500);
 
   h.evt2LSS[8]  = new TH1F("lep1_pt",  "lep1_pt",  50, 0, 500);
   h.evt2LSS[9]  = new TH1F("lep1_eta", "lep1_eta", 100, -4, 4);
   h.evt2LSS[10] = new TH1F("lep1_phi", "lep1_phi", 100, -4, 4);
-  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 200, 0, 0.2);
+  h.evt2LSS[11] = new TH1F("lep1_iso", "lep1_iso", 200, 0, 1);
   h.evt2LSS[12] = new TH1F("lep1_mt",  "lep1_mt",  50, 0, 500);
 
   h.evt2LSS[13] = new TH1F("dilep_pt",  "dilep_pt",  50, 0, 500);
@@ -125,7 +126,7 @@ void AnaScript::BookHistograms(){
   h.evt2LSS[20] = new TH1F("dilep_dR",   "dilep_dR",   100, 0, 6);
   h.evt2LSS[21] = new TH1F("dilep_ptratio","dilep_ptratio",100, 0, 1);
 
-  h.evt2LSS[22] = new TH1F("HT", "HT", 10, 0, 500);
+  h.evt2LSS[22] = new TH1F("HT", "HT", 20, 0, 500);
   h.evt2LSS[23] = new TH1F("STvis", "STvis", 50, 0, 500);
   h.evt2LSS[24] = new TH1F("STfrac", "STfrac", 100, 0, 1.1); //For nJet-==0, STfrac=1
   
@@ -174,5 +175,16 @@ void AnaScript::BookHistograms(){
   h.gen2LSS[18]  = new TH1F("mm_chargematch_rate","mm 0=all, 1=lep0match, 2=lep1match, 3=bothmatch",  5, 0, 5);
   
   for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();
+
+  h.btagsf[0] = new TH1F("JetHadronFlavor_all", "JetHadronFlavor_all", 10, -2, 8);
+  //2D plots for bTagSF calculation:
+  float x_bin_pT[10] = {20,30,50,70,100,140,200,300,600,1000};
+  float y_bin_eta[4] = {0.0,0.8,1.6,3.0};
+  h.bJets[0] = new TH2F("bJet_PtEta","bJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.bJets[1] = new TH2F("bJet_MedWP_PtEta","bJet_MedWP_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.cJets[0] = new TH2F("cJet_PtEta","cJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.cJets[1] = new TH2F("cJet_Mis_PtEta","cJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.lJets[0] = new TH2F("LightJet_PtEta","LightJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   
 }
