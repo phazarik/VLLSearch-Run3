@@ -360,6 +360,9 @@ public :
   //btagWeight
   TTreeReaderValue<Float_t> btagWeight_CSVV2 =    {fReader_MC, "btagWeight_CSVV2"};
   TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};
+
+  //Jetflavor:
+  TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
   
   //_________________________________________________________________________
   
@@ -430,6 +433,8 @@ public :
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
+  void SetLumi(double lumi){_lumi=lumi;}
+  void SetSampleName(TString samplename){_samplename=samplename;}
 
   void BookHistograms();
 
@@ -483,6 +488,7 @@ public:
     vector<int> dauid; //pdgid of the daughters (GenPart only)
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
     float btagscore;
+    int hadronflavor;
   };
 
   //Functions that involve the 'Particle' type objects:
@@ -503,7 +509,8 @@ private:
   int _data, _lep, _year,_mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi;
-  TString _era, _flag;
+  TString _era, _flag, _samplename, _campaign;
+  double _lumi;
 
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;

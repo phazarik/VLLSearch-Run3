@@ -25,7 +25,7 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   //3. data   : 0, or 1 depedning on whether 'ifname' is MC or data.
   //4. year   : Which year of data taking. (affects trigger paths and efficiencies)
   //5. lep    : If muon dataset, lep=1, if electron dataset, lep=0
-
+  
   gROOT->Time();
   const char *hstfilename;
   TChain *chain = new TChain("Events");

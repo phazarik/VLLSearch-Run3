@@ -36,7 +36,7 @@ void AnaScript::Make2muSSPlots(){
       wt = scalefactor*triggereff;
       //Corrections for Jets:
       double jeteff = 1.0;
-      if(_year == 2018) bjeteff = bTagEff2018(Jet);
+      if(_campaign == "UL18") bjeteff = bTagEff2018(Jet, 0); //Tweaking the SF from POG by 0 %
       wt = wt*bjeteff;
     }
     h.evtweight[0]->Fill(scalefactor);

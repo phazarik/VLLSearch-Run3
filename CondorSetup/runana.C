@@ -7,6 +7,10 @@
 //##############################################################################################
 
 //.x runana.C("/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Mar05_Baseline/DYJetsToLL_M50_2024-03-05/*.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/test_outputs/test_runana.root", "0", "2018", "1", "dy", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker", "30321.155", "DYJetsToLL_M50")
+//OR
+//.x runana.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/test_outputs/test_runana.root", "0", "2018", "1", "dy", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer", "30321.155", "DYJetsToLL_M50")
+//OR
+//.x runana.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", " /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker/test_outputs/test_runana.root", "0", "2018", "1", "dy", "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/TreeMaker", "30321.155", "DYJetsToLL_M50")
 
 // I will add more parameters, if needed later.
 

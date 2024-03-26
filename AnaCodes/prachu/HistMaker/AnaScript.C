@@ -14,6 +14,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 //#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
 
@@ -70,6 +71,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   evt_wt = 1.0;
   bad_event = false;
   evt_trigger = false;
+  _campaign = "UL18";
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -285,10 +287,10 @@ Bool_t AnaScript::Process(Long64_t entry)
       Tau.clear();
       Jet.clear();
       bJet.clear();
+      MediumbJet.clear();
       LooseLepton.clear();
       //For Uttsavi:
       ForwardJet.clear();
-      MediumbJet.clear();
       ForwardMediumbJet.clear();
       
       createLightLeptons();
@@ -304,6 +306,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Investigating 2muSS:
       Make2muSSPlots();
+      MakebJetSFPlots();
       
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.

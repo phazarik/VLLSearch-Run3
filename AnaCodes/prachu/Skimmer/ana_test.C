@@ -23,6 +23,8 @@ void ana_test(int sample=1)
     m_selec.SetMCwt(1);
     m_selec.SetLep(1); //0-electron dataset, 1-muon dataset
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("SingleMuon_A");
+    m_selec.SetLumi(59800);
   }
   
   else if(sample==1){//Drell-Yan
@@ -35,6 +37,8 @@ void ana_test(int sample=1)
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("DYJetsToLL_M50");
+    m_selec.SetLumi(59800);
   }
 
   else if(sample==2){//Drell-Yan
@@ -47,6 +51,8 @@ void ana_test(int sample=1)
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
     m_selec.SetFlag("qcd"); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("QCD_MuEnriched_170to300");
+    m_selec.SetLumi(59800);
   }
 
   else if(sample==800){//Signal
@@ -59,6 +65,8 @@ void ana_test(int sample=1)
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
     m_selec.SetFlag("doublet"); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("VLLD_ele_M800");
+    m_selec.SetLumi(59800);
   }
   
   else if(sample==500){//Signal
@@ -71,6 +79,8 @@ void ana_test(int sample=1)
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("VLLS_ele_M500");
+    m_selec.SetLumi(59800);
   }
   
   else{

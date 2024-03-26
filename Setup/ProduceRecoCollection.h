@@ -129,7 +129,7 @@ void AnaScript::createJets(){
     temp.ind = i;
     temp.btagscore = Jet_btagDeepFlavB[i];
     if(_data==0) temp.hadronflavor = Jet_hadronFlavour[i];
-    else temp.hadronflavor = 999;
+    else temp.hadronflavor = -1;
 
     bool ptetacut = temp.v.Pt()>30 && fabs(temp.v.Eta())<2.4;
     bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.5);

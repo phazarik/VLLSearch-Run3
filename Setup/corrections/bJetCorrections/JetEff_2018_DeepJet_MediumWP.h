@@ -12,7 +12,7 @@ using namespace std;
 
 
 // 2018
-float AnaScript::bTagEff2018 (vector<Particle>Jet){
+double AnaScript::bTagEff2018 (vector<Particle>Jet, double tweak){
   //initializing
   float probability_mc  = 1.0;
   float probability_data = 1.0;
@@ -189,6 +189,112 @@ float AnaScript::bTagEff2018 (vector<Particle>Jet){
       }
     }
   }
+
+  /*
+  else if (_samplename == "QCD_EMEnriched_15to20") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }
+  else if (_samplename == "QCD_EMEnriched_20to30") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }
+  else if (_samplename == "QCD_EMEnriched_30to50") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }
+  else if (_samplename == "QCD_EMEnriched_50to80") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }  
+  else if (_samplename == "QCD_EMEnriched_80to120") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }
+  else if (_samplename == "QCD_EMEnriched_120to170") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }
+  else if (_samplename == "QCD_EMEnriched_170to300") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+  }
+  else if (_samplename == "QCD_EMEnriched_300toInf") {
+    float BJetEff_temp[3][8] = ;
+    float CJetEff_temp[3][8] = ;
+    float LJetEff_temp[3][8] = ;
+            
+    for ( int i=0; i<3 ; i++) {
+      for ( int j=0; j<8; j++) {
+	LJetEff[i][j] = LJetEff_temp[i][j];
+	CJetEff[i][j] = CJetEff_temp[i][j];
+	BJetEff[i][j] = BJetEff_temp[i][j];
+      }
+    }
+    }*/
   
   //ZZ(20-29)
   else if (_samplename == "ZZTo2Q2L") {//2Q2L 
@@ -577,9 +683,9 @@ float AnaScript::bTagEff2018 (vector<Particle>Jet){
     else                                    jet_eff = LJetEff[etabin][ptbin];
 
     double SFfromPOG =  1.0;
-    if( Jet.at(i).hadronflavor == 5)       SFfromPOG = getScaleFactors_bTagJets_MedWP_UL18(Jet.at(i).v.Eta(),Jet.at(i).v.Pt());
-    else if(Jet.at(i).hadronflavor == 4 )  SFfromPOG = getScaleFactors_cTagJets_Mis_UL18(Jet.at(i).v.Eta(),Jet.at(i).v.Pt());
-    else                                   SFfromPOG = getScaleFactors_LightTagJets_Mis_UL18(Jet.at(i).v.Eta(),Jet.at(i).v.Pt());
+    if( Jet.at(i).hadronflavor == 5)       SFfromPOG = getScaleFactors_bTagJets_MedWP_UL18(Jet.at(i).v.Eta(),Jet.at(i).v.Pt(), tweak);
+    else if(Jet.at(i).hadronflavor == 4 )  SFfromPOG = getScaleFactors_cTagJets_Mis_UL18(Jet.at(i).v.Eta(),Jet.at(i).v.Pt(), tweak);
+    else                                   SFfromPOG = getScaleFactors_LightTagJets_Mis_UL18(Jet.at(i).v.Eta(),Jet.at(i).v.Pt(), tweak);
     //These functions are defined in the other file
     
     // check if jet is tagged or not
@@ -596,7 +702,7 @@ float AnaScript::bTagEff2018 (vector<Particle>Jet){
     probability_mc   *= jet_prob_mc;
   }
   
-  float scaleFactor = 1.0;
+  double scaleFactor = 1.0;
   if (probability_mc > 0.0) scaleFactor = probability_data/probability_mc;
   
   return scaleFactor;

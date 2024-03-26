@@ -175,5 +175,16 @@ void AnaScript::BookHistograms(){
   h.gen2LSS[18]  = new TH1F("mm_chargematch_rate","mm 0=all, 1=lep0match, 2=lep1match, 3=bothmatch",  5, 0, 5);
   
   for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();
+
+  h.btagsf[0] = new TH1F("JetHadronFlavor_all", "JetHadronFlavor_all", 10, -2, 8);
+  //2D plots for bTagSF calculation:
+  float x_bin_pT[10] = {20,30,50,70,100,140,200,300,600,1000};
+  float y_bin_eta[4] = {0.0,0.8,1.6,3.0};
+  h.bJets[0] = new TH2F("bJet_PtEta","bJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.bJets[1] = new TH2F("bJet_MedWP_PtEta","bJet_MedWP_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.cJets[0] = new TH2F("cJet_PtEta","cJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.cJets[1] = new TH2F("cJet_Mis_PtEta","cJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.lJets[0] = new TH2F("LightJet_PtEta","LightJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   
 }
