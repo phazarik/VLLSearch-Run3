@@ -362,7 +362,7 @@ public :
   TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};
 
   //Jetflavor:
-  TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+   TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
   
   //_________________________________________________________________________
   
@@ -425,6 +425,7 @@ public :
   //User defined functions are declared here
   void SetHstFileName(const char *HstFileName){ _HstFileName = HstFileName;}
   void SetSumFileName(const char *SumFileName){ _SumFileName = SumFileName;}
+  void SetSkimFileName(const char *SkimFileName){ _SkimFileName = SkimFileName;}//skimmer
   void SetSample(int sample){_sample=sample;}
   void SetLep(int lep){_lep=lep;}
   void SetVerbose(int verbose){ _verbosity = verbose; }
@@ -452,25 +453,35 @@ public :
   void SortGenObjects();
   void SortVLL();
   void EventSelection();
-  TString ParticleName(int pdgid);
+  float getEventWeight();
 
-  //for skimmer:
-  void SetSkimFileName(const char *SkimFileName){ _SkimFileName = SkimFileName;}
-  void ReadBranch();
-  void ActivateBranch(TTree *t);
+  //For specific studies:
+  void MakeSignalPlots(float wt);
+  void Make_evt2LSS_plots(float wt);
+  void Make_gen2LSS_plots(float wt);
+  void Make2muSSPlots();
+  void MakebJetSFPlots();
+  void MakePlotsForUttsavi();
+  TString ParticleName(int pdgid);
 
 public:
   struct Hists {
     //Histograms are declared here.
     TH1F *nevt;
     TH1F *evtweight[10];
-    TH1F *hist[10];
+    TH1F *hist[50];
     //Object level hists:
-    TH1F *mu[10];TH1F *ele[10];TH1F *llep[10];
+    TH1F *mu[10]; TH1F *ele[10]; TH1F *llep[10];
     TH1F *pho[10];TH1F *tau[10];
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
+    TH1F *evt2LSS[50];
+    TH1F *gen2LSS[50];
+    TH1F *evt2muSS[50];
+    TH1F *btagsf[10];
+    TH2F *bJets[5],*cJets[5],*lJets[5];
+    
   };
   struct Particle {
     TLorentzVector v;
@@ -495,6 +506,10 @@ public:
   void SortPt(vector<Particle> part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
+
+  //for skimmer
+  void ReadBranch();
+  void ActivateBranch(TTree *t);
   
 protected:
   Hists h;
@@ -502,11 +517,12 @@ protected:
 private:
   //Global variables go here. Make them global only if necessary.
   TFile *_HstFile;
+  TFile *_SkimFile; TTree *skimTree; //for skimmer
   const char *_HstFileName;
   const char *_SumFileName;
+  const char *_SkimFileName; //for skimmer
   int _verbosity,_exclude,_sample;
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtBad;
-  int _data, _lep, _year,_mcwt;
+  int _data, _lep, _year, _mcwt;
   bool GoodEvt, GoodEvt2016, GoodEvt2017, GoodEvt2018,triggerRes,trigger2016,trigger2017,trigger2018;
   float metpt, metphi;
   TString _era, _flag, _samplename, _campaign;
@@ -515,27 +531,26 @@ private:
   vector<Particle> genMuon, genElectron, genLightLepton;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
-  vector<Particle> ForwardJet, MediumbJet, ForwardMediumbJet;
+  vector<Particle> MediumbJet;
+  vector<Particle> ForwardJet, ForwardMediumbJet; //for uttsavi
   vector<Particle> LooseLepton; //Loose objects
 
   //Counters:
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
+  int n2muss, n2ess, nemuss;
+  int nbasicpass, nadvancedpass, nbasicpass2, nadvancedpass2; //For Uttsavi
 
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
   bool evt_trigger;
-  float evt_wt;
+  double evt_wt;
 
   //For signal:
   bool bad_event;
 
-  time_t start, end;
-
-  //for skimmer
-  const char *_SkimFileName;
-  int nEvtSkim;
-  TTree *tree,*skimTree;
-  TFile *_SkimFile;
+  time_t start, end, buffer;
+  int batch_index, batch_size;
 
   ClassDef(AnaScript,0);
 
@@ -563,7 +578,6 @@ void AnaScript::Init(TTree *tree)
   _SkimFile = new TFile(_SkimFileName,"recreate");
   skimTree = tree->CloneTree(0);
   //skimTree->Reset();
-  
 }
 
 Bool_t AnaScript::Notify()
