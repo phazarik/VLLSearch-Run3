@@ -13,7 +13,7 @@ extern int rebin;
 extern float globalSbyB;
 extern float globalObsbyExp;
 extern float globalObsbyExpErr;
-extern float QCDscale;
+extern double QCDscale;
 extern bool toZoom;
 
 //The following function are used by get_hist()
@@ -248,6 +248,7 @@ void SetFillColorFromLineColor(THStack *stack) {
       //if(!hist) DisplayText("Warning: nullptr for "+(TString *)hist->GetName(), 31);
       hist->SetFillColor(hist->GetLineColor());
       hist->SetLineColor(kBlack);
+      //hist->SetLineWidth(1);
     }
   }
 }

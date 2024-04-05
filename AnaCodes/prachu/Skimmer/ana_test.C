@@ -86,6 +86,15 @@ void ana_test(int sample=1)
   else{
     cout<<"Invalid argument!"<<endl;
   }
+
+  //For testing purposesL
+  //Extract Number of events:
+  TFile *tfile = new TFile("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "READ");
+  TTree *ttree = (TTree *)tfile->Get("Events");
+  TBranch *br = ttree->GetBranch("run");
+  int nevt = br->GetEntries();
+  std::cout<<"Total no of events : (test) "<<nevt<<std::endl;
+  
   std::cout<<"Output file : "<<skimfilename<<std::endl;
   m_selec.SetHstFileName(hstfilename);
   m_selec.SetSumFileName(sumfilename);

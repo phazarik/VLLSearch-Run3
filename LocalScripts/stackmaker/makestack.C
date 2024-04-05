@@ -25,7 +25,7 @@ int nbins;
 float xmin;
 float xmax;
 int rebin;
-float QCDscale;
+double QCDscale;
 //Being used by decorations.h
 float globalSbyB;
 float globalObsbyExp;
@@ -39,9 +39,9 @@ TString tag, tag2; //Additional info while saving the plots
 
 //Declaring ROOT objects here for memory management.
 TH1F *dummy;
-TH1F *sig_eles_100;
-TH1F *sig_eles_750;
-TH1F *sig_eled_100;
+TH1F *sig1;
+TH1F *sig2;
+TH1F *sig3;
 TH1F *hst_data;
 //TH1F *hst_smuon;
 //TH1F *hst_egamma;
@@ -71,16 +71,17 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2muSS_Mar13_baseline";
+  TString jobname = "hist_2muSS_Apr04_baselineIso";
   input_path = "../input_files/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_baseline_withdata"; //Don't use special symbols (because this string is part of the folder name)
-  tag2 = "2muSS baseline"; //This appears on the plot.
-  QCDscale = 1;//1.2217294;//0.0355525;
+  tag = "2muSS_basline_Iso"; //Don't use special symbols (because this string is part of the folder name)
+  tag2 = "QCD Baseline (iso mu)"; //This appears on the plot.
+  //QCDscale = 1.0;
+  QCDscale = 0.094647493; //0.129596389;//0.136561*0.949;
 
   struct plotdata {
     TString var;
@@ -96,14 +97,14 @@ void makestack(){
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 1},,
+    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 5},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},
     //{.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
     //{.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   5},
     //{.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
-    
+    /*
     {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
@@ -121,8 +122,8 @@ void makestack(){
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  5},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
-    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
-    /*
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
+    
     {.var="ST",              .name="ST (GeV)",          200, 0, 200, 5},
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
@@ -137,7 +138,7 @@ void makestack(){
     {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 5},
     {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
     {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},*/
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
   };
 
   int count = 0;
@@ -164,7 +165,7 @@ void makestack(){
 //---------------------------------------------------------------
 // Event selection: Put cuts on the branches and filter the tree
 //---------------------------------------------------------------
-
+/*
 TTree* GetFilteredTree(TTree *intree){
 
   //Define the branch cuts using TCut
@@ -173,7 +174,7 @@ TTree* GetFilteredTree(TTree *intree){
   TCut cut = pt0cut; 
   TTree *filtered_tree = intree->CopyTree(cut);
   return filtered_tree;
-}
+  }*/
 
 //-----------------------------------
 // Plotmaker (runs for each variable)
@@ -276,10 +277,6 @@ void plot(TString var, TString name){
   };
   
   //DisplayText("Reading done.", 33);
-
-  sig_eles_100 = nullptr;//get_hist(var, "VLLS", "mu_M100",    657832.10);
-  sig_eles_750 = get_hist(var, "VLLS", "mu_M125", 1316553.24);
-  sig_eled_100 = nullptr;//get_hist(var, "VLLD", "mu_M100",      8689.91);
   
   //Merging the histograms from each samples and storing in a collection:
   bkg = {
@@ -300,10 +297,20 @@ void plot(TString var, TString name){
   for(size_t i = 0; i < bkg.size(); ++i){
     if (bkg[i] != nullptr) nulls_removed.push_back(bkg[i]);
   }
-  bkg = nulls_removed;
-  
-  TH1F *hst_qcd = bkg[0];
-  
+  bkg = nulls_removed;  
+  TH1F *hst_qcd = bkg[0]; //Assuming qcd isn't null
+
+  //################
+  //Managing signal:
+  sig1 = get_hist(var, "VLLD", "mu_M100", 8689.91);
+  sig2 = get_hist(var, "VLLS", "mu_M125", 1316553.24);
+  sig3 = nullptr; //get_hist(var, "VLLS", "mu_M100",    657832.10);
+  if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetName("VLLD mu M100");}
+  if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetName("VLLS mu M125");}
+  //if(sig3) {SetHistoStyle(sig3, kRed+2); sig3->SetName("VLLD mu M125");}
+
+  //###############
+  //Managing data:
   TH1F *hst_smuon = merge_and_decorate(SingleMuon, "SingleMuon", kBlack);
   TH1F *hst_egamma= merge_and_decorate(EGamma,     "EGamma",   kBlack);
 
@@ -311,11 +318,7 @@ void plot(TString var, TString name){
   if(hst_egamma) hst_data->Add(hst_egamma);
   hst_data->SetName("Data (2018)");
 
-  if(sig_eles_100) {SetHistoStyle(sig_eles_100, kRed);   sig_eles_100->SetName("VLLS mu M100");}
-  if(sig_eles_750) {SetHistoStyle(sig_eles_750, kRed+2); sig_eles_750->SetName("VLLS mu M125");}
-  if(sig_eled_100) {SetHistoStyle(sig_eled_100, kRed+2); sig_eled_100->SetName("VLLD mu M100");}
-
-  //Sorting the collection and stacking:
+  //Sorting the background collection and stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
   bkgstack = new THStack("Stacked",var+";"+var+";Events");
   for(int i=0; i<(int)bkg.size(); i++) bkgstack->Add(bkg[i]);
@@ -351,8 +354,9 @@ void plot(TString var, TString name){
     }
     cout<<fixed<<setprecision(2);
     cout<<"Total background = "<<sum_bkg<<" ± "<<sqrt(sum_bkg_sqerr)<<"\n";
-    if(sig_eles_100) cout<<"Signal = "<<sig_eles_100->Integral()<<" ± "<<GetStatUncertainty(sig_eles_100)<<endl;
-    if(sig_eles_750) cout<<"Signal = "<<sig_eles_750->Integral()<<" ± "<<GetStatUncertainty(sig_eles_750)<<endl;
+    if(sig1) cout<<"Signal = "<<sig1->Integral()<<" ± "<<GetStatUncertainty(sig1)<<endl;
+    if(sig2) cout<<"Signal = "<<sig2->Integral()<<" ± "<<GetStatUncertainty(sig2)<<endl;
+    if(sig3) cout<<"Signal = "<<sig2->Integral()<<" ± "<<GetStatUncertainty(sig3)<<endl;
     cout<<defaultfloat<<endl;
   } 
   //-----------------------------------------------------------------------------
@@ -380,9 +384,9 @@ void plot(TString var, TString name){
   //Now draw the rest.
   if(toOverlayData) hst_data->Draw("ep same");
   bkgstack->Draw("hist same");
-  if(sig_eled_100) sig_eled_100->Draw("HIST same");
-  if(sig_eles_100) sig_eles_100->Draw("HIST same");
-  if(sig_eles_750) sig_eles_750->Draw("HIST same");
+  if(sig1) sig1->Draw("HIST same");
+  if(sig2) sig2->Draw("HIST same");
+  if(sig3) sig3->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
 
   ratioPad->cd();
@@ -390,8 +394,9 @@ void plot(TString var, TString name){
   //SoverB
   globalSbyB = 0;
   sbyrb = nullptr;
-  if     (sig_eles_100) sbyrb = GetSbyRootB(sig_eles_100, bkg);
-  else if(sig_eles_750) sbyrb = GetSbyRootB(sig_eles_750, bkg);
+  if     (sig1) sbyrb = GetSbyRootB(sig1, bkg);
+  else if(sig2) sbyrb = GetSbyRootB(sig2, bkg);
+  else if(sig3) sbyrb = GetSbyRootB(sig3, bkg);
   if(sbyrb){
     SetRatioStyle(sbyrb, name);
     sbyrb->GetYaxis()->SetTitle("S/sqrtB");
@@ -445,9 +450,9 @@ void plot(TString var, TString name){
   }
 
   for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
-  if(sig_eled_100) SetLegendEntry(lg, sig_eled_100);
-  if(sig_eles_100) SetLegendEntry(lg, sig_eles_100);
-  if(sig_eles_750) SetLegendEntry(lg, sig_eles_750);
+  if(sig1) SetLegendEntry(lg, sig1);
+  if(sig2) SetLegendEntry(lg, sig2);
+  if(sig3) SetLegendEntry(lg, sig3);
   TString legendheader = ("Global significance = " + to_string(globalSbyB)).c_str();
   if(toOverlayData){
     legendheader = ("Global obs/exp = " + to_string(globalObsbyExp)).c_str();

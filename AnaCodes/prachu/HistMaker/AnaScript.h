@@ -99,6 +99,7 @@ public :
   TTreeReaderArray<Bool_t> Electron_mvaFall17V2noIso_WPL = {fReader, "Electron_mvaFall17V2noIso_WPL"};
   TTreeReaderArray<UChar_t> Electron_seedGain = {fReader, "Electron_seedGain"};
 
+  /*
   //IsoTrack
   TTreeReaderValue<UInt_t>  nIsoTrack = {fReader, "nIsoTrack"};
   TTreeReaderArray<Float_t> IsoTrack_dxy = {fReader, "IsoTrack_dxy"};
@@ -115,7 +116,7 @@ public :
   TTreeReaderArray<Int_t>   IsoTrack_pdgId = {fReader, "IsoTrack_pdgId"};
   TTreeReaderArray<Bool_t>  IsoTrack_isHighPurityTrack = {fReader, "IsoTrack_isHighPurityTrack"};
   TTreeReaderArray<Bool_t>  IsoTrack_isPFcand = {fReader, "IsoTrack_isPFcand"};
-  TTreeReaderArray<Bool_t>  IsoTrack_isFromLostTrack = {fReader, "IsoTrack_isFromLostTrack"};
+  TTreeReaderArray<Bool_t>  IsoTrack_isFromLostTrack = {fReader, "IsoTrack_isFromLostTrack"};*/
   
   //Jet
   TTreeReaderValue<UInt_t>  nJet = {fReader, "nJet"};
@@ -357,12 +358,13 @@ public :
   TTreeReaderValue<Float_t> GenMET_phi =         {fReader_MC, "GenMET_phi"};
   TTreeReaderValue<Float_t> GenMET_pt =          {fReader_MC, "GenMET_pt"};
 
+  /*
   //btagWeight
   TTreeReaderValue<Float_t> btagWeight_CSVV2 =    {fReader_MC, "btagWeight_CSVV2"};
-  TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};
+  TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};*/
 
   //Jetflavor:
-   TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+  TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
   
   //_________________________________________________________________________
   
@@ -652,7 +654,7 @@ private:
   //For signal:
   bool bad_event;
 
-  time_t start, end;
+  time_t start, end, buffer;
 
   ClassDef(AnaScript,0);
 

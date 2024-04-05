@@ -5,13 +5,16 @@
 // This driver script is run using runana.C, which uses gROOT to run this from outside the root terminal.
 //#########################################################################################################
 
-//Execution line : .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "flag", "59800", "DYJetsToLL_M50")
+//Execution line :
+// .x anaCond.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "dy", "30321.155", "DYJetsToLL_M50")
 //OR
-// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "doublet", "59800", "VLLD_ele_M800")
+// .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "ele", "doublet", "7439522.46", "VLLD_ele_M800")
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TString.h>
+#include <string>
 //#include <boost/lexical_cast.hpp>// for lexical_cast()
 
 void anaCond( TString ifname , TString ofname, TString data, TString year, TString lep, TString flag, TString lumi, TString samplename)
@@ -22,10 +25,9 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   //3. data   : 0, or 1 depedning on whether 'ifname' is MC or data.
   //4. year   : Which year of data taking. (affects trigger paths and efficiencies)
   //5. lep    : If muon dataset, lep=1, if electron dataset, lep=0
-  //6. flag   : Mention "doublet" for the corrections to be applied. Else, keep it as "flag"
-
+  
   gROOT->Time();
-  const char *skimfilename;
+  const char *hstfilename;
   TChain *chain = new TChain("Events");
   AnaScript m_selec;
 
@@ -36,10 +38,10 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   if(!manual) input += "/*.root"; //This makes sure that the input filenames always end with .root
   chain->Add(input);
   
-  skimfilename = ofname;  
+  hstfilename = ofname;  
 
   //SetHstFileName:
-  m_selec.SetSkimFileName(skimfilename);
+  m_selec.SetHstFileName(hstfilename);
 
   //SetVerbose:
   m_selec.SetVerbose(1);
@@ -62,16 +64,15 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   if(lep=="el") m_selec.SetLep(0);
   if(lep=="mu") m_selec.SetLep(1);
 
-  //Set the additional flag:
+  //Set the additional flags:
   m_selec.SetFlag(flag);
   m_selec.SetSampleName(samplename);
 
-  /*
   //Set lumi:
   //double lumival = lumi.Atof();
   std::string lumistring(lumi.Data()); 
   double lumival = std::stod(lumistring);
-  m_selec.SetLumi(lumival);*/
+  m_selec.SetLumi(lumival);
   
   chain->Process(&m_selec);
   gROOT->Time();

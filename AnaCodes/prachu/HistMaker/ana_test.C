@@ -178,7 +178,7 @@ void ana_test(int sample=0)
   else if(sample==666){//Testing skimmed version.
     chain->Add("/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/test_outputs/*.root");
     hstfilename = "test_outputs/hst_local_skimmed.root";
-    m_selec.SetData(1);
+    m_selec.SetData(0);
     m_selec.SetYear(2018);
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);

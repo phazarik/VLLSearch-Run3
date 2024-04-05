@@ -42,6 +42,7 @@ void AnaScript::Begin(TTree * /*tree*/)
 void AnaScript::SlaveBegin(TTree * /*tree*/)
 {
   time(&start);
+  cout<<"\nn-events \t time_taken (sec)"<<endl;
 
   TString option = GetOption();
   nEvtTotal = 0;
@@ -113,20 +114,6 @@ void AnaScript::SlaveTerminate()
   cout<<"2eSS  = "<<n2ess<<endl;
   cout<<"emuSS = "<<nemuss<<endl;
   //cout<<"\nLumiScale = "<<59800/_lumi<<endl;
-
-  /*
-  cout<<"\nFor Uttsavi:"<<endl;
-  float acc11 = ((float)nbasicpass)/((float)nEvtTotal);
-  float acc12 = ((float)nadvancedpass)/((float)nEvtTotal);
-  float acc21 = ((float)nbasicpass2)/((float)nEvtTotal);
-  float acc22 = ((float)nadvancedpass2)/((float)nEvtTotal);
-
-  cout<<"nEvtTotal (in the input nanoAOD) = "<<nEvtTotal<<endl;
-  cout<<"Events that pass Uttsavi's basic event selection = "<<nbasicpass<<" ("<<acc11<<")"<<endl;
-  cout<<"Events that pass Uttsavi's additional selections = "<<nadvancedpass<<" ("<<acc12<<")"<<endl;
-  cout<<"Events that pass the basic event selection in the paper = "<<nbasicpass2<<" ("<<acc21<<")"<<endl;
-  cout<<"Events that pass the additional selections in the paper = "<<nadvancedpass2<<" ("<<acc22<<")"<<endl;
-  */
   
   time(&end);
 
@@ -165,10 +152,10 @@ Bool_t AnaScript::Process(Long64_t entry)
     fReader_Data.SetLocalEntry(entry);
 
   //Setting verbosity:
-  //Verbosity determines the number of processed events after which
-  //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  time(&buffer);
+  double time_taken_so_far = double(buffer-start);
+  if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+  else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
   nEvtTotal++;
   h.nevt->Fill(0);
@@ -306,7 +293,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Investigating 2muSS:
       Make2muSSPlots();
-      MakebJetSFPlots();
+      //MakebJetSFPlots();
       
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.
