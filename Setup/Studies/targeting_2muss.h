@@ -89,43 +89,26 @@ void AnaScript::Make2muSSPlots(){
     Float_t dphi_metlep_min = (Float_t)min(dphi_metlep0, dphi_metlep1);
 
     //Booleans to get rid of bad events:
-    bool baseline = dilep_mass>20 && lep0_iso<0.10;
+    bool baseline = dilep_mass>20;
     bool exclude_low_stat = fabs(dilep_eta)<3 && (0.4<dilep_dR && dilep_dR<4.0) && metpt>20 && STfrac<0.8 && HT<500;
     baseline = baseline && exclude_low_stat;
-    
-    //Booleans for selecting QCD enhanced region:
-    bool QCD_enhanced_region = baseline && exclude_low_stat && nbjet==0 && njet<2 && (0.15<lep1_iso && lep1_iso<0.50);
-    bool QCD_CR = QCD_enhanced_region && metphi<0;
-    bool QCD_VR = QCD_enhanced_region && metphi>=0;
-    
-    bool WR = baseline && exclude_low_stat && lep1_iso<0.15; //Working Region: both leptons are isolated.
 
-    //Defining signal region:
-    //bool SR = WR && nbjet==0;
-    
-    //Correcting TTbar:
-    bool ttbar_CR = WR && nbjet>0;
+    //Picking a QCD enhanced region:
+    bool QCD_enhanced_region = baseline && ST<50 && fabs(dilep_eta)<2;
+    bool QCD_CR = QCD_enhanced_region && (0.15<lep1_iso && lep1_iso<0.50);
+    bool QCD_VR = QCD_enhanced_region && lep1_iso < 0.15;
+
+    //Working region:
+    bool isoregion = baseline && lep0_iso<0.15 && lep1_iso<0.20;
 
     //Final event selection that used in the plots:
-    bool event_selection = baseline;
+    bool event_selection = isoregion;
 
     //------------------------
-    // QCD scaling in HT bins:
+    // QCD scaling (globally):
     //------------------------
-    double qcdscale = 1.0; //default
-
-    //QCD SF in fine bins of HT (March 07, 2024), subleading iso:0.20-0.50
-    /*
-    if(HT < 25)                qcdscale = 0.2814977;
-    else if(25<=HT && HT<50)   qcdscale = 0.3189403;
-    else if(50<=HT && HT<75)   qcdscale = 0.4316772;
-    else if(75<=HT && HT<100)  qcdscale = 0.7809550;
-    else if(100<=HT && HT<125) qcdscale = 0.3491072;
-    else if(125<=HT && HT<150) qcdscale = 0.3042732;
-    else if(150<=HT && HT<200) qcdscale = 0.1994921;
-    else if(200<=HT && HT<250) qcdscale = 0.7897220;
-    else if(250<=HT)           qcdscale = 0.5625;
-    if(_flag == "qcd") wt = wt*qcdscale;*/
+    //double qcdscale = 0.129596389; //default
+    //if(_flag == "qcd") wt = wt*qcdscale;
 
     if(_data==1) wt = 1.0;
 

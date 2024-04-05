@@ -42,6 +42,7 @@ void AnaScript::Begin(TTree * /*tree*/)
 void AnaScript::SlaveBegin(TTree * /*tree*/)
 {
   time(&start);
+  cout<<"\nn-events \t time_taken (sec)"<<endl;
 
   TString option = GetOption();
   nEvtTotal = 0;
@@ -151,10 +152,10 @@ Bool_t AnaScript::Process(Long64_t entry)
     fReader_Data.SetLocalEntry(entry);
 
   //Setting verbosity:
-  //Verbosity determines the number of processed events after which
-  //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  time(&buffer);
+  double time_taken_so_far = double(buffer-start);
+  if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+  else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
   nEvtTotal++;
   h.nevt->Fill(0);

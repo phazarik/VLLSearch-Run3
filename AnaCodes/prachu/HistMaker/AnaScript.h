@@ -364,7 +364,7 @@ public :
   TTreeReaderValue<Float_t> btagWeight_DeepCSVB = {fReader_MC, "btagWeight_DeepCSVB"};*/
 
   //Jetflavor:
-   TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+  TTreeReaderArray<Int_t> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
   
   //_________________________________________________________________________
   
@@ -654,7 +654,7 @@ private:
   //For signal:
   bool bad_event;
 
-  time_t start, end;
+  time_t start, end, buffer;
 
   ClassDef(AnaScript,0);
 
