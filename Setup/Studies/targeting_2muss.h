@@ -102,16 +102,16 @@ void AnaScript::Make2muSSPlots(){
     bool isoregion = baseline && lep0_iso<0.15 && lep1_iso<0.20;
 
     //Final event selection that used in the plots:
-    bool event_selection = isoregion;
+    bool event_selection = QCD_CR;
 
     //------------------------
     // QCD scaling (globally):
     //------------------------
-    //double qcdscale = 0.129596389; //default
-    //if(_flag == "qcd") wt = wt*qcdscale;
+    double qcdscale = 0.094647493; //Global Scaling
+    if(_flag == "qcd") wt = wt*qcdscale;
 
     if(_data==1) wt = 1.0;
-
+    
     if(event_selection){
       h.nevt->Fill(3);
       h.nevt->Fill(4, wt);

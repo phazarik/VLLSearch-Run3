@@ -7,6 +7,8 @@ void AnaScript::BookHistograms(){
   h.evtweight[3] = new TH1F("wt_evt","Event weight",200,0,2);
   h.evtweight[4] = new TH1F("wt_lumi","LumiScale",3000,0,3000);
   //for(int i=0; i<3; i++)h.evtweight[i]->Sumw2();
+  //h.evtweight[5] = new TH1F("wt_evt_qcd","Event weight (QCD)",200,0,2);
+  //h.evtweight[6] = new TH1F("wt_evt_final","Final Event weight (lumi-scaled)",2000,0,0.1);
 
   //Checking the triggers:
   h.hist[0] = new TH1F("Flag_goodVertices", "Flag_goodVertices", 5, 0, 5);

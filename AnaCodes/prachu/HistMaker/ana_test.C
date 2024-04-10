@@ -47,7 +47,7 @@ void ana_test(int sample=0)
     m_selec.SetLep(1);
     m_selec.SetFlag("");
     m_selec.SetSampleName("DYJetsToLL_M50");
-    m_selec.SetLumi(59800);
+    m_selec.SetLumi(30321.155);
   }
 
   else if(sample==2){//QCD
@@ -60,7 +60,7 @@ void ana_test(int sample=0)
     m_selec.SetLep(1);
     m_selec.SetFlag("");
     m_selec.SetSampleName("QCD_MuEnriched_170to300");
-    m_selec.SetLumi(59800);
+    m_selec.SetLumi(10265.815);
   }
 
   else if(sample==3){//TTbarSemileptonic

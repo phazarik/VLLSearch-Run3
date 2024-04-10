@@ -38,9 +38,9 @@ file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
+#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
-#condorsamples = ["TTBar"]
+condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
 
 #_____________________________________________________________
 #
@@ -74,8 +74,8 @@ print(f'\n\033[93mSubmitting condor jobs ...\033[0m')
 
 
 #Creating condor jobs for each process mentioned in the list:
-for item in condorsamples:
-    for sample, subs in samplelist.items():
+for sample, subs in samplelist.items():
+    for item in condorsamples:
         #print(f'Checking ... {item} and {sample}')
         if sample == item: #The entry from the list must be identical to the key in the json file.
             #print(f'Match found : {sample}')
