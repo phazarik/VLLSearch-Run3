@@ -71,15 +71,15 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2muSS_Apr08_baselineIso_scaled";
-  input_path = "../input_files/"+jobname;
+  TString jobname = "hist_2muSS_Apr10_ST150";
+  input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = false;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_basline_Iso"; //Don't use special symbols (because this string is part of the folder name)
-  tag2 = "QCD Baseline (iso mu)"; //This appears on the plot.
+  tag = "2muSS_ST150"; //Don't use special symbols (because this string is part of the folder name)
+  tag2 = "2muSS, ST>150 GeV"; //This appears on the plot.
   QCDscale = 1.0;
   //QCDscale = 0.094647493; //0.129596389;//0.136561*0.949;
 
@@ -97,9 +97,9 @@ void makestack(){
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 5},
+    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 5},
     {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
+    //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},
     //{.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
     //{.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   5},
@@ -161,20 +161,6 @@ void makestack(){
   TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\nNo of plots = "+to_string(count)+"\n";
   DisplayText(report, 33); //33 is the ANSI color code for yellow
 }
-
-//---------------------------------------------------------------
-// Event selection: Put cuts on the branches and filter the tree
-//---------------------------------------------------------------
-/*
-TTree* GetFilteredTree(TTree *intree){
-
-  //Define the branch cuts using TCut
-  TCut pt0cut = "lep0_pt > 35";
-
-  TCut cut = pt0cut; 
-  TTree *filtered_tree = intree->CopyTree(cut);
-  return filtered_tree;
-  }*/
 
 //-----------------------------------
 // Plotmaker (runs for each variable)
