@@ -622,7 +622,7 @@ private:
   //For signal:
   bool bad_event;
 
-  time_t start, end;
+  time_t start, end, buffer;
 
   //For treemaker:
   const char *_TreeFileName;
@@ -637,28 +637,34 @@ private:
   Float_t lep0_pt;
   Float_t lep0_eta;
   Float_t lep0_phi;
+  Float_t lep0_iso;
   Float_t lep0_mt;
   Float_t lep1_pt;
   Float_t lep1_eta;
   Float_t lep1_phi;
+  Float_t lep1_iso;
   Float_t lep1_mt;
   Float_t dilep_pt;
   Float_t dilep_eta;
   Float_t dilep_phi;
   Float_t dilep_mass;
   Float_t dilep_mt;
-  Float_t ll_deta;
-  Float_t ll_dphi;
-  Float_t ll_dR;
-  Float_t ll_ptratio;
+  Float_t dilep_deta;
+  Float_t dilep_dphi;
+  Float_t dilep_dR;
+  Float_t dilep_ptratio;
   Float_t HT;
+  Float_t STvis;
   Float_t ST;
   Float_t STfrac;
   Float_t dphi_metlep0;
   Float_t dphi_metlep1;
+  Float_t dphi_metdilep;
   Float_t dphi_metlep_max;
   Float_t dphi_metlep_min;
-
+  Float_t metpt_tree;
+  Float_t metphi_tree;
+  
   ClassDef(AnaScript,0);
 
 };

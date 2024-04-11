@@ -34,6 +34,7 @@ void AnaScript::Begin(TTree * /*tree*/)
 void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 {
   time(&start);
+  cout<<"\nn-events \t time_taken (sec)"<<endl;
 
   TString option = GetOption();
   nEvtTotal = 0;
@@ -81,15 +82,6 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
-
-  cout<<"Event counts:"<<endl;
-  cout<<"4L   = "<<n4l<<endl;
-  cout<<"3L   = "<<n3l<<endl;
-  cout<<"2LSS = "<<n2lss<<endl;
-  cout<<"2LOS = "<<n2los<<endl;
-  cout<<"1L2J = "<<n1l2j<<endl;
-  cout<<"1L1J = "<<n1l1j<<endl;
-  cout<<"1L0J = "<<n1l0j<<endl;
   
   time(&end);
 
@@ -128,25 +120,12 @@ Bool_t AnaScript::Process(Long64_t entry)
     fReader_Data.SetLocalEntry(entry);
 
   //Setting verbosity:
-  //Verbosity determines the number of processed events after which
-  //the root prompt is supposed to display a status update.
-  if(_verbosity==0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;      
-  else if(_verbosity>0 && nEvtTotal%10000==0)cout<<"Processed "<<nEvtTotal<<" event..."<<endl;
+  time(&buffer);
+  double time_taken_so_far = double(buffer-start);
+  if(_verbosity==0 && nEvtTotal%1000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+  else if(_verbosity>0 && nEvtTotal%1000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
   nEvtTotal++;
-  //h.nevt->Fill(0);
-
-  /*
-  //Let's plot some flags/triiger which are used later.
-  h.hist[0]->Fill(*Flag_goodVertices);
-  h.hist[1]->Fill(*Flag_globalSuperTightHalo2016Filter);
-  h.hist[2]->Fill(*Flag_HBHENoiseFilter);
-  h.hist[3]->Fill(*Flag_EcalDeadCellTriggerPrimitiveFilter);
-  h.hist[4]->Fill(*Flag_BadPFMuonFilter);
-  h.hist[5]->Fill(*HLT_IsoMu24);
-  h.hist[6]->Fill(*HLT_IsoMu27);
-  h.hist[7]->Fill(*HLT_Ele27_WPTight_Gsf);
-  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);*/
   
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2017 = (_year==2017 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -171,7 +150,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);      
+      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
+      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
     }
     
     if(triggerRes){
@@ -189,48 +169,6 @@ Bool_t AnaScript::Process(Long64_t entry)
       vlnu.clear();
 
       bad_event = false;
-      
-      if(_data==0){
-	createGenLightLeptons();
-	SortPt(genMuon);
-	SortPt(genElectron);
-	SortPt(genLightLepton);
-
-	SortGenObjects();
-
-	createSignalArrays();
-	SortVLL();
-
-	//Correcting the Doublet model (flagging out the invalid decays)
-	if(_flag=="doublet"){ //for VLLD files
-	  
-	  //a) The neutral particle cannot decay to H,nu or Z,nu.
-	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
-	  //cout<<"----"<<endl;
-	  for(int i=0; i<(int)vlnu.size(); i++){
-	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
-	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
-	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
-	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
-	    }
-	    //cout<<""<<endl;
-	  }
-	  //if(bad_event) cout<<"bad"<<endl;
-	  //else cout<<"good"<<endl;
-	  //cout<<"----"<<endl;
-	  
-	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
-	  // I am flagging out the events with W(24) as daughetrs of L
-	  for(int i=0; i<(int)vllep.size(); i++){
-	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
-	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
-	    }
-	  }
-	}
-	//Make gen-level plots here.
-      }
-
-      //Counting bad events:
       if(bad_event) nEvtBad++;
 
       //###################
@@ -247,6 +185,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       Tau.clear();
       Jet.clear();
       bJet.clear();
+      MediumbJet.clear();
       LooseLepton.clear();
       
       createLightLeptons();
@@ -255,85 +194,44 @@ Bool_t AnaScript::Process(Long64_t entry)
       createJets();
 
       SortRecoObjects();
-
-      //----------------------------------------------------------------
-      //Event-selection is done right after creating the object arrays.
-      //evt_wt is also calculated alongwith.
-      //This is done before any plotting.
-      EventSelection();
-      evt_wt = getEventWeight();
-      //----------------------------------------------------------------
-
-      /*
-      //Basic object-level plots:
-      //ELectrons
-      h.ele[0]->Fill((int)Electron.size());
-      for(int i=0; i<(int)Electron.size(); i++){
-	h.ele[1]->Fill(Electron.at(i).v.Pt(), evtwt);
-	h.ele[2]->Fill(Electron.at(i).v.Eta(), evtwt);
-	h.ele[3]->Fill(Electron.at(i).v.Phi(), evtwt);
-	h.ele[4]->Fill(Electron.at(i).reliso03, evtwt);
-      }
-      //Muons
-      h.mu[0]->Fill((int)Muon.size());
-      for(int i=0; i<(int)Muon.size(); i++){
-	h.mu[1]->Fill(Muon.at(i).v.Pt(), evtwt);
-	h.mu[2]->Fill(Muon.at(i).v.Eta(), evtwt);
-	h.mu[3]->Fill(Muon.at(i).v.Phi(), evtwt);
-	h.mu[4]->Fill(Muon.at(i).reliso03, evtwt);
-      }
-      //Photons
-      h.pho[0]->Fill((int)Photon.size());
-      for(int i=0; i<(int)Photon.size(); i++){
-	h.pho[1]->Fill(Photon.at(i).v.Pt(), evtwt);
-	h.pho[2]->Fill(Photon.at(i).v.Eta(), evtwt);
-	h.pho[3]->Fill(Photon.at(i).v.Phi(), evtwt);
-	h.pho[4]->Fill(Photon.at(i).reliso03, evtwt);
-      }
-      //Taus
-      h.tau[0]->Fill((int)Tau.size());
-      for(int i=0; i<(int)Tau.size(); i++){
-	h.tau[1]->Fill(Tau.at(i).v.Pt(), evtwt);
-	h.tau[2]->Fill(Tau.at(i).v.Eta(), evtwt);
-	h.tau[3]->Fill(Tau.at(i).v.Phi(), evtwt);
-      }
-      //Jets
-      h.jet[0]->Fill((int)Jet.size());
-      for(int i=0; i<(int)Jet.size(); i++){
-	h.jet[1]->Fill(Jet.at(i).v.Pt(), evtwt);
-	h.jet[2]->Fill(Jet.at(i).v.Eta(), evtwt);
-	h.jet[3]->Fill(Jet.at(i).v.Phi(), evtwt);
-      }
-      //bJets
-      h.bjet[0]->Fill((int)bJet.size());
-      for(int i=0; i<(int)bJet.size(); i++){
-	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evtwt);
-	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evtwt);
-	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evtwt);
-	}*/
-
      
       //_______________________________________________________________________________________________________
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
-      /*
-      if(evt_2LSS && evt_trigger && !bad_event){ 
+      //Selecting 2muSS events to fill:
+      bool basic_evt_selection = false;
+  
+      if((int)Muon.size()==2 && (int)Electron.size()==0){
+	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge)
+	  basic_evt_selection = true;
+      }
 
-	//For a particular final state, fillup the tree.
-	//Edit the funtion while changing the final state,
-	//otherwise it will give a segmentation error.
-	
+      bool isolated_leptons = false;
+      bool excluding_low_stats = false;
+      bool baseline = false;
+
+      if(basic_evt_selection){
+
+	//Defining local variables for event selection. (Not for filling the tree)
+	float dR_ = Muon.at(0).v.DeltaR(Muon.at(1).v);
+	float deta_ = fabs((Muon.at(0).v + Muon.at(1).v).Eta());
+	float HT_=0; for(int i=0; i<(int)Jet.size(); i++)  HT_ = HT_ +  Jet.at(i).v.Pt();
+	float LT_=0; for(int i=0; i<(int)Muon.size(); i++) LT_ = LT_ + Muon.at(i).v.Pt();
+	float ST_ = HT_+LT_+metpt;
+	float STfrac_ = LT_/ST_;
+      
+	isolated_leptons = Muon.at(0).reliso03<0.15 && Muon.at(1).reliso03<0.20;
+	excluding_low_stats = deta_ <3 && (0.4<dR_ && dR_<4.0) && metpt>20 && STfrac_<0.8 && HT_<500;
+	baseline = (Muon.at(0).v + Muon.at(1).v).M() > 20 && excluding_low_stats && isolated_leptons;
+		   
+      }
+
+      if(baseline){
+	nEvtPass++;
 	FillTree(mytree);	  
 	mytree->Fill();
-
-	} */
-      if((int)Muon.size()==2 && (int)Electron.size()==0){
-	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
-	  FillTree(mytree);	  
-	  mytree->Fill();
-	}
       }
       
       

@@ -100,9 +100,13 @@ void AnaScript::Make2muSSPlots(){
 
     //Working region:
     bool isoregion = baseline && lep0_iso<0.15 && lep1_iso<0.20;
+    bool highST    = isoregion && ST>150;
+
+    //Controlling ttbar:
+    bool ttbarCR = highST && nbjet>=2;
 
     //Final event selection that used in the plots:
-    bool event_selection = QCD_CR;
+    bool event_selection = highST;
 
     //------------------------
     // QCD scaling (globally):
