@@ -1,8 +1,20 @@
 import ROOT
 import os, sys
+import argparse
+import time
+start_time = time.time()
 
-def extractHistFromTree():
-    jobname = "tree_Apr10_2muSS_ST150"
+parser=argparse.ArgumentParser()
+parser.add_argument('--jobname',type=str, required=True,  help='Condor job name')
+parser.add_argument('--test',   type=bool,required=False, help='Run for only one sample')
+parser.add_argument('--dryrun', type=bool,required=False, help='Print statments')
+args=parser.parse_args()
+
+jobname = args.jobname
+test    = args.test
+dryrun  = args.dryrun
+
+def extractHistFromTree(jobname):
 
     # Define a structure for histograms
     class Histogram:
@@ -13,7 +25,25 @@ def extractHistFromTree():
             self.xmax = xmax
 
     # Mention which samples to run on
-    sample = ["DYJetsToLL_M50"]
+    samples = ["DYJetsToLL_M10to50","DYJetsToLL_M50",
+              "HTbinnedWJets_70to100","HTbinnedWJets_100to200","HTbinnedWJets_200to400","HTbinnedWJets_400to600","HTbinnedWJets_600to800","HTbinnedWJets_800to1200","HTbinnedWJets_1200to2500","HTbinnedWJets_2500toInf",
+              "QCD_MuEnriched_20to30","QCD_MuEnriched_30to50","QCD_MuEnriched_50to80", "QCD_MuEnriched_80to120", "QCD_MuEnriched_120to170","QCD_MuEnriched_170to300", "QCD_MuEnriched_300to470", "QCD_MuEnriched_470to600","QCD_MuEnriched_600to800", "QCD_MuEnriched_800to1000",
+              "QCD_EMEnriched_15to20","QCD_EMEnriched_20to30","QCD_EMEnriched_30to50","QCD_EMEnriched_50to80", "QCD_EMEnriched_80to120", "QCD_EMEnriched_120to170","QCD_EMEnriched_170to300", "QCD_EMEnriched_300toInf",
+              "SingleTop_s-channel_LeptonDecays","SingleTop_t-channel_AntiTop_InclusiveDecays","SingleTop_t-channel_Top_InclusiveDecays","SingleTop_tW_AntiTop_InclusiceDecays","SingleTop_tW_Top_InclusiveDecays",
+              "TTBar_TTTo2L2Nu","TTBar_TTToSemiLeptonic",
+              "TTW_TTWToLNu",
+              "TTZ_TTZToLL",
+              "WW_WWTo1L1Nu2Q","WW_WWTo4Q",
+              "WZ_WZTo1L1Nu2Q","WZ_WZTo2Q2L","WZ_WZTo3LNu",
+              "ZZ_ZZTo2L2Nu","ZZ_ZZTo2Q2L","ZZ_ZZTo2Q2Nu","ZZ_ZZTo4L",
+              "VLLS_ele_M100","VLLS_ele_M125","VLLS_ele_M150","VLLS_ele_M200","VLLS_ele_M250","VLLS_ele_M300","VLLS_ele_M350","VLLS_ele_M400","VLLS_ele_M450","VLLS_ele_M500","VLLS_ele_M750","VLLS_ele_M1000",
+              "VLLS_mu_M100","VLLS_mu_M125","VLLS_mu_M150","VLLS_mu_M200","VLLS_mu_M250","VLLS_mu_M300","VLLS_mu_M350","VLLS_mu_M400","VLLS_mu_M450","VLLS_mu_M500","VLLS_mu_M750","VLLS_mu_M1000",
+              "VLLD_ele_M100","VLLD_ele_M200","VLLD_ele_M300","VLLD_ele_M400","VLLD_ele_M600","VLLD_ele_M800","VLLD_ele_M1000",
+              "VLLD_mu_M100","VLLD_mu_M200","VLLD_mu_M300","VLLD_mu_M400","VLLD_mu_M600","VLLD_mu_M800","VLLD_mu_M1000",
+              "SingleMuon_SingleMuon_A","SingleMuon_SingleMuon_B","SingleMuon_SingleMuon_C","SingleMuon_SingleMuon_D",
+              "EGamma_EGamma_A","EGamma_EGamma_B","EGamma_EGamma_C","EGamma_EGamma_D",
+              ]
+    #samples = ["DYJetsToLL_M10to50", "DYJetsToLL_M50", "WZ_WZto3LNu"]
 
     # Booking histograms
     histograms = [
@@ -46,8 +76,10 @@ def extractHistFromTree():
         Histogram("metpt", 50, 0, 500),
         Histogram("metphi", 100, -4, 4),
         Histogram("HT", 20, 0, 500),
+        Histogram("LT", 20, 0, 500),
         Histogram("STvis", 20, 0, 500),
         Histogram("ST", 20, 0, 500),
+        Histogram("STtrue", 20, 0, 500),
         Histogram("STfrac", 100, 0, 1.1),
         Histogram("dphi_metlep0", 100, 0, 4),
         Histogram("dphi_metlep1", 100, 0, 4),
@@ -56,16 +88,18 @@ def extractHistFromTree():
         Histogram("dphi_metlep_min", 100, 0, 4)
     ]
 
-    for s in sample:
-        print("Making histograms for", s)
+    prev_time = start_time
+
+    for s in samples:
+        print("Making histograms for "+s+ " ...")
         indir = "../input_trees/" + jobname + "/"
-        outdir = "../StackMaker/input_files/"+jobname+"/"
+        outdir = "../input_hists/"+jobname+"/"
         inputfilename = "tree_" + s + ".root"
         outputfilename = "hst_" + s + ".root"
 
         # Reading the input file and accessing the tree
         if not os.path.exists(indir+inputfilename):
-            print("Error: File not found: "+indir+inputfilename)
+            print("\033[31mError: File not found: "+indir+inputfilename+" \033[0m")
             continue
 
         infile = ROOT.TFile(indir+inputfilename, "READ")
@@ -75,7 +109,7 @@ def extractHistFromTree():
         os.system('mkdir -p '+outdir)
         outfile = ROOT.TFile(outdir+outputfilename, "RECREATE")
         if not infile:
-            print("Error: Output file not created for", s)
+            print("\033[31mError: Output file not created for " +s+ " \033[0m")
             continue
 
         # Looping over each branch to create a histogram
@@ -96,6 +130,16 @@ def extractHistFromTree():
 
         infile.Close()
         outfile.Close()
-        print("File created: "+outdir+outputfilename)
 
-extractHistFromTree()
+        current_time = time.time()
+        processing_time = current_time - prev_time
+        prev_time = current_time
+        print(f"\033[33mFile created:\033[0m {outdir+outputfilename} in \033[33m{processing_time:.2f} seconds\033[0m")
+
+        if test: break
+
+extractHistFromTree(jobname)
+
+end_time = time.time()
+time_taken = end_time-start_time
+print(f"\n\033[33mDone!\nTotal time taken = {time_taken:.2f} seconds.\033[0m")

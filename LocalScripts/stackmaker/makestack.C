@@ -64,6 +64,8 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
+//void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax, int _rebin){
+
 void makestack(){
 
   time_t start, end;
@@ -71,17 +73,17 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2muSS_Apr10_ST150";
+  TString jobname = "tree_Apr12_2muSS_ST150";
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_ST150"; //Don't use special symbols (because this string is part of the folder name)
+  tag = "2muSS_ST150_fromtree"; //Don't use special symbols (because this string is part of the folder name)
   tag2 = "2muSS, ST>150 GeV"; //This appears on the plot.
-  QCDscale = 1.0;
-  //QCDscale = 0.094647493; //0.129596389;//0.136561*0.949;
+  //QCDscale = 1.0;
+  QCDscale = 0.094647493; //0.129596389;//0.136561*0.949;
 
   struct plotdata {
     TString var;
@@ -93,12 +95,13 @@ void makestack(){
   };
 
   vector<plotdata> p = {
+    //{_var, _name, _nbins, _xmin, _xmax, _rebin}
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
     //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 5},
-    {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
+    //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},
     //{.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
@@ -109,10 +112,10 @@ void makestack(){
     {.var="njet",     .name="number of jets",    10, 0, 10, 1},
     {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
     {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    {.var="STvis",    .name="HT+LT (GeV)",    200, 0, 200, 5},
+    {.var="STvis",    .name="HT+LT (GeV)",    200, 0, 200, 1},
     {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 5},
-    {.var="MET",      .name="MET (GeV)",    200, 0, 200, 2},
-    {.var="MET_phi",  .name="MET phi",    200, -4, 4, 5},
+    {.var="metpt",      .name="MET (GeV)",    200, 0, 200, 2},
+    {.var="metphi",  .name="MET phi",    200, -4, 4, 5},
     {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 2},
     {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  5},
     {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  5},
@@ -123,7 +126,7 @@ void makestack(){
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
     {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
-    /*
+    
     {.var="ST",              .name="ST (GeV)",          200, 0, 200, 5},
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
@@ -138,7 +141,7 @@ void makestack(){
     {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 5},
     {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
     {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},*/
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
   };
 
   int count = 0;
@@ -449,7 +452,8 @@ void plot(TString var, TString name){
   lg->Draw();
 
   DisplayText("Made plot for "+var, 0);
-
+  //cout<<"\033[33mMade plot for "+var+"\033[0m\n"<<endl;
+  
   //Make a new folder and put all the plots there:
   if(toSave){
     createFolder(dump_folder);

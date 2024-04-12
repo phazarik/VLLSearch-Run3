@@ -67,14 +67,17 @@ TH1F *get_hist(
     DisplayText("Not found: "+filename, 31); //31 is the ANSI color code for red
     return nullptr;
   }
-  TFile *file = new TFile(filename, "READ");
+  //TFile *file = new TFile(filename, "READ");
+  TFile *file = TFile::Open(filename, "READ");
   TH1F *hst = (TH1F *)file->Get(var);
   if(!hst){
     DisplayText("Hist not found for "+filename, 31);
+    delete file;
     return nullptr;
   }
-  
-  float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
+
+  float scalefactor = 0;
+  //float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
 
   //Tweaking the histogram:
   float datalumi = 59800; //pb^{-1}
@@ -85,7 +88,6 @@ TH1F *get_hist(
   hst->Rebin(rebin);
 
   //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
-
   return hst;
 }
 
