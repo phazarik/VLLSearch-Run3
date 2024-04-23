@@ -18,6 +18,8 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/EventSelection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
+
+//Corrections:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
@@ -25,6 +27,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -169,6 +172,45 @@ Bool_t AnaScript::Process(Long64_t entry)
       vlnu.clear();
 
       bad_event = false;
+      if(_data==0){
+	//createGenLightLeptons();
+	//SortGenObjects();
+	//SortPt(genMuon);
+	//SortPt(genElectron);
+	//SortPt(genLightLepton);
+	
+	createSignalArrays();
+	SortVLL();
+
+	//Correcting the Doublet model (flagging out the invalid decays)
+	//This is donw because getting rid of these bad events later will be difficult
+	if(_flag=="doublet"){ //for VLLD files
+	  bad_event = false;
+	  //a) The neutral particle cannot decay to H,nu or Z,nu.
+	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
+	  //cout<<"----"<<endl;
+	  for(int i=0; i<(int)vlnu.size(); i++){
+	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
+	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
+	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
+	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
+	    }
+	    //cout<<""<<endl;
+	  }
+	  //if(bad_event) cout<<"bad"<<endl;
+	  //else cout<<"good"<<endl;
+	  //cout<<"----"<<endl;
+	  
+	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
+	  // I am flagging out the events with W(24) as daughetrs of L
+	  for(int i=0; i<(int)vllep.size(); i++){
+	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
+	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
+	    }
+	  }
+	}  
+	//Make gen-level plots here.
+      }
       if(bad_event) nEvtBad++;
 
       //###################
@@ -211,26 +253,53 @@ Bool_t AnaScript::Process(Long64_t entry)
       bool isolated_leptons = false;
       bool excluding_low_stats = false;
       bool baseline = false;
+      bool highST = false;
 
       if(basic_evt_selection){
 
 	//Defining local variables for event selection. (Not for filling the tree)
 	float dR_ = Muon.at(0).v.DeltaR(Muon.at(1).v);
-	float deta_ = fabs((Muon.at(0).v + Muon.at(1).v).Eta());
+	TLorentzVector dilep_ = Muon.at(0).v + Muon.at(1).v;
+	float dilepeta_ = dilep_.Eta();
 	float HT_=0; for(int i=0; i<(int)Jet.size(); i++)  HT_ = HT_ +  Jet.at(i).v.Pt();
-	float LT_=0; for(int i=0; i<(int)Muon.size(); i++) LT_ = LT_ + Muon.at(i).v.Pt();
+	float LT_= dilep_.Pt();//Muon.at(0).v.Pt() + Muon.at(1).v.Pt();
 	float ST_ = HT_+LT_+metpt;
 	float STfrac_ = LT_/ST_;
       
 	isolated_leptons = Muon.at(0).reliso03<0.15 && Muon.at(1).reliso03<0.20;
-	excluding_low_stats = deta_ <3 && (0.4<dR_ && dR_<4.0) && metpt>20 && STfrac_<0.8 && HT_<500;
-	baseline = (Muon.at(0).v + Muon.at(1).v).M() > 20 && excluding_low_stats && isolated_leptons;
+	excluding_low_stats = fabs(dilepeta_)<3 && (0.4<dR_ && dR_<4.0) && metpt>20 && STfrac_<0.8 && HT_<500;
+	baseline = (Muon.at(0).v + Muon.at(1).v).M() > 20 && excluding_low_stats;
+	highST = baseline && isolated_leptons && ST_>150;
 		   
       }
 
-      if(baseline){
+      if(highST){
 	nEvtPass++;
-	FillTree(mytree);	  
+
+	//Calculating event weight:
+	wt = 1.0;
+	
+	double scalefactor = 1.0;
+	double triggereff = 1.0;
+	double bjeteff = 1.0;
+	if(_data==0){
+	  double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
+	  double sf1 = Muon_2018UL_Reco(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
+	  scalefactor = sf0*sf1;
+	  double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
+	  double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
+	  triggereff = 1-((1-ef0)*(1-ef1));
+	  wt = scalefactor*triggereff;
+	  //Corrections for Jets:
+	  double jeteff = 1.0;
+	  bjeteff = bTagEff_UL2018(Jet, 0); //Tweaking the SF from POG by 0 %
+	  wt = wt*bjeteff;
+	}
+	
+	//Calculating other variables:
+	FillTree(mytree);
+
+	//Filling the tree with all these values:
 	mytree->Fill();
       }
       

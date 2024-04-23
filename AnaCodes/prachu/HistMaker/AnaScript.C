@@ -34,6 +34,9 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
 
+//Correctionlib:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/applyCorrections.h"
+
 void AnaScript::Begin(TTree * /*tree*/)
 {
   TString option = GetOption();
@@ -72,7 +75,14 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   evt_wt = 1.0;
   bad_event = false;
   evt_trigger = false;
-  _campaign = "UL18";
+
+  //-------------------------------------------
+  //Set Campaign : (important for corrections)
+  _campaign = "2018_UL";
+  //_campaign = "2017_UL";
+  //_campaign = "2016preVFP_UL";
+  //_campaign = "2016postVFP_UL";
+  //-------------------------------------------
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -100,20 +110,6 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
-
-  cout<<"Event counts (raw):"<<endl;
-  cout<<"4L   = "<<n4l<<endl;
-  cout<<"3L   = "<<n3l<<endl;
-  cout<<"2LSS = "<<n2lss<<endl;
-  cout<<"2LOS = "<<n2los<<endl;
-  cout<<"1L2J = "<<n1l2j<<endl;
-  cout<<"1L1J = "<<n1l1j<<endl;
-  cout<<"1L0J = "<<n1l0j<<endl;
-  
-  cout<<"2muSS = "<<n2muss<<endl;
-  cout<<"2eSS  = "<<n2ess<<endl;
-  cout<<"emuSS = "<<nemuss<<endl;
-  //cout<<"\nLumiScale = "<<59800/_lumi<<endl;
   
   time(&end);
 

@@ -36,6 +36,7 @@ void AnaScript::createLightLeptons(){
     temp.id = -11*Electron_charge[i];
     temp.ind = i;
     temp.charge = Electron_charge[i];
+    temp.sip3d  = Electron_sip3d[i];
     temp.reliso03 = Electron_pfRelIso03_all[i];
 
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4;

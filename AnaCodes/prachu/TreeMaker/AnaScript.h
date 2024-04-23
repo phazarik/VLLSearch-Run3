@@ -550,6 +550,23 @@ public :
   float TrigEff_2018_Ele32WPTightGsf_MC(float pt, float eta);
   float TrigEff_2018_Ele32WPTightGsf_Data(float pt, float eta);
   //--------------------------------------------------------------------------
+  //For correcting bJets:
+  //2016 preVFP:
+  double getScaleFactors_bTagJets_MedWP_UL2016preVFP(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL2016preVFP(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL2016preVFP(float eta, float pt, double tweak);
+  //2016 postVFP
+  double getScaleFactors_bTagJets_MedWP_UL2016postVFP(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL2016postVFP(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL2016postVFP(float eta, float pt, double tweak);
+  //2017
+  double getScaleFactors_bTagJets_MedWP_UL17(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL17(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL17(float eta, float pt, double tweak);
+  //2018
+  double getScaleFactors_bTagJets_MedWP_UL18(float eta, float pt, double tweak);
+  double getScaleFactors_cTagJets_Mis_UL18(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL18(float eta, float pt, double tweak);
 
 public:
   struct Hists {
@@ -588,6 +605,13 @@ public:
   void SortPt(vector<Particle> part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
+  //--------------------------------------------------------------------------
+  //Corrections on bJets:
+  //double bTagEff2016preVFP (vector<Particle>Jet, double tweak);
+  //double bTagEff2016postVFP (vector<Particle>Jet, double tweak);
+  double bTagEff_UL2017 (vector<Particle>Jet, double tweak);
+  double bTagEff_UL2018 (vector<Particle>Jet, double tweak);
+  //--------------------------------------------------------------------------
   
 protected:
   Hists h;
@@ -638,11 +662,13 @@ private:
   Float_t lep0_eta;
   Float_t lep0_phi;
   Float_t lep0_iso;
+  Float_t lep0_sip3d;
   Float_t lep0_mt;
   Float_t lep1_pt;
   Float_t lep1_eta;
   Float_t lep1_phi;
   Float_t lep1_iso;
+  Float_t lep1_sip3d;
   Float_t lep1_mt;
   Float_t dilep_pt;
   Float_t dilep_eta;
@@ -654,8 +680,10 @@ private:
   Float_t dilep_dR;
   Float_t dilep_ptratio;
   Float_t HT;
+  Float_t LT;
   Float_t STvis;
   Float_t ST;
+  Float_t HTMETllpt;
   Float_t STfrac;
   Float_t dphi_metlep0;
   Float_t dphi_metlep1;
@@ -664,6 +692,7 @@ private:
   Float_t dphi_metlep_min;
   Float_t metpt_tree;
   Float_t metphi_tree;
+  Double_t wt;
   
   ClassDef(AnaScript,0);
 

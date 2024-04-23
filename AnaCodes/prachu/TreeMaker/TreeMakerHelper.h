@@ -10,6 +10,7 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("lep0_eta",  &lep0_eta,  "lep0_eta/F",  32000);
   tree->Branch("lep0_phi",  &lep0_phi,  "lep0_phi/F",  32000);
   tree->Branch("lep0_iso",  &lep0_iso,  "lep0_iso/F",  32000);
+  tree->Branch("lep0_sip3d",&lep0_sip3d,"lep0_sip3d/F",32000);
   tree->Branch("lep0_mt",   &lep0_mt,   "lep0_mt/F",   32000);
   
   //Object-level (second lepton)
@@ -32,9 +33,13 @@ void AnaScript::InitializeBranches(TTree *tree){
 
   //Event level:
   tree->Branch("HT",        &HT,        "HT/F",        32000);
+  tree->Branch("LT",        &LT,        "LT/F",        32000);
   tree->Branch("STvis",     &STvis,     "STvis/F",     32000);
   tree->Branch("ST",        &ST,        "ST/F",        32000);
+  tree->Branch("HTMETllpt", &HTMETllpt, "HTMETllpt/F", 32000);
   tree->Branch("STfrac",    &STfrac,    "STfrac/F",    32000);
+  tree->Branch("metpt",     &metpt_tree,     "metpt/F",     32000);
+  tree->Branch("metphi",    &metphi_tree,    "metphi/F",    32000);
 
   tree->Branch("dphi_metlep0",   &dphi_metlep0,   "dphi_metlep0/F",   32000);
   tree->Branch("dphi_metlep1",   &dphi_metlep1,   "dphi_metlep1/F",   32000);
@@ -42,14 +47,13 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("dphi_metlep_max",&dphi_metlep_max,"dphi_metlep_max/F",32000);
   tree->Branch("dphi_metlep_min",&dphi_metlep_min,"dphi_metlep_min/F",32000);
 
-  tree->Branch("metpt",     &metpt_tree,     "metpt/F",     32000);
-  tree->Branch("metphi",    &metphi_tree,    "metphi/F",    32000);
+  tree->Branch("wt",    &wt,    "wt/D",    32000);
 }
 
 void AnaScript::FillTree(TTree *tree){
   
   // This function sets values to the variables that goes into the tree.
-  // Event selection must be done before calling this function.
+  // Event selection must be done before calling this function.  
     
   //Integers:
   nlep  = (UInt_t)Muon.size();
@@ -81,9 +85,11 @@ void AnaScript::FillTree(TTree *tree){
   dilep_ptratio = (Float_t)lep1_pt/lep0_pt;
 
   //Event level:
-  HT=0; for(Int_t i=0; i<(Int_t)Jet.size(); i++) HT = HT + Jet.at(i).v.Pt();
-  STvis = HT + dilep_pt;
-  ST = STvis + metpt;
+  HT=0; for(Int_t i=0; i<(Int_t)Jet.size();  i++) HT = HT +  Jet.at(i).v.Pt();
+  LT=0; for(Int_t i=0; i<(Int_t)Muon.size(); i++) LT = LT + Muon.at(i).v.Pt();
+  STvis = HT + LT;
+  ST = HT + LT + metpt;
+  HTMETllpt = HT + metpt + dilep_pt;
   STfrac = 0; if(ST>0) STfrac = dilep_pt/ST;
   dphi_metlep0 = (Float_t)delta_phi(Muon.at(0).v.Phi(), metphi);
   dphi_metlep1 = (Float_t)delta_phi(Muon.at(1).v.Phi(), metphi);

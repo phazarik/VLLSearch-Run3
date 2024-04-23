@@ -38,9 +38,9 @@ file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 #################################
 # Select which samples to run on:
 #################################
-#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
+condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
-condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
+#condorsamples = ["DYJetsToLL"]
 
 #_____________________________________________________________
 #

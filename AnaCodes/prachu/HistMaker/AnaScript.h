@@ -568,6 +568,12 @@ public :
   double getScaleFactors_cTagJets_Mis_UL18(float eta, float pt, double tweak);
   double getScaleFactors_LightTagJets_Mis_UL18(float eta, float pt, double tweak);
 
+  //#################
+  //ForCorrectionlib:
+  float correctionlib_muonIDSF(float pt, float eta, string mode);
+  float correctionlib_muonIsoSF(float pt, float eta, string mode);
+  
+
 public:
   struct Hists {
     //Histograms are declared here.
