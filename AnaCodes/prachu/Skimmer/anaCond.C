@@ -6,7 +6,7 @@
 //#########################################################################################################
 
 //Execution line :
-// .x anaCond.C("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "dy", "30321.155", "DYJetsToLL_M50")
+// .x anaCond.C("/home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root", "test_outputs/test_anaCond.root", "0", "2018", "mu", "dy", "30321.155", "DYJetsToLL_M50")
 //OR
 // .x anaCond.C("/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/VLLD/ele/VLLD_ele_M800/*.root", "test_outputs/test_anaCond.root", "0", "2018", "ele", "doublet", "7439522.46", "VLLD_ele_M800")
 
@@ -27,7 +27,7 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   //5. lep    : If muon dataset, lep=1, if electron dataset, lep=0
   
   gROOT->Time();
-  const char *hstfilename;
+  const char *skimfilename;
   TChain *chain = new TChain("Events");
   AnaScript m_selec;
 
@@ -38,10 +38,10 @@ void anaCond( TString ifname , TString ofname, TString data, TString year, TStri
   if(!manual) input += "/*.root"; //This makes sure that the input filenames always end with .root
   chain->Add(input);
   
-  hstfilename = ofname;  
+  skimfilename = ofname;  
 
   //SetHstFileName:
-  m_selec.SetHstFileName(hstfilename);
+  m_selec.SetSkimFileName(skimfilename);
 
   //SetVerbose:
   m_selec.SetVerbose(1);

@@ -56,7 +56,6 @@ float AnaScript::getEventWeight(){
     h.evtweight[2]->Fill(evt_wt);
     
   }
-
   
   return wt;
 

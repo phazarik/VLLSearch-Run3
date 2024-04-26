@@ -17,7 +17,11 @@ auto muoniso2016preVFP  = muonjson2016preVFP->at("NUM_TightRelIso_DEN_MediumID")
 auto muonid2016preVFP   = muonjson2016preVFP->at("NUM_MediumID_DEN_genTracks");
 
 
-float AnaScript::correctionlib_muonIDSF(float pt, float eta, string mode){
+float AnaScript::correctionlib_muonIDSF(Particle muon, string mode){
+
+  float pt = muon.v.Pt();
+  float eta = muon.v.Eta();
+
   string mode_;
   if(      mode=="nom"  ) mode_="sf";
   else if( mode=="up"   ) mode_="systup";
@@ -48,7 +52,11 @@ float AnaScript::correctionlib_muonIDSF(float pt, float eta, string mode){
   return sf;
 }
 
-float AnaScript::correctionlib_muonIsoSF(float pt, float eta, string mode){
+float AnaScript::correctionlib_muonIsoSF(Particle muon, string mode){
+
+  float pt = muon.v.Pt();
+  float eta = muon.v.Eta();
+
   string mode_;
   if(      mode=="nom"  ) mode_="sf";
   else if( mode=="up"   ) mode_="systup";

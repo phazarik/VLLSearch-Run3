@@ -323,6 +323,13 @@ public :
   TTreeReaderArray<Int_t>   TrigObj_l1charge =   {fReader, "TrigObj_l1charge"};
   TTreeReaderArray<Int_t>   TrigObj_filterBits = {fReader, "TrigObj_filterBits"};
 
+  //For correcting Jets:
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader, "fixedGridRhoFastjetAll"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader, "fixedGridRhoFastjetCentral"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralCalo =    {fReader, "fixedGridRhoFastjetCentralCalo"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralChargedPileUp = {fReader, "fixedGridRhoFastjetCentralChargedPileUp"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader, "fixedGridRhoFastjetCentralNeutral"};
+
   //_______________________________________________________________________
   
   //GenJet (read using fReader_MC)
@@ -448,6 +455,7 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void createGenJets();
   void createSignalArrays();
   void SortRecoObjects();
   void SortGenObjects();
@@ -500,6 +508,7 @@ public:
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
     float btagscore;
     int hadronflavor;
+    int genindex;
   };
 
   //Functions that involve the 'Particle' type objects:
@@ -528,7 +537,7 @@ private:
   TString _era, _flag, _samplename, _campaign;
   double _lumi;
 
-  vector<Particle> genMuon, genElectron, genLightLepton;
+  vector<Particle> genMuon, genElectron, genLightLepton, genJet;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
   vector<Particle> MediumbJet;

@@ -324,6 +324,13 @@ public :
   TTreeReaderArray<Int_t>   TrigObj_l1charge =   {fReader, "TrigObj_l1charge"};
   TTreeReaderArray<Int_t>   TrigObj_filterBits = {fReader, "TrigObj_filterBits"};
 
+  //For correcting Jets:
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader, "fixedGridRhoFastjetAll"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader, "fixedGridRhoFastjetCentral"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralCalo =    {fReader, "fixedGridRhoFastjetCentralCalo"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralChargedPileUp = {fReader, "fixedGridRhoFastjetCentralChargedPileUp"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader, "fixedGridRhoFastjetCentralNeutral"};
+
   //_______________________________________________________________________
   
   //GenJet (read using fReader_MC)
@@ -449,6 +456,7 @@ public :
   void createTaus();
   void createJets();
   void createGenLightLeptons();
+  void createGenJets();
   void createSignalArrays();
   void SortRecoObjects();
   void SortGenObjects();
@@ -465,8 +473,10 @@ public :
   void AddAndCompressBranch(TBranch *br);
   void InitializeBranches(TTree *tree);
 
+  /*
   //--------------------------------------------------------------------------
-  //Correction functions:
+  //Old Correction functions: (before correctionlib)
+
   double LeptonIDSF(int id, float pt, float eta);;
   double Electron2016SF(float pt, float eta);
   double Electron2017SF(float pt, float eta);
@@ -566,7 +576,7 @@ public :
   //2018
   double getScaleFactors_bTagJets_MedWP_UL18(float eta, float pt, double tweak);
   double getScaleFactors_cTagJets_Mis_UL18(float eta, float pt, double tweak);
-  double getScaleFactors_LightTagJets_Mis_UL18(float eta, float pt, double tweak);
+  double getScaleFactors_LightTagJets_Mis_UL18(float eta, float pt, double tweak);*/
 
 public:
   struct Hists {
@@ -599,6 +609,7 @@ public:
     int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
     float btagscore;
     int hadronflavor;
+    int genindex;
   };
 
   //Functions that involve the 'Particle' type objects:
@@ -609,8 +620,30 @@ public:
   //Corrections on bJets:
   //double bTagEff2016preVFP (vector<Particle>Jet, double tweak);
   //double bTagEff2016postVFP (vector<Particle>Jet, double tweak);
-  double bTagEff_UL2017 (vector<Particle>Jet, double tweak);
-  double bTagEff_UL2018 (vector<Particle>Jet, double tweak);
+  //double bTagEff_UL2017 (vector<Particle>Jet, double tweak);
+  //double bTagEff_UL2018 (vector<Particle>Jet, double tweak);
+  //--------------------------------------------------------------------------
+
+  //ForCorrectionlib:
+  float correctionlib_muonIDSF(Particle muon, string mode);
+  float correctionlib_muonIsoSF(Particle muon, string mode);
+  float correctionlib_egmIDSF(Particle electron, string mode);
+  //float correctionlib_egmIsoSF(float pt, float eta, string mode);
+  float correctionlib_jetSF(Particle jet, string mode);
+  float correctionlib_jetRF(Particle jet, vector<Particle> genJet, float rho, string mode);
+  double correctionlib_btagMCeff_2018UL(Particle jet);
+  float correctionlib_btagWPSFfromPOG(Particle jet, string mode);
+  float correctionlib_btagIDSF(vector<Particle> Jet, string mode);
+  
+  //--------------------------------------------------------------------------
+
+  //For Lepton Trigger Efficiency Scale Factors:
+  double GetLeptonTriggerEfficiency(Particle lepton);
+  double TrigEFF_allCampaign_Isomu24_MC(Particle muon);
+  double TrigEFF_allCampaign_Isomu24_Data(Particle muon);
+  double TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(Particle electron);
+  double TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron);
+  
   //--------------------------------------------------------------------------
   
 protected:
@@ -628,7 +661,7 @@ private:
   TString _era, _flag, _samplename, _campaign;
   double _lumi;
 
-  vector<Particle> genMuon, genElectron, genLightLepton;
+  vector<Particle> genMuon, genElectron, genLightLepton, genJet;
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
   vector<Particle> ForwardJet, MediumbJet, ForwardMediumbJet;
@@ -692,6 +725,11 @@ private:
   Float_t dphi_metlep_min;
   Float_t metpt_tree;
   Float_t metphi_tree;
+  Float_t jec;
+  Float_t jer;
+  Double_t sf_lepIdIso;
+  Double_t sf_lepTrigEff;
+  Double_t sf_btagEff;
   Double_t wt;
   
   ClassDef(AnaScript,0);

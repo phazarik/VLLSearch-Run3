@@ -76,23 +76,26 @@ def extractHistFromTree(jobname):
         Histogram("metpt", 50, 0, 500),
         Histogram("metphi", 100, -4, 4),
         Histogram("HT", 20, 0, 500),
-        Histogram("LT", 20, 0, 500),
+        #Histogram("LT", 20, 0, 500),
         Histogram("STvis", 20, 0, 500),
-        Histogram("ST", 20, 0, 500),
-        Histogram("STtrue", 20, 0, 500),
+        Histogram("ST", 50, 0, 500),
+        #Histogram("STtrue", 20, 0, 500),
         Histogram("STfrac", 100, 0, 1.1),
         Histogram("dphi_metlep0", 100, 0, 4),
         Histogram("dphi_metlep1", 100, 0, 4),
         Histogram("dphi_metdilep", 100, 0, 4),
         Histogram("dphi_metlep_max", 100, 0, 4),
-        Histogram("dphi_metlep_min", 100, 0, 4)
+        Histogram("dphi_metlep_min", 100, 0, 4),
+
+        Histogram('NNscore', 200, 0, 1)
     ]
 
     prev_time = start_time
 
     for s in samples:
         print("Making histograms for "+s+ " ...")
-        indir = "../input_trees/" + jobname + "/"
+        #indir = "../input_trees/" + jobname + "/"
+        indir = "../input_trees_modified/" + jobname + "/"
         outdir = "../input_hists/"+jobname+"/"
         inputfilename = "tree_" + s + ".root"
         outputfilename = "hst_" + s + ".root"

@@ -14,6 +14,7 @@ void AnaScript::createLightLeptons(){
     temp.sip3d  = Muon_sip3d[i];
     temp.reliso03 = Muon_pfRelIso03_all[i];
     temp.reliso04 = Muon_pfRelIso04_all[i];
+    temp.genindex = -1;
     
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4; 
     bool promptmuon = fabs(Muon_dxy[i])<0.05 && fabs(Muon_dz[i])<0.1;
@@ -38,6 +39,7 @@ void AnaScript::createLightLeptons(){
     temp.charge = Electron_charge[i];
     temp.sip3d  = Electron_sip3d[i];
     temp.reliso03 = Electron_pfRelIso03_all[i];
+    temp.genindex = -1;
 
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4;
     bool cleaned_from_muons = clean_from_array(temp, Muon, 0.5);
@@ -51,7 +53,7 @@ void AnaScript::createLightLeptons(){
 	isprompt = true;
     }
     bool passcut_looseele  = ptetacut && isprompt && Electron_cutBased[i]>1;
-    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 0.15;
+    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 1.0; //warning
 
     if(passcut_mediumele){
       Electron.push_back(temp);
@@ -73,6 +75,7 @@ void AnaScript::createPhotons(){
     temp.id = 22*Photon_charge[i];
     temp.ind = i;
     temp.reliso03 = Photon_pfRelIso03_all[i];
+    temp.genindex = -1;
 
     bool ptetacut = temp.v.Pt()>50 && temp.v.Eta()<2.4;
     bool passcuts = ptetacut && Photon_pfRelIso03_all[i]<0.15;
@@ -110,6 +113,7 @@ void AnaScript::createTaus(){
     temp.id = -15*Tau_charge[i];
     temp.ind = i;
     temp.charge = Tau_charge[i];
+    temp.genindex = -1;
 
     bool ptetacut = temp.v.Pt()>20 && fabs(temp.v.Eta())<2.3;
     bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.5);

@@ -19,7 +19,8 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
 
-//Corrections:
+/*
+//Old Corrections:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
@@ -27,7 +28,11 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"*/
+
+//Correctionlib:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/applyCorrections.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/TriggerEfficiency.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -57,6 +62,14 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 
   evt_wt = 1.0;
   bad_event = false;
+
+  //-------------------------------------------
+  //Set Campaign : (important for corrections)
+  _campaign = "2018_UL";
+  //_campaign = "2017_UL";
+  //_campaign = "2016preVFP_UL";
+  //_campaign = "2016postVFP_UL";
+  //-------------------------------------------
 
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
@@ -125,8 +138,8 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   time(&buffer);
   double time_taken_so_far = double(buffer-start);
-  if(_verbosity==0 && nEvtTotal%1000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
-  else if(_verbosity>0 && nEvtTotal%1000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+  if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+  else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
   nEvtTotal++;
   
@@ -168,13 +181,15 @@ Bool_t AnaScript::Process(Long64_t entry)
       genMuon.clear();
       genElectron.clear();
       genLightLepton.clear();
+      genJet.clear();
       vllep.clear();
       vlnu.clear();
 
       bad_event = false;
       if(_data==0){
-	//createGenLightLeptons();
-	//SortGenObjects();
+	createGenLightLeptons();
+	createGenJets();
+	SortGenObjects();
 	//SortPt(genMuon);
 	//SortPt(genElectron);
 	//SortPt(genLightLepton);
@@ -242,6 +257,9 @@ Bool_t AnaScript::Process(Long64_t entry)
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
+      jec = 1.0;
+      jer = 1.0;
+      
       //Selecting 2muSS events to fill:
       bool basic_evt_selection = false;
   
@@ -256,6 +274,16 @@ Bool_t AnaScript::Process(Long64_t entry)
       bool highST = false;
 
       if(basic_evt_selection){
+
+	//Correcting the four-vectors of jets:
+	if(_data == 0){
+	  for(int i=0; i<(int)Jet.size(); i++){
+	    jec = correctionlib_jetSF(Jet.at(i),"nom");
+	    jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+	    Jet.at(i).v = Jet.at(i).v * jec;
+	    Jet.at(i).v = Jet.at(i).v * jer;
+	  }
+	}
 
 	//Defining local variables for event selection. (Not for filling the tree)
 	float dR_ = Muon.at(0).v.DeltaR(Muon.at(1).v);
@@ -273,34 +301,38 @@ Bool_t AnaScript::Process(Long64_t entry)
 		   
       }
 
-      if(highST){
+      if(baseline){
 	nEvtPass++;
 
 	//Calculating event weight:
 	wt = 1.0;
-	
-	double scalefactor = 1.0;
-	double triggereff = 1.0;
-	double bjeteff = 1.0;
+	sf_lepIdIso = 1.0;
+	sf_lepTrigEff = 1.0;
+	sf_btagEff = 1.0;
+
 	if(_data==0){
-	  double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-	  double sf1 = Muon_2018UL_Reco(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-	  scalefactor = sf0*sf1;
-	  double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-	  double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-	  triggereff = 1-((1-ef0)*(1-ef1));
-	  wt = scalefactor*triggereff;
-	  //Corrections for Jets:
-	  double jeteff = 1.0;
-	  bjeteff = bTagEff_UL2018(Jet, 0); //Tweaking the SF from POG by 0 %
-	  wt = wt*bjeteff;
+
+	  //Muon Scale Factors:
+	  double sf0 = correctionlib_muonIDSF(Muon.at(0),"nom") * correctionlib_muonIsoSF(Muon.at(0),"nom");
+	  double sf1 = correctionlib_muonIDSF(Muon.at(1),"nom") * correctionlib_muonIsoSF(Muon.at(1),"nom");
+	  sf_lepIdIso = sf0*sf1;
+
+	  //Trigger efficiency:
+	  double ef0 = GetLeptonTriggerEfficiency(Muon.at(0));
+	  double ef1 = GetLeptonTriggerEfficiency(Muon.at(1));
+	  sf_lepTrigEff = 1-((1-ef0)*(1-ef1));
+
+	  //Corrections for bJet identification:
+	  //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
+	  sf_btagEff = correctionlib_btagIDSF(Jet, "nom");
+
+	  wt = sf_lepIdIso * sf_lepTrigEff;
+	  
 	}
 	
-	//Calculating other variables:
+	//Calculating other variables and writing in tree:
 	FillTree(mytree);
 
-	//Filling the tree with all these values:
-	mytree->Fill();
       }
       
       

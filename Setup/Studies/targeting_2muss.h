@@ -1,5 +1,24 @@
 void AnaScript::Make2muSSPlots(){
 
+  //##################################################################################################
+  //Corrections to Jets:
+  if(_data == 0){
+    for(int i=0; i<(int)Jet.size(); i++){
+
+      float jec = correctionlib_jetSF(Jet.at(i),"nom");
+      float jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+          
+      //Jet Energy Correction:
+      Jet.at(i).v = Jet.at(i).v * jec;
+      Jet.at(i).v = Jet.at(i).v * jer;
+
+      h.evtweight[5]->Fill(jec);
+      h.evtweight[6]->Fill(jer);
+      h.evtweight[7]->Fill(jec*jer);
+    }
+  }
+  //##################################################################################################
+
   //Picking events with exactly 2muons with same-sign, where the leading muon pT>26 GeV.
   bool basic_evt_selection = false;
 
@@ -24,9 +43,9 @@ void AnaScript::Make2muSSPlots(){
 
     //Calculating event weights:
     double wt = 1.0;
-    double scalefactor = 1.0;
-    double triggereff = 1.0;
-    double bjeteff = 1.0;
+    double lepIdIsoSF = 1.0;
+    double triggerEff = 1.0;
+    double bjetSF = 1.0;
     /*
     if(_data==0){
       double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
@@ -45,20 +64,28 @@ void AnaScript::Make2muSSPlots(){
     //Using correctionlib:
     if(_data==0){
 
-      //Corrections for muons:
-      double sf0 = correctionlib_muonIDSF(Muon.at(0).v.Pt(),Muon.at(0).v.Eta(),"nom") * correctionlib_muonIsoSF(Muon.at(0).v.Pt(),Muon.at(0).v.Eta(),"nom");
-      double sf1 = correctionlib_muonIDSF(Muon.at(1).v.Pt(),Muon.at(1).v.Eta(),"nom") * correctionlib_muonIsoSF(Muon.at(1).v.Pt(),Muon.at(1).v.Eta(),"nom");
-      scalefactor = sf0*sf1;
-      double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-      double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-      triggereff = 1-((1-ef0)*(1-ef1));
-      wt = scalefactor*triggereff;
+      //Corrections for muon reconstruction:
+      //Options: "nom", "up", "down"
+      double sf0 = correctionlib_muonIDSF(Muon.at(0),"nom") * correctionlib_muonIsoSF(Muon.at(0),"nom");
+      double sf1 = correctionlib_muonIDSF(Muon.at(1),"nom") * correctionlib_muonIsoSF(Muon.at(1),"nom");
+      lepIdIsoSF = sf0*sf1;
+
+      //Trigger efficiencies:
+      double ef0 = GetLeptonTriggerEfficiency(Muon.at(0));
+      double ef1 = GetLeptonTriggerEfficiency(Muon.at(1));
+      triggerEff = 1-((1-ef0)*(1-ef1));
+
+      //Corrections for bJet identification:
+      //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
+      bjetSF = correctionlib_btagIDSF(Jet, "nom");
+      
+      wt = lepIdIsoSF*triggerEff;
 
     }
     
-    h.evtweight[0]->Fill(scalefactor);
-    h.evtweight[1]->Fill(triggereff);
-    h.evtweight[2]->Fill(bjeteff);
+    h.evtweight[0]->Fill(lepIdIsoSF);
+    h.evtweight[1]->Fill(triggerEff);
+    h.evtweight[2]->Fill(bjetSF);
     h.evtweight[3]->Fill(wt);
 
     //Event level variabls:

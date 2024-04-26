@@ -36,7 +36,7 @@ void AnaScript::SlaveBegin(TTree *tree)
 
   evt_wt = 1.0;
   evt_trigger = false;
-  _campaign = "UL18";
+  _campaign = "2018_UL";
 
   //For skimmer
   tree->SetBranchStatus("*",0);
@@ -105,8 +105,8 @@ Bool_t AnaScript::Process(Long64_t entry)
   //Setting verbosity:
   time(&buffer);
   double time_taken_so_far = double(buffer-start);
-  if(_verbosity==0 && nEvtTotal%1000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
-  else if(_verbosity>0 && nEvtTotal%1000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;  
+  if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+  else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;  
 
   nEvtTotal++;
   
@@ -161,9 +161,9 @@ Bool_t AnaScript::Process(Long64_t entry)
       ForwardMediumbJet.clear();
       
       createLightLeptons();
-      createPhotons();
-      createTaus();
-      createJets();
+      //createPhotons();
+      //createTaus();
+      //createJets();
 
       SortRecoObjects();
 
@@ -173,19 +173,26 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       bool keep_this_event = false;
 
+      //2LSS skim:
+      if((int)LightLepton.size()==2){
+	bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
+	bool trigger = false;
+	if(fabs(LightLepton.at(0).id)==11 && LightLepton.at(0).v.Pt()>32) trigger = true;
+	if(fabs(LightLepton.at(0).id)==13 && LightLepton.at(0).v.Pt()>26) trigger = true;
+	bool reject_low_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
+	
+	if(samesign && trigger && reject_low_resonances) keep_this_event = true;
+      }
+
       /*
-      if((int)LightLepton.size()>=2){
-	if(fabs(LightLepton.at(0).id)==11 && LightLepton.at(0).v.Pt()>32) keep_these_events = true;
-	if(fabs(LightLepton.at(0).id)==13 && LightLepton.at(0).v.Pt()>26) keep_these_events = true;
-	}*/
-      
+      //2muSS skim:
       if((int)Muon.size()==2 && (int)Electron.size()==0){
 	bool reject_low_resonances = (Muon.at(0).v + Muon.at(1).v).M() > 15;
 	bool samesign = Muon.at(0).charge == Muon.at(1).charge;
 	bool ptcut = Muon.at(0).v.Pt()>26;	
 	bool basic_cuts = samesign && ptcut && reject_low_resonances;
 	if(basic_cuts) keep_this_event = true;
-      }
+	}*/
       
       if(keep_this_event){
 	nEvtPass++;

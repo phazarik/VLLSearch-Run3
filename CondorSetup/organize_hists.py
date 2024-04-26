@@ -8,10 +8,11 @@ date = today.strftime('%Y-%m-%d')
 start_time = time.time()
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--jobname',type=str, required=True, help='Condor job name: Such as hist_2LSS_Dec13')
-parser.add_argument('--date',type=str, required=False, help='In the format : YYYY-MM-DD')
-parser.add_argument('--test' ,type=bool,required=False,help='Run for only one sample')
-parser.add_argument('--dryrun' ,type=bool,required=False,help='Check If everything is correct before running')
+parser.add_argument('--jobname', type=str,  required=True,  help='Condor job name: Such as hist_2LSS_Dec13')
+parser.add_argument('--date',    type=str,  required=False, help='In the format : YYYY-MM-DD')
+parser.add_argument('--test' ,   type=bool, required=False, help='Run for only one sample')
+parser.add_argument('--dryrun',  type=bool, required=False, help='Check If everything is correct before running')
+parser.add_argument('--skim',    type=bool, required=False, help='hadd skimmed files')
 args=parser.parse_args()
 
 jobname = args.jobname
@@ -19,6 +20,7 @@ if args.date: date = args.date
 test    = args.test
 dryrun  = args.dryrun
 DUMP    = '/home/work/phazarik1/work/CondorDump/hadded/'+jobname
+skimmed = args.skim
 
 if not dryrun : os.system(f'mkdir -p {DUMP}')
 
@@ -40,6 +42,7 @@ for sample, subdict in indict.items():
         #os.system(f'ls {ifname}')
 
         ofname = f'{DUMP}/hst_{sample}_{subsample}.root'
+        if skimmed : ofname = f'{DUMP}/skimmed_{sample}_{subsample}.root'
         hadd_command = f'hadd -fk {ofname} {indir}/*root'
         if dryrun : print(f'Processline = {hadd_command}')
         else : os.system(hadd_command)

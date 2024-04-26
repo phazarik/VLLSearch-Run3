@@ -7,7 +7,7 @@ void AnaScript::ActivateBranch(TTree *t){
   //DON'T USE THIS FUNCTION if you want to keep the same tree structure in the skimmed file.
   //Keepting the same structure is helpful, because the same analysis script works on it.
   
-  for(auto activeBranchName : {"run","luminosityBlock","event", "HLT_IsoMu20","HLT_IsoMu24","HLT_IsoMu27","HLT_Ele32_WPTight_Gsf","HLT_Ele27_WPTight_Gsf","Flag_*","nMuon","Muon_*","nElectron","Electron_*","nTau","Tau_*","nJet","Jet_*","MET_*","PuppiMET_*","nTrigObj","TrigObj_*", "nPhoton", "Photon_*"})
+  for(auto activeBranchName : {"run","luminosityBlock","event", "HLT_IsoMu20","HLT_IsoMu24","HLT_IsoMu27","HLT_Ele32_WPTight_Gsf","HLT_Ele27_WPTight_Gsf","Flag_*","nMuon","Muon_*","nElectron","Electron_*","nTau","Tau_*","nJet","Jet_*","MET_*","PuppiMET_*","nTrigObj","TrigObj_*", "nPhoton", "Photon_*", "fixedGrid*"})
     t->SetBranchStatus(activeBranchName, 1);
 
   if(_data==0){
@@ -63,6 +63,13 @@ void AnaScript::ReadBranch(){
   *Flag_trkPOG_toomanystripclus53X;
   *Flag_trkPOG_logErrorTooManyClusters;
   *Flag_METFilters;
+
+  //For Jet corrections:
+  *fixedGridRhoFastjetAll;
+  *fixedGridRhoFastjetCentral;
+  *fixedGridRhoFastjetCentralCalo;
+  *fixedGridRhoFastjetCentralChargedPileUp;
+  *fixedGridRhoFastjetCentralNeutral;
 
   //btagWeight
   if(_data==0)*btagWeight_DeepCSVB; //MC

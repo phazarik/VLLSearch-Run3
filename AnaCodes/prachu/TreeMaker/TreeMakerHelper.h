@@ -47,7 +47,13 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("dphi_metlep_max",&dphi_metlep_max,"dphi_metlep_max/F",32000);
   tree->Branch("dphi_metlep_min",&dphi_metlep_min,"dphi_metlep_min/F",32000);
 
-  tree->Branch("wt",    &wt,    "wt/D",    32000);
+  //Corrections:
+  tree->Branch("jec",           &jec,           "jec/F",           32000);
+  tree->Branch("jer",           &jer,           "jer/F",           32000);
+  tree->Branch("sf_lepIdIso",   &sf_lepIdIso,   "sf_lepIdIso/D",   32000);
+  tree->Branch("sf_lepTrigEff", &sf_lepTrigEff, "sf_lepTrigEff/D", 32000);
+  tree->Branch("sf_btagEff",    &sf_btagEff,    "sf_btagEff/D",    32000);
+  tree->Branch("wt",            &wt,            "wt/D",            32000);
 }
 
 void AnaScript::FillTree(TTree *tree){
@@ -99,6 +105,11 @@ void AnaScript::FillTree(TTree *tree){
   metpt_tree = metpt;
   metphi_tree = metphi;
 
+
+  //Filling the tree with all these values:
+  //Additional constraints can be put here.
+  bool write_these_events = true;
+  if(write_these_events) mytree->Fill();
 }
 
 //The following function is called to apply settings to all branches, if needed.
