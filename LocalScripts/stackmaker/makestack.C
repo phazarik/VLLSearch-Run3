@@ -64,22 +64,25 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-void makestack(){
+void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax, int _rebin){
+
+  //void makestack(){
 
   time_t start, end;
   time(&start);
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2muSS_Apr04_baselineIso";
-  input_path = "../input_files/"+jobname;
+  TString jobname = "hist_Apr19_2muSS_baseline_cleaned";
+  //input_path = "../input_hists/"+jobname;
+  input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_basline_Iso"; //Don't use special symbols (because this string is part of the folder name)
-  tag2 = "QCD Baseline (iso mu)"; //This appears on the plot.
+  tag = "2muSS_baseline_cleaned_withdata"; //Don't use special symbols (folder name)
+  tag2 = "2muSS baseline"; //This appears on the plot.
   //QCDscale = 1.0;
   QCDscale = 0.094647493; //0.129596389;//0.136561*0.949;
 
@@ -93,6 +96,7 @@ void makestack(){
   };
 
   vector<plotdata> p = {
+    {_var, _name, _nbins, _xmin, _xmax, _rebin}
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
@@ -100,31 +104,44 @@ void makestack(){
     //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 5},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    //{.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},
-    //{.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
-    //{.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   5},
-    //{.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
+    //{.var="NNscore", .name="NNScore",200, 0, 1, 5},
+    //{.var="HTMETllpt",.name="HT+MET+dilep pt (GeV)", 200, 0, 200, 5},
+    //{.var="STvis",    .name="HT+LT (GeV)",           200, 0, 200, 5},
+    //{.var="lep1_sip3d", .name="SubLeading lepton sip3d",    500, 0, 50, 20},
+    //{.var="lep0_sip3d", .name="Leading lepton sip3d",    500, 0, 50, 20}, 
+    //{.var="metpt",    .name="MET (GeV)",             200, 0, 200, 2},
+    //{.var="metphi",   .name="MET phi",               200, -4, 4, 5},
     /*
-    {.var="nlep",     .name="number of leptons", 10, 0, 10, 1},
-    {.var="njet",     .name="number of jets",    10, 0, 10, 1},
-    {.var="nbjet",    .name="number of bjets",  10, 0, 10, 1},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
-    {.var="STvis",    .name="HT+LT (GeV)",    200, 0, 200, 5},
-    {.var="STfrac",   .name="LT/(HT+LT)", 200, 0, 1.2, 5},
-    {.var="MET",      .name="MET (GeV)",    200, 0, 200, 2},
-    {.var="MET_phi",  .name="MET phi",    200, -4, 4, 5},
+    {.var="nlep",     .name="number of leptons",      10, 0, 10, 1},
+    {.var="njet",     .name="number of jets",         10, 0, 10, 1},
+    {.var="nbjet",    .name="number of bjets (medium)", 10, 0, 10, 1},
+    {.var="HT",       .name="HT (GeV)",              200, 0, 200, 1},
+    {.var="LT",       .name="LT (GeV)",              200, 0, 200, 1},
+    {.var="STvis",    .name="HT+LT (GeV)",           200, 0, 200, 5},
+    {.var="ST",       .name="ST (GeV)",              200, 0, 200, 5},
+    {.var="HTMETllpt",.name="HT+MET+dilep pt (GeV)", 200, 0, 200, 5},
+    {.var="STfrac",   .name="LT/(HT+LT)",            200, 0, 1.2, 5},
+    {.var="metpt",    .name="MET (GeV)",             200, 0, 200, 2},
+    {.var="metphi",   .name="MET phi",               200, -4, 4, 5},
+    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",   200, 0, 4, 5},
+    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 5},
+    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
+    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
+    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5}*/
+    /*
     {.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 2},
     {.var="lep0_eta", .name="Leading lepton eta",         200, -4, 4,  5},
     {.var="lep0_phi", .name="Leading lepton phi",         200, -4, 4,  5},
     {.var="lep0_mt",  .name="Leading lepton mT (GeV)",    200, 0, 200, 2},
     {.var="lep0_iso", .name="Leading lepton reliso03",    1000, 0, 10, 10},    
+    {.var="lep0_sip3d", .name="Leading lepton sip3d",    500, 0, 50, 10},    
     {.var="lep1_pt",  .name="SubLeading lepton pT (GeV)", 200, 0, 200, 2},
     {.var="lep1_eta", .name="SubLeading lepton eta",      200, -4, 4,  5},
     {.var="lep1_phi", .name="SubLeading lepton phi",      200, -4, 4,  5},
     {.var="lep1_mt",  .name="SubLeading lepton mT (GeV)", 200, 0, 200, 2},
-    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},*/
-    
-    {.var="ST",              .name="ST (GeV)",          200, 0, 200, 5},
+    {.var="lep1_iso", .name="SubLeading lepton reliso03", 1000, 0, 10, 10},
+    {.var="lep1_sip3d", .name="SubLeading lepton sip3d",    500, 0, 50, 10},*/
+    /*
     {.var="dilep_pt",        .name="Dilep pT (GeV)",    200, 0, 200, 2},
     {.var="dilep_eta",       .name="Dilep eta",         200, -4, 4,  5},
     {.var="dilep_phi",       .name="Dilep phi",         200, -4, 4,  5},
@@ -133,12 +150,7 @@ void makestack(){
     {.var="dilep_deta",      .name="deta(lep0, lep1)",  200, 0, 6,   5},
     {.var="dilep_dphi",      .name="dphi(lep0, lep1)",  200, 0, 6,   5},
     {.var="dilep_dR",        .name="dR(lep0, lep1)",    200, 0, 6,   5},
-    {.var="dilep_ptratio",   .name="pT1/pT0",           200, 0, 1, 5},
-    {.var="dphi_metlep0",    .name="dphi(lep0, MET)",   200, 0, 4, 5},
-    {.var="dphi_metlep1",    .name="dphi(lep1, MET)",   200, 0, 4, 5},
-    {.var="dphi_metdilep",   .name="dphi(dilep, MET)",  200, 0, 4, 5},
-    {.var="dphi_metlep_max", .name="max-dphi(lep, MET)",200, 0, 4, 5},
-    {.var="dphi_metlep_min", .name="min-dphi(lep, MET)",200, 0, 4, 5},
+    {.var="dilep_ptratio",   .name="pT1/pT0",           200, 0, 1, 5},*/
   };
 
   int count = 0;
@@ -161,20 +173,6 @@ void makestack(){
   TString report = "\nDone!!\nTime taken : "+to_string((int)time_taken)+" second(s).\nNo of plots = "+to_string(count)+"\n";
   DisplayText(report, 33); //33 is the ANSI color code for yellow
 }
-
-//---------------------------------------------------------------
-// Event selection: Put cuts on the branches and filter the tree
-//---------------------------------------------------------------
-/*
-TTree* GetFilteredTree(TTree *intree){
-
-  //Define the branch cuts using TCut
-  TCut pt0cut = "lep0_pt > 35";
-
-  TCut cut = pt0cut; 
-  TTree *filtered_tree = intree->CopyTree(cut);
-  return filtered_tree;
-  }*/
 
 //-----------------------------------
 // Plotmaker (runs for each variable)
@@ -200,6 +198,7 @@ void plot(TString var, TString name){
     get_hist(var, "DYJetsToLL", "M50",    30321.155),
   };
   vector<TH1F *> QCD = {    
+    
     get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
     get_hist(var, "QCD_MuEnriched", "30to50",         42.906),
     get_hist(var, "QCD_MuEnriched", "50to80",        105.880),
@@ -463,7 +462,8 @@ void plot(TString var, TString name){
   lg->Draw();
 
   DisplayText("Made plot for "+var, 0);
-
+  //cout<<"\033[33mMade plot for "+var+"\033[0m\n"<<endl;
+  
   //Make a new folder and put all the plots there:
   if(toSave){
     createFolder(dump_folder);

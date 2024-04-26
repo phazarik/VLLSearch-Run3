@@ -8,5 +8,6 @@
 *txt
 *png
 *zip
+*gz
 CondorSetup/previous_jobs/
 *.ipynb_checkpoints

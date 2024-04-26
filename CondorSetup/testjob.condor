@@ -8,5 +8,5 @@ Notification=never
 output = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.out
 error = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.err
 log = /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.log
-arguments = /home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M10to50_2023-12-11/100655_skim_DYJetsToLL_M10to50_83.root_data.root /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.root 0 2018 mu flag /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker 5925.522
+arguments = /home/work/alaha1/public/RunII_ULSamples/2018/DYJetsToLL/M50/VLL_DYJetsToLL_M50_98.root /home/work/phazarik1/work/Analysis-Run3/CondorSetup/demo_test.root 0 2018 mu flag /home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer 30321.155 DYJetsToLL_M50
 queue

@@ -99,7 +99,7 @@ void ana_test(int sample=0)
 
   //Testing on skim:
   else if(sample==999){//Testing skimmed version.
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_Dec11/DYJetsToLL_M50_2023-12-11/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Mar05_Baseline/DYJetsToLL_M50_2024-03-05/*.root");
     treefilename = "test_outputs/tree_DYJetsToLL_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetYear(2018);

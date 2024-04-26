@@ -59,6 +59,17 @@ void AnaScript::createGenLightLeptons(){
 
 }
 
+void AnaScript::createGenJets(){
+  for(unsigned int i=0; i< (*nGenJet); i++){
+    Particle temp;
+    temp.v.SetPtEtaPhiM(GenJet_pt[i],GenJet_eta[i],GenJet_phi[i],GenJet_mass[i]);
+    temp.ind = i;
+
+    bool passcuts = temp.v.Pt()>30 && fabs(temp.v.Eta())<2.4;
+    if(passcuts) genJet.push_back(temp);
+  }
+}
+
 //SIGNAL:
 void AnaScript::createSignalArrays(){
   //Creating signal arrays and flagging the bad events:

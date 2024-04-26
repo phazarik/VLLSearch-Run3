@@ -25,6 +25,10 @@ void runana(TString ifname, TString ofname, TString data, TString year, TString 
   // DO NOT TOUCH ANYTHING
   //#######################
 
+  //Loading correctionlib:
+  gInterpreter->AddIncludePath("/home/work/phazarik1/.local/lib/python3.9/site-packages/correctionlib/include");
+  gSystem->Load("/home/work/phazarik1/.local/lib/python3.9/site-packages/correctionlib/lib/libcorrectionlib.so");
+  
   TString path_to_anaCond = codedir;
   TString path_to_library =path_to_anaCond;
   //TString anastring =".x "+path_to_anaCond+"/anaCond.C(\""+ifname+"\",\""+ofname+"\",\""+data+"\",\""+year+"\",\""+lep+"\",\""+flag+"\")";

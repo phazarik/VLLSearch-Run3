@@ -32,15 +32,15 @@ year = 2018
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "hist"             #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'skimmed'     #Options: 'normal', 'skimmed'
+mode = "skim"             #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'normal'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
 condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
-#condorsamples = ["TTBar"]
+#condorsamples = ["DYJetsToLL"]
 
 #_____________________________________________________________
 #
@@ -50,8 +50,8 @@ condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriche
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-#if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2muSS_QCDregion_Feb20"
 if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Mar05_Baseline"
+#if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Apr25"
 else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
 
 codedir = None
@@ -74,8 +74,8 @@ print(f'\n\033[93mSubmitting condor jobs ...\033[0m')
 
 
 #Creating condor jobs for each process mentioned in the list:
-for item in condorsamples:
-    for sample, subs in samplelist.items():
+for sample, subs in samplelist.items():
+    for item in condorsamples:
         #print(f'Checking ... {item} and {sample}')
         if sample == item: #The entry from the list must be identical to the key in the json file.
             #print(f'Match found : {sample}')

@@ -14,7 +14,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
+//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 //#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
 
@@ -24,15 +24,21 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
 
-//Corrections
+/*
+//Old Corrections
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"
+*/
+
+//Correctionlib:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/applyCorrections.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/TriggerEfficiency.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -72,7 +78,14 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   evt_wt = 1.0;
   bad_event = false;
   evt_trigger = false;
-  _campaign = "UL18";
+
+  //-------------------------------------------
+  //Set Campaign : (important for corrections)
+  _campaign = "2018_UL";
+  //_campaign = "2017_UL";
+  //_campaign = "2016preVFP_UL";
+  //_campaign = "2016postVFP_UL";
+  //-------------------------------------------
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -100,21 +113,15 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
-
-  cout<<"Event counts (raw):"<<endl;
-  cout<<"4L   = "<<n4l<<endl;
-  cout<<"3L   = "<<n3l<<endl;
-  cout<<"2LSS = "<<n2lss<<endl;
-  cout<<"2LOS = "<<n2los<<endl;
-  cout<<"1L2J = "<<n1l2j<<endl;
-  cout<<"1L1J = "<<n1l1j<<endl;
-  cout<<"1L0J = "<<n1l0j<<endl;
-  
-  cout<<"2muSS = "<<n2muss<<endl;
-  cout<<"2eSS  = "<<n2ess<<endl;
-  cout<<"emuSS = "<<nemuss<<endl;
-  //cout<<"\nLumiScale = "<<59800/_lumi<<endl;
-  
+  cout<<"Additional counters:"<<endl;
+  cout<<"n4l   = "<<   n4l<<endl;
+  cout<<"n3l   = "<<   n3l<<endl;
+  cout<<"n2lss = "<< n2lss<<endl;
+  cout<<"n2los = "<< n2los<<endl;
+  cout<<"n1l2j = "<< n1l2j<<endl;
+  cout<<"n1l1j = "<< n1l1j<<endl;
+  cout<<"n1l0j = "<< n1l0j<<endl;
+    
   time(&end);
 
   double time_taken = double(end-start);
@@ -210,6 +217,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       genMuon.clear();
       genElectron.clear();
       genLightLepton.clear();
+      genJet.clear();
       vllep.clear();
       vlnu.clear();
 
@@ -217,6 +225,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       
       if(_data==0){
 	createGenLightLeptons();
+	createGenJets();
         SortGenObjects();
 	//SortPt(genMuon);
 	//SortPt(genElectron);
@@ -287,24 +296,6 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
-      //--------------------------------------------------------------------------
-      //For Uttsavi:
-      //MakePlotsForUttsavi();
-
-      //Investigating 2muSS:
-      Make2muSSPlots();
-      //MakebJetSFPlots();
-      
-      //----------------------------------------------------------------
-      //Event-selection is done right after creating the object arrays.
-      //evt_wt is also calculated alongwith.
-      //This is done before any plotting.
-
-      //EventSelection(); //This is where trigger is applied.
-      //if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
-      //else evt_wt = 1.0;
-      //----------------------------------------------------------------
-
       /*
       //Basic object-level plots:
       //Electrons
@@ -352,11 +343,26 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evt_wt);
 	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evt_wt);
 	}*/
+
+      //----------------------------------------------------------------
+      //Event-selection is done right after creating the object arrays.
+      //evt_wt is also calculated alongwith.
+      //This is done before any plotting.
+
+      EventSelection(); //This is where trigger is applied.
+      //if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
+      //else evt_wt = 1.0;
+      //---------------------------------------------------------------- 
+            
      
       //_______________________________________________________________________________________________________
       
       //                         Analysis block
       //_______________________________________________________________________________________________________
+
+      //Investigating 2muSS:
+      Make2muSSPlots();
+      //MakebJetSFPlots();
 
       /*
       //lumiscaling:

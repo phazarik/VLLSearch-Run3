@@ -57,6 +57,9 @@ void AnaScript::SortGenObjects(){
   for(int i=0; i<(int)genLightLepton.size()-1; i++){
     for(int j=i+1; j<(int)genLightLepton.size(); j++){
       if(genLightLepton[i].v.Pt() < genLightLepton[j].v.Pt() ) swap(genLightLepton.at(i), genLightLepton.at(j));}}
+  for(int i=0; i<(int)genJet.size()-1; i++){
+    for(int j=i+1; j<(int)genJet.size(); j++){
+      if(genJet[i].v.Pt() < genJet[j].v.Pt() ) swap(genJet.at(i), genJet.at(j));}}
 }
 
 void AnaScript::SortVLL(){
