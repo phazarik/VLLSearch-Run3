@@ -23,23 +23,28 @@ void AnaScript::Make2muSSPlots(){
   bool basic_evt_selection = false;
 
   if((int)Muon.size()==2 && (int)Electron.size()==0){
-    if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge)
+    if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
       basic_evt_selection = true;
+      n2muss++;
+      //n2lss++;
+    }
   }
   if((int)Muon.size()==1 && (int)Electron.size()==1){
     if(Muon.at(0).v.Pt()>26 || Electron.at(0).v.Pt()>32){
-      if(Muon.at(0).charge == Electron.at(0).charge)
+      if(Muon.at(0).charge == Electron.at(0).charge){
 	nemuss++;
+	//n2lss++;
+      }
     }
   }
   if((int)Muon.size()==0 && (int)Electron.size()==2){
-    if(Electron.at(0).v.Pt()>32 && Electron.at(0).charge == Electron.at(1).charge)
+    if(Electron.at(0).v.Pt()>32 && Electron.at(0).charge == Electron.at(1).charge){
       n2ess++;
+      //n2lss++;
+    }
   }
   
   if(basic_evt_selection){
-    
-    n2muss++;
 
     //Calculating event weights:
     double wt = 1.0;
@@ -134,30 +139,34 @@ void AnaScript::Make2muSSPlots(){
     Float_t dphi_metlep_max = (Float_t)max(dphi_metlep0, dphi_metlep1);
     Float_t dphi_metlep_min = (Float_t)min(dphi_metlep0, dphi_metlep1);
 
-    //Booleans to get rid of bad events:
-    bool baseline = dilep_mass>20 && lep0_iso<0.15;
-    bool exclude_low_stat = STfrac<0.8 && STvis>50 && dilep_dR<4.0 && dilep_pt>20;
-    baseline = baseline && exclude_low_stat;
+    //Event selections:
+    basic_evt_selection = basic_evt_selection && dilep_mass>15; //syncing with skimmed version
+
+    //The leading lepton is well-isolated:
+    bool baseline = basic_evt_selection && lep0_iso<0.15 && lep0_sip3d<20;
 
     //Picking a QCD enhanced region:
-    bool QCD_enhanced_region = baseline && HTMETllpt<50;
-    bool QCD_CR = QCD_enhanced_region && (0.15<lep1_iso && lep1_iso<0.50);
-    bool QCD_VR = QCD_enhanced_region && lep1_iso < 0.15;
-
+    bool QCD_enhanced_region = baseline && ST<100 && (0.20<lep1_iso && lep1_iso<0.45);
+    bool QCD_CR = QCD_enhanced_region && metphi<0;
+    bool QCD_VR = QCD_enhanced_region && metphi>0;
+    
     //Working region:
-    bool isoregion = baseline && lep0_iso<0.15 && lep1_iso<0.20;
-    bool highST    = isoregion && ST>150;
+    bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
+    bool highSTiso = isoregion && ST>100; //Outisde the QCD control region
+    bool highSTisoClean = highSTiso && fabs(dilep_eta)<5 && STfrac<0.8; 
 
     //Controlling ttbar:
-    bool ttbarCR = highST && nbjet>=2;
+    bool ttbarCR = highSTisoClean && nbjet>=2;
 
+    //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = QCD_enhanced_region;
-
+    bool event_selection = ttbarCR;
+    //---------------------------------------------
+    
     //------------------------
     // QCD scaling (globally):
     //------------------------
-    double qcdscale = 0.094647493; //Global Scaling
+    //double qcdscale = 0.284324926; //Global Scaling
     //if(_flag == "qcd") wt = wt*qcdscale;
 
     if(_data==1) wt = 1.0;

@@ -116,7 +116,10 @@ void AnaScript::SlaveTerminate()
   cout<<"Additional counters:"<<endl;
   cout<<"n4l   = "<<   n4l<<endl;
   cout<<"n3l   = "<<   n3l<<endl;
+  cout<<"------------------"<<endl;
   cout<<"n2lss = "<< n2lss<<endl;
+  cout<<n2muss<<" + "<<n2ess<<" + "<<nemuss<<endl;
+  cout<<"------------------"<<endl;
   cout<<"n2los = "<< n2los<<endl;
   cout<<"n1l2j = "<< n1l2j<<endl;
   cout<<"n1l1j = "<< n1l1j<<endl;
