@@ -47,7 +47,7 @@ float AnaScript::correctionlib_muonIDSF(Particle muon, string mode){
     else if(_campaign=="2017_UL")        sf = muonid2017->evaluate(values); 
     else if(_campaign=="2016postVFP_UL") sf = muonid2016postVFP->evaluate(values); 
     else if(_campaign=="2016preVFP_UL")  sf = muonid2016preVFP->evaluate(values); 
-    else cout<<"Warning: Set correct _campaign"<<endl;
+    else cout<<"muon.h : Warning: Provide correct campaign name!"<<endl;
   }
   return sf;
 }
@@ -76,7 +76,7 @@ float AnaScript::correctionlib_muonIsoSF(Particle muon, string mode){
     else if(_campaign=="2017_UL" )       sf = muonid2017->evaluate(values); 
     else if(_campaign=="2016postVFP_UL") sf = muonid2016postVFP->evaluate(values); 
     else if(_campaign=="2016preVFP_UL")  sf = muonid2016preVFP->evaluate(values);
-    else cout<<"Warning: Set correct _campaign"<<endl;
+    else cout<<"muon.h : Warning: Provide correct campaign name!"<<endl;
   }
   return sf;
 }

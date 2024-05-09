@@ -13,14 +13,13 @@ from datetime import datetime
 
 timestamp = datetime.now().strftime("%Y-%m-%d")
 
-
 #input arguments:
 jobname    = sys.argv[1] 
 samplepath = sys.argv[2] # input path
 dumpdir    = sys.argv[3]
 samplename = sys.argv[4] # input name (eg: DYJetsToLL_M50)
 data       = sys.argv[5] # "0" = mC, "1" = data
-year       = sys.argv[6]
+campaign   = sys.argv[6] 
 lep        = sys.argv[7] #"el" = electron dataset, "mu" = muon dataset
 flag       = sys.argv[8] # customizable string flag
 codedir    = sys.argv[9]
@@ -105,7 +104,6 @@ with open(runScript, 'w') as file:
     for string in list_of_instructions:
         file.write(string + '\n')
 
-
         
 ##################################################################
 #Preparing the condor file that goes as an argument to 'condor_q'
@@ -151,7 +149,7 @@ for filename in input_files:
         out_samplename = out_samplename.replace("_", "")
         out_subsamplename = out_subsamplename.replace("_", "")
         
-        ofile = outputtag+"_"+out_samplename+"_"+out_subsamplename+"_"+str(filecount)+".root"
+        ofile = outputtag+"_"+campaign+"_"+out_samplename+"_"+out_subsamplename+"_"+str(filecount)+".root"
         #print(ofile)
         
         if debug == True :
@@ -165,7 +163,7 @@ for filename in input_files:
             "output = "+LOGDIR+"//$(Cluster)_data_"+filename+".out",
             "error = "+LOGDIR+"//$(Cluster)_data_"+filename+".err",
             "log = "+LOGDIR+"//$(Cluster)_data_"+filename+".log",
-            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+str(year)+" "+str(lep)+" "+str(flag)+" "+codedir+" "+str(lumi)+" "+samplename,
+            "arguments = "+INDIR+"/"+filename+" "+OUTDIR+"//$(Cluster)_"+ofile+"_data.root "+str(data)+" "+campaign+" "+str(lep)+" "+str(flag)+" "+codedir+" "+str(lumi)+" "+samplename,
             "queue",
             ""
         ]

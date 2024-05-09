@@ -28,19 +28,19 @@ debug  = args.debug #for debugging the condor-script
 #################
 #Global settings:
 #################
-year = 2018
+campaign = "2016preVFP_UL"
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
 mode = "hist"             #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'skimmed'     #Options: 'normal', 'skimmed'
+file_type = 'normal'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
+#condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
-#condorsamples = ["DYJetsToLL"]
+condorsamples = ["SingleMuon"]
 
 #_____________________________________________________________
 #
@@ -50,9 +50,11 @@ condorsamples = ["DYJetsToLL", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriche
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-#if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2muSS_Mar05_Baseline"
 if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Apr27"
-else : nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
+else :
+    if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
+    elif "2017" in campaign: nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2017"
+    elif "2016" in campaign: nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2016"
 
 codedir = None
 if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker"
@@ -69,9 +71,7 @@ list_processed=[]
 with open(jsonfile,'r') as infile:
     samplelist = json.load(infile)
 
-list_processed=[]
 print(f'\n\033[93mSubmitting condor jobs ...\033[0m')
-
 
 #Creating condor jobs for each process mentioned in the list:
 for sample, subs in samplelist.items():
@@ -101,19 +101,40 @@ for sample, subs in samplelist.items():
                 #Corrections for the nanoAOD sample storage scheme in our cluster:
                 if file_type != "skimmed" :
                     input_path = input_path + '/' + sample
-                    if   sample == 'SingleMuon': input_path = nanoAOD_path + "/UL2018Data/SingleMuon"
-                    elif sample == 'EGamma':     input_path = nanoAOD_path + "/UL2018Data/EGamma"
+
+                    #For data:
+                    if sample == 'SingleMuon' or sample == 'EGamma':
+                        if '2018' in campaign:   input_path = nanoAOD_path + "/UL2018Data/" +sample
+                        elif '2017' in campaign: input_path = nanoAOD_path + "/UL2017Data/" +sample
+                        elif '2016' in campaign: input_path = nanoAOD_path + "/SingleMuon"
+                    if sample == 'EGamma' and '2016' in campaign : input_path = nanoAOD_path + "UL2016Data/SingleElectron"
                     elif 'VLLS' in sample or 'VLLD' in sample:
                         input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample.split('_')[0]}/{sample.split('_')[1]}"
 
-                list_dirs = os.listdir(input_path)
+                    if not ('VLL' in sample):
+                        if campaign == '2016preVFP_UL':    input_path = input_path+"/preVFP"
+                        elif campaign == '2016postVFP_UL': input_path = input_path+"/postVFP"
+
+                try: list_dirs = os.listdir(input_path)
+                except:
+                    print(f'\033[91mWarning : {sample} does not exist in this path: {input_path}\033[0m')
+                    continue
+                    
                 list_dirs = [s for s in list_dirs if '.tar' not in s] #filtering the list for .tar objects
 
-                #Idiot proofing, in case the directory does not contain the sample/subsample
+                #Correction for naming inconsistencies:
+                #1) EGamma -> Egamma
                 if not any(subsample in s for s in list_dirs) :
                     print(f"Error with {sample}_{subsample} : files not found!")
                     print('replacing G with g in EGamma ..')
                     subsample = subsample.replace('G', 'g')
+                #2) M10to50 -> M10To50 in case of DrellYan 2016 samples  
+                if file_type != 'skimmed' and sample == 'DYJetsToLL' and '2016' in campaign:
+                    print(f'replacing subsample from {subsample}', end=' ')
+                    subsample = subsample.replace("to", "To")
+                    print(f'to {subsample}')
+
+                print(file_type, sample, campaign)
 
                 #Setting the input directory
                 #The input directory is more fragmented in case of the regular nanoAOD files. 
@@ -148,8 +169,8 @@ for sample, subs in samplelist.items():
                 mcwt = -1
                 
 
-                #arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug}'
-                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {year} {lep} {flag} {codedir} {mode} {debug} {lumi}'
+                #arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {campaign} {lep} {flag} {codedir} {mode} {debug}'
+                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {campaign} {lep} {flag} {codedir} {mode} {debug} {lumi}'
                 processline = 'python3 createCondorJob.py '+arguments
 
                 if dryrun == True : print(processline)

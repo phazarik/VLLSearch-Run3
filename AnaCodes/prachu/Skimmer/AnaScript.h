@@ -437,7 +437,8 @@ public :
   void SetLep(int lep){_lep=lep;}
   void SetVerbose(int verbose){ _verbosity = verbose; }
   void SetData(int data){_data=data;}
-  void SetYear(int year){_year = year;}
+  //void SetYear(int year){_year = year;}
+  void SetCampaign(TString campaign){_campaign=campaign;}
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
