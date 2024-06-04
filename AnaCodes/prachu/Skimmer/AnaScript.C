@@ -135,12 +135,17 @@ Bool_t AnaScript::Process(Long64_t entry)
       else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
       else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
 
-      //Muons are preferrred over electrons.
-      //For the electron dataset, pick up only those events which do not fire a Muon trigger.
-      //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger); //The union of two sets.
-      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
-      //triggerRes = electron_trigger;
+      bool overlapping_events = muon_trigger && electron_trigger;
+
+      /*
+      triggerRes = muon_trigger || electron_trigger;
+      //This is the union of both datasets (may overlap).
+      //Removing the overlapping events from the EGamma dataset as follows:
+      if(_flag == "egamma" && overlapping_events) triggerRes = false;*/
+
+      triggerRes = true;
+      //In the skimmer, I am keeping all events from data, including the overcounted ones.
+      //This is because I have the control to play with the trigger paths later.
     }
     
     if(triggerRes){
@@ -181,24 +186,21 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //2LSS skim:
       if((int)LightLepton.size()==2){
-	bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
+	//Condition 1: SS
+	//bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
+	//Condition 2: finding a triggerable object
 	bool trigger = false;
-	if(fabs(LightLepton.at(0).id)==11 && LightLepton.at(0).v.Pt()>32) trigger = true;
-	if(fabs(LightLepton.at(0).id)==13 && LightLepton.at(0).v.Pt()>26) trigger = true;
+	for(int i=0; i<(int)LightLepton.size(); i++){
+	  int lepton_id = fabs(LightLepton.at(i).id);
+	  float lepton_pt = LightLepton.at(i).v.Pt();
+	  if(lepton_id == 11 && lepton_pt > 32) trigger = true;
+	  if(lepton_id == 13 && lepton_pt > 26) trigger = true;
+	}
+	//Condition 3: low-res veto
 	bool reject_low_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
 	
-	if(samesign && trigger && reject_low_resonances) keep_this_event = true;
+	if(trigger && reject_low_resonances) keep_this_event = true;
       }
-
-      /*
-      //2muSS skim:
-      if((int)Muon.size()==2 && (int)Electron.size()==0){
-	bool reject_low_resonances = (Muon.at(0).v + Muon.at(1).v).M() > 15;
-	bool samesign = Muon.at(0).charge == Muon.at(1).charge;
-	bool ptcut = Muon.at(0).v.Pt()>26;	
-	bool basic_cuts = samesign && ptcut && reject_low_resonances;
-	if(basic_cuts) keep_this_event = true;
-	}*/
       
       if(keep_this_event){
 	nEvtPass++;

@@ -207,12 +207,17 @@ Bool_t AnaScript::Process(Long64_t entry)
       else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
       else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
 
-      //Muons are preferrred over electrons.
+      //For running the code over muon final states, muons are preferrred over electrons.
       //For the electron dataset, pick up only those events which do not fire a Muon trigger.
       //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger); //The union of two sets.
-      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
-      //triggerRes = electron_trigger;
+
+      bool overlapping_events = muon_trigger && electron_trigger;
+
+      triggerRes = (muon_trigger || electron_trigger);
+      //This is the union of both datasets (may overlap).
+      //Removing the overlapping events from the EGamma dataset as follows:
+      if(_flag == "egamma" && overlapping_events) triggerRes = false;
+      
     }
     
     if(triggerRes){
@@ -370,7 +375,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //_______________________________________________________________________________________________________
 
       //Investigating 2muSS:
-      Make2muSSPlots();
+      Make2LSSPlots();
       //MakebJetSFPlots();
 
       /*

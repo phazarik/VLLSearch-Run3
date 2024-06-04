@@ -93,6 +93,28 @@ void AnaScript::Make2muSSPlots(){
     h.evtweight[2]->Fill(bjetSF);
     h.evtweight[3]->Fill(wt);
 
+    //Finding the closest jet and plotting its deepjet score:
+    float drmin0 = 1000; float drmin1=1000;
+    int closest_Jet_index0=-1; int closest_Jet_index1=-1;
+    for(int i=0; i<(int)Jet.size(); i++){
+      float dr0temp = Muon.at(0).v.DeltaR(Jet.at(i).v);
+      float dr1temp = Muon.at(1).v.DeltaR(Jet.at(i).v);
+      //Leading muon:
+      if(dr0temp < drmin0){
+	drmin0 = dr0temp;
+	closest_Jet_index0 = i;
+	Muon.at(0).btagscore = Jet.at(i).btagscore;
+      }
+      else Muon.at(0).btagscore = -1;
+      //Subleading muon:
+      if(dr1temp < drmin1){
+	drmin1 = dr1temp;
+	closest_Jet_index1 = i;
+	Muon.at(1).btagscore = Jet.at(i).btagscore;
+      }
+      else Muon.at(1).btagscore = -1;      
+    }
+
     //Event level variabls:
     //Counts:
     UInt_t nlep  = (UInt_t)Muon.size();
@@ -106,6 +128,7 @@ void AnaScript::Make2muSSPlots(){
     Float_t lep0_iso = (Float_t)Muon.at(0).reliso03;
     Float_t lep0_sip3d = (Float_t)Muon.at(0).sip3d;
     Float_t lep0_mt  = (Float_t)transv_mass(Muon.at(0).v.E(), Muon.at(0).v.Phi(), metpt, metphi);
+    Float_t lep0_deepjet = (Float_t)Muon.at(0).btagscore;
     //Second lepton
     Float_t lep1_pt  = (Float_t)Muon.at(1).v.Pt();
     Float_t lep1_eta = (Float_t)Muon.at(1).v.Eta();
@@ -113,7 +136,7 @@ void AnaScript::Make2muSSPlots(){
     Float_t lep1_iso = (Float_t)Muon.at(1).reliso03;
     Float_t lep1_sip3d = (Float_t)Muon.at(1).sip3d;
     Float_t lep1_mt  = (Float_t)transv_mass(Muon.at(1).v.E(), Muon.at(1).v.Phi(), metpt, metphi);
-
+    Float_t lep1_deepjet = (Float_t)Muon.at(1).btagscore;
     //Dilepton system:
     TLorentzVector dilep = Muon.at(0).v + Muon.at(1).v;
     Float_t dilep_pt   = (Float_t)dilep.Pt();
@@ -160,7 +183,7 @@ void AnaScript::Make2muSSPlots(){
 
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = ttbarCR;
+    bool event_selection = highSTisoClean;
     //---------------------------------------------
     
     //------------------------
@@ -217,10 +240,12 @@ void AnaScript::Make2muSSPlots(){
       h.evt2LSS[33]->Fill(dphi_metlep1, wt);
       h.evt2LSS[34]->Fill(dphi_metdilep, wt);
       h.evt2LSS[35]->Fill(dphi_metlep_max, wt);
-      h.evt2LSS[36]->Fill(dphi_metlep_min, wt);         
-    
-      }
+      h.evt2LSS[36]->Fill(dphi_metlep_min, wt);
 
+      h.evt2LSS[37]->Fill(lep0_deepjet, wt);
+      h.evt2LSS[38]->Fill(lep1_deepjet, wt);
+    }
+    
   }
   
 }

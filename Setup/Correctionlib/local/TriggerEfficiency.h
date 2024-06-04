@@ -10,7 +10,7 @@ double AnaScript::GetLeptonTriggerEfficiency(Particle lepton){
   int flav = fabs(lepton.id);
 
   // I want to directly apply the trigger efficiency measured in data on MC
-  if(flav == 13) sf = TrigEFF_allCampaign_Isomu24_Data(lepton);
+  if(flav == 13)      sf = TrigEFF_allCampaign_Isomu24_Data(lepton);
   else if(flav == 11) sf = TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(lepton);
   else cout<<"Warning: Provide correct lepton while calculating trigger sf."<<endl;
 

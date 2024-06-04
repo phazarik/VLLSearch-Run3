@@ -143,7 +143,7 @@ void ana_test(int sample=0)
   
   //Testing on skim:
   else if(sample==999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Apr27/DYJetsToLL_M50_2024-04-27/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun03/DYJetsToLL_M50_2024-06-03/*DYJetsToLL_M50_38.*.root");
     hstfilename = "test_outputs/hst_DYJetsToLL_M50_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -154,7 +154,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(30321.155);
   }
   else if(sample==998){
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Apr27/QCD_MuEnriched_170to300_2024-04-27/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun03/QCD_MuEnriched_170to300_2024-06-03/*.root");
     hstfilename = "test_outputs/hst_qcd_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -165,7 +165,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==-999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Apr27/EGamma_EGamma_A_2024-04-27/*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun03/EGamma_EGamma_A_2024-06-03/*.root");
     hstfilename = "test_outputs/hst_EGammaA_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetCampaign("2018_UL");

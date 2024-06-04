@@ -467,9 +467,9 @@ public :
 
   //For specific studies:
   void MakeSignalPlots(float wt);
-  void Make_evt2LSS_plots(float wt);
   void Make_gen2LSS_plots(float wt);
   void Make2muSSPlots();
+  void Make2LSSPlots();
   void MakebJetSFPlots();
   void MakePlotsForUttsavi();
   TString ParticleName(int pdgid);
@@ -597,6 +597,7 @@ public:
     TH1F *evt2muSS[50];
     TH1F *btagsf[10];
     TH2F *bJets[5],*cJets[5],*lJets[5];
+    TH1F *flav[10];
     
   };
   struct Particle {
