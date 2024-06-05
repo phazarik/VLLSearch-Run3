@@ -52,18 +52,19 @@ float AnaScript::correctionlib_btagWPSFfromPOG(Particle jet, string mode){
       if(flav==5 || flav==4){ sf = bcjet2018->evaluate(values);    }
       else                  { sf = lightjet2018->evaluate(values); }
     }
-    if( _campaign=="2017_UL" ){
+    else if( _campaign=="2017_UL" ){
       if(flav==5 || flav==4){ sf = bcjet2017->evaluate(values);    }
       else                  { sf = lightjet2017->evaluate(values); }
     }
-    if( _campaign=="2016postVFP_UL" ){
+    else if( _campaign=="2016postVFP_UL" ){
       if(flav==5 || flav==4){ sf = bcjet2016postVFP->evaluate(values);    }
       else                  { sf = lightjet2016postVFP->evaluate(values); }
     }
-    if( _campaign=="2016preVFP_UL" ){
+    else if( _campaign=="2016preVFP_UL" ){
       if(flav==5 || flav==4){ sf = bcjet2016preVFP->evaluate(values);    }    
       else                  { sf = lightjet2016preVFP->evaluate(values); }
-    }     
+    }
+    else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
   }
 
   return sf;
@@ -85,7 +86,10 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
     
     //get MC efficiency
     if(_campaign=="2018_UL") jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i));
-    else cout<<"Provide correct campaign name!"<<endl;   
+    else {
+      jet_eff = 1.0;
+      cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
+    }
 
     //SFfromPOG
     float SFfromPOG = correctionlib_btagWPSFfromPOG(Jet.at(i), mode);
@@ -102,7 +106,7 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
     else if (_campaign =="2017_UL")        WPth=0.3040;
     else if (_campaign =="2016preVFP_UL")  WPth=0.2598;
     else if (_campaign =="2016postVFP_UL") WPth=0.2489;
-    else cout<<"Provide correct campaign name!"<<endl;
+    else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
     
     // check if jet is tagged or not
     if (Jet_btagDeepB[Jet.at(i).ind] > WPth){

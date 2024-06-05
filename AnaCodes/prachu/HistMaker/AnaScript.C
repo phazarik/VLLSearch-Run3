@@ -79,13 +79,13 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   bad_event = false;
   evt_trigger = false;
 
-  //-------------------------------------------
-  //Set Campaign : (important for corrections)
-  _campaign = "2018_UL";
+  //---------------------------------------------------
+  //Set Campaign manually : (important for corrections)
+  //_campaign = "2018_UL";
   //_campaign = "2017_UL";
   //_campaign = "2016preVFP_UL";
   //_campaign = "2016postVFP_UL";
-  //-------------------------------------------
+  //---------------------------------------------------
 
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
@@ -116,7 +116,10 @@ void AnaScript::SlaveTerminate()
   cout<<"Additional counters:"<<endl;
   cout<<"n4l   = "<<   n4l<<endl;
   cout<<"n3l   = "<<   n3l<<endl;
+  cout<<"------------------"<<endl;
   cout<<"n2lss = "<< n2lss<<endl;
+  cout<<n2muss<<" + "<<n2ess<<" + "<<nemuss<<endl;
+  cout<<"------------------"<<endl;
   cout<<"n2los = "<< n2los<<endl;
   cout<<"n1l2j = "<< n1l2j<<endl;
   cout<<"n1l1j = "<< n1l1j<<endl;
@@ -164,6 +167,12 @@ Bool_t AnaScript::Process(Long64_t entry)
   if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
   else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
+  //Setting year (overriding SetYear());
+  if(_campaign == "2018_UL") _year = 2018;
+  else if(_campaign == "2017_UL") _year = 2017;
+  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else cout<<"main: Provide correct campaign name"<<endl;
+
   nEvtTotal++;
   h.nevt->Fill(0);
 
@@ -189,26 +198,52 @@ Bool_t AnaScript::Process(Long64_t entry)
     h.nevt->Fill(1);
 
     triggerRes=true; //default, always true for MC
+    bool muon_trigger = false;
+    bool electron_trigger = false;
+
+    if     (_year==2016) {
+      muon_trigger =     (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+    else if(_year==2017) {
+      muon_trigger =     (*HLT_IsoMu27==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+    else if(_year==2018) {
+      muon_trigger =     (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+
+    bool overlapping_events = muon_trigger && electron_trigger;
+    
+    //Checking trigger flags before:
+    if(muon_trigger)       h.count[0]->Fill(0); else h.count[0]->Fill(1);
+    if(electron_trigger)   h.count[0]->Fill(2); else h.count[0]->Fill(3);
+    if(overlapping_events) h.count[0]->Fill(4);
+
+    //Investigaring the electron trigger:
+    if(*HLT_Ele27_WPTight_Gsf==1) h.count[2]->Fill(0);    else h.count[2]->Fill(1);
+    if(*HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(2);    else h.count[2]->Fill(3);
+    if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(4); //bothpass
+    if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(5); //bothfail
+    if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(6); //only 27 pass
+    if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(7); //only 32 pass
 
     if(_data==1){
-      triggerRes=false;
-      bool muon_trigger = false;
-      bool electron_trigger = false;
-      if     (_year==2016) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
-      else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
-      else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
-
-      //Muons are preferrred over electrons.
-      //For the electron dataset, pick up only those events which do not fire a Muon trigger.
-      //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger); //The union of two sets.
-      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
-      //triggerRes = electron_trigger;
+      triggerRes = (muon_trigger || electron_trigger);
+      //This is the union of both datasets (may overlap).
+      //Removing the overlapping events from the EGamma dataset as follows:
+      if(_flag == "egamma" && overlapping_events) triggerRes = false;
     }
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events
       h.nevt->Fill(2);
+
+      //Checking trigger flags after:
+      if(muon_trigger)       h.count[1]->Fill(0); else h.count[1]->Fill(1);
+      if(electron_trigger)   h.count[1]->Fill(2); else h.count[1]->Fill(3);
+      if(overlapping_events) h.count[1]->Fill(4);
 
       //###################
       //Gen particle block
@@ -361,7 +396,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //_______________________________________________________________________________________________________
 
       //Investigating 2muSS:
-      Make2muSSPlots();
+      Make2LSSPlots();
       //MakebJetSFPlots();
 
       /*

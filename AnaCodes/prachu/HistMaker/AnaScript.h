@@ -438,7 +438,8 @@ public :
   void SetLep(int lep){_lep=lep;}
   void SetVerbose(int verbose){ _verbosity = verbose; }
   void SetData(int data){_data=data;}
-  void SetYear(int year){_year = year;}
+  //void SetYear(int year){_year = year;}
+  void SetCampaign(TString campaign){_campaign = campaign;}
   void SetEra(TString era){_era=era;}
   void SetMCwt(int mcwt){_mcwt=mcwt;}
   void SetFlag(TString flag){_flag=flag;}
@@ -466,9 +467,9 @@ public :
 
   //For specific studies:
   void MakeSignalPlots(float wt);
-  void Make_evt2LSS_plots(float wt);
   void Make_gen2LSS_plots(float wt);
   void Make2muSSPlots();
+  void Make2LSSPlots();
   void MakebJetSFPlots();
   void MakePlotsForUttsavi();
   TString ParticleName(int pdgid);
@@ -596,6 +597,8 @@ public:
     TH1F *evt2muSS[50];
     TH1F *btagsf[10];
     TH2F *bJets[5],*cJets[5],*lJets[5];
+    TH1F *flav[10];
+    TH1F *count[10];
     
   };
   struct Particle {

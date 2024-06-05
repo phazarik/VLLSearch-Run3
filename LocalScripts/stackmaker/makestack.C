@@ -73,7 +73,7 @@ void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_Apr19_2muSS_baseline_cleaned";
+  TString jobname = "hist_2018UL_Jun05_TTbarCR_em";
   //input_path = "../input_hists/"+jobname;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
@@ -81,10 +81,10 @@ void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "2muSS_baseline_cleaned_withdata"; //Don't use special symbols (folder name)
-  tag2 = "2muSS baseline"; //This appears on the plot.
+  tag = "emSS_TTBarCR"; //Don't use special symbols (folder name)
+  tag2 = "TTbar CR (#mu-e channel)"; //This appears on the plot.
   //QCDscale = 1.0;
-  QCDscale = 0.094647493; //0.129596389;//0.136561*0.949;
+  QCDscale = 0.284324926; //2024-04-30
 
   struct plotdata {
     TString var;
@@ -197,6 +197,9 @@ void plot(TString var, TString name){
     get_hist(var, "DYJetsToLL", "M10to50", 5925.522),
     get_hist(var, "DYJetsToLL", "M50",    30321.155),
   };
+  vector<TH1F *>ZGamma={
+    get_hist(var, "ZGamma", "ZGToLLG_01J", 592588.5918)
+  };
   vector<TH1F *> QCD = {    
     
     get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
@@ -281,6 +284,7 @@ void plot(TString var, TString name){
   bkg = {
     merge_and_decorate(QCD,   "QCD",   kYellow),
     merge_and_decorate(DY,    "DY",    kRed-7),
+    merge_and_decorate(ZGamma,"ZGamma",kRed-9),
     merge_and_decorate(WJets, "WJets", kGray+1),
     merge_and_decorate(ST,    "ST",    kCyan-7),
     merge_and_decorate(TTBar, "TTBar", kAzure+1),
@@ -302,8 +306,8 @@ void plot(TString var, TString name){
   //################
   //Managing signal:
   sig1 = get_hist(var, "VLLD", "mu_M100", 8689.91);
-  sig2 = get_hist(var, "VLLS", "mu_M125", 1316553.24);
-  sig3 = nullptr; //get_hist(var, "VLLS", "mu_M100",    657832.10);
+  sig2 = nullptr;//get_hist(var, "VLLS", "mu_M125", 1316553.24);
+  sig3 = nullptr;//get_hist(var, "VLLS", "mu_M100",    657832.10);
   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetName("VLLD mu M100");}
   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetName("VLLS mu M125");}
   //if(sig3) {SetHistoStyle(sig3, kRed+2); sig3->SetName("VLLD mu M125");}
@@ -375,7 +379,7 @@ void plot(TString var, TString name){
   //dummy->Reset();
   dummy = (TH1F *)bkg[0]->Clone(); dummy->Reset(); 
   dummy->GetYaxis()->SetTitle("Events");
-  dummy->GetYaxis()->SetRangeUser(0.1, 10E6);
+  dummy->GetYaxis()->SetRangeUser(0.1, 10E4);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
   dummy->SetStats(0);
   dummy->Draw("hist");
@@ -438,7 +442,7 @@ void plot(TString var, TString name){
   
   put_text("CMS", 0.10, 0.93, 62, 0.06);
   put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_text(tag2+"", 0.35, 0.93, 42, 0.04);
+  put_latex_text(tag2+"", 0.35, 0.93, 42, 0.04);
   put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
 
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);

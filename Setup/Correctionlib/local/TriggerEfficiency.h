@@ -9,9 +9,18 @@ double AnaScript::GetLeptonTriggerEfficiency(Particle lepton){
   double sf = 1.0; 
   int flav = fabs(lepton.id);
 
-  // I want to directly apply the trigger efficiency measured in data on MC
-  if(flav == 13) sf = TrigEFF_allCampaign_Isomu24_Data(lepton);
+  // Method 1:
+  // Directly applying the trigger efficiency measured in data on MC (The HLT flags are not used in MC) 
+  
+  if(flav == 13)      sf = TrigEFF_allCampaign_Isomu24_Data(lepton);
   else if(flav == 11) sf = TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(lepton);
+
+  /*
+  //Method 2:
+  //Using the HLT flags in both data and MC, and then calculating a scale factor from the trigger efficiency ratio
+  if(flav == 13)      sf = TrigEFF_allCampaign_Isomu24_Data(lepton) / TrigEFF_allCampaign_Isomu24_MC(lepton);
+  else if(flav == 11) sf = TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(lepton) / TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(lepton);*/
+  
   else cout<<"Warning: Provide correct lepton while calculating trigger sf."<<endl;
 
   return sf;
@@ -29,7 +38,7 @@ double AnaScript::TrigEFF_allCampaign_Isomu24_MC(Particle muon){
   double eff = 0.0;
   
   float pt  = muon.v.Pt();
-  float eta = muon.v.Eta();
+  float eta = fabs(muon.v.Eta());
 
   if(_campaign == "2016preVFP_UL"){
     if( pt<10 || eta>2.4 ) return 0.0;
@@ -66,7 +75,7 @@ double AnaScript::TrigEFF_allCampaign_Isomu24_Data(Particle muon){
   double eff = 0.0;
   
   float pt  = muon.v.Pt();
-  float eta = muon.v.Eta();
+  float eta = fabs(muon.v.Eta());
 
   if(_campaign == "2016preVFP_UL"){
     float eff = 0.0; //default value
@@ -118,7 +127,7 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(Particle electron){
   double eff = 0.0;
   
   float pt  = electron.v.Pt();
-  float eta = electron.v.Eta();
+  float eta = fabs(electron.v.Eta());
 
   if(_campaign == "2016preVFP_UL"){
     if( pt<10 || eta>2.4 ) return 0.0;
@@ -155,7 +164,7 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron
   double eff = 0.0;
   
   float pt  = electron.v.Pt();
-  float eta = electron.v.Eta();
+  float eta = fabs(electron.v.Eta());
 
   if(_campaign == "2016preVFP_UL"){
     if( pt<10 || eta>2.4 ) return 0.0;
@@ -175,11 +184,15 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron
     else if(fabs(eta)>1.479)  eff = 0.5*0.962208*(1.0+TMath::Erf((pt-33.9927)/(2.0*1.55814)));
     return eff;
   }
-  else if(_campaign == "2018_UL"){
+  else if(_campaign == "2018_UL"){ 
+    /*
     if( pt<10 || eta>2.4 ) return 0.0;
     else if(fabs(eta)<=1.479) eff = 0.5*0.962897*(1.0+TMath::Erf((pt-33.1188)/(2.0*0.844886)));
     else if(fabs(eta)>1.479)  eff = 0.5*0.975043*(1.0+TMath::Erf((pt-32.9805)/(2.0*1.18094)));
-    return eff;
+    return eff;*/
+    if(eta<=1.479)     eff = 0.5*0.950463*(1.0+TMath::Erf((pt-23.9593)/(2.0*0.375996)));
+    else if(eta>1.479) eff = 0.5*0.953162*(1.0+TMath::Erf((pt-23.9459)/(2.0*0.457351)));
+    return eff; //Taken from Yash on 05-06-2024 //HLT_Ele32_WPTight_Gsf
   }
   else{
     cout<<"Warning: Give proper campaign name."<<endl;

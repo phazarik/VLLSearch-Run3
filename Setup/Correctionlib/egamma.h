@@ -36,6 +36,7 @@ float AnaScript::correctionlib_egmIDSF(Particle electron, string mode){
   else if( _campaign=="2017_UL" )       era_ = "2017";
   else if( _campaign=="2016preVFP_UL" ) era_ = "2016preVFP";
   else if( _campaign=="2016preVFP_UL" ) era_ = "2016postVFP";
+  else cout<<"egamma.h : Provide correct campaign name!"<<endl;
   
   std::vector<correction::Variable::Type>  values;
   values.emplace_back(era_);

@@ -41,6 +41,7 @@ void AnaScript::Begin(TTree * /*tree*/)
 
 void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 {
+  
   time(&start);
   cout<<"\nn-events \t time_taken (sec)"<<endl;
 
@@ -65,7 +66,7 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 
   //-------------------------------------------
   //Set Campaign : (important for corrections)
-  _campaign = "2018_UL";
+  //_campaign = "2018_UL";
   //_campaign = "2017_UL";
   //_campaign = "2016preVFP_UL";
   //_campaign = "2016postVFP_UL";
@@ -140,6 +141,12 @@ Bool_t AnaScript::Process(Long64_t entry)
   double time_taken_so_far = double(buffer-start);
   if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
   else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
+
+  //Setting year (overriding SetYear());
+  if(_campaign == "2018_UL") _year = 2018;
+  else if(_campaign == "2017_UL") _year = 2017;
+  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else cout<<"main: Provide correct campaign name"<<endl;
 
   nEvtTotal++;
   

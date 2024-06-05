@@ -51,7 +51,7 @@ float AnaScript::correctionlib_jetSF(Particle jet, string mode){
   else if( _campaign=="2017_UL" )        unc=jecsfjson2017->evaluate(values);
   else if( _campaign=="2016postVFP_UL" ) unc=jecsfjson2016postVFP->evaluate(values);
   else if( _campaign=="2016preVFP_UL" )  unc=jecsfjson2016preVFP->evaluate(values);
-  else cout<<"Pick and correct campaign name!"<<endl;
+  else cout<<"jetmet.h : Provide correct campaign name!"<<endl;
   
   if (      mode =="up"  ) {sf = 1.0+unc;}
   else if ( mode =="down") {sf = 1.0-unc;}
@@ -76,7 +76,7 @@ float AnaScript::correctionlib_jetRF(Particle jet, vector<Particle> genJet, floa
   else if(_campaign == "2017_UL")        era = "2017";
   else if(_campaign == "2016preVFP_UL")  era = "2016preVFP";
   else if(_campaign == "2016postVFP_UL") era = "2016postVFP";
-  else cout<<"Give correct campaign name!"<<endl;
+  else cout<<"jetmet.h : Provide correct campaign name!"<<endl;
   
   jersfvalues.emplace_back(eta);
   jersfvalues.emplace_back(mode); 

@@ -141,7 +141,7 @@ void AnaScript::createJets(){
     bool cleaned_from_muons = clean_from_array(temp, Muon, 0.4);
     bool cleaned_from_taus = clean_from_array(temp, Tau, 0.5);
     bool jetID = _year == 2016 ? Jet_jetId[i]>=1 : Jet_jetId[i]>=2; //if 2016, >=1; else >=2
-    bool passcut = ptetacut && cleaned_from_leptons && cleaned_from_taus && jetID;
+    bool passcut = ptetacut && cleaned_from_leptons && jetID;
     //bool passcut = ptetacut && jetID; //warning
     
     if(passcut && cleaned_from_muons){
