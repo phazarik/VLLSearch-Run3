@@ -13,6 +13,9 @@ class PlotData:
     rebin: int
 
 p = [
+    #PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
+    #PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=4),
+    
     PlotData(var="nlep",    name="number of leptons",     nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="njet",    name="number of jets",        nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="nbjet",   name="number of bjets",       nbins=10, xmin=0, xmax=10, rebin=1),
@@ -30,14 +33,16 @@ p = [
     PlotData(var="lep0_phi",   name="Leading lepton phi",      nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="lep0_mt",    name="Leading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep0_iso",   name="Leading lepton reliso03", nbins=1000, xmin=0, xmax=10, rebin=10),
-    #PlotData(var="lep0_sip3d", name="Leading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep0_sip3d", name="Leading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep0_deepjet", name="DeepJet score (near L0)", nbins=300, xmin=-1, xmax=2, rebin=5),
 
     PlotData(var="lep1_pt",    name="SubLeading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_eta",   name="SubLeading lepton eta",      nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="lep1_phi",   name="SubLeading lepton phi",      nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="lep1_mt",    name="SubLeading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_iso",   name="SubLeading lepton reliso03", nbins=1000, xmin=0, xmax=10, rebin=10),
-    #PlotData(var="lep1_sip3d", name="SubLeading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep1_sip3d", name="SubLeading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep1_deepjet", name="DeepJet score (near L1)",  nbins=300, xmin=-1, xmax=2, rebin=5),
     
     PlotData(var="dilep_pt",   name="Dilep pT (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="dilep_eta",  name="Dilep eta",        nbins=200, xmin=-4, xmax=4, rebin=5),

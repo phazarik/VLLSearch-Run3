@@ -29,6 +29,10 @@ void AnaScript::BookHistograms(){
   h.hist[12] = new TH1F("sideZ_ptbins", "sideZ_ptbins", 5, 0, 5);
   h.hist[13] = new TH1F("TTbarAcceptanceStudy", "0=all, 1=basic, 2=cuts, 3=basic2, 4=cuts2", 10, 0, 10);
   for(int i=0; i<14; i++) h.hist[i]->Sumw2();
+
+  h.count[0] = new TH1F("overlap_before_trigger", "0-mupass, 1-mufail, 2-epass, 3-efail, 4-overlap", 10, 0, 10);
+  h.count[1] = new TH1F("overlap_after_trigger", "0-mupass, 1-mufail, 2-epass, 3-efail, 4-overlap", 10, 0, 10);
+  h.count[2] = new TH1F("overlap_ofIsoEle27", "0-27pass, 1-27fail, 2-32pass, 3-32fail, 4-bothpass, 5-bothfail", 10, 0, 10);
   
   //############################################
   //Object level plots: (before event selection)

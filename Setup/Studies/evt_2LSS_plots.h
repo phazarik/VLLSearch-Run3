@@ -92,7 +92,7 @@ void AnaScript::Make2LSSPlots(){
     }
   }
 
-  basic_evt_selection = ee;
+  basic_evt_selection = em;
   
   if(basic_evt_selection){
 
@@ -301,17 +301,16 @@ void AnaScript::Make2LSSPlots(){
       h.evt2LSS[37]->Fill(dphi_metlep_max, wt);
       h.evt2LSS[38]->Fill(dphi_metlep_min, wt);
 
-    }//custom event selection
+      //flavor check:
+      for(int i=0; i<(int)LightLepton.size(); i++){
+	h.flav[0]->Fill(fabs(LightLepton.at(i).id));
+	h.flav[3]->Fill(LightLepton.at(i).id);
+      }
+      h.flav[1]->Fill(fabs(LightLepton.at(0).id));
+      h.flav[2]->Fill(fabs(LightLepton.at(1).id));
+      h.flav[4]->Fill(LightLepton.at(0).id);
+      h.flav[5]->Fill(LightLepton.at(1).id);
 
-    //flavor check:
-    for(int i=0; i<(int)LightLepton.size(); i++){
-      h.flav[0]->Fill(fabs(LightLepton.at(i).id));
-      h.flav[3]->Fill(LightLepton.at(i).id);
-    }
-    h.flav[1]->Fill(fabs(LightLepton.at(0).id));
-    h.flav[2]->Fill(fabs(LightLepton.at(1).id));
-    h.flav[4]->Fill(LightLepton.at(0).id);
-    h.flav[5]->Fill(LightLepton.at(1).id);
-    
+    }//custom event selection
   }//Baseline event selection
 }

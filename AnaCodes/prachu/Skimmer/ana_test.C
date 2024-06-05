@@ -117,6 +117,19 @@ void ana_test(int sample=1)
     m_selec.SetSampleName("DYJetsToLL_M50");
     m_selec.SetLumi(59800);
   }
+  //------------------------------------------------------------------------------------------------------------
+  //Testing on skimmed samples
+  else if(sample==999){
+    chain->Add("/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun03/DYJetsToLL_M50_2024-06-03/*DYJetsToLL_M50_38.*.root");
+    skimfilename = "test_outputs/skim_DYJetsToLL_M50_skimmed.root";
+    m_selec.SetData(0);
+    m_selec.SetCampaign("2018_UL");
+    m_selec.SetMCwt(2);
+    m_selec.SetLep(1);
+    m_selec.SetFlag("dy"); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("DYJetsToLL_M50");
+    m_selec.SetLumi(30321.155);
+  }
   else{
     cout<<"Invalid argument!"<<endl;
   }

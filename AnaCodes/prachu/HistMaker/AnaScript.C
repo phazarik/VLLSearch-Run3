@@ -198,31 +198,52 @@ Bool_t AnaScript::Process(Long64_t entry)
     h.nevt->Fill(1);
 
     triggerRes=true; //default, always true for MC
+    bool muon_trigger = false;
+    bool electron_trigger = false;
+
+    if     (_year==2016) {
+      muon_trigger =     (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+    else if(_year==2017) {
+      muon_trigger =     (*HLT_IsoMu27==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+    else if(_year==2018) {
+      muon_trigger =     (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+
+    bool overlapping_events = muon_trigger && electron_trigger;
+    
+    //Checking trigger flags before:
+    if(muon_trigger)       h.count[0]->Fill(0); else h.count[0]->Fill(1);
+    if(electron_trigger)   h.count[0]->Fill(2); else h.count[0]->Fill(3);
+    if(overlapping_events) h.count[0]->Fill(4);
+
+    //Investigaring the electron trigger:
+    if(*HLT_Ele27_WPTight_Gsf==1) h.count[2]->Fill(0);    else h.count[2]->Fill(1);
+    if(*HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(2);    else h.count[2]->Fill(3);
+    if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(4); //bothpass
+    if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(5); //bothfail
+    if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(6); //only 27 pass
+    if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(7); //only 32 pass
 
     if(_data==1){
-      triggerRes=false;
-      bool muon_trigger = false;
-      bool electron_trigger = false;
-      if     (_year==2016) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
-      else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
-      else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
-
-      //For running the code over muon final states, muons are preferrred over electrons.
-      //For the electron dataset, pick up only those events which do not fire a Muon trigger.
-      //Otherwise there will be overcounting.
-
-      bool overlapping_events = muon_trigger && electron_trigger;
-
       triggerRes = (muon_trigger || electron_trigger);
       //This is the union of both datasets (may overlap).
       //Removing the overlapping events from the EGamma dataset as follows:
       if(_flag == "egamma" && overlapping_events) triggerRes = false;
-      
     }
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events
       h.nevt->Fill(2);
+
+      //Checking trigger flags after:
+      if(muon_trigger)       h.count[1]->Fill(0); else h.count[1]->Fill(1);
+      if(electron_trigger)   h.count[1]->Fill(2); else h.count[1]->Fill(3);
+      if(overlapping_events) h.count[1]->Fill(4);
 
       //###################
       //Gen particle block

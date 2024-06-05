@@ -72,7 +72,7 @@ void AnaScript::ReadBranch(){
   *fixedGridRhoFastjetCentralNeutral;
 
   //btagWeight
-  if(_data==0)*btagWeight_DeepCSVB; //MC
+  //if(_data==0)*btagWeight_DeepCSVB; //MC
 
   //PFMET
   *MET_MetUnclustEnUpDeltaX;

@@ -187,7 +187,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //2LSS skim:
       if((int)LightLepton.size()==2){
 	//Condition 1: SS
-	//bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
+	bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
 	//Condition 2: finding a triggerable object
 	bool trigger = false;
 	for(int i=0; i<(int)LightLepton.size(); i++){
@@ -199,7 +199,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	//Condition 3: low-res veto
 	bool reject_low_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
 	
-	if(trigger && reject_low_resonances) keep_this_event = true;
+	if(trigger && reject_low_resonances && samesign) keep_this_event = true;
       }
       
       if(keep_this_event){

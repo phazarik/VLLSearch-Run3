@@ -598,6 +598,7 @@ public:
     TH1F *btagsf[10];
     TH2F *bJets[5],*cJets[5],*lJets[5];
     TH1F *flav[10];
+    TH1F *count[10];
     
   };
   struct Particle {
