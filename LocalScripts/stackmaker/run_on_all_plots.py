@@ -14,12 +14,12 @@ class PlotData:
 
 p = [
     #PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
-    #PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=4),
+    #PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     
     PlotData(var="nlep",    name="number of leptons",     nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="njet",    name="number of jets",        nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="nbjet",   name="number of bjets",       nbins=10, xmin=0, xmax=10, rebin=1),
-    PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
+    
     PlotData(var="LT",      name="LT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
     PlotData(var="STvis",   name="HT+LT (GeV)",           nbins=200, xmin=0, xmax=200, rebin=5),
     PlotData(var="ST",      name="ST (GeV)",              nbins=200, xmin=0, xmax=200, rebin=5),
@@ -34,7 +34,7 @@ p = [
     PlotData(var="lep0_mt",    name="Leading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep0_iso",   name="Leading lepton reliso03", nbins=1000, xmin=0, xmax=10, rebin=10),
     PlotData(var="lep0_sip3d", name="Leading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
-    PlotData(var="lep0_deepjet", name="DeepJet score (near L0)", nbins=300, xmin=-1, xmax=2, rebin=5),
+    PlotData(var="lep0_deepjet", name="DeepJet score (near L0)", nbins=300, xmin=-1, xmax=2, rebin=10),
 
     PlotData(var="lep1_pt",    name="SubLeading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_eta",   name="SubLeading lepton eta",      nbins=200, xmin=-4, xmax=4, rebin=5),
@@ -42,7 +42,7 @@ p = [
     PlotData(var="lep1_mt",    name="SubLeading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_iso",   name="SubLeading lepton reliso03", nbins=1000, xmin=0, xmax=10, rebin=10),
     PlotData(var="lep1_sip3d", name="SubLeading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
-    PlotData(var="lep1_deepjet", name="DeepJet score (near L1)",  nbins=300, xmin=-1, xmax=2, rebin=5),
+    PlotData(var="lep1_deepjet", name="DeepJet score (near L1)",  nbins=300, xmin=-1, xmax=2, rebin=10),
     
     PlotData(var="dilep_pt",   name="Dilep pT (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="dilep_eta",  name="Dilep eta",        nbins=200, xmin=-4, xmax=4, rebin=5),
@@ -58,7 +58,21 @@ p = [
     PlotData(var="dphi_metlep1",    name="dphi(lep1, MET)",    nbins=200, xmin=0, xmax=4, rebin=5),
     PlotData(var="dphi_metdilep",   name="dphi(dilep, MET)",   nbins=200, xmin=0, xmax=4, rebin=5),
     PlotData(var="dphi_metlep_max", name="max-dphi(lep, MET)", nbins=200, xmin=0, xmax=4, rebin=5),
-    PlotData(var="dphi_metlep_min", name="min-dphi(lep, MET)", nbins=200, xmin=0, xmax=4, rebin=5)]
+    PlotData(var="dphi_metlep_min", name="min-dphi(lep, MET)", nbins=200, xmin=0, xmax=4, rebin=5),
+
+    PlotData(var="all_lep_flav_abs", name="lep abs(id)",  nbins=20, xmin=0,   xmax=20, rebin=1),
+    PlotData(var="lep0_flav_abs",    name="lep0 abs(id)", nbins=20, xmin=0,   xmax=20, rebin=1),
+    PlotData(var="lep1_flav_abs",    name="lep1 abs(id)", nbins=20, xmin=0,   xmax=20, rebin=1),
+    PlotData(var="all_lep_flav_raw", name="lep id",       nbins=40, xmin=-20, xmax=20, rebin=1),
+    PlotData(var="lep0_flav_raw",    name="lep0 id",      nbins=40, xmin=-20, xmax=20, rebin=1),
+    PlotData(var="lep1_flav_raw",    name="lep1 id",      nbins=40, xmin=-20, xmax=20, rebin=1),
+
+    PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
+
+    #PlotData(var="overlap_before_trigger", name="overlap before trigger", nbins=10, xmin=0, xmax=10, rebin=1),
+    #PlotData(var="overlap_after_trigger",  name="overlap after trigger",  nbins=10, xmin=0, xmax=10, rebin=1),
+    #PlotData(var="overlap_ofIsoEle27",     name="overlap of IsoEle27",    nbins=10, xmin=0, xmax=10, rebin=1)
+    ]
 
 start_time = time.time()
 

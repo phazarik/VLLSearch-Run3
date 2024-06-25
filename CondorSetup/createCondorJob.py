@@ -128,6 +128,9 @@ condorfile_info=[
 #We need to add the runana.C script and the  input parameters for each files in this condor file.
 #For that, we need to loop over all files in the input directory.
 input_files = os.listdir(INDIR)
+
+if len(input_files) == 0: print("Empty directory: "+INDIR)
+
 filecount=0
 for filename in input_files:
     if filename.endswith(".root"):

@@ -50,7 +50,8 @@ condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_notriggers_2018UL_Jun05"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Jun18"
+#if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun17"
 else :
     if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
     elif "2017" in campaign: nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2017"
@@ -154,7 +155,7 @@ for sample, subs in samplelist.items():
                 exists = os.path.exists(indir)
                 empty  = len(os.listdir(indir)) == 0
                 if empty or not exists:
-                    print(f'\033[91mWarning : SKipping empty folder : {indir}')
+                    print(f'\033[91mWarning : Skipping empty folder : {indir}\033[0m')
                     continue
                 
                 #Corrections on the parameters based on which sample it is:

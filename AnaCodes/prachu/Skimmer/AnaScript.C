@@ -193,7 +193,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	for(int i=0; i<(int)LightLepton.size(); i++){
 	  int lepton_id = fabs(LightLepton.at(i).id);
 	  float lepton_pt = LightLepton.at(i).v.Pt();
-	  if(lepton_id == 11 && lepton_pt > 32) trigger = true;
+	  if(lepton_id == 11 && lepton_pt > 35) trigger = true;
 	  if(lepton_id == 13 && lepton_pt > 26) trigger = true;
 	}
 	//Condition 3: low-res veto

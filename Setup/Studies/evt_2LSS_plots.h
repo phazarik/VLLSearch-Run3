@@ -54,6 +54,9 @@ void AnaScript::Make2LSSPlots(){
   bool ee = false;
   bool em = false;
   bool mm = false;
+
+  float ptcut_mu  = 26; if(_campaign=="2017_UL") ptcut_mu = 32;
+  float ptcut_ele = 35; 
   
   if(LightLepton.size() == 2){
     if(LightLepton.at(0).charge == LightLepton.at(1).charge){
@@ -61,28 +64,28 @@ void AnaScript::Make2LSSPlots(){
       int flav1 = fabs(LightLepton.at(1).id);
       
       if(flav0 == 13 && flav1 == 13){//mu-mu channel
-	if(LightLepton.at(0).v.Pt() > 26){//Muon trigger
+	if(LightLepton.at(0).v.Pt() > ptcut_mu){//Muon trigger
 	  n2muss++;
 	  mm = true;
 	}
       }
 
       else if(flav0 == 13 && flav1 == 11){//e-mu channel
-	if(LightLepton.at(0).v.Pt() > 26){//Muon trigger
+	if((LightLepton.at(0).v.Pt() > ptcut_mu) || (LightLepton.at(1).v.Pt() > ptcut_ele)){ //at least one object passes the offline ptcut
 	  nemuss++;
 	  em = true;
 	}
       }
       
       else if(flav0 == 11 && flav1 == 13){//e-mu channel
-	if(LightLepton.at(0).v.Pt() > 32){//Electron trigger
+	if((LightLepton.at(0).v.Pt() > ptcut_ele) || (LightLepton.at(1).v.Pt() > ptcut_mu)){ //at least one object passes the offline ptcut
 	  nemuss++;
 	  em = true;
 	}
       }
       
       else if(flav0 == 11 && flav1 == 11){//e-e channel
-	if(LightLepton.at(0).v.Pt() > 32){//Electron trigger
+	if(LightLepton.at(0).v.Pt() > ptcut_ele){//Electron trigger
 	  n2ess++;
 	  ee= true;
 	}
@@ -92,7 +95,12 @@ void AnaScript::Make2LSSPlots(){
     }
   }
 
-  basic_evt_selection = em;
+  //#######################
+  // Select the channel :
+  //
+  basic_evt_selection = mm;
+  //
+  //#######################
   
   if(basic_evt_selection){
 
@@ -149,7 +157,7 @@ void AnaScript::Make2LSSPlots(){
     h.evtweight[1]->Fill(triggerEff);
     h.evtweight[2]->Fill(bjetSF);
     h.evtweight[3]->Fill(wt);
-
+    
     //Finding the closest jet and plotting its deepjet score:
     float drmin0 = 1000; float drmin1=1000;
     int closest_Jet_index0=-1; int closest_Jet_index1=-1;
@@ -238,6 +246,8 @@ void AnaScript::Make2LSSPlots(){
     //Controlling ttbar:
     bool ttbarCR = highSTisoClean && nbjet>=2;
 
+    //DY enhanced region for charge misID measurement:
+
     //---------------------------------------------
     //Final event selection that used in the plots:
     bool event_selection = ttbarCR;
@@ -266,13 +276,13 @@ void AnaScript::Make2LSSPlots(){
       h.evt2LSS[6] ->Fill(lep0_iso, wt);
       h.evt2LSS[7] ->Fill(lep0_sip3d, wt);
       h.evt2LSS[8] ->Fill(lep0_mt, wt);
-      h.evt2LSS[9]->Fill(lep0_deepjet, wt);
+      h.evt2LSS[9] ->Fill(lep0_deepjet, wt);
       
-      h.evt2LSS[10] ->Fill(lep1_pt, wt);
-      h.evt2LSS[11] ->Fill(lep1_eta, wt);
+      h.evt2LSS[10]->Fill(lep1_pt, wt);
+      h.evt2LSS[11]->Fill(lep1_eta, wt);
       h.evt2LSS[12]->Fill(lep1_phi, wt);
       h.evt2LSS[13]->Fill(lep1_iso, wt);
-      h.evt2LSS[14] ->Fill(lep1_sip3d, wt);
+      h.evt2LSS[14]->Fill(lep1_sip3d, wt);
       h.evt2LSS[15]->Fill(lep1_mt, wt);
       h.evt2LSS[16]->Fill(lep1_deepjet, wt);
 
@@ -312,5 +322,43 @@ void AnaScript::Make2LSSPlots(){
       h.flav[5]->Fill(LightLepton.at(1).id);
 
     }//custom event selection
+
+    //Other calculations:
+    
+    //#########################
+    // ChargeMisId measurement:
+    // Specifically, in 2LSS events, what fraction of events comes from Z->LL, where one of the charges flip?
+    // 1. Pick a DY enhanced region, and choose a Z window (91-106).
+    // 2. Estimate the natural background from the sideband. (55-70 U 110-125)
+    // 3. Misidentified events = onZ events - sideband events
+    // 4. Fraction of misId events = (onZ events - sideband events)/onZ events
+    // 5. Do this in pT bins of the leading lepton, which is usually the prompt lepton.
+
+    bool ptbin0 = lep0_pt < 50;
+    bool ptbin1 = 50  <= lep0_pt && lep0_pt < 150;
+    bool ptbin2 = 150 <= lep0_pt;
+    
+    bool onZ      = 91<dilep_mass && dilep_mass<106;
+    bool sideband = (55<dilep_mass && dilep_mass<70) || (110<dilep_mass && dilep_mass<125);
+
+    if(event_selection){
+      if(ptbin0){
+	h.chargeflip[0]->Fill((int)0, wt);
+	if(onZ)      h.chargeflip[0]->Fill((int)1, wt);
+	if(sideband) h.chargeflip[0]->Fill((int)2, wt);
+      }
+      else if(ptbin1){
+	h.chargeflip[1]->Fill((int)0, wt);
+	if(onZ)      h.chargeflip[1]->Fill((int)1, wt);
+	if(sideband) h.chargeflip[1]->Fill((int)2, wt);
+      }
+      else if(ptbin2){
+	h.chargeflip[2]->Fill((int)0, wt);
+	if(onZ)      h.chargeflip[2]->Fill((int)1, wt);
+	if(sideband) h.chargeflip[2]->Fill((int)2, wt);
+      }
+    }//custom event selection
+        
   }//Baseline event selection
+
 }
