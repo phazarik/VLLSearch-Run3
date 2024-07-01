@@ -98,7 +98,7 @@ void AnaScript::Make2LSSPlots(){
   //#######################
   // Select the channel :
   //
-  basic_evt_selection = mm;
+  basic_evt_selection = ee;
   //
   //#######################
   
@@ -233,6 +233,14 @@ void AnaScript::Make2LSSPlots(){
     //The leading lepton is well-isolated:
     bool baseline = basic_evt_selection && lep0_iso<0.15 && lep0_sip3d<20;
 
+    //Vetoing DY in case of ee channel:
+    bool removed_dy_from_ee = true;
+    if(basic_evt_selection == ee){
+      if(76 < dilep_mass && dilep_mass < 106)
+	removed_dy_from_ee = false;
+    }
+    baseline = baseline && removed_dy_from_ee;
+    
     //Picking a QCD enhanced region:
     bool QCD_enhanced_region = baseline && ST<100 && (0.20<lep1_iso && lep1_iso<0.45);
     bool QCD_CR = QCD_enhanced_region && metphi<0;

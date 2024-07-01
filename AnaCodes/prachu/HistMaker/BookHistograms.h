@@ -116,6 +116,7 @@ void AnaScript::BookHistograms(){
   // Final states:
   //##############
 
+  /*
   h.evt2LSS[0]  = new TH1F("nlep", "nlep", 10, 0, 10);
   h.evt2LSS[1]  = new TH1F("njet", "njet", 10, 0, 10);
   h.evt2LSS[2]  = new TH1F("nbjet", "nbjet", 10, 0, 10);
@@ -170,7 +171,7 @@ void AnaScript::BookHistograms(){
   h.flav[3] = new TH1F("all_lep_flav_raw", "lep flav (all)", 40, -20, 20);
   h.flav[4] = new TH1F("lep0_flav_raw", "lep0 flav", 40, -20, 20);
   h.flav[5] = new TH1F("lep1_flav_raw", "lep1 flav", 40, -20, 20);
-  for(int i=0; i<6; i++) h.flav[i]->Sumw2();
+  for(int i=0; i<6; i++) h.flav[i]->Sumw2();*/
   
   /*
   //Gen-Level study:
@@ -197,7 +198,7 @@ void AnaScript::BookHistograms(){
   h.gen2LSS[17]  = new TH1F("mm_genmatch_rate",   "mm 0=all, 1=lep0match, 2=lep1match, 3=bothmatch",  5, 0, 5);
   h.gen2LSS[18]  = new TH1F("mm_chargematch_rate","mm 0=all, 1=lep0match, 2=lep1match, 3=bothmatch",  5, 0, 5);
   
-  for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();
+  for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();*/
 
   h.btagsf[0] = new TH1F("JetHadronFlavor_all", "JetHadronFlavor_all", 10, -2, 8);
   //2D plots for bTagSF calculation:
@@ -208,6 +209,6 @@ void AnaScript::BookHistograms(){
   h.cJets[0] = new TH2F("cJet_PtEta","cJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.cJets[1] = new TH2F("cJet_Mis_PtEta","cJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.lJets[0] = new TH2F("LightJet_PtEta","LightJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
-  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);*/
+  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   
 }
