@@ -39,9 +39,10 @@ file_type = 'normal'     #Options: 'normal', 'skimmed'
 # Select which samples to run on:
 #################################
 #condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
-condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
+#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
 #condorsamples = ["SingleMuon", "EGamma"]
+condorsamples = ["Rare", "WJetsNLO", "WWZ", "WZZ", "ZZZ"]
 
 #_____________________________________________________________
 #
@@ -117,6 +118,7 @@ for sample, subs in samplelist.items():
                         if campaign == '2016preVFP_UL':    input_path = input_path+"/preVFP"
                         elif campaign == '2016postVFP_UL': input_path = input_path+"/postVFP"
 
+
                 try: list_dirs = os.listdir(input_path)
                 except:
                     print(f'\033[91mWarning : {sample} does not exist in this path: {input_path}\033[0m')
@@ -126,10 +128,11 @@ for sample, subs in samplelist.items():
 
                 #Correction for naming inconsistencies:
                 #1) EGamma -> Egamma
-                if not any(subsample in s for s in list_dirs) :
-                    print(f"Error with {sample}_{subsample} : files not found!")
-                    print('replacing G with g in EGamma ..')
-                    subsample = subsample.replace('G', 'g')
+                if sample == "EGamma":
+                    if not any(subsample in s for s in list_dirs) :
+                        print(f"Error with {sample}_{subsample} : files not found!")
+                        print('replacing G with g in EGamma ..')
+                        subsample = subsample.replace('G', 'g')
                 #2) M10to50 -> M10To50 in case of DrellYan 2016 samples  
                 if file_type != 'skimmed' and sample == 'DYJetsToLL' and '2016' in campaign:
                     print(f'replacing subsample from {subsample}', end=' ')
@@ -141,16 +144,21 @@ for sample, subs in samplelist.items():
                 #Setting the input directory
                 #The input directory is more fragmented in case of the regular nanoAOD files. 
                 indir = None
+                
+                if file_type == 'normal':
+                    if sample == 'WJetsNLO': indir = input_path
+                    
                 if file_type == 'skimmed' :
                     try: indir = input_path + "/"+ next((f for f in list_dirs if sample in f and subsample in f), None)
                     except :
                         print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
                         continue
                 else :
-                    try : indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
-                    except :
-                        print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
-                        continue
+                    if sample != "WJetsNLO": #Because it does not have a subdirectory:
+                        try : indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
+                        except :
+                            print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
+                            continue
 
                 #Skip if indir is empty:
                 exists = os.path.exists(indir)

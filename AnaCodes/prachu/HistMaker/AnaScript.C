@@ -396,8 +396,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //_______________________________________________________________________________________________________
 
       //Investigating 2muSS:
-      Make2LSSPlots();
-      //MakebJetSFPlots();
+      //Make2LSSPlots();
+      MakebJetSFPlots();
 
       /*
       //lumiscaling:
