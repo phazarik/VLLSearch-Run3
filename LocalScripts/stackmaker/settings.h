@@ -58,7 +58,7 @@ TH1F *get_hist(
 	       const TString& var,
 	       const TString& sample,
 	       const TString& subsample,
-	       const float& lumi
+	       const double& lumi
 	       ){
 
   //Accessing the hist:
@@ -80,7 +80,7 @@ TH1F *get_hist(
   //float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
 
   //Tweaking the histogram:
-  float datalumi = 59800; //pb^{-1}
+  double datalumi = 59800; //pb^{-1}
   if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
   else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
     
@@ -184,6 +184,36 @@ Double_t GetStatUncertainty(TH1F *hist){
   return uncertainty;
 }
 
+TH1F *DivideHists(TH1F *hst_num, TH1F*hst_den){
+
+  int nbins = hst_num->GetNbinsX();
+
+  //Idiot proofing:
+  if (!hst_num || !hst_den)  return nullptr;  
+  if (nbins != hst_den->GetNbinsX())  return nullptr;
+
+  TH1F* hst_result = (TH1F*)hst_num->Clone("hst_result"); hst_result->Reset();
+
+  for (int i = 1; i <= nbins; ++i) {
+    double num = hst_num->GetBinContent(i);
+    double den = hst_den->GetBinContent(i);
+    double num_err = hst_num->GetBinError(i);
+    double den_err = hst_den->GetBinError(i);
+    if (den != 0) {
+      double bin_content = num / den;
+      double bin_error = bin_content * sqrt(pow(num_err/num, 2) + pow(den_err/den, 2));
+      hst_result->SetBinContent(i, bin_content);
+      hst_result->SetBinError(i, bin_error);
+    }
+    else {
+      hst_result->SetBinContent(i, 0);
+      hst_result->SetBinError(i, 0);
+    }
+  }
+  
+  return hst_result;
+}
+
 TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
   //First, get a sum of all the backgrounds:
   TH1F *rootb = (TH1F *)bkg[0]->Clone(); rootb->Reset();
@@ -195,12 +225,13 @@ TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
     rootb->SetBinContent(bin, std::sqrt(val));
     rootb->SetBinError(bin, err/(2.0*std::sqrt(val)));
   }
-  TH1F * srb = (TH1F *)sig->Clone("copy");
   if(!rootb){
     cout<<"Error: Background is null!"<<endl;
-    srb = nullptr;
+    return nullptr;
   }
-  else srb->Divide(rootb);
+  //TH1F * srb = (TH1F *)sig->Clone("copy");
+  //srb->Divide(rootb);
+  TH1F *srb = DivideHists(sig, rootb);
 
   //print global S/sqrtB
   float nsig = sig->Integral();
@@ -216,12 +247,13 @@ TH1F *GetRatio(TH1F *data, vector<TH1F*> bkg){
   //First, get a sum of all the backgrounds:
   TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
   for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
-  TH1F *ratio = (TH1F *)data->Clone("copy");
   if(!allbkg){
     cout<<"Error: Background is null!"<<endl;
-    ratio = nullptr;
+    return nullptr;
   }
-  else ratio->Divide(allbkg);
+  //TH1F *ratio = (TH1F *)data->Clone("copy");
+  //ratio->Divide(allbkg);
+  TH1F *ratio = DivideHists(data, allbkg);
 
   //calculating global ratio:
   float nobs = data->Integral();

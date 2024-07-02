@@ -73,16 +73,16 @@ void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2018UL_ttbarCR_Jun20_em";
+  TString jobname = "hist_2LSS_2018UL_Jul02_ttbarCR_ee";
   //input_path = "../input_hists/"+jobname;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = true;
+  toSave = false;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "for_RAC_ttbarCR_em"; //Don't use special symbols (folder name)
-  tag2 = "TTBar CR (e-#mu channel)"; //This appears on the plot.
+  tag = "for_RAC_ttbarCR_ee"; //Don't use special symbols (folder name)
+  tag2 = "TTBar CR (e-e channel)"; //This appears on the plot.
   //QCDscale = 1.0;
   QCDscale = 0.284324926; //2024-04-30 for mu-mu or e-e channel
   //QCDscale = 0.549667774; //2024-06-19 for e-mu channel
@@ -266,6 +266,25 @@ void plot(TString var, TString name){
     get_hist(var, "ZZ", "ZZTo2Q2Nu",  4405016.452),
     get_hist(var, "ZZ", "ZZTo4L",    74330566.038),
   };
+  vector<TH1F *>VVV={
+    get_hist(var, "WWZ", "Inclusive", 1452841.24194),
+    get_hist(var, "WZZ", "Inclusive", 5254860.74619),
+    get_hist(var, "ZZZ", "Inclusive", 16937669.376694),
+  };
+  vector<TH1F *>Rare={
+    get_hist(var, "Rare", "THQ",     39983860.190527),
+    get_hist(var, "Rare", "THW",    101122448.979592),
+    get_hist(var, "Rare", "TTHH",   745156482.861401),
+    get_hist(var, "Rare", "TTTJ",  1246882793.01746),
+    get_hist(var, "Rare", "TTTT",  1613891978.74181),
+    get_hist(var, "Rare", "TTTW",   678385059.049712),
+    get_hist(var, "Rare", "TTWH",   435201401.050788),
+    get_hist(var, "Rare", "TTWW",   134857142.857143),
+    get_hist(var, "Rare", "TTWZ",   202686202.686203),
+    get_hist(var, "Rare", "TTZH",   440528634.361234),
+    get_hist(var, "Rare", "TTZZ",   358273381.29496),
+    get_hist(var, "Rare", "TZq_ll", 157598201.29612),
+  };
   vector<TH1F *>SingleMuon={
     get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
     get_hist(var, "SingleMuon", "SingleMuon_B", 59800),
@@ -294,6 +313,8 @@ void plot(TString var, TString name){
     merge_and_decorate(WW,    "WW",    kGreen-3),
     merge_and_decorate(WZ,    "WZ",    kGreen-9),
     merge_and_decorate(ZZ,    "ZZ",    kGreen-10),
+    merge_and_decorate(VVV,   "VVV",   kGreen),
+    merge_and_decorate(Rare,  "Rare",  kMagenta),
   };
 
   //Remove null pointers:

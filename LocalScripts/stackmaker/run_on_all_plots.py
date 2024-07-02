@@ -13,7 +13,7 @@ class PlotData:
     rebin: int
 
 p = [
-    #PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
+    PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
     #PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     
     PlotData(var="nlep",    name="number of leptons",     nbins=10, xmin=0, xmax=10, rebin=1),
@@ -95,7 +95,7 @@ for plot_data in p:
     #print("Executing :" + processline + " ... ", end = "\n")
     os.system(processline)
     #print("\033[033mSuccess.\033[0m")
-    #break
+    break
 
 end_time = time.time()
 time_taken = end_time-start_time
