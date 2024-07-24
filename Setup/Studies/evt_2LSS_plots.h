@@ -6,11 +6,13 @@ void AnaScript::Make2LSSPlots(){
 
   //##################################################################################################
   //Corrections to Jets:
+  float jec = 1.0;
+  float jer = 1.0;
   if(_data == 0){
     for(int i=0; i<(int)Jet.size(); i++){
       
-      float jec = correctionlib_jetSF(Jet.at(i),"nom");
-      float jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+      jec = correctionlib_jetSF(Jet.at(i),"nom");
+      jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
       
       //Jet Energy Correction:
       Jet.at(i).v = Jet.at(i).v * jec;
@@ -247,18 +249,21 @@ void AnaScript::Make2LSSPlots(){
     bool QCD_VR = QCD_enhanced_region && metphi>0;
     
     //Working region:
-    bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
+    //bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
+    bool isoregion = baseline && (lep1_iso<0.15 && lep1_sip3d<20); //Both leptons are isolated
     bool highSTiso = isoregion && ST>100; //Outisde the QCD control region
     bool highSTisoClean = highSTiso && fabs(dilep_eta)<5 && STfrac<0.8; 
 
     //Controlling ttbar:
+    bool topEnhanced = highSTisoClean && nbjet>=1;
     bool ttbarCR = highSTisoClean && nbjet>=2;
+    bool SR = highSTisoClean && nbjet==0;
 
     //DY enhanced region for charge misID measurement:
 
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = ttbarCR;
+    bool event_selection = topEnhanced;
     //---------------------------------------------
     
     //------------------------
@@ -328,6 +333,25 @@ void AnaScript::Make2LSSPlots(){
       h.flav[2]->Fill(fabs(LightLepton.at(1).id));
       h.flav[4]->Fill(LightLepton.at(0).id);
       h.flav[5]->Fill(LightLepton.at(1).id);
+
+      //Weights check:
+      h.evtweight[8] ->Fill(jec);
+      h.evtweight[9] ->Fill(jer);
+      h.evtweight[10]->Fill(jec*jer);
+      h.evtweight[11]->Fill(lepIdIsoSF);
+      h.evtweight[12]->Fill(triggerEff);
+      h.evtweight[13]->Fill(bjetSF);
+      h.evtweight[14]->Fill(wt);
+
+      //Trigger check:
+      h.flag[0]->Fill(*HLT_IsoMu24, wt);
+      h.flag[1]->Fill(*HLT_IsoMu27, wt);
+      h.flag[2]->Fill(*HLT_Ele27_WPTight_Gsf, wt);
+      h.flag[3]->Fill(*HLT_Ele32_WPTight_Gsf, wt);
+      h.flag[4]->Fill((int)0, wt);
+      if(muon_trigger)       h.flag[4]->Fill((int)1, wt);
+      if(electron_trigger)   h.flag[4]->Fill((int)2, wt);
+      if(overlapping_events) h.flag[4]->Fill((int)3, wt); //Should not appear in EGamma dataset
 
     }//custom event selection
 

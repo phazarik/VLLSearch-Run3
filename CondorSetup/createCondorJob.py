@@ -26,6 +26,7 @@ codedir    = sys.argv[9]
 mode       = sys.argv[10]
 debug_str  = sys.argv[11]
 lumi       = sys.argv[12]
+file_type  = sys.argv[13]
 #For the old setup:
 #era = 'Z'
 #mc = 'wz'
@@ -141,8 +142,15 @@ for filename in input_files:
         out_subsamplename = INDIR.split("/")[-1]
 
         if "VLL" in samplename:
-            out_samplename = INDIR.split("/")[-3]
-            out_subsamplename = INDIR.split("/")[-1].split("_")[-2]+INDIR.split("/")[-1].split("_")[-1]
+            if not 'tau' in samplename:
+                out_samplename = INDIR.split("/")[-3]
+                out_subsamplename = INDIR.split("/")[-1].split("_")[-2]+INDIR.split("/")[-1].split("_")[-1]
+            if 'tau' in samplename and file_type == 'normal':
+                out_samplename = samplename.split('_')[0]
+                out_subsamplename = samplename.split('_')[1]+samplename.split('_')[2]
+
+        #print('test: sample    = '+out_samplename)
+        #print('test: subsample = '+out_subsamplename)
         
         #Naming Scheme:
         #outputtag_sample_subsample_filecount.root.

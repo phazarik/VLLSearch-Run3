@@ -27,7 +27,7 @@ void AnaScript::EventSelection(){
   if(!bad_event){
   
     //Selecting events in the order 4L>3L>2L
-    if((int)LightLepton.size()>3       && all_leptons_isolated)  evt_4L_incl = true;
+    if((int)LightLepton.size()>3       && all_leptons_isolated)  evt_4L_incl   = true;
     else if((int)LightLepton.size()==3 && all_leptons_isolated)  evt_3L        = true;
     else if((int)LightLepton.size()==2){
 	if(LightLepton.at(0).charge == (-1)*LightLepton.at(1).charge) evt_2LOS = true;

@@ -38,7 +38,7 @@ bool file_exists(TString filename){
   return file.good();
 }
 
-void DisplayText(TString text, int color){
+void DisplayText(TString text, int color=31){
   //ANSI COLOR CODE:
   //Black   = 30
   //Red     = 31
@@ -189,8 +189,8 @@ TH1F *DivideHists(TH1F *hst_num, TH1F*hst_den){
   int nbins = hst_num->GetNbinsX();
 
   //Idiot proofing:
-  if (!hst_num || !hst_den)  return nullptr;  
-  if (nbins != hst_den->GetNbinsX())  return nullptr;
+  if (!hst_num || !hst_den)          return nullptr;  
+  if (nbins != hst_den->GetNbinsX()) return nullptr;
 
   TH1F* hst_result = (TH1F*)hst_num->Clone("hst_result"); hst_result->Reset();
 
@@ -229,9 +229,9 @@ TH1F *GetSbyRootB(TH1F *sig, vector<TH1F*> bkg){
     cout<<"Error: Background is null!"<<endl;
     return nullptr;
   }
-  //TH1F * srb = (TH1F *)sig->Clone("copy");
-  //srb->Divide(rootb);
-  TH1F *srb = DivideHists(sig, rootb);
+  TH1F * srb = (TH1F *)sig->Clone("copy");
+  srb->Divide(rootb);
+  //TH1F *srb = DivideHists(sig, rootb);
 
   //print global S/sqrtB
   float nsig = sig->Integral();

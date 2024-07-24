@@ -73,16 +73,16 @@ void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2LSS_2018UL_Jul02_ttbarCR_ee";
+  TString jobname = "hist_2LSS_2018UL_Jul23_SR_em";
   //input_path = "../input_hists/"+jobname;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "for_RAC_ttbarCR_ee"; //Don't use special symbols (folder name)
-  tag2 = "TTBar CR (e-e channel)"; //This appears on the plot.
+  tag = "SR_em"; //Don't use special symbols (folder name)
+  tag2 = "Search region (e-#mu channel)"; //This appears on the plot.
   //QCDscale = 1.0;
   QCDscale = 0.284324926; //2024-04-30 for mu-mu or e-e channel
   //QCDscale = 0.549667774; //2024-06-19 for e-mu channel
@@ -362,7 +362,7 @@ void plot(TString var, TString name){
       cout<<"Data\t";
       cout<<hst_data->Integral()<<"\\pm"<<GetStatUncertainty(hst_data);
       cout<<fixed<<setprecision(5);
-      cout<<"\t (SF= "<<hst_data->Integral()/hst_data->GetEntries()<<" )";
+      //cout<<"\t (SF= "<<hst_data->Integral()/hst_data->GetEntries()<<" )";
       cout<<defaultfloat<<endl;
     }
     Double_t sum_bkg = 0;
@@ -428,6 +428,8 @@ void plot(TString var, TString name){
     if(toZoom) sbyrb->GetXaxis()->SetRangeUser(xmin, xmax);
     if(!toOverlayData) sbyrb->Draw("ep");
   }
+  else DisplayText("Warning: SbyRootB is null!");
+  canvas->Update();
   
   //obs/exp
   globalObsbyExp =0;
@@ -459,6 +461,7 @@ void plot(TString var, TString name){
     line->Draw("same");
     ratiohist->Draw("ep same"); //I want the ratio to be on top.
   }
+  canvas->Update();
   
   mainPad->cd();
   

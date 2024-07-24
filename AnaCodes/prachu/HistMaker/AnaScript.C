@@ -197,24 +197,25 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++; //only good events
     h.nevt->Fill(1);
 
-    triggerRes=true; //default, always true for MC
-    bool muon_trigger = false;
-    bool electron_trigger = false;
+    triggerRes         = true; //default, always true for MC
+    muon_trigger       = false;
+    electron_trigger   = false;
+    overlapping_events = false;
 
     if     (_year==2016) {
-      muon_trigger =     (*HLT_IsoMu24==1);
+      muon_trigger     = (*HLT_IsoMu24==1);
       electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
     else if(_year==2017) {
-      muon_trigger =     (*HLT_IsoMu27==1);
+      muon_trigger     = (*HLT_IsoMu27==1);
       electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
     else if(_year==2018) {
-      muon_trigger =     (*HLT_IsoMu24==1);
+      muon_trigger     = (*HLT_IsoMu24==1);
       electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
 
-    bool overlapping_events = muon_trigger && electron_trigger;
+    overlapping_events = muon_trigger && electron_trigger;
     
     //Checking trigger flags before:
     if(muon_trigger)       h.count[0]->Fill(0); else h.count[0]->Fill(1);
@@ -229,6 +230,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(6); //only 27 pass
     if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(7); //only 32 pass
 
+    //Update triggerRes only in case of data.
     if(_data==1){
       triggerRes = (muon_trigger || electron_trigger);
       //This is the union of both datasets (may overlap).
@@ -397,7 +399,8 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Investigating 2muSS:
       //Make2LSSPlots();
-      MakebJetSFPlots();
+      //MakebJetSFPlots();
+      if(!bad_event) MakeSignalPlots(1.0);
 
       /*
       //lumiscaling:

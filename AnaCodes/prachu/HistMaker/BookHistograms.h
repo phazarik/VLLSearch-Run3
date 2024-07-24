@@ -9,9 +9,7 @@ void AnaScript::BookHistograms(){
   h.evtweight[5] = new TH1F("wt_jec","Jet Energy Correction for each Jet",200,0,2);
   h.evtweight[6] = new TH1F("wt_jer","Jet Energy Resolution Correction for each Jet",200,0,2);
   h.evtweight[7] = new TH1F("wt_jecjer","JEC*JER for each Jet",200,0,2);
-  //for(int i=0; i<3; i++)h.evtweight[i]->Sumw2();
-  //h.evtweight[5] = new TH1F("wt_evt_qcd","Event weight (QCD)",200,0,2);
-  //h.evtweight[6] = new TH1F("wt_evt_final","Final Event weight (lumi-scaled)",2000,0,0.1);
+  //More of these below.
 
   //Checking the triggers:
   h.hist[0] = new TH1F("Flag_goodVertices", "Flag_goodVertices", 5, 0, 5);
@@ -86,7 +84,6 @@ void AnaScript::BookHistograms(){
   for(int i=0; i<4; i++)h.bjet[i]->Sumw2();*/
 
   //SignalStudy:
-  /*
   h.sig[0] = new TH1F("genPart_pdgId_all", "genPart_pdgId_all", 2000, -1000, 1000);
   h.vll[0] = new TH1F("nvll",         "nvll",          10, 0, 10);
   h.vll[1] = new TH1F("allvll_pt",    "allvll_pt",   1000,0,1000);
@@ -104,7 +101,7 @@ void AnaScript::BookHistograms(){
   h.vln[4] = new TH1F("allvlnu_mass",  "allvlnu_mass", 2500,0,2500);
   h.vln[5] = new TH1F("allvlnu_charge","allvlnu_charge",    6,-3,3);
   h.vln[6] = new TH1F("allvlnu_decay", "allvlnu_decay",    5, 0, 5);
-  h.vln[7] = new TH1F("allvlnu_daughers", "allvll_daughers", 100, -50, 50);*/
+  h.vln[7] = new TH1F("allvlnu_daughers", "allvll_daughers", 100, -50, 50);
 
   // VLL pair production final states:
   h.sig[1] = new TH1F("finalstates_for_LL", "finalstates for LL", 10, 0, 10);
@@ -171,7 +168,25 @@ void AnaScript::BookHistograms(){
   h.flav[3] = new TH1F("all_lep_flav_raw", "lep flav (all)", 40, -20, 20);
   h.flav[4] = new TH1F("lep0_flav_raw", "lep0 flav", 40, -20, 20);
   h.flav[5] = new TH1F("lep1_flav_raw", "lep1 flav", 40, -20, 20);
-  for(int i=0; i<6; i++) h.flav[i]->Sumw2();*/
+  for(int i=0; i<6; i++) h.flav[i]->Sumw2();
+
+  //Weights check:
+  h.evtweight[8]  = new TH1F("SS_jec",   "Jet Energy Correction for each Jet",200,0,2);
+  h.evtweight[9]  = new TH1F("SS_jer",   "Jet Energy Resolution Correction for each Jet",200,0,2);
+  h.evtweight[10] = new TH1F("SS_jecjer","JEC*JER for each Jet",200,0,2);
+  h.evtweight[11] = new TH1F("SS_SFwt",  "Reco-ID-Iso Scale Factor",200,0,2);
+  h.evtweight[12] = new TH1F("SS_trigwt","Trigger Scale Factor",200,0,2);
+  h.evtweight[13] = new TH1F("SS_bjetwt","bJet weight",200,0,2);
+  h.evtweight[14] = new TH1F("SS_evtwt", "Event weight",200,0,2);
+  for(int i=0; i<14; i++) h.evtweight[i]->Sumw2();
+
+  //Trigger check:
+  h.flag[0] = new TH1F("SS_HLT_IsoMu24",           "HLT_IsoMu24", 5, 0, 5);
+  h.flag[1] = new TH1F("SS_HLT_IsoMu27",           "HLT_IsoMu27", 5, 0, 5);
+  h.flag[2] = new TH1F("SS_HLT_Ele27_WPTight_Gsf", "HLT_Ele27_WPTight_Gsf", 5, 0, 5);
+  h.flag[3] = new TH1F("SS_HLT_Ele32_WPTight_Gsf", "HLT_Ele32_WPTight_Gsf", 5, 0, 5);
+  h.flag[4] = new TH1F("SS_overlap",               "0:all, 1:mu, 2:ele, 3:overlap", 5, 0, 5);
+  for(int i=0; i<5; i++) h.flag[i]->Sumw2();*/
   
   /*
   //Gen-Level study:
@@ -200,6 +215,7 @@ void AnaScript::BookHistograms(){
   
   for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();*/
 
+  /*
   h.btagsf[0] = new TH1F("JetHadronFlavor_all", "JetHadronFlavor_all", 10, -2, 8);
   //2D plots for bTagSF calculation:
   float x_bin_pT[10] = {20,30,50,70,100,140,200,300,600,1000};
@@ -209,6 +225,6 @@ void AnaScript::BookHistograms(){
   h.cJets[0] = new TH2F("cJet_PtEta","cJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.cJets[1] = new TH2F("cJet_Mis_PtEta","cJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.lJets[0] = new TH2F("LightJet_PtEta","LightJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
-  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);*/
   
 }

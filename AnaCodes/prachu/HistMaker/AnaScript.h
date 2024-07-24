@@ -584,7 +584,7 @@ public:
   struct Hists {
     //Histograms are declared here.
     TH1F *nevt;
-    TH1F *evtweight[10];
+    TH1F *evtweight[20];
     TH1F *hist[50];
     //Object level hists:
     TH1F *mu[10]; TH1F *ele[10]; TH1F *llep[10];
@@ -597,7 +597,7 @@ public:
     TH1F *evt2muSS[50];
     TH1F *btagsf[10];
     TH2F *bJets[5],*cJets[5],*lJets[5];
-    TH1F *flav[10];
+    TH1F *flav[10], *flag[10];
     TH1F *count[10];
     TH1F *chargeflip[10];
     
@@ -678,6 +678,11 @@ private:
   vector<Particle> ForwardJet, ForwardMediumbJet; //for uttsavi
   vector<Particle> LooseLepton; //Loose objects
 
+  //Flags::
+  bool muon_trigger, electron_trigger, overlapping_events;
+  bool evt_trigger;
+  bool bad_event; //For flagging out signal
+  
   //Counters:
   int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
@@ -686,11 +691,9 @@ private:
 
   //FinalStates:
   bool evt_1L0J, evt_1L1J, evt_1L2J_incl, evt_2LOS, evt_2LSS, evt_3L, evt_4L_incl;
-  bool evt_trigger;
-  double evt_wt;
 
-  //For signal:
-  bool bad_event;
+  //Weights:
+  double evt_wt;
 
   time_t start, end, buffer;
 
