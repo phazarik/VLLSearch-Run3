@@ -18,7 +18,7 @@ void AnaScript::MakeSignalPlots(float wt){
     h.vll[2]->Fill( vllep.at(i).v.Eta(), wt);
     h.vll[3]->Fill( vllep.at(i).v.Phi(), wt);
     h.vll[4]->Fill( vllep.at(i).v.M(),   wt);
-    h.vll[5]->Fill( vllep.at(i).charge,  wt);
+    h.vll[5]->Fill( vllep.at(i).pdgid,  wt);
     for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
       h.vll[6] -> Fill(vllep.at(i).decaymode);
       h.vll[7] -> Fill(vllep.at(i).dauid[j]); //j-th daugher of the i-th particle
@@ -32,7 +32,7 @@ void AnaScript::MakeSignalPlots(float wt){
     h.vln[2]->Fill( vlnu.at(i).v.Eta(), wt);
     h.vln[3]->Fill( vlnu.at(i).v.Phi(), wt);
     h.vln[4]->Fill( vlnu.at(i).v.M(),   wt);
-    h.vln[5]->Fill( vlnu.at(i).charge,  wt);
+    h.vln[5]->Fill( vlnu.at(i).pdgid,  wt);
     for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
       h.vln[6] -> Fill(vlnu.at(i).decaymode);
       h.vln[7] -> Fill(vlnu.at(i).dauid[j]); //j-th daugher of the i-th particle

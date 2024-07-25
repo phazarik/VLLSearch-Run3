@@ -466,6 +466,7 @@ public :
   float getEventWeight();
 
   //For specific studies:
+  void MakeBasicEvtPlots(); //Plots with Electron, Muon, Jet and MediumbJet
   void MakeSignalPlots(float wt);
   void Make_gen2LSS_plots(float wt);
   void Make2muSSPlots();
@@ -591,6 +592,7 @@ public:
     TH1F *pho[10];TH1F *tau[10];
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
+    TH1F *basic[50];
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
     TH1F *evt2LSS[50];
     TH1F *gen2LSS[50];

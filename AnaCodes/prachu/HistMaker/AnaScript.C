@@ -17,6 +17,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 //#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/basic_study.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
@@ -333,7 +334,6 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
-      /*
       //Basic object-level plots:
       //Electrons
       h.ele[0]->Fill((int)Electron.size());
@@ -351,6 +351,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.mu[3]->Fill(Muon.at(i).v.Phi(), evt_wt);
 	h.mu[4]->Fill(Muon.at(i).reliso03, evt_wt);
       }
+      /*
       //Photons
       h.pho[0]->Fill((int)Photon.size());
       for(int i=0; i<(int)Photon.size(); i++){
@@ -365,7 +366,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.tau[1]->Fill(Tau.at(i).v.Pt(), evt_wt);
 	h.tau[2]->Fill(Tau.at(i).v.Eta(), evt_wt);
 	h.tau[3]->Fill(Tau.at(i).v.Phi(), evt_wt);
-      }
+	}*/
       //Jets
       h.jet[0]->Fill((int)Jet.size());
       for(int i=0; i<(int)Jet.size(); i++){
@@ -374,12 +375,13 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.jet[3]->Fill(Jet.at(i).v.Phi(), evt_wt);
       }
       //bJets
-      h.bjet[0]->Fill((int)bJet.size());
-      for(int i=0; i<(int)bJet.size(); i++){
-	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evt_wt);
-	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evt_wt);
-	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evt_wt);
-	}*/
+      h.bjet[0]->Fill((int)MediumbJet.size());
+      for(int i=0; i<(int)MediumbJet.size(); i++){
+	h.bjet[1]->Fill(MediumbJet.at(i).v.Pt(), evt_wt);
+	h.bjet[2]->Fill(MediumbJet.at(i).v.Eta(), evt_wt);
+	h.bjet[3]->Fill(MediumbJet.at(i).v.Phi(), evt_wt);
+      }
+      MakeBasicEvtPlots();
 
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.
