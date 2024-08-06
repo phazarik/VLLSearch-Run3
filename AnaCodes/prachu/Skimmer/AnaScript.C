@@ -126,7 +126,10 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++; //only good events
 
     triggerRes=true; //default, always true for MC
+    //In the skimmer, I am keeping all events from data, including the overcounted ones.
+    //This is because I have the control to play with the trigger paths later.
 
+    /*
     if(_data==1){
       triggerRes=false;
       bool muon_trigger = false;
@@ -137,16 +140,13 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       bool overlapping_events = muon_trigger && electron_trigger;
 
-      /*
       triggerRes = muon_trigger || electron_trigger;
       //This is the union of both datasets (may overlap).
       //Removing the overlapping events from the EGamma dataset as follows:
-      if(_flag == "egamma" && overlapping_events) triggerRes = false;*/
+      if(_flag == "egamma" && overlapping_events) triggerRes = false;
 
       triggerRes = true;
-      //In the skimmer, I am keeping all events from data, including the overcounted ones.
-      //This is because I have the control to play with the trigger paths later.
-    }
+    }*/
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events
@@ -167,6 +167,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       bJet.clear();
       MediumbJet.clear();
       LooseLepton.clear();
+      LooseMuon.clear();
+      LooseElectron.clear();
       //For Uttsavi:
       ForwardJet.clear();
       ForwardMediumbJet.clear();

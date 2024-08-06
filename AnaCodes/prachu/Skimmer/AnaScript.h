@@ -493,7 +493,7 @@ public:
     TH2F *bJets[5],*cJets[5],*lJets[5];
     
   };
-  struct Particle {
+   struct Particle {
     TLorentzVector v;
     int id;
     int ind;
@@ -501,16 +501,22 @@ public:
     int charge;
     int momid;
     int status;
-    int pdgid;
+    //Isolation:
     float sip3d;
     float reliso03;
     float reliso04;
+    //Calorimeter information
+    float hovere;
+    float r9;
+    //MVA/NN Score:
+    float btagscore;
+    //Gen-level information:
+    int pdgid;
+    int genindex;
+    int hadronflavor;
+    int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
     vector<int> dauind; //indices of the daughters (GenPart only)
     vector<int> dauid; //pdgid of the daughters (GenPart only)
-    int decaymode; //For VLL, 0-stable, 1-W, 2-Z, 3-Higgs
-    float btagscore;
-    int hadronflavor;
-    int genindex;
   };
 
   //Functions that involve the 'Particle' type objects:
@@ -544,7 +550,7 @@ private:
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet;
   vector<Particle> MediumbJet;
   vector<Particle> ForwardJet, ForwardMediumbJet; //for uttsavi
-  vector<Particle> LooseLepton; //Loose objects
+  vector<Particle> LooseLepton, LooseMuon, LooseElectron; //Loose objects
 
   //Counters:
   int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;

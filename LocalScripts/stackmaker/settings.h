@@ -164,7 +164,8 @@ void SetFillColorFromLineColor(THStack *stack) {
       TH1 *hist = static_cast<TH1*>(obj);
       //if(!hist) DisplayText("Warning: nullptr for "+(TString *)hist->GetName(), 31);
       hist->SetFillColor(hist->GetLineColor());
-      hist->SetLineColor(kBlack);
+      hist->SetLineColor(hist->GetLineColor());
+      //hist->SetLineColor(kBlack);
       //hist->SetLineWidth(1);
     }
   }

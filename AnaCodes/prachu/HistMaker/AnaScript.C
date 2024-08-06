@@ -213,7 +213,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     }
     else if(_year==2018) {
       muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1) || (*HLT_Ele27_WPTight_Gsf);
     }
 
     overlapping_events = muon_trigger && electron_trigger;
@@ -323,6 +323,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       bJet.clear();
       MediumbJet.clear();
       LooseLepton.clear();
+      LooseElectron.clear();
+      LooseMuon.clear();
       //For Uttsavi:
       ForwardJet.clear();
       ForwardMediumbJet.clear();
@@ -399,10 +401,9 @@ Bool_t AnaScript::Process(Long64_t entry)
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
-      //Investigating 2muSS:
-      //Make2LSSPlots();
+      Make2LSSPlots();
       //MakebJetSFPlots();
-      if(!bad_event) MakeSignalPlots(1.0);
+      //if(!bad_event) MakeSignalPlots(1.0);
 
       /*
       //lumiscaling:

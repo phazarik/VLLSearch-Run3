@@ -64,25 +64,24 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax, int _rebin){
-
-  //void makestack(){
+//void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax, int _rebin){
+void makestack(){
 
   time_t start, end;
   time(&start);
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2LSS_2018UL_Jul23_SR_em";
+  TString jobname = "hist_2LSS_2018UL_Jul22_SR_mm";
   //input_path = "../input_hists/"+jobname;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = true;
+  toSave = false;
   toLog = true;
   toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "SR_em"; //Don't use special symbols (folder name)
-  tag2 = "Search region (e-#mu channel)"; //This appears on the plot.
+  tag = "SR_mm"; //Don't use special symbols (folder name)
+  tag2 = "Search region (#mu-#mu channel)"; //This appears on the plot.
   //QCDscale = 1.0;
   QCDscale = 0.284324926; //2024-04-30 for mu-mu or e-e channel
   //QCDscale = 0.549667774; //2024-06-19 for e-mu channel
@@ -97,12 +96,12 @@ void makestack(TString _var, TString _name, int _nbins, float _xmin, float _xmax
   };
 
   vector<plotdata> p = {
-    {_var, _name, _nbins, _xmin, _xmax, _rebin}
+    //{_var, _name, _nbins, _xmin, _xmax, _rebin}
     //Parameters : branch name, plot name, nbins, xmin, xmax, rebin
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 5},
+    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 2},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
     //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="NNscore", .name="NNScore",200, 0, 1, 5},
@@ -325,6 +324,12 @@ void plot(TString var, TString name){
   bkg = nulls_removed;  
   TH1F *hst_qcd = bkg[0]; //Assuming qcd isn't null
 
+  TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
+  for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
+  allbkg->SetFillStyle(3004);
+  allbkg->SetFillColor(kGray+3);
+  allbkg->SetMarkerSize(0); //No marker
+ 
   //################
   //Managing signal:
   sig1 = get_hist(var, "VLLD", "ele_M100", 8608.00);
@@ -343,12 +348,20 @@ void plot(TString var, TString name){
   if(hst_egamma) hst_data->Add(hst_egamma);
   hst_data->SetName("Data (2018)");
 
-  //Sorting the background collection and stacking:
+  //###############
+  //Stacking:
   std::sort(bkg.begin(), bkg.end(), compareHists);
   bkgstack = new THStack("Stacked",var+";"+var+";Events");
   for(int i=0; i<(int)bkg.size(); i++) bkgstack->Add(bkg[i]);
   SetFillColorFromLineColor(bkgstack);
   bkgstack->SetTitle("");
+  //Adjusting the topmost histogram in the stack:
+  /*
+  TList* histlist = bkgstack->GetHists();
+  int histnum = histlist->GetSize();
+  TH1* last = nullptr;
+  if(histnum>0) last = (TH1*)histlist->At(histnum-1);
+  if(last) last->SetLineColor(kBlack);*/
   
   //----------------------------------------------------------------------------
   //ON SCREEN DISPLAYS:
@@ -408,7 +421,12 @@ void plot(TString var, TString name){
 
   //Now draw the rest.
   if(toOverlayData) hst_data->Draw("ep same");
-  bkgstack->Draw("hist same");
+  bkgstack->Draw("hist same"); //Stacked (total) background
+  allbkg->Draw("E2 same");     //Uncertainty on the total background
+  TH1F *allbkg2 = (TH1F*) allbkg->Clone();
+  allbkg2->SetFillColor(0);
+  allbkg2->SetLineColor(kGray+3);
+  allbkg2->Draw("hist same");  //Black hist over the stack
   if(sig1) sig1->Draw("HIST same");
   if(sig2) sig2->Draw("HIST same");
   if(sig3) sig3->Draw("HIST same");
@@ -448,8 +466,6 @@ void plot(TString var, TString name){
     line->SetLineWidth(2);
     
     //Calculating the uncertainty on the background in each bin:
-    TH1F *allbkg = (TH1F *)bkg[0]->Clone(); allbkg->Reset();
-    for(int i=0; i<(int)bkg.size(); i++) allbkg->Add(bkg[i]);
     TGraphErrors *err = GetUncertainty(allbkg);
     err->GetYaxis()->SetNdivisions(5, kTRUE);
     err->SetStats(0);
@@ -467,8 +483,8 @@ void plot(TString var, TString name){
   
   put_text("CMS", 0.10, 0.93, 62, 0.06);
   put_text("preliminary", 0.18, 0.93, 52, 0.05);
-  put_latex_text(tag2+"", 0.35, 0.93, 42, 0.04);
-  put_latex_text("(2018) 59.8 fb^{-1}", 0.61, 0.93, 42, 0.04);
+  put_latex_text(tag2+"", 0.33, 0.93, 42, 0.04);
+  put_latex_text("59.8 fb^{-1} (2018)", 0.61, 0.93, 42, 0.04);
 
   TLegend *lg = create_legend(0.76, 0.30, 0.95, 0.90);
   if(toOverlayData){

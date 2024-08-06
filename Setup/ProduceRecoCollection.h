@@ -15,10 +15,12 @@ void AnaScript::createLightLeptons(){
     temp.reliso03 = Muon_pfRelIso03_all[i];
     temp.reliso04 = Muon_pfRelIso04_all[i];
     temp.genindex = -1;
+    temp.hovere   = -999;
+    temp.r9       = -999;
     
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4; 
     bool promptmuon = fabs(Muon_dxy[i])<0.05 && fabs(Muon_dz[i])<0.1;
-    bool passcut_loosemuon  = ptetacut && promptmuon && Muon_looseId[i] && Muon_pfRelIso03_all[i]<0.30;
+    bool passcut_loosemuon  = ptetacut && promptmuon && Muon_looseId[i] &&  Muon_pfRelIso03_all[i]<0.30;
     bool passcut_mediummuon = ptetacut && promptmuon && Muon_mediumId[i] && Muon_pfRelIso03_all[i]<0.15; //warning
 
     if(passcut_mediummuon){
@@ -27,6 +29,7 @@ void AnaScript::createLightLeptons(){
     }
     if(passcut_loosemuon){
       LooseLepton.push_back(temp);
+      LooseMuon.push_back(temp);
     }
   }//for muons
 
@@ -36,13 +39,15 @@ void AnaScript::createLightLeptons(){
     temp.v.SetPtEtaPhiM(Electron_pt[i],Electron_eta[i],Electron_phi[i],0.000511); 
     temp.id = -11*Electron_charge[i];
     temp.ind = i;
-    temp.charge = Electron_charge[i];
-    temp.sip3d  = Electron_sip3d[i];
+    temp.charge   = Electron_charge[i];
+    temp.sip3d    = Electron_sip3d[i];
     temp.reliso03 = Electron_pfRelIso03_all[i];
     temp.genindex = -1;
+    temp.hovere   = Electron_hoe[i];
+    temp.r9       = Electron_r9[i];
 
     bool ptetacut = temp.v.Pt()>10 && fabs(temp.v.Eta())<2.4;
-    bool cleaned_from_muons = clean_from_array(temp, Muon, 0.5);
+    bool cleaned_from_muons = clean_from_array(temp, LooseMuon, 0.4);
     bool isprompt = false;
     if(fabs(temp.v.Eta())<=1.479){//for barrel
       if(fabs(Electron_dxy[i])<0.05 && fabs(Electron_dz[i])<0.1)
@@ -61,6 +66,7 @@ void AnaScript::createLightLeptons(){
     }
     if(passcut_looseele){
       LooseLepton.push_back(temp);
+      LooseElectron.push_back(temp);
     }
   }//For electrons
   

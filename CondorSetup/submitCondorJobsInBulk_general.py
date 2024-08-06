@@ -33,14 +33,14 @@ lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
 mode = "hist"             #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'normal'     #Options: 'normal', 'skimmed'
+file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 
 #################################
 # Select which samples to run on:
 #################################
-#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
+condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
 #condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
-condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "VLLS_tau"]
+#condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "VLLS_tau"]
 #condorsamples = ["VLLD_mu"]
 #condorsamples = ["SingleMuon", "EGamma"]
 #condorsamples = ["Rare", "WJetsNLO", "WWZ", "WZZ", "ZZZ"]
@@ -54,7 +54,7 @@ condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "VLLS_tau"]
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Jun18"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Aug05"
 #if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun17"
 else :
     if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
