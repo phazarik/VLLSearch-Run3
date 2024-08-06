@@ -14,9 +14,10 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/evt_2LSS_plots.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/targeting_2muss.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/gen_study.h"
-//#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/bJetScaleFactorCalculator.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 //#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/basic_study.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
@@ -197,24 +198,25 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++; //only good events
     h.nevt->Fill(1);
 
-    triggerRes=true; //default, always true for MC
-    bool muon_trigger = false;
-    bool electron_trigger = false;
+    triggerRes         = true; //default, always true for MC
+    muon_trigger       = false;
+    electron_trigger   = false;
+    overlapping_events = false;
 
     if     (_year==2016) {
-      muon_trigger =     (*HLT_IsoMu24==1);
+      muon_trigger     = (*HLT_IsoMu24==1);
       electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
     else if(_year==2017) {
-      muon_trigger =     (*HLT_IsoMu27==1);
+      muon_trigger     = (*HLT_IsoMu27==1);
       electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
     else if(_year==2018) {
-      muon_trigger =     (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+      muon_trigger     = (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1) || (*HLT_Ele27_WPTight_Gsf);
     }
 
-    bool overlapping_events = muon_trigger && electron_trigger;
+    overlapping_events = muon_trigger && electron_trigger;
     
     //Checking trigger flags before:
     if(muon_trigger)       h.count[0]->Fill(0); else h.count[0]->Fill(1);
@@ -229,6 +231,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(6); //only 27 pass
     if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(7); //only 32 pass
 
+    //Update triggerRes only in case of data.
     if(_data==1){
       triggerRes = (muon_trigger || electron_trigger);
       //This is the union of both datasets (may overlap).
@@ -320,6 +323,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       bJet.clear();
       MediumbJet.clear();
       LooseLepton.clear();
+      LooseElectron.clear();
+      LooseMuon.clear();
       //For Uttsavi:
       ForwardJet.clear();
       ForwardMediumbJet.clear();
@@ -331,7 +336,6 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       SortRecoObjects();
 
-      /*
       //Basic object-level plots:
       //Electrons
       h.ele[0]->Fill((int)Electron.size());
@@ -349,6 +353,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.mu[3]->Fill(Muon.at(i).v.Phi(), evt_wt);
 	h.mu[4]->Fill(Muon.at(i).reliso03, evt_wt);
       }
+      /*
       //Photons
       h.pho[0]->Fill((int)Photon.size());
       for(int i=0; i<(int)Photon.size(); i++){
@@ -363,7 +368,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.tau[1]->Fill(Tau.at(i).v.Pt(), evt_wt);
 	h.tau[2]->Fill(Tau.at(i).v.Eta(), evt_wt);
 	h.tau[3]->Fill(Tau.at(i).v.Phi(), evt_wt);
-      }
+	}*/
       //Jets
       h.jet[0]->Fill((int)Jet.size());
       for(int i=0; i<(int)Jet.size(); i++){
@@ -372,12 +377,13 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.jet[3]->Fill(Jet.at(i).v.Phi(), evt_wt);
       }
       //bJets
-      h.bjet[0]->Fill((int)bJet.size());
-      for(int i=0; i<(int)bJet.size(); i++){
-	h.bjet[1]->Fill(bJet.at(i).v.Pt(), evt_wt);
-	h.bjet[2]->Fill(bJet.at(i).v.Eta(), evt_wt);
-	h.bjet[3]->Fill(bJet.at(i).v.Phi(), evt_wt);
-	}*/
+      h.bjet[0]->Fill((int)MediumbJet.size());
+      for(int i=0; i<(int)MediumbJet.size(); i++){
+	h.bjet[1]->Fill(MediumbJet.at(i).v.Pt(), evt_wt);
+	h.bjet[2]->Fill(MediumbJet.at(i).v.Eta(), evt_wt);
+	h.bjet[3]->Fill(MediumbJet.at(i).v.Phi(), evt_wt);
+      }
+      MakeBasicEvtPlots();
 
       //----------------------------------------------------------------
       //Event-selection is done right after creating the object arrays.
@@ -395,9 +401,9 @@ Bool_t AnaScript::Process(Long64_t entry)
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
-      //Investigating 2muSS:
       Make2LSSPlots();
       //MakebJetSFPlots();
+      //if(!bad_event) MakeSignalPlots(1.0);
 
       /*
       //lumiscaling:

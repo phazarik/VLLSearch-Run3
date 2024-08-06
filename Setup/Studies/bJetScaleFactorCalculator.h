@@ -1,21 +1,27 @@
 void AnaScript::MakebJetSFPlots(){
+  
+  bool basic_evt_selection = true;
 
-  //Picking 2LSS events:
-  bool basic_evt_selection = false;
-
+  //Making sure all leptons are isolated:
   bool all_leptons_isolated = true;
   for(int i=0; i<(int)LightLepton.size(); i++){if(LightLepton.at(i).reliso03 > 0.15) all_leptons_isolated = false;}
-  
-  if((int)LightLepton.size()>=2){
-    if( fabs(LightLepton.at(0).id) == 11 && LightLepton.at(0).v.Pt() > 32 )      basic_evt_selection = true;
-    else if( fabs(LightLepton.at(0).id) == 13 && LightLepton.at(0).v.Pt() > 26 ) basic_evt_selection = true;
-  }
+  basic_evt_selection = basic_evt_selection && all_leptons_isolated;
 
-  //cout<<"Snippet works"<<endl;
+  //Picking 2L events:
+  bool trigger = false;
+  if((int)LightLepton.size()==2){
+    //Finding a triggerable object:
+    for(int i=0; i<(int)LightLepton.size(); i++){
+      if(      fabs(LightLepton.at(i).id) == 11 && LightLepton.at(i).v.Pt() > 32 ) trigger = true;
+      else if( fabs(LightLepton.at(i).id) == 13 && LightLepton.at(i).v.Pt() > 26 ) trigger = true;
+    }
+  }
+  basic_evt_selection = basic_evt_selection && trigger;
+
+  //Filling the 2D histograms:
   if(basic_evt_selection && _data==0){
 
     //Plotting all the candidates:
-
     for(int i=0; i<(int)Jet.size(); i++){
       
       h.btagsf[0]->Fill(Jet.at(i).hadronflavor);
@@ -27,9 +33,11 @@ void AnaScript::MakebJetSFPlots(){
 
       //For all the candiadtes that pass the b-tag medium threshold:
       bool medium_pass = Jet.at(i).btagscore > 0.2783;
+
       if(Jet.at(i).hadronflavor == 5 && medium_pass)      h.bJets[1]->Fill(Jet.at(i).v.Pt(), Jet.at(i).v.Eta()); //b-tagged b-candidate (true positive)
       else if(Jet.at(i).hadronflavor == 4 && medium_pass) h.cJets[1]->Fill(Jet.at(i).v.Pt(), Jet.at(i).v.Eta()); //b-tagged c-candidate (false positive) 
       else if(Jet.at(i).hadronflavor == 0 && medium_pass) h.lJets[1]->Fill(Jet.at(i).v.Pt(), Jet.at(i).v.Eta()); //b-tagged light-candidate (false positive) 
+
     }
 
   }

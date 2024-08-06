@@ -10,7 +10,7 @@ using namespace std;
 // ------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------
 
-double AnaScript::correctionlib_btagMCeff_2018UL(Particle jet){
+double AnaScript::correctionlib_btagMCeff_2018_UL(Particle jet){
 
 
   float LJetEff[3][9] = {{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0},  //eta: 0.0-0.8

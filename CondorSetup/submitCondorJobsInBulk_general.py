@@ -38,9 +38,13 @@ file_type = 'skimmed'     #Options: 'normal', 'skimmed'
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "SingleMuon", "EGamma"]
-#condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "SingleMuon"]
+condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
+#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
+#condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "VLLS_tau"]
+#condorsamples = ["VLLD_mu"]
 #condorsamples = ["SingleMuon", "EGamma"]
+#condorsamples = ["Rare", "WJetsNLO", "WWZ", "WZZ", "ZZZ"]
+#condorsamples = ["Rare", "WWZ", "WZZ", "ZZZ"]
 
 #_____________________________________________________________
 #
@@ -50,13 +54,20 @@ condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD
 #jsonfile = '../InputJsons/sample_database.json'
 jsonfile = '../InputJsons/lumidata_2018.json'
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Jun18"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Aug05"
 #if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun17"
 else :
     if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
     elif "2017" in campaign: nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2017"
     elif "2016" in campaign: nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2016"
 
+#Setting year:
+year = None
+if "2018" in campaign:   year = 2018
+elif "2017" in campaign: year = 2017
+elif "2016" in campaign: year = 2016
+
+#Setting codedir:
 codedir = None
 if   mode == "hist" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker"
 elif mode == "skim" : codedir = "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer"
@@ -110,11 +121,15 @@ for sample, subs in samplelist.items():
                         elif '2016' in campaign: input_path = nanoAOD_path + "/SingleMuon"
                     if sample == 'EGamma' and '2016' in campaign : input_path = nanoAOD_path + "UL2016Data/SingleElectron"
                     elif 'VLLS' in sample or 'VLLD' in sample:
-                        input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/2018/{sample.split('_')[0]}/{sample.split('_')[1]}"
+                        if not 'tau' in sample:
+                            input_path = f"/home/work/ykumar1/Work/VLLAnalysis_e-muLike/Samples/Signal/{year}/{sample.split('_')[0]}/{sample.split('_')[1]}"
+                        if 'tau' in sample:
+                            input_path = f"/home/work/alaha1/public/RunII_ULSamples/{year}/VLL"
 
                     if not ('VLL' in sample):
                         if campaign == '2016preVFP_UL':    input_path = input_path+"/preVFP"
                         elif campaign == '2016postVFP_UL': input_path = input_path+"/postVFP"
+
 
                 try: list_dirs = os.listdir(input_path)
                 except:
@@ -125,10 +140,11 @@ for sample, subs in samplelist.items():
 
                 #Correction for naming inconsistencies:
                 #1) EGamma -> Egamma
-                if not any(subsample in s for s in list_dirs) :
-                    print(f"Error with {sample}_{subsample} : files not found!")
-                    print('replacing G with g in EGamma ..')
-                    subsample = subsample.replace('G', 'g')
+                if sample == "EGamma":
+                    if not any(subsample in s for s in list_dirs) :
+                        print(f"Error with {sample}_{subsample} : files not found!")
+                        print('replacing G with g in EGamma ..')
+                        subsample = subsample.replace('G', 'g')
                 #2) M10to50 -> M10To50 in case of DrellYan 2016 samples  
                 if file_type != 'skimmed' and sample == 'DYJetsToLL' and '2016' in campaign:
                     print(f'replacing subsample from {subsample}', end=' ')
@@ -140,16 +156,21 @@ for sample, subs in samplelist.items():
                 #Setting the input directory
                 #The input directory is more fragmented in case of the regular nanoAOD files. 
                 indir = None
+                
+                if file_type == 'normal':
+                    if sample == 'WJetsNLO': indir = input_path
+                    
                 if file_type == 'skimmed' :
                     try: indir = input_path + "/"+ next((f for f in list_dirs if sample in f and subsample in f), None)
                     except :
                         print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
                         continue
                 else :
-                    try : indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
-                    except :
-                        print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
-                        continue
+                    if sample != "WJetsNLO": #Because it does not have a subdirectory:
+                        try : indir = input_path + "/"+ next((f for f in list_dirs if subsample in f), None)
+                        except :
+                            print(f'\033[91mWarning : {sample}_{subsample} not found.\033[0m')
+                            continue
 
                 #Skip if indir is empty:
                 exists = os.path.exists(indir)
@@ -171,7 +192,7 @@ for sample, subs in samplelist.items():
                 
 
                 #arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {campaign} {lep} {flag} {codedir} {mode} {debug}'
-                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {campaign} {lep} {flag} {codedir} {mode} {debug} {lumi}'
+                arguments = f'{jobname} {indir} {dumpdir} {sample}_{subsample} {data} {campaign} {lep} {flag} {codedir} {mode} {debug} {lumi} {file_type}'
                 processline = 'python3 createCondorJob.py '+arguments
 
                 if dryrun == True : print(processline)

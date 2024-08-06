@@ -6,11 +6,13 @@ void AnaScript::Make2LSSPlots(){
 
   //##################################################################################################
   //Corrections to Jets:
+  float jec = 1.0;
+  float jer = 1.0;
   if(_data == 0){
     for(int i=0; i<(int)Jet.size(); i++){
       
-      float jec = correctionlib_jetSF(Jet.at(i),"nom");
-      float jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+      jec = correctionlib_jetSF(Jet.at(i),"nom");
+      jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
       
       //Jet Energy Correction:
       Jet.at(i).v = Jet.at(i).v * jec;
@@ -25,76 +27,35 @@ void AnaScript::Make2LSSPlots(){
   
   //Picking events with exactly 2muons with same-sign, where the leading muon pT>26 GeV.
   bool basic_evt_selection = false;
-
-  /*
-  if((int)Muon.size()==2 && (int)Electron.size()==0){
-    if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge){
-      //basic_evt_selection = true;
-      n2muss++;
-      //n2lss++;
-    }
-  }
-  if((int)Muon.size()==1 && (int)Electron.size()==1){
-    if(Muon.at(0).v.Pt()>26 || Electron.at(0).v.Pt()>32){
-      if(Muon.at(0).charge == Electron.at(0).charge){
-	basic_evt_selection = true;
-	nemuss++;
-	//n2lss++;
-      }
-    }
-  }
-  if((int)Muon.size()==0 && (int)Electron.size()==2){
-    if(Electron.at(0).v.Pt()>32 && Electron.at(0).charge == Electron.at(1).charge){
-      //basic_evt_selection = true;
-      n2ess++;
-      //n2lss++;
-    }
-    }*/
-
   bool ee = false;
   bool em = false;
   bool mm = false;
 
+  //Offline cuts on the leptons:
   float ptcut_mu  = 26; if(_campaign=="2017_UL") ptcut_mu = 32;
-  float ptcut_ele = 35; 
+  float ptcut_ele = 35;
   
   if(LightLepton.size() == 2){
     if(LightLepton.at(0).charge == LightLepton.at(1).charge){
+
       int flav0 = fabs(LightLepton.at(0).id);
       int flav1 = fabs(LightLepton.at(1).id);
+      //At least one of these two leptons must satisfy the offline trigger cut.
+      bool offline_trigger = false;
+      if(      flav0 == 13 && LightLepton.at(0).v.Pt() > ptcut_mu)  offline_trigger = true;
+      else if (flav0 == 11 && LightLepton.at(0).v.Pt() > ptcut_ele) offline_trigger = true;
+      if(      flav1 == 13 && LightLepton.at(1).v.Pt() > ptcut_mu)  offline_trigger = true;
+      else if (flav1 == 11 && LightLepton.at(1).v.Pt() > ptcut_ele) offline_trigger = true;
       
-      if(flav0 == 13 && flav1 == 13){//mu-mu channel
-	if(LightLepton.at(0).v.Pt() > ptcut_mu){//Muon trigger
-	  n2muss++;
-	  mm = true;
-	}
+      if(offline_trigger){
+	if(     flav0 == 13 && flav1 == 13){ n2muss++; mm = true; }
+	else if(flav0 == 13 && flav1 == 11){ nemuss++; em = true; }
+	else if(flav0 == 11 && flav1 == 13){ nemuss++; em = true; }
+	else if(flav0 == 11 && flav1 == 11){ n2ess++;  ee = true; }
       }
-
-      else if(flav0 == 13 && flav1 == 11){//e-mu channel
-	if((LightLepton.at(0).v.Pt() > ptcut_mu) || (LightLepton.at(1).v.Pt() > ptcut_ele)){ //at least one object passes the offline ptcut
-	  nemuss++;
-	  em = true;
-	}
-      }
-      
-      else if(flav0 == 11 && flav1 == 13){//e-mu channel
-	if((LightLepton.at(0).v.Pt() > ptcut_ele) || (LightLepton.at(1).v.Pt() > ptcut_mu)){ //at least one object passes the offline ptcut
-	  nemuss++;
-	  em = true;
-	}
-      }
-      
-      else if(flav0 == 11 && flav1 == 11){//e-e channel
-	if(LightLepton.at(0).v.Pt() > ptcut_ele){//Electron trigger
-	  n2ess++;
-	  ee= true;
-	}
-      }
-      
-      else cout<<"This event is weird"<<endl;
     }
   }
-
+  
   //#######################
   // Select the channel :
   //
@@ -192,16 +153,20 @@ void AnaScript::Make2LSSPlots(){
     Float_t lep0_phi = (Float_t)LightLepton.at(0).v.Phi();
     Float_t lep0_iso = (Float_t)LightLepton.at(0).reliso03;
     Float_t lep0_sip3d = (Float_t)LightLepton.at(0).sip3d;
-    Float_t lep0_mt  = (Float_t)transv_mass(LightLepton.at(0).v.E(), LightLepton.at(0).v.Phi(), metpt, metphi);
+    Float_t lep0_mt    = (Float_t)transv_mass(LightLepton.at(0).v.E(), LightLepton.at(0).v.Phi(), metpt, metphi);
     Float_t lep0_deepjet = (Float_t)LightLepton.at(0).btagscore;
+    Float_t lep0_hovere  = (Float_t)LightLepton.at(0).hovere;
+    Float_t lep0_r9      = (Float_t)LightLepton.at(0).r9;
     //Second lepton
     Float_t lep1_pt  = (Float_t)LightLepton.at(1).v.Pt();
     Float_t lep1_eta = (Float_t)LightLepton.at(1).v.Eta();
     Float_t lep1_phi = (Float_t)LightLepton.at(1).v.Phi();
     Float_t lep1_iso = (Float_t)LightLepton.at(1).reliso03;
     Float_t lep1_sip3d = (Float_t)LightLepton.at(1).sip3d;
-    Float_t lep1_mt  = (Float_t)transv_mass(LightLepton.at(1).v.E(), LightLepton.at(1).v.Phi(), metpt, metphi);
+    Float_t lep1_mt    = (Float_t)transv_mass(LightLepton.at(1).v.E(), LightLepton.at(1).v.Phi(), metpt, metphi);
     Float_t lep1_deepjet = (Float_t)LightLepton.at(1).btagscore;
+    Float_t lep1_hovere  = (Float_t)LightLepton.at(1).hovere;
+    Float_t lep1_r9      = (Float_t)LightLepton.at(1).r9;
     //Dilepton system:
     TLorentzVector dilep = LightLepton.at(0).v + LightLepton.at(1).v;
     Float_t dilep_pt   = (Float_t)dilep.Pt();
@@ -231,26 +196,38 @@ void AnaScript::Make2LSSPlots(){
     basic_evt_selection = basic_evt_selection && dilep_mass>15; //syncing with skimmed version
 
     //The leading lepton is well-isolated:
-    bool baseline = basic_evt_selection && lep0_iso<0.15 && lep0_sip3d<20;
-
+    //bool baseline = basic_evt_selection && lep0_iso<0.15 && lep0_sip3d<20;
+    bool baseline = basic_evt_selection;
+    
+    //Vetoing DY in case of ee channel:
+    bool removed_dy_from_ee = true;
+    if(basic_evt_selection == ee){
+      if(76 < dilep_mass && dilep_mass < 106)
+	removed_dy_from_ee = false;
+    }
+    baseline = baseline && removed_dy_from_ee;
+    
     //Picking a QCD enhanced region:
     bool QCD_enhanced_region = baseline && ST<100 && (0.20<lep1_iso && lep1_iso<0.45);
     bool QCD_CR = QCD_enhanced_region && metphi<0;
     bool QCD_VR = QCD_enhanced_region && metphi>0;
     
     //Working region:
-    bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
+    //bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
+    bool isoregion = baseline && (lep1_iso<0.15 && lep1_sip3d<20); //Both leptons are isolated
     bool highSTiso = isoregion && ST>100; //Outisde the QCD control region
     bool highSTisoClean = highSTiso && fabs(dilep_eta)<5 && STfrac<0.8; 
 
     //Controlling ttbar:
+    bool topEnhanced = highSTisoClean && nbjet>=1;
     bool ttbarCR = highSTisoClean && nbjet>=2;
+    bool SR = highSTisoClean && nbjet==0;
 
     //DY enhanced region for charge misID measurement:
 
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = ttbarCR;
+    bool event_selection = basic_evt_selection;
     //---------------------------------------------
     
     //------------------------
@@ -311,6 +288,16 @@ void AnaScript::Make2LSSPlots(){
       h.evt2LSS[37]->Fill(dphi_metlep_max, wt);
       h.evt2LSS[38]->Fill(dphi_metlep_min, wt);
 
+      //Special variables:
+      if(fabs(LightLepton.at(0).id) == 11){
+	h.evt2LSS[39]->Fill(LightLepton.at(0).hovere, wt);
+	h.evt2LSS[40]->Fill(LightLepton.at(0).r9, wt);
+      }
+      if(fabs(LightLepton.at(1).id) == 11){
+	h.evt2LSS[41]->Fill(LightLepton.at(1).hovere, wt);
+	h.evt2LSS[42]->Fill(LightLepton.at(1).r9, wt);
+      }
+
       //flavor check:
       for(int i=0; i<(int)LightLepton.size(); i++){
 	h.flav[0]->Fill(fabs(LightLepton.at(i).id));
@@ -320,6 +307,25 @@ void AnaScript::Make2LSSPlots(){
       h.flav[2]->Fill(fabs(LightLepton.at(1).id));
       h.flav[4]->Fill(LightLepton.at(0).id);
       h.flav[5]->Fill(LightLepton.at(1).id);
+
+      //Weights check:
+      h.evtweight[8] ->Fill(jec);
+      h.evtweight[9] ->Fill(jer);
+      h.evtweight[10]->Fill(jec*jer);
+      h.evtweight[11]->Fill(lepIdIsoSF);
+      h.evtweight[12]->Fill(triggerEff);
+      h.evtweight[13]->Fill(bjetSF);
+      h.evtweight[14]->Fill(wt);
+
+      //Trigger check:
+      h.flag[0]->Fill(*HLT_IsoMu24, wt);
+      h.flag[1]->Fill(*HLT_IsoMu27, wt);
+      h.flag[2]->Fill(*HLT_Ele27_WPTight_Gsf, wt);
+      h.flag[3]->Fill(*HLT_Ele32_WPTight_Gsf, wt);
+      h.flag[4]->Fill((int)0, wt);
+      if(muon_trigger)       h.flag[4]->Fill((int)1, wt);
+      if(electron_trigger)   h.flag[4]->Fill((int)2, wt);
+      if(overlapping_events) h.flag[4]->Fill((int)3, wt); //Should not appear in EGamma dataset
 
     }//custom event selection
 

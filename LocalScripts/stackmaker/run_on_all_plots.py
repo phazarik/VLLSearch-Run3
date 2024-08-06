@@ -15,6 +15,13 @@ class PlotData:
 p = [
     #PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
     #PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    #PlotData(var="njet",    name="number of jets",        nbins=10, xmin=0, xmax=10, rebin=1),
+    #PlotData(var="lep0_pt",    name="Leading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    #PlotData(var="lep1_pt",    name="SubLeading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    #PlotData(var="lep1_mt",    name="SubLeading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    #PlotData(var="dilep_pt",   name="Dilep pT (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
+    #PlotData(var="LT",      name="LT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
+    #PlotData(var="metpt",   name="MET (GeV)",             nbins=200, xmin=0, xmax=200, rebin=2),
     
     PlotData(var="nlep",    name="number of leptons",     nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="njet",    name="number of jets",        nbins=10, xmin=0, xmax=10, rebin=1),
@@ -78,7 +85,7 @@ start_time = time.time()
 
 # Accessing elements of the vector
 count = 0
-for plot_data in p:
+for i, plot_data in enumerate(p):
     
     count = count+1
     #print(plot_data.var, plot_data.name, plot_data.nbins, plot_data.xmin, plot_data.xmax, plot_data.rebin)
@@ -95,7 +102,7 @@ for plot_data in p:
     #print("Executing :" + processline + " ... ", end = "\n")
     os.system(processline)
     #print("\033[033mSuccess.\033[0m")
-    #break
+    #if i==6: break
 
 end_time = time.time()
 time_taken = end_time-start_time

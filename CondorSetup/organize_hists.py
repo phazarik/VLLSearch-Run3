@@ -29,8 +29,8 @@ indict = json_data
 
 for sample, subdict in indict.items():
     for subsample, lumi in subdict.items():
-        #print(sample, subsample, lumi)
-        
+        print(sample, subsample, lumi)
+    
         indir = f'/home/work/phazarik1/work/CondorDump/output/{jobname}/{sample}_{subsample}_{date}'
         pathexists = os.path.exists(indir)
         if not pathexists: continue
@@ -47,7 +47,6 @@ for sample, subdict in indict.items():
         if dryrun : print(f'Processline = {hadd_command}')
         else : os.system(hadd_command)
         
-
         if test : break #subsample loop
     if test : break #sample loop
 
