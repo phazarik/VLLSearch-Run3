@@ -120,6 +120,8 @@ void AnaScript::Make2LSSPlots(){
     h.evtweight[3]->Fill(wt);
     
     //Finding the closest jet and plotting its deepjet score:
+    LightLepton.at(0).btagscore = -1;
+    LightLepton.at(1).btagscore = -1;
     float drmin0 = 1000; float drmin1=1000;
     int closest_Jet_index0=-1; int closest_Jet_index1=-1;
     for(int i=0; i<(int)Jet.size(); i++){
@@ -131,14 +133,12 @@ void AnaScript::Make2LSSPlots(){
 	closest_Jet_index0 = i;
 	LightLepton.at(0).btagscore = Jet.at(i).btagscore;
       }
-      else LightLepton.at(0).btagscore = -1;
       //Subleading muon:
       if(dr1temp < drmin1){
 	drmin1 = dr1temp;
 	closest_Jet_index1 = i;
 	LightLepton.at(1).btagscore = Jet.at(i).btagscore;
       }
-      else LightLepton.at(1).btagscore = -1;      
     }
 
     //Event level variabls:
@@ -206,28 +206,31 @@ void AnaScript::Make2LSSPlots(){
 	removed_dy_from_ee = false;
     }
     baseline = baseline && removed_dy_from_ee;
-    
-    //Picking a QCD enhanced region:
-    bool QCD_enhanced_region = baseline && ST<100 && (0.20<lep1_iso && lep1_iso<0.45);
-    bool QCD_CR = QCD_enhanced_region && metphi<0;
-    bool QCD_VR = QCD_enhanced_region && metphi>0;
-    
-    //Working region:
-    //bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
-    bool isoregion = baseline && (lep1_iso<0.15 && lep1_sip3d<20); //Both leptons are isolated
-    bool highSTiso = isoregion && ST>100; //Outisde the QCD control region
-    bool highSTisoClean = highSTiso && fabs(dilep_eta)<5 && STfrac<0.8; 
 
-    //Controlling ttbar:
-    bool topEnhanced = highSTisoClean && nbjet>=1;
-    bool ttbarCR = highSTisoClean && nbjet>=2;
-    bool SR = highSTisoClean && nbjet==0;
 
-    //DY enhanced region for charge misID measurement:
+    //August 2024:
+    //Step1 : Reducing QCD by picking prompt, high ST events:
+    bool prompt = lep0_sip3d < 5 && lep1_sip3d < 10;
+    bool ST200  = baseline && prompt && ST>200;
+
+    //Step2: QCD scaling (orthogonal to promptHighST)
+    bool QCDregion = baseline && ST<100;
+    bool QCDCR = QCDregion && 0.05<lep0_iso && lep0_iso<0.15;
+    bool QCDVR = QCDregion && lep0_iso<0.04;
+    if(basic_evt_selection == ee){
+      QCDCR = QCDCR && STfrac<0.65;
+      QCDVR = QCDVR && STfrac<0.65;
+    }
+
+    //General SR:
+    bool generalSigR = ST200 && nbjet==0;
+
+    //TTbarCR:
+    bool topEnhanced = ST200 && nbjet>0;
 
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = basic_evt_selection;
+    bool event_selection = generalSigR;
     //---------------------------------------------
     
     //------------------------

@@ -23,63 +23,63 @@ p = [
     #PlotData(var="LT",      name="LT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
     #PlotData(var="metpt",   name="MET (GeV)",             nbins=200, xmin=0, xmax=200, rebin=2),
     
-    PlotData(var="nlep",    name="number of leptons",     nbins=10, xmin=0, xmax=10, rebin=1),
-    PlotData(var="njet",    name="number of jets",        nbins=10, xmin=0, xmax=10, rebin=1),
-    PlotData(var="nbjet",   name="number of bjets",       nbins=10, xmin=0, xmax=10, rebin=1),
+    PlotData(var="nlep",    name="N_{L}",                 nbins=10, xmin=0, xmax=10, rebin=1),
+    PlotData(var="njet",    name="N_{J}",                 nbins=10, xmin=0, xmax=10, rebin=1),
+    PlotData(var="nbjet",   name="N_{bJ}",               nbins=10, xmin=0, xmax=10, rebin=1),
+
+    PlotData(var="HT",      name="H_{ T} (GeV)",           nbins=200, xmin=0, xmax=200, rebin=1),
+    PlotData(var="LT",      name="L_{T} (GeV)",           nbins=200, xmin=0, xmax=200, rebin=1),
+    PlotData(var="STvis",   name="H_{ T} + L_{T} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=5),
+    PlotData(var="ST",      name="S_{T} (GeV)",           nbins=200, xmin=0, xmax=200, rebin=5),
+    PlotData(var="STfrac",  name="L_{T}/S_{T}",           nbins=200, xmin=0, xmax=1.2, rebin=5),
+    PlotData(var="HTMETllpt", name="H_{ T} + p_{T}^{miss} + p_{T}^{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=5),
+    PlotData(var="metpt",   name="p_{T}^{miss} (GeV)",    nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="metphi",  name="#phi^{miss}",         nbins=200, xmin=-4, xmax=4, rebin=5),
+
+    PlotData(var="lep0_pt",    name="p_{T}(L_{0}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="lep0_eta",   name="#eta(L_{0})",        nbins=200, xmin=-4, xmax=4, rebin=5),
+    PlotData(var="lep0_phi",   name="#phi(L_{0})",        nbins=200, xmin=-4, xmax=4, rebin=5),
+    PlotData(var="lep0_mt",    name="m_{ T}(L_{0}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="lep0_iso",   name="reliso03 (L_{0})",   nbins=1000, xmin=0, xmax=10, rebin=5),
+    PlotData(var="lep0_sip3d", name="sip3d (L_{0})",      nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep0_deepjet", name="DeepJet score (J near L_{0})", nbins=300, xmin=-1, xmax=2, rebin=10),
+
+    PlotData(var="lep1_pt",    name="p_{T}(L_{1}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="lep1_eta",   name="#eta(L_{1})",        nbins=200, xmin=-4, xmax=4, rebin=5),
+    PlotData(var="lep1_phi",   name="#phi(L_{1})",        nbins=200, xmin=-4, xmax=4, rebin=5),
+    PlotData(var="lep1_mt",    name="m_{ T}(L_{1}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="lep1_iso",   name="reliso03 (L_{1})",   nbins=1000, xmin=0, xmax=10, rebin=5),
+    PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep1_deepjet", name="DeepJet score (J near L_{1})", nbins=300, xmin=-1, xmax=2, rebin=10),
+
+    PlotData(var="dilep_pt",   name="p_{T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="dilep_eta",  name="#eta_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
+    PlotData(var="dilep_phi",  name="#phi_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
+    PlotData(var="dilep_mt",   name="m_{ T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="dilep_deta", name="#Delta#eta(L_{0}, L_{1})", nbins=200, xmin=0, xmax=6, rebin=5),
+    PlotData(var="dilep_dphi", name="#Delta#phi(L_{0}, L_{1})", nbins=200, xmin=0, xmax=6, rebin=5),
+    PlotData(var="dilep_dR",   name="#Delta R(L_{0}, L_{1})",   nbins=200, xmin=0, xmax=6, rebin=5),
+
+    PlotData(var="dilep_ptratio",   name="p_{T1} / p_{T0}",    nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="dphi_metlep0",    name="#Delta#phi(L_{0}, p_{T}^{miss})", nbins=200, xmin=0, xmax=4, rebin=5),
+    PlotData(var="dphi_metlep1",    name="#Delta#phi(L_{1}, p_{T}^{miss})", nbins=200, xmin=0, xmax=4, rebin=5),
+    PlotData(var="dphi_metdilep",   name="#Delta#phi(LL, p_{T}^{miss})", nbins=200, xmin=0, xmax=4, rebin=5),
+    PlotData(var="dphi_metlep_max", name="max(#Delta#phi(L, p_{T}^{miss}))", nbins=200, xmin=0, xmax=4, rebin=5),
+    PlotData(var="dphi_metlep_min", name="min(#Delta#phi(L, p_{T}^{miss}))", nbins=200, xmin=0, xmax=4, rebin=5),
+
+    PlotData(var="all_lep_flav_abs", name="L |id|",  nbins=20, xmin=0, xmax=20, rebin=1),
+    PlotData(var="lep0_flav_abs",    name="L_{0} |id|", nbins=20, xmin=0, xmax=20, rebin=1),
+    PlotData(var="lep1_flav_abs",    name="L_{1} |id|", nbins=20, xmin=0, xmax=20, rebin=1),
+    PlotData(var="all_lep_flav_raw", name="L id",       nbins=40, xmin=-20, xmax=20, rebin=1),
+    PlotData(var="lep0_flav_raw",    name="L_{0} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
+    PlotData(var="lep1_flav_raw",    name="L_{1} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
+
+    PlotData(var="dilep_mass", name="M_{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=2)
     
-    PlotData(var="LT",      name="LT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
-    PlotData(var="STvis",   name="HT+LT (GeV)",           nbins=200, xmin=0, xmax=200, rebin=5),
-    PlotData(var="ST",      name="ST (GeV)",              nbins=200, xmin=0, xmax=200, rebin=5),
-    PlotData(var="STfrac",  name="LT/ST",                 nbins=200, xmin=0, xmax=1.2, rebin=5),
-    PlotData(var="HTMETllpt",name="HT+MET+Dilep Pt (GeV)",nbins=200, xmin=0, xmax=200, rebin=5),
-    PlotData(var="metpt",   name="MET (GeV)",             nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="metphi",  name="MET phi",               nbins=200, xmin=-4, xmax=4, rebin=5),
-
-    PlotData(var="lep0_pt",    name="Leading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="lep0_eta",   name="Leading lepton eta",      nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="lep0_phi",   name="Leading lepton phi",      nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="lep0_mt",    name="Leading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="lep0_iso",   name="Leading lepton reliso03", nbins=1000, xmin=0, xmax=10, rebin=10),
-    PlotData(var="lep0_sip3d", name="Leading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
-    PlotData(var="lep0_deepjet", name="DeepJet score (near L0)", nbins=300, xmin=-1, xmax=2, rebin=10),
-
-    PlotData(var="lep1_pt",    name="SubLeading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="lep1_eta",   name="SubLeading lepton eta",      nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="lep1_phi",   name="SubLeading lepton phi",      nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="lep1_mt",    name="SubLeading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="lep1_iso",   name="SubLeading lepton reliso03", nbins=1000, xmin=0, xmax=10, rebin=10),
-    PlotData(var="lep1_sip3d", name="SubLeading lepton sip3d",    nbins=500, xmin=0, xmax=50, rebin=20),
-    PlotData(var="lep1_deepjet", name="DeepJet score (near L1)",  nbins=300, xmin=-1, xmax=2, rebin=10),
-    
-    PlotData(var="dilep_pt",   name="Dilep pT (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="dilep_eta",  name="Dilep eta",        nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="dilep_phi",  name="Dilep phi",        nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="dilep_mt",   name="Dilep mT (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="dilep_deta", name="deta(lep0, lep1)", nbins=200, xmin=0, xmax=6, rebin=5),
-    PlotData(var="dilep_dphi", name="dphi(lep0, lep1)", nbins=200, xmin=0, xmax=6, rebin=5),
-    PlotData(var="dilep_dR",   name="dR(lep0, lep1)",   nbins=200, xmin=0, xmax=6, rebin=5),
-
-    PlotData(var="dilep_ptratio",   name="pT1/pT0",            nbins=200, xmin=0, xmax=1, rebin=5),
-    PlotData(var="dphi_metlep0",    name="dphi(lep0, MET)",    nbins=200, xmin=0, xmax=4, rebin=5),
-    PlotData(var="dphi_metlep1",    name="dphi(lep1, MET)",    nbins=200, xmin=0, xmax=4, rebin=5),
-    PlotData(var="dphi_metdilep",   name="dphi(dilep, MET)",   nbins=200, xmin=0, xmax=4, rebin=5),
-    PlotData(var="dphi_metlep_max", name="max-dphi(lep, MET)", nbins=200, xmin=0, xmax=4, rebin=5),
-    PlotData(var="dphi_metlep_min", name="min-dphi(lep, MET)", nbins=200, xmin=0, xmax=4, rebin=5),
-
-    PlotData(var="all_lep_flav_abs", name="lep abs(id)",  nbins=20, xmin=0,   xmax=20, rebin=1),
-    PlotData(var="lep0_flav_abs",    name="lep0 abs(id)", nbins=20, xmin=0,   xmax=20, rebin=1),
-    PlotData(var="lep1_flav_abs",    name="lep1 abs(id)", nbins=20, xmin=0,   xmax=20, rebin=1),
-    PlotData(var="all_lep_flav_raw", name="lep id",       nbins=40, xmin=-20, xmax=20, rebin=1),
-    PlotData(var="lep0_flav_raw",    name="lep0 id",      nbins=40, xmin=-20, xmax=20, rebin=1),
-    PlotData(var="lep1_flav_raw",    name="lep1 id",      nbins=40, xmin=-20, xmax=20, rebin=1),
-
-    PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
-
     #PlotData(var="overlap_before_trigger", name="overlap before trigger", nbins=10, xmin=0, xmax=10, rebin=1),
     #PlotData(var="overlap_after_trigger",  name="overlap after trigger",  nbins=10, xmin=0, xmax=10, rebin=1),
     #PlotData(var="overlap_ofIsoEle27",     name="overlap of IsoEle27",    nbins=10, xmin=0, xmax=10, rebin=1)
-    ]
+]
 
 start_time = time.time()
 
@@ -88,6 +88,7 @@ count = 0
 for i, plot_data in enumerate(p):
     
     count = count+1
+    print(f'\n\033[93mPlot no: {count}\033[0m')
     #print(plot_data.var, plot_data.name, plot_data.nbins, plot_data.xmin, plot_data.xmax, plot_data.rebin)
 
     p1 = plot_data.var
@@ -98,7 +99,8 @@ for i, plot_data in enumerate(p):
     p6 = plot_data.rebin
 
     arguments = f'"{p1}", "{p2}", {p3}, {p4}, {p5}, {p6}'
-    processline = "root -q -b -l 'makestack.C("+arguments+")'"
+    #processline = "root -q -b -l 'makestack.C("+arguments+")'"
+    processline = "root -q -b -l 'makeplotForCMS.C("+arguments+")'"
     #print("Executing :" + processline + " ... ", end = "\n")
     os.system(processline)
     #print("\033[033mSuccess.\033[0m")
