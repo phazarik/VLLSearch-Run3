@@ -5,7 +5,9 @@
 void AnaScript::createLightLeptons(){
 
   //Muon block:
-  for(unsigned int i=0; i< (*nMuon); i++){
+  //unsigned int iterator_mu = (unsigned int)*(readerConfig->nMuon);
+  unsigned int iterator_mu = (unsigned int)*nMuon;
+  for(unsigned int i=0; i<iterator_mu ; i++){;
     Particle temp;
     temp.v.SetPtEtaPhiM(Muon_pt[i],Muon_eta[i],Muon_phi[i],0.105);
     temp.id = -13*Muon_charge[i];
@@ -34,7 +36,9 @@ void AnaScript::createLightLeptons(){
   }//for muons
 
   //Electron block:
-  for(unsigned int i=0; i< (*nElectron); i++){
+  //unsigned int iterator_ele = (unsigned int)*(readerConfig->nElectron);
+  unsigned int iterator_ele = (unsigned int)*nElectron;
+  for(unsigned int i=0; i<iterator_ele; i++){
     Particle temp;
     temp.v.SetPtEtaPhiM(Electron_pt[i],Electron_eta[i],Electron_phi[i],0.000511); 
     temp.id = -11*Electron_charge[i];
@@ -57,8 +61,8 @@ void AnaScript::createLightLeptons(){
       if(fabs(Electron_dxy[i])<0.1 && fabs(Electron_dz[i])<0.2)
 	isprompt = true;
     }
-    bool passcut_looseele  = ptetacut && isprompt && Electron_cutBased[i]>1 && Electron_pfRelIso03_all[i] < 1.0;
-    bool passcut_mediumele = ptetacut && isprompt && Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 0.15; //warning
+    bool passcut_looseele  = ptetacut && isprompt && (int)Electron_cutBased[i]>1 && Electron_pfRelIso03_all[i] < 1.0;
+    bool passcut_mediumele = ptetacut && isprompt && (int)Electron_cutBased[i]>2 && cleaned_from_muons && Electron_pfRelIso03_all[i] < 0.15; //warning
 
     if(passcut_mediumele){
       Electron.push_back(temp);
@@ -73,9 +77,9 @@ void AnaScript::createLightLeptons(){
 } 
 
 //_____________________________________________________________________
-
+/*
 void AnaScript::createPhotons(){
-  for(unsigned int i=0; i< (*nPhoton); i++){
+  for(unsigned int i=0; i<(unsigned int)*nPhoton; i++){
     Particle temp;
     temp.v.SetPtEtaPhiM(Photon_pt[i],Photon_eta[i],Photon_phi[i],0); 
     temp.id = 22*Photon_charge[i];
@@ -87,12 +91,14 @@ void AnaScript::createPhotons(){
     bool passcuts = ptetacut && Photon_pfRelIso03_all[i]<0.15;
     if(passcuts) Photon.push_back(temp);
   }
-}
+  }*/
 
 //_____________________________________________________________________
 
 void AnaScript::createTaus(){
-  for(unsigned int i=0; i< (*nTau); i++){
+  //unsigned int iterator = (unsigned int)*(readerConfig->nTau);
+  unsigned int iterator_tau = (unsigned int)*nTau;
+  for(unsigned int i=0; i<iterator_tau ; i++){
     //Set the energy corrections according the decay modes:
     float tlv_corr = 1.;
     if(_year==2016){
@@ -134,7 +140,9 @@ void AnaScript::createTaus(){
 //_____________________________________________________________________
 
 void AnaScript::createJets(){
-  for(unsigned int i=0; i< (*nJet); i++){
+  //unsigned int iterator_jet = (unsigned int)*(readerConfig->nJet);
+  unsigned int iterator_jet = (unsigned int)*nJet;
+  for(unsigned int i=0; i<iterator_jet; i++){
     Particle temp;
     temp.v.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
     temp.ind = i;
@@ -146,13 +154,13 @@ void AnaScript::createJets(){
     bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.4);
     //bool cleaned_from_muons = clean_from_array(temp, Muon, 0.4);
     //bool cleaned_from_taus = clean_from_array(temp, Tau, 0.5);
-    bool jetID = _year == 2016 ? Jet_jetId[i]>=1 : Jet_jetId[i]>=2; //if 2016, >=1; else >=2
+    bool jetID = _year == 2016 ? (int)Jet_jetId[i]>=1 : (int)Jet_jetId[i]>=2; //if 2016, >=1; else >=2
     bool passcut = ptetacut && cleaned_from_leptons && jetID;
     //bool passcut = ptetacut && jetID; //warning
     
     if(passcut && cleaned_from_leptons){
       Jet.push_back(temp);
-      if(Jet_btagDeepB[i]>0.2783)     MediumbJet.push_back(temp); //2018 //4184
+      if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp); //2018 //4184
       //if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp); //2018
     }
 

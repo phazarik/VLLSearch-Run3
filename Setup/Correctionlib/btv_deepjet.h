@@ -64,6 +64,7 @@ float AnaScript::correctionlib_btagWPSFfromPOG(Particle jet, string mode){
       if(flav==5 || flav==4){ sf = bcjet2016preVFP->evaluate(values);    }    
       else                  { sf = lightjet2016preVFP->evaluate(values); }
     }
+    else if( _campaign=="Summer22" ) return 1.0;
     else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
   }
 
@@ -106,10 +107,11 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
     else if (_campaign =="2017_UL")        WPth=0.3040;
     else if (_campaign =="2016preVFP_UL")  WPth=0.2598;
     else if (_campaign =="2016postVFP_UL") WPth=0.2489;
+    else if (_campaign =="Summer22")       return 1.0;
     else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
     
     // check if jet is tagged or not
-    if (Jet_btagDeepB[Jet.at(i).ind] > WPth){
+    if (Jet_btagDeepFlavB[Jet.at(i).ind] > WPth){
       jet_prob_data = jet_eff*SFfromPOG;
       jet_prob_mc   = jet_eff;
     }

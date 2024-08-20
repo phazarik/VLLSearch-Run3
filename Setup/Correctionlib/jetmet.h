@@ -33,6 +33,13 @@ auto jersfjson2016preVFP  = json2016preVFP->at(jersflabel2016preVFP);
 auto ptreslabel2016preVFP = "Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs";
 auto ptresjson2016preVFP  = json2016preVFP->at(ptreslabel2016preVFP);
 
+//auto json2022 = correction::CorrectionSet::from_file("/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/POG/JME/2022_Summer22/jet_jerc.json"); 
+//auto jecsflabel2022 = "Summer19UL17_V5_MC_Total_AK4PFchs";
+//auto jecsfjson2022  = json2022->at(jecsflabel2022);
+//auto jersflabel2022 = "Summer19UL17_JRV2_MC_ScaleFactor_AK4PFchs";
+//auto jersfjson2022  = json2022->at(jersflabel2022);
+//auto ptreslabel2022 = "Summer19UL17_JRV2_MC_PtResolution_AK4PFchs";
+//auto ptresjson2022  = json2022->at(ptreslabel2022);
 
 
 float AnaScript::correctionlib_jetSF(Particle jet, string mode){
@@ -51,6 +58,7 @@ float AnaScript::correctionlib_jetSF(Particle jet, string mode){
   else if( _campaign=="2017_UL" )        unc=jecsfjson2017->evaluate(values);
   else if( _campaign=="2016postVFP_UL" ) unc=jecsfjson2016postVFP->evaluate(values);
   else if( _campaign=="2016preVFP_UL" )  unc=jecsfjson2016preVFP->evaluate(values);
+  else if( _campaign=="Summer22" )       return 1.0;
   else cout<<"jetmet.h : Provide correct campaign name!"<<endl;
   
   if (      mode =="up"  ) {sf = 1.0+unc;}
@@ -76,6 +84,7 @@ float AnaScript::correctionlib_jetRF(Particle jet, vector<Particle> genJet, floa
   else if(_campaign == "2017_UL")        era = "2017";
   else if(_campaign == "2016preVFP_UL")  era = "2016preVFP";
   else if(_campaign == "2016postVFP_UL") era = "2016postVFP";
+  else if(_campaign == "Summer22")       return 1.0;
   else cout<<"jetmet.h : Provide correct campaign name!"<<endl;
   
   jersfvalues.emplace_back(eta);
@@ -89,19 +98,19 @@ float AnaScript::correctionlib_jetRF(Particle jet, vector<Particle> genJet, floa
   float cjer =1.0;
   
   if( _campaign=="2018_UL" ){
-    sjer  = jersfjson2018->evaluate(jersfvalues);
+    sjer     = jersfjson2018->evaluate(jersfvalues);
     sigmajer = ptresjson2018->evaluate(ptresvalues);
   }
   if( _campaign=="2017_UL" ){
-    sjer  = jersfjson2017->evaluate(jersfvalues);
+    sjer     = jersfjson2017->evaluate(jersfvalues);
     sigmajer = ptresjson2017->evaluate(ptresvalues);
   }
   if( _campaign=="2016postVFP_UL" ){
-    sjer  = jersfjson2016postVFP->evaluate(jersfvalues);
+    sjer     = jersfjson2016postVFP->evaluate(jersfvalues);
     sigmajer = ptresjson2016postVFP->evaluate(ptresvalues);
   }
   if( _campaign=="2016preVFP_UL" ){
-    sjer  = jersfjson2016preVFP->evaluate(jersfvalues);
+    sjer     = jersfjson2016preVFP->evaluate(jersfvalues);
     sigmajer = ptresjson2016preVFP->evaluate(ptresvalues);
   }
 

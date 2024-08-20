@@ -12,7 +12,17 @@ void AnaScript::Make2LSSPlots(){
     for(int i=0; i<(int)Jet.size(); i++){
       
       jec = correctionlib_jetSF(Jet.at(i),"nom");
-      jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+      float rho = 0.0;
+      if(ptr_fixedGridRhoFastjetAll != nullptr) rho = **ptr_fixedGridRhoFastjetAll;
+      //rho = *fixedGridRhoFastjetAll;
+      cout<<"Test: rho= "<<rho<<endl;
+      //------------------------------------  Note  -----------------------------------------
+      //ptr_fixedGridRhoFastjetAll is a pointer to a TTreeReaderValue<Float_t>.
+      //*ptr_fixedGridRhoFastjetAll gives you the TTreeReaderValue<Float_t> object.
+      //**ptr_fixedGridRhoFastjetAll gives you the actual float value stored in that object.
+      jer = correctionlib_jetRF(Jet.at(0),genJet,rho,"nom");
+      //-------------------------------------------------------------------------------------
+      //jer = correctionlib_jetRF(Jet.at(0),genJet,1.0,"nom");
       
       //Jet Energy Correction:
       Jet.at(i).v = Jet.at(i).v * jec;

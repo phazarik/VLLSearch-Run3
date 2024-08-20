@@ -141,7 +141,7 @@ for filename in input_files:
         out_samplename = INDIR.split("/")[-2]
         out_subsamplename = INDIR.split("/")[-1]
 
-        if "VLL" in samplename:
+        if "VLL" in samplename and "legacy" not in samplename:
             if not 'tau' in samplename:
                 out_samplename = INDIR.split("/")[-3]
                 out_subsamplename = INDIR.split("/")[-1].split("_")[-2]+INDIR.split("/")[-1].split("_")[-1]

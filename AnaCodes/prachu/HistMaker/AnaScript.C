@@ -47,7 +47,7 @@ void AnaScript::Begin(TTree * /*tree*/)
 }
 
 void AnaScript::SlaveBegin(TTree * /*tree*/)
-{
+{ 
   time(&start);
   cout<<"\nn-events \t time_taken (sec)"<<endl;
 
@@ -156,12 +156,18 @@ Bool_t AnaScript::Process(Long64_t entry)
   //
   // The return value is currently not used.
 
+  //------------------------------------------------------
+  //Initializing fReaders:
   fReader.SetLocalEntry(entry);
-  if(_data == 0)
-    fReader_MC  .SetLocalEntry(entry);
-  if(_data == 1)
-    fReader_Data.SetLocalEntry(entry);
-
+  if(_run3)  fReader_Run3.SetLocalEntry(entry);
+  else       fReader_Run2.SetLocalEntry(entry);
+  if(_data == 0){
+    fReader_MC.SetLocalEntry(entry);
+    if(!_run3) fReader_Run2_MC.SetLocalEntry(entry);
+    else       fReader_Run3_MC.SetLocalEntry(entry);
+  } 
+  //------------------------------------------------------
+  
   //Setting verbosity:
   time(&buffer);
   double time_taken_so_far = double(buffer-start);
@@ -172,6 +178,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   if(_campaign == "2018_UL") _year = 2018;
   else if(_campaign == "2017_UL") _year = 2017;
   else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else if(_campaign == "Summer22") _year = 2022;
   else cout<<"main: Provide correct campaign name"<<endl;
 
   nEvtTotal++;
@@ -193,6 +200,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   GoodEvt2016 = (_year==2016 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
 
   GoodEvt = GoodEvt2016 && GoodEvt2017 && GoodEvt2018;
+  if(_campaign=="Summer22") GoodEvt = true;
 
   if(GoodEvt){
     nEvtRan++; //only good events
@@ -238,7 +246,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //Removing the overlapping events from the EGamma dataset as follows:
       if(_flag == "egamma" && overlapping_events) triggerRes = false;
     }
-    
+
+    if(_campaign=="Summer22") triggerRes = true;
     if(triggerRes){
       nEvtTrigger++; //only triggered events
       h.nevt->Fill(2);
@@ -263,13 +272,13 @@ Bool_t AnaScript::Process(Long64_t entry)
       
       if(_data==0){
 	createGenLightLeptons();
-	createGenJets();
+	//createGenJets();
         SortGenObjects();
 	//SortPt(genMuon);
 	//SortPt(genElectron);
 	//SortPt(genLightLepton);
 	
-	createSignalArrays();
+	//createSignalArrays();
 	SortVLL();
 
 	//Correcting the Doublet model (flagging out the invalid decays)
@@ -330,7 +339,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       ForwardMediumbJet.clear();
       
       createLightLeptons();
-      createPhotons();
+      //createPhotons();
       createTaus();
       createJets();
 

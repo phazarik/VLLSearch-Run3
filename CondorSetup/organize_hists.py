@@ -13,6 +13,7 @@ parser.add_argument('--date',    type=str,  required=False, help='In the format 
 parser.add_argument('--test' ,   type=bool, required=False, help='Run for only one sample')
 parser.add_argument('--dryrun',  type=bool, required=False, help='Check If everything is correct before running')
 parser.add_argument('--skim',    type=bool, required=False, help='hadd skimmed files')
+parser.add_argument('--tree',    type=bool, required=False, help='hadd trees')
 args=parser.parse_args()
 
 jobname = args.jobname
@@ -21,10 +22,12 @@ test    = args.test
 dryrun  = args.dryrun
 DUMP    = '/home/work/phazarik1/work/CondorDump/hadded/'+jobname
 skimmed = args.skim
+trees   = args.tree
 
 if not dryrun : os.system(f'mkdir -p {DUMP}')
 
 with open('../InputJsons/lumidata_2018.json', 'r') as file: json_data = json.load(file)
+#with open('../InputJsons/lumidata_legacy_2016.json', 'r') as file: json_data = json.load(file)
 indict = json_data
 
 for sample, subdict in indict.items():
@@ -41,8 +44,11 @@ for sample, subdict in indict.items():
             continue
         #os.system(f'ls {ifname}')
 
-        ofname = f'{DUMP}/hst_{sample}_{subsample}.root'
-        if skimmed : ofname = f'{DUMP}/skimmed_{sample}_{subsample}.root'
+        prefix = 'hst'
+        if trees:   prefix = 'tree'
+        if skimmed: prefix = 'skim'
+
+        ofname = f'{DUMP}/{prefix}_{sample}_{subsample}.root'
         hadd_command = f'hadd -fk {ofname} {indir}/*root'
         if dryrun : print(f'Processline = {hadd_command}')
         else : os.system(hadd_command)

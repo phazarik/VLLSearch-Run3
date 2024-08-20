@@ -5,8 +5,10 @@
 void AnaScript::createGenLightLeptons(){
 
   int grandmomid=-1;
-
-  for(unsigned int i=0; i< (*nGenPart); i++){
+ 
+  //unsigned int iterator = (unsigned int)*(readerConfig->nGenPart);
+  unsigned int iterator = (unsigned int)*nGenPart;
+  for(unsigned int i=0; i<iterator; i++){
     Particle temp;
     temp.v.SetPtEtaPhiM(GenPart_pt[i],GenPart_eta[i],GenPart_phi[i],GenPart_mass[i]);
     temp.status = GenPart_status[i];
@@ -60,7 +62,9 @@ void AnaScript::createGenLightLeptons(){
 }
 
 void AnaScript::createGenJets(){
-  for(unsigned int i=0; i< (*nGenJet); i++){
+  //unsigned int iterator = (unsigned int)*(readerConfig->nGenJet);
+  unsigned int iterator = (unsigned int)*nGenJet;
+  for(unsigned int i=0; i<iterator; i++){
     Particle temp;
     temp.v.SetPtEtaPhiM(GenJet_pt[i],GenJet_eta[i],GenJet_phi[i],GenJet_mass[i]);
     temp.ind = i;
@@ -94,8 +98,9 @@ void AnaScript::createSignalArrays(){
     }
     cout<<"--------------------------------------------------\n"<<endl;
     }*/
-
-  for(unsigned int i=0; i< (*nGenPart); i++){
+  //unsigned int iterator = (unsigned int)*(readerConfig->nGenPart);
+  unsigned int iterator = (unsigned int)*nGenPart;
+  for(unsigned int i=0; i<iterator; i++){
     Particle temp;
     temp.v.SetPtEtaPhiM(GenPart_pt[i],GenPart_eta[i],GenPart_phi[i],GenPart_mass[i]);
     temp.status = GenPart_status[i];
@@ -114,7 +119,9 @@ void AnaScript::createSignalArrays(){
     vector<int> daughter_ind, daughter_id;
     daughter_ind.clear(); daughter_id.clear();
 
-    for(unsigned int j=0; j< (*nGenPart); j++){
+    //unsigned int iterator2 = (unsigned int)*(readerConfig->nGenPart);
+    unsigned int iterator2 = (unsigned int)*nGenPart;
+    for(unsigned int j=0; j<iterator2; j++){
       float id = GenPart_pdgId[j];
       //float momid = GenPart_pdgId[GenPart_genPartIdxMother[i]];
       float momid = MotherID(j,GenPart_genPartIdxMother[j]);

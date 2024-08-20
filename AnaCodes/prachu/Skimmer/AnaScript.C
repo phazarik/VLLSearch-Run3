@@ -94,11 +94,17 @@ Bool_t AnaScript::Process(Long64_t entry)
   //
   // The return value is currently not used.
 
+  //------------------------------------------------------
+  //Initializing fReaders:
   fReader.SetLocalEntry(entry);
-  if(_data == 0)
-    fReader_MC  .SetLocalEntry(entry);
-  if(_data == 1)
-    fReader_Data.SetLocalEntry(entry);
+  if(_run3)  fReader_Run3.SetLocalEntry(entry);
+  else       fReader_Run2.SetLocalEntry(entry);
+  if(_data == 0){
+    fReader_MC.SetLocalEntry(entry);
+    if(!_run3) fReader_Run2_MC.SetLocalEntry(entry);
+    else       fReader_Run3_MC.SetLocalEntry(entry);
+  } 
+  //-------------------------------------------------------
 
   ReadBranch(); //for skimmer
 
@@ -112,6 +118,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   if(_campaign == "2018_UL") _year = 2018;
   else if(_campaign == "2017_UL") _year = 2017;
   else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else if(_campaign == "Summer22") _year = 2022;
   else cout<<"main: Provide correct campaign name"<<endl;
 
   nEvtTotal++;
@@ -121,6 +128,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   GoodEvt2016 = (_year==2016 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
 
   GoodEvt = GoodEvt2016 && GoodEvt2017 && GoodEvt2018;
+  if(_campaign=="Summer22") GoodEvt = true;
 
   if(GoodEvt){
     nEvtRan++; //only good events
@@ -150,6 +158,59 @@ Bool_t AnaScript::Process(Long64_t entry)
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events
+      bad_event = false;
+      
+      //###################
+      //Gen particle block
+      //###################
+ 
+      genMuon.clear();
+      genElectron.clear();
+      genLightLepton.clear();
+      genJet.clear();
+      vllep.clear();
+      vlnu.clear();
+
+      if(_data==0){
+	//createGenLightLeptons();
+	//createGenJets();
+        //SortGenObjects();
+		
+	createSignalArrays();
+	SortVLL();
+
+	//Correcting the Doublet model (flagging out the invalid decays)
+	if(_flag=="doublet"){ //for VLLD files
+	  //a) The neutral particle cannot decay to H,nu or Z,nu.
+	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
+	  //cout<<"----"<<endl;
+	  for(int i=0; i<(int)vlnu.size(); i++){
+	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
+	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
+	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
+	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
+	    }
+	    //cout<<""<<endl;
+	  }
+	  //if(bad_event) cout<<"bad"<<endl;
+	  //else cout<<"good"<<endl;
+	  //cout<<"----"<<endl;
+	  
+	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
+	  // I am flagging out the events with W(24) as daughetrs of L
+	  for(int i=0; i<(int)vllep.size(); i++){
+	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
+	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
+	    }
+	  }
+	}
+  
+	//Make gen-level plots here.
+	
+      }
+
+      //Counting bad events:
+      if(bad_event) nEvtBad++;
       
       //###################
       //Reco particle block
@@ -203,6 +264,8 @@ Bool_t AnaScript::Process(Long64_t entry)
 	
 	if(trigger && reject_low_resonances && samesign) keep_this_event = true;
       }
+
+      if(bad_event) keep_this_event = false;
       
       if(keep_this_event){
 	nEvtPass++;
