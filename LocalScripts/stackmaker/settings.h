@@ -264,6 +264,14 @@ TH1F *GetRatio(TH1F *data, vector<TH1F*> bkg){
   float sumsqerr =  nobserr_frac*nobserr_frac + nbkgerr_frac*nbkgerr_frac;
   globalObsbyExpErr = globalObsbyExp*sqrt(sumsqerr);
   
+  // Remove bins where data is zero:
+  for (int bin = 1; bin <= data->GetNbinsX(); bin++) {
+    if (data->GetBinContent(bin) == 0) {
+      ratio->SetBinContent(bin, 0);
+      ratio->SetBinError(bin, 0);
+    }
+  }
+
   return ratio;
 }
 

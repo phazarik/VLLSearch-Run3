@@ -72,20 +72,20 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
 
   //SET GLOBAL SETTINGS HERE:
   channel = "ee";
-  TString jobname = "hist_2LSS_2018UL_Aug11_SRgeneral_"+channel;
+  TString jobname = "hist_2LSS_2018UL_Aug26_topCR_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "SRgeneral_"+channel; //Don't use special symbols (folder name)
-  TString info = "S_{T}>200, N_{bj}=0";
+  tag = "topCR_"+channel; //Don't use special symbols (folder name)
+  TString info = "top CR";
 
   //DON'T TOUCH BELOW:
-  if     (channel == "ee") tag2 = info+" (e-e channel)"; //This appears on the plot.
-  else if(channel == "em") tag2 = info+" (e-#mu channel)";
-  else if(channel == "mm") tag2 = info+" (#mu-#mu channel)";
+  if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
+  else if(channel == "em") tag2 = info+" (e-#mu)";
+  else if(channel == "mm") tag2 = info+" (#mu-#mu)";
   else DisplayText("Error! Please provide correct channel name!", 31);
 
   QCDscale = 1.0;/*
@@ -152,7 +152,7 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
 //-----------------------------------
 
 void plot(TString var, TString name){
-
+  
   //rebin = 1; //overriding rebin
   //cout<<"Test : toZoom = "<<toZoom;
   //cout<<"\txmin, xmax = "<<xmin<<" "<<xmax<<endl;

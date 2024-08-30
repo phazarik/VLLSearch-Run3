@@ -13,15 +13,11 @@ class PlotData:
     rebin: int
 
 p = [
-    #PlotData(var="HT",      name="HT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
-    #PlotData(var="dilep_mass", name="Dilep mass (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    #PlotData(var="njet",    name="number of jets",        nbins=10, xmin=0, xmax=10, rebin=1),
-    #PlotData(var="lep0_pt",    name="Leading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    #PlotData(var="lep1_pt",    name="SubLeading lepton pT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    #PlotData(var="lep1_mt",    name="SubLeading lepton mT (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
-    #PlotData(var="dilep_pt",   name="Dilep pT (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
-    #PlotData(var="LT",      name="LT (GeV)",              nbins=200, xmin=0, xmax=200, rebin=1),
-    #PlotData(var="metpt",   name="MET (GeV)",             nbins=200, xmin=0, xmax=200, rebin=2),
+
+    #PlotData(var="2LSS_wt_leptonSF", name="Lepton IdIso SF",   nbins=200, xmin=0, xmax=2, rebin=5),
+    #PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=5),
+    #PlotData(var="2LSS_wt_bjet", name="bJet weight",           nbins=200, xmin=0, xmax=2, rebin=5),
+    #PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=5),
     
     PlotData(var="nlep",    name="N_{L}",                 nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="njet",    name="N_{J}",                 nbins=10, xmin=0, xmax=10, rebin=1),
@@ -56,7 +52,7 @@ p = [
     PlotData(var="dilep_eta",  name="#eta_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="dilep_phi",  name="#phi_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="dilep_mt",   name="m_{ T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
-    PlotData(var="dilep_deta", name="#Delta#eta(L_{0}, L_{1})", nbins=200, xmin=0, xmax=6, rebin=5),
+    PlotData(var="dilep_deta", name="|#Delta#eta(L_{0}, L_{1})|", nbins=200, xmin=0, xmax=6, rebin=5),
     PlotData(var="dilep_dphi", name="#Delta#phi(L_{0}, L_{1})", nbins=200, xmin=0, xmax=6, rebin=5),
     PlotData(var="dilep_dR",   name="#Delta R(L_{0}, L_{1})",   nbins=200, xmin=0, xmax=6, rebin=5),
 
@@ -73,6 +69,11 @@ p = [
     PlotData(var="all_lep_flav_raw", name="L id",       nbins=40, xmin=-20, xmax=20, rebin=1),
     PlotData(var="lep0_flav_raw",    name="L_{0} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
     PlotData(var="lep1_flav_raw",    name="L_{1} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
+
+    PlotData(var="2LSS_wt_leptonSF", name="Lepton IdIso SF", nbins=200, xmin=0, xmax=2, rebin=1),
+    PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=1),
+    PlotData(var="2LSS_wt_bjet", name="bJet weight", nbins=200, xmin=0, xmax=2, rebin=1),
+    PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=1),
 
     PlotData(var="dilep_mass", name="M_{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=2)
     
@@ -104,7 +105,7 @@ for i, plot_data in enumerate(p):
     #print("Executing :" + processline + " ... ", end = "\n")
     os.system(processline)
     #print("\033[033mSuccess.\033[0m")
-    #if i==6: break
+    #if i==4: break
 
 end_time = time.time()
 time_taken = end_time-start_time
