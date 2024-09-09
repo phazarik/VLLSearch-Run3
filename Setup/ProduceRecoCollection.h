@@ -147,8 +147,8 @@ void AnaScript::createJets(){
     temp.v.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
     temp.ind = i;
     temp.btagscore = Jet_btagDeepFlavB[i];
+    temp.hadronflavor = -1;
     if(_data==0) temp.hadronflavor = Jet_hadronFlavour[i];
-    else temp.hadronflavor = -1;
 
     bool ptetacut = temp.v.Pt()>30 && fabs(temp.v.Eta())<2.4;
     bool cleaned_from_leptons = clean_from_array(temp, LooseLepton, 0.4);
@@ -157,10 +157,18 @@ void AnaScript::createJets(){
     bool jetID = _year == 2016 ? (int)Jet_jetId[i]>=1 : (int)Jet_jetId[i]>=2; //if 2016, >=1; else >=2
     bool passcut = ptetacut && cleaned_from_leptons && jetID;
     //bool passcut = ptetacut && jetID; //warning
+
+    float WPth=0;
+    if(_campaign =="2018_UL")              WPth=0.2783;
+    else if (_campaign =="2017_UL")        WPth=0.3040;
+    else if (_campaign =="2016preVFP_UL")  WPth=0.2598;
+    else if (_campaign =="2016postVFP_UL") WPth=0.2489;
+    else cout<<"ProduceGenCollection.h : Provide correct campaign name!"<<endl;
+    bool medium_pass = Jet.at(i).btagscore > WPth;
     
     if(passcut && cleaned_from_leptons){
       Jet.push_back(temp);
-      if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp); //2018 //4184
+      if(Jet_btagDeepFlavB[i] > WPth) MediumbJet.push_back(temp); //2018 //4184
       //if(Jet_btagDeepFlavB[i]>0.2783) MediumbJet.push_back(temp); //2018
     }
 

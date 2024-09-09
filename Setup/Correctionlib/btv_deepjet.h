@@ -1,4 +1,4 @@
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_UL2018.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_2018_UL_2L.h"
 #include "correction.h"
 
 auto btvjson2018      = correction::CorrectionSet::from_file("/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/POG/BTV/2018_UL/btagging.json.gz");
@@ -49,8 +49,14 @@ float AnaScript::correctionlib_btagWPSFfromPOG(Particle jet, string mode){
   
   if(pt>20.0 && fabs(eta)<2.5){
     if( _campaign=="2018_UL" ){
-      if(flav==5 || flav==4){ sf = bcjet2018->evaluate(values);    }
-      else                  { sf = lightjet2018->evaluate(values); }
+      if(flav==5 || flav==4){
+	sf = bcjet2018->evaluate(values);
+	h.evtweight[15]->Fill(sf);
+      }
+      else{
+	sf = lightjet2018->evaluate(values);
+	h.evtweight[16]->Fill(sf);
+      }
     }
     else if( _campaign=="2017_UL" ){
       if(flav==5 || flav==4){ sf = bcjet2017->evaluate(values);    }
@@ -67,7 +73,7 @@ float AnaScript::correctionlib_btagWPSFfromPOG(Particle jet, string mode){
     else if( _campaign=="Summer22" ) return 1.0;
     else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
   }
-
+  
   return sf;
 }
 
@@ -81,12 +87,15 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
   
   //btag SF is basically an event reweighting procedure
   for (int i = 0; i < (int)Jet.size(); i++){
-    float jet_prob_mc = 1.0;
+    float jet_prob_mc   = 1.0;
     float jet_prob_data = 1.0;
     float jet_eff = 1.0; //MC efficiency
     
     //get MC efficiency
-    if(_campaign=="2018_UL") jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i));
+    if(_campaign=="2018_UL"){
+      jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i));
+      h.evtweight[20]->Fill(jet_eff);
+    }
     else {
       jet_eff = 1.0;
       cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
@@ -109,9 +118,12 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
     else if (_campaign =="2016postVFP_UL") WPth=0.2489;
     else if (_campaign =="Summer22")       return 1.0;
     else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
-    
+
+    //Skipping trailing jets.
+    //if(i>2) return 1.0;
+      
     // check if jet is tagged or not
-    if (Jet_btagDeepFlavB[Jet.at(i).ind] > WPth){
+    if (Jet.at(i).btagscore > WPth){
       jet_prob_data = jet_eff*SFfromPOG;
       jet_prob_mc   = jet_eff;
     }

@@ -91,9 +91,10 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
 
-  if(_flag=="doublet")  cout<<"Removing invalid VLLD decay modes ..."<<endl;
-  else if(_flag=="qcd") cout<<"Scaling QCD files ..."<<endl;
-  else if(_flag=="dy") cout<<"Scaling DY files ..."<<endl;
+  if(_flag=="doublet")     cout<<"Removing invalid VLLD decay modes ..."<<endl;
+  else if(_flag=="egamma") cout<<"Removing overlapping events from EGamma ..."<<endl;
+  //else if(_flag=="qcd") cout<<"Scaling QCD files ..."<<endl;
+  //else if(_flag=="dy") cout<<"Scaling DY files ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()
@@ -221,7 +222,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     }
     else if(_year==2018) {
       muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1) || (*HLT_Ele27_WPTight_Gsf);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
 
     overlapping_events = muon_trigger && electron_trigger;
@@ -241,10 +242,18 @@ Bool_t AnaScript::Process(Long64_t entry)
 
     //Update triggerRes only in case of data.
     if(_data==1){
+      //Strategy 1:
+      triggerRes = false;
       triggerRes = (muon_trigger || electron_trigger);
       //This is the union of both datasets (may overlap).
       //Removing the overlapping events from the EGamma dataset as follows:
       if(_flag == "egamma" && overlapping_events) triggerRes = false;
+      /*
+      //Strategy2: Either electron32 trigger, or muon26 trigger.
+      triggerRes = false;
+      if(muon_trigger && !electron_trigger)      triggerRes = true;
+      else if(!muon_trigger && electron_trigger) triggerRes = true;*/
+      
     }
 
     if(_campaign=="Summer22") triggerRes = true;

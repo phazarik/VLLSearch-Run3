@@ -14,8 +14,7 @@ void AnaScript::Make2LSSPlots(){
       jec = correctionlib_jetSF(Jet.at(i),"nom");
       float rho = 0.0;
       if(ptr_fixedGridRhoFastjetAll != nullptr) rho = **ptr_fixedGridRhoFastjetAll;
-      //rho = *fixedGridRhoFastjetAll;
-      cout<<"Test: rho= "<<rho<<endl;
+      //cout<<"Test: rho= "<<rho<<endl;
       //------------------------------------  Note  -----------------------------------------
       //ptr_fixedGridRhoFastjetAll is a pointer to a TTreeReaderValue<Float_t>.
       //*ptr_fixedGridRhoFastjetAll gives you the TTreeReaderValue<Float_t> object.
@@ -27,7 +26,6 @@ void AnaScript::Make2LSSPlots(){
       //Jet Energy Correction:
       Jet.at(i).v = Jet.at(i).v * jec;
       Jet.at(i).v = Jet.at(i).v * jer;
-      
       h.evtweight[5]->Fill(jec);
       h.evtweight[6]->Fill(jer);
       h.evtweight[7]->Fill(jec*jer);
@@ -39,6 +37,7 @@ void AnaScript::Make2LSSPlots(){
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
+  bool me = false;
   bool mm = false;
 
   //Offline cuts on the leptons:
@@ -59,7 +58,7 @@ void AnaScript::Make2LSSPlots(){
       
       if(offline_trigger){
 	if(     flav0 == 13 && flav1 == 13){ n2muss++; mm = true; }
-	else if(flav0 == 13 && flav1 == 11){ nemuss++; em = true; }
+	else if(flav0 == 13 && flav1 == 11){ nemuss++; me = true; }
 	else if(flav0 == 11 && flav1 == 13){ nemuss++; em = true; }
 	else if(flav0 == 11 && flav1 == 11){ n2ess++;  ee = true; }
       }
@@ -80,35 +79,16 @@ void AnaScript::Make2LSSPlots(){
     double lepIdIsoSF = 1.0;
     double triggerEff = 1.0;
     double bjetSF = 1.0;
-    /*
-    if(_data==0){
-      double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-      double sf1 = Muon_2018UL_Reco(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-      scalefactor = sf0*sf1;
-      double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-      double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-      triggereff = 1-((1-ef0)*(1-ef1));
-      wt = scalefactor*triggereff;
-      //Corrections for Jets:
-      double jeteff = 1.0;
-      if(_campaign == "UL18") bjeteff = bTagEff_UL2018(Jet, 0); //Tweaking the SF from POG by 0 %
-      wt = wt*bjeteff;
-      }*/
 
     //Using correctionlib:
     if(_data==0){
-
+      
       //Corrections for muon reconstruction:
       //Options: "nom", "up", "down"
       double sf0 = 1.0; double sf1 = 1.0;
-      if(fabs(LightLepton.at(0).id) == 13){
-	sf0 = correctionlib_muonIDSF(LightLepton.at(0),"nom") * correctionlib_muonIsoSF(LightLepton.at(0),"nom");
-	sf1 = correctionlib_muonIDSF(LightLepton.at(1),"nom") * correctionlib_muonIsoSF(LightLepton.at(1),"nom");
-      }
-      else if(fabs(LightLepton.at(0).id) == 11){
-	sf0 = correctionlib_egmIDSF(LightLepton.at(0), "nom");
-	sf1 = correctionlib_egmIDSF(LightLepton.at(1), "nom");
-      }
+      sf0 = correctinlib_leptonSF(LightLepton.at(0), "nom");
+      sf1 = correctinlib_leptonSF(LightLepton.at(1), "nom");
+
       lepIdIsoSF = sf0*sf1;
 
       //Trigger efficiencies:
@@ -120,15 +100,21 @@ void AnaScript::Make2LSSPlots(){
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
       bjetSF = correctionlib_btagIDSF(Jet, "nom");
       
-      wt = lepIdIsoSF*triggerEff;
+      wt = lepIdIsoSF*triggerEff*bjetSF;
 
+      //Plotting corrections:
+      h.scalef[0]->Fill(sf0, LightLepton.at(0).v.Pt());
+      h.scalef[1]->Fill(sf1, LightLepton.at(1).v.Pt());
+      h.scalef[2]->Fill(ef0, LightLepton.at(0).v.Pt());
+      h.scalef[3]->Fill(ef1, LightLepton.at(1).v.Pt());
+     
     }
     
     h.evtweight[0]->Fill(lepIdIsoSF);
     h.evtweight[1]->Fill(triggerEff);
     h.evtweight[2]->Fill(bjetSF);
     h.evtweight[3]->Fill(wt);
-    
+
     //Finding the closest jet and plotting its deepjet score:
     LightLepton.at(0).btagscore = -1;
     LightLepton.at(1).btagscore = -1;
@@ -233,14 +219,15 @@ void AnaScript::Make2LSSPlots(){
     }
 
     //General SR:
-    bool generalSigR = ST200 && nbjet==0;
+    bool generalSigR = ST200 && dilep_dR<4 && nbjet==0;
 
     //TTbarCR:
-    bool topEnhanced = ST200 && nbjet>0;
-
+    bool topEnhanced = ST200 && nbjet > 0;
+    bool topCR = topEnhanced && dilep_dR<4 && nbjet>1;
+  
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = generalSigR;
+    bool event_selection = topCR;
     //---------------------------------------------
     
     //------------------------
@@ -249,7 +236,12 @@ void AnaScript::Make2LSSPlots(){
     //double qcdscale = 0.284324926; //Global Scaling
     //if(_flag == "qcd") wt = wt*qcdscale;
 
-    if(_data==1) wt = 1.0;
+    if(_data==1){
+      lepIdIsoSF = 1.0;
+      triggerEff = 1.0;
+      bjetSF     = 1.0;
+      wt         = 1.0;
+    }
 
     if(event_selection){
       h.nevt->Fill(3);
@@ -301,6 +293,12 @@ void AnaScript::Make2LSSPlots(){
       h.evt2LSS[37]->Fill(dphi_metlep_max, wt);
       h.evt2LSS[38]->Fill(dphi_metlep_min, wt);
 
+      //Corrections:
+      h.evt2LSS[39]->Fill(lepIdIsoSF);
+      h.evt2LSS[40]->Fill(triggerEff);
+      h.evt2LSS[41]->Fill(bjetSF);
+      h.evt2LSS[42]->Fill(wt);
+
       //Special variables:
       if(fabs(LightLepton.at(0).id) == 11){
 	h.evt2LSS[39]->Fill(LightLepton.at(0).hovere, wt);
@@ -342,6 +340,7 @@ void AnaScript::Make2LSSPlots(){
 
     }//custom event selection
 
+    /*
     //Other calculations:
     
     //#########################
@@ -377,6 +376,7 @@ void AnaScript::Make2LSSPlots(){
 	if(sideband) h.chargeflip[2]->Fill((int)2, wt);
       }
     }//custom event selection
+    */
         
   }//Baseline event selection
 

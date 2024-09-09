@@ -41,6 +41,7 @@ private:
   using int_or_char  = UChar_t;
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;*/
+
   //Run2
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
@@ -631,7 +632,7 @@ public:
   struct Hists {
     //Histograms are declared here.
     TH1F *nevt;
-    TH1F *evtweight[20];
+    TH1F *evtweight[25];
     TH1F *hist[50];
     //Object level hists:
     TH1F *mu[10]; TH1F *ele[10]; TH1F *llep[10];
@@ -640,7 +641,7 @@ public:
     //For spcific studies:
     TH1F *basic[50];
     TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
-    TH1F *evt2LSS[50];
+    TH1F *evt2LSS[55];
     TH1F *gen2LSS[50];
     TH1F *evt2muSS[50];
     TH1F *btagsf[10];
@@ -648,7 +649,8 @@ public:
     TH1F *flav[10], *flag[10];
     TH1F *count[10];
     TH1F *chargeflip[10];
-    
+    //Corrections:
+    TH2F * scalef[10];
   };
   struct Particle {
     TLorentzVector v;
@@ -689,6 +691,7 @@ public:
   //--------------------------------------------------------------------------
 
   //ForCorrectionlib:
+  double correctinlib_leptonSF(Particle lepton, string mode);
   float correctionlib_muonIDSF(Particle muon, string mode);
   float correctionlib_muonIsoSF(Particle muon, string mode);
   float correctionlib_egmIDSF(Particle electron, string mode);
