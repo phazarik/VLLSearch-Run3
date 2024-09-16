@@ -205,6 +205,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
   if(GoodEvt){
     nEvtRan++; //only good events
+    
     h.nevt->Fill(1);
 
     triggerRes         = true; //default, always true for MC
@@ -241,21 +242,26 @@ Bool_t AnaScript::Process(Long64_t entry)
     if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(7); //only 32 pass
 
     //Update triggerRes only in case of data.
-    if(_data==1){
+    if(_data !=0){
+      
       //Strategy 1:
-      triggerRes = false;
-      triggerRes = (muon_trigger || electron_trigger);
+      //triggerRes = false;
+      //triggerRes = (muon_trigger || electron_trigger);
       //This is the union of both datasets (may overlap).
       //Removing the overlapping events from the EGamma dataset as follows:
       if(_flag == "egamma" && overlapping_events) triggerRes = false;
-      /*
+      
       //Strategy2: Either electron32 trigger, or muon26 trigger.
-      triggerRes = false;
-      if(muon_trigger && !electron_trigger)      triggerRes = true;
-      else if(!muon_trigger && electron_trigger) triggerRes = true;*/
+      //triggerRes = false;
+      //if(muon_trigger && !electron_trigger)      triggerRes = true;
+      //else if(!muon_trigger && electron_trigger) triggerRes = true;
+
+      //Strategy3:
+      if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset  
       
     }
-
+    
     if(_campaign=="Summer22") triggerRes = true;
     if(triggerRes){
       nEvtTrigger++; //only triggered events
@@ -278,7 +284,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       vlnu.clear();
 
       bad_event = false;
-      
+
       if(_data==0){
 	createGenLightLeptons();
 	//createGenJets();
@@ -319,7 +325,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   
 	//Make gen-level plots here.
 	
-      }
+	}
 
       //Counting bad events:
       if(bad_event) nEvtBad++;
@@ -328,7 +334,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //###################
       //Reco particle block
       //###################
-
+    
       metpt = *PuppiMET_pt;
       metphi = *PuppiMET_phi;
       
@@ -371,7 +377,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	h.mu[3]->Fill(Muon.at(i).v.Phi(), evt_wt);
 	h.mu[4]->Fill(Muon.at(i).reliso03, evt_wt);
       }
-      /*
+      /*      
       //Photons
       h.pho[0]->Fill((int)Photon.size());
       for(int i=0; i<(int)Photon.size(); i++){
@@ -408,12 +414,11 @@ Bool_t AnaScript::Process(Long64_t entry)
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
 
-      EventSelection(); //This is where trigger is applied.
+      //EventSelection(); //This is where trigger is applied.
       //if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
       //else evt_wt = 1.0;
       //---------------------------------------------------------------- 
             
-     
       //_______________________________________________________________________________________________________
       
       //                         Analysis block

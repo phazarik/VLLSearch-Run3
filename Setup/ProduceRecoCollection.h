@@ -164,7 +164,7 @@ void AnaScript::createJets(){
     else if (_campaign =="2016preVFP_UL")  WPth=0.2598;
     else if (_campaign =="2016postVFP_UL") WPth=0.2489;
     else cout<<"ProduceGenCollection.h : Provide correct campaign name!"<<endl;
-    bool medium_pass = Jet.at(i).btagscore > WPth;
+    bool medium_pass = temp.btagscore > WPth;
     
     if(passcut && cleaned_from_leptons){
       Jet.push_back(temp);

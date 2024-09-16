@@ -14,6 +14,7 @@ extern float globalSbyB;
 extern float globalObsbyExp;
 extern float globalObsbyExpErr;
 extern double QCDscale;
+extern double TOPscale;
 extern bool toZoom;
 
 //The following function are used by get_hist()
@@ -82,6 +83,7 @@ TH1F *get_hist(
   //Tweaking the histogram:
   double datalumi = 59800; //pb^{-1}
   if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
+  else if (sample == "TTBar")                                   hst->Scale((datalumi/lumi)*TOPscale);
   else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
     
   SetLastBinAsOverflow(hst);
@@ -384,4 +386,5 @@ void DisplaySignalYieldsInBins(TH1F *sig){
   }
   cout << defaultfloat << endl;
 }
+
 #endif // SETTINGS_H

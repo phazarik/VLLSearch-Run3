@@ -145,7 +145,7 @@ void ana_test(int sample=0)
   //Testing on skim:
   //-----------------
   else if(sample==999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug20/hst_DYJetsToLL_M50.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_DYJetsToLL_M50.root");
     hstfilename = "test_outputs/hst_DYJetsToLL_M50_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -156,7 +156,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(30321.155);
   }
   else if(sample==998){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug20/hst_QCD_EMEnriched_170to300.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_QCD_EMEnriched_170to300.root");
     hstfilename = "test_outputs/hst_qcd_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -167,7 +167,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==997){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug20/hst_TTBar_TTToSemiLeptonic.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_TTBar_TTToSemiLeptonic.root");
     hstfilename = "test_outputs/hst_ttbar_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -178,7 +178,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==-999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug20/hst_EGamma_EGamma_*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_EGamma_EGamma_*.root");
     hstfilename = "test_outputs/hst_EGamma_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetCampaign("2018_UL");
@@ -189,7 +189,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(59800);
   }
   else if(sample==-998){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug20/hst_SingleMuon_SingleMuon_*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_SingleMuon_SingleMuon_*.root");
     hstfilename = "test_outputs/hst_SingleMuon_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetCampaign("2018_UL");

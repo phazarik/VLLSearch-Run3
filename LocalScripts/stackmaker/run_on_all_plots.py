@@ -75,7 +75,7 @@ p = [
     PlotData(var="2LSS_wt_bjet", name="bJet weight", nbins=200, xmin=0, xmax=2, rebin=1),
     PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=1),
 
-    PlotData(var="dilep_mass", name="M_{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=2)
+    PlotData(var="dilep_mass", name="M_{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     
     #PlotData(var="overlap_before_trigger", name="overlap before trigger", nbins=10, xmin=0, xmax=10, rebin=1),
     #PlotData(var="overlap_after_trigger",  name="overlap after trigger",  nbins=10, xmin=0, xmax=10, rebin=1),

@@ -72,7 +72,7 @@ void makestack(){
    
   //Initializing some global variables:
   //input_path = "../trees/2023-12-13";
-  TString jobname = "hist_2LSS_2018UL_Aug08_highSTprompt_ee";
+  TString jobname = "hist_2LSS_2018UL_Sept10_TopCR_mm";
   //input_path = "../input_hists/"+jobname;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
@@ -80,13 +80,13 @@ void makestack(){
   toLog = true;
   toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "highSTprompt_ee"; //Don't use special symbols (folder name)
+  tag = "topCR_mm"; //Don't use special symbols (folder name)
   tag2 = "ST > 100 (e-e channel)"; //This appears on the plot.
   //QCDscale = 1.0;
   //------------2024-08-07---------------//
-  QCDscale = 0.70572926; //ee-channel
+  //QCDscale = 0.70572926; //ee-channel
   //QCDscale = 0.25988226; //em-channel
-  //QCDscale = 0.18630010; //mm-channel
+  QCDscale = 0.18630010; //mm-channel
   //-------------------------------------//
   //QCDscale = 0.284324926; //2024-04-30 for mu-mu or e-e channel
   //QCDscale = 0.549667774; //2024-06-19 for e-mu channel
@@ -106,9 +106,9 @@ void makestack(){
     //For histograms, nbins do not matter (already decided).
     //It matters if the code is reading branches.
     //Rebin can be overwritten inside the plot loop.
-    //{.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 2},
+    {.var="dilep_mass",      .name="Dilep mass (GeV)",  200, 0, 200, 2},
     //{.var="lep0_pt",  .name="Leading lepton pT (GeV)",    200, 0, 200, 1},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
+    //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="NNscore", .name="NNScore",200, 0, 1, 5},
     //{.var="HTMETllpt",.name="HT+MET+dilep pt (GeV)", 200, 0, 200, 5},
     //{.var="STvis",    .name="HT+LT (GeV)",           200, 0, 200, 5},
@@ -202,11 +202,12 @@ void plot(TString var, TString name){
     get_hist(var, "DYJetsToLL", "M10to50", 5925.522),
     get_hist(var, "DYJetsToLL", "M50",    30321.155),
   };
-  vector<TH1F *>ZGamma={
-    get_hist(var, "ZGamma", "ZGToLLG_01J", 592588.5918)
+  vector<TH1F *>VGamma={
+    get_hist(var, "ZGamma", "ZGToLLG_01J", 592588.5918),
+    get_hist(var, "WGamma", "WGToLNuGincl", 23896.3683)
+    //get_hist(var, "WGamma", "WGToLNuGo1J", 59602.4012)
   };
-  vector<TH1F *> QCD = {    
-    
+  vector<TH1F *> QCD = {       
     get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
     get_hist(var, "QCD_MuEnriched", "30to50",         42.906),
     get_hist(var, "QCD_MuEnriched", "50to80",        105.880),
@@ -259,6 +260,10 @@ void plot(TString var, TString name){
     get_hist(var, "WW", "WWTo2L2Nu",   901172.227),
     get_hist(var, "WW", "WWTo4Q",      773049.853),
   };
+  vector<TH1F *>WpWp={
+    get_hist(var, "WpWp", "WpWpJJEWK", 5277973.2583),
+    get_hist(var, "WpWp", "WpWpJJQCD", 6313131.3131),
+  };
   vector<TH1F *>WZ={
     get_hist(var, "WZ", "WZTo1L1Nu2Q", 805257.731),
     get_hist(var, "WZ", "WZTo2Q2L",   4499605.731),
@@ -271,6 +276,7 @@ void plot(TString var, TString name){
     get_hist(var, "ZZ", "ZZTo4L",    74330566.038),
   };
   vector<TH1F *>VVV={
+    get_hist(var, "WWW", "Inclusive", 1112140.8712),
     get_hist(var, "WWZ", "Inclusive", 1452841.24194),
     get_hist(var, "WZZ", "Inclusive", 5254860.74619),
     get_hist(var, "ZZZ", "Inclusive", 16937669.376694),
@@ -288,6 +294,15 @@ void plot(TString var, TString name){
     get_hist(var, "Rare", "TTZH",   440528634.361234),
     get_hist(var, "Rare", "TTZZ",   358273381.29496),
     get_hist(var, "Rare", "TZq_ll", 157598201.29612),
+  };
+  vector<TH1F *>Higgs={
+    get_hist(var, "Higgs", "bbH_HToZZTo4L",   3533384497.3139),
+    get_hist(var, "Higgs", "GluGluHToZZTo4L",28693528693.5287),
+    get_hist(var, "Higgs", "GluGluToZH",        75554356.2066),
+    get_hist(var, "Higgs", "GluGluZH",         344444108.7613),
+    get_hist(var, "Higgs", "ttHToNonbb",        34603366.3834),
+    get_hist(var, "Higgs", "VBF_HToZZTo4L",    472277227.7228),
+    get_hist(var, "Higgs", "VHToNonbb",          13166481.4209)
   };
   vector<TH1F *>SingleMuon={
     get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
@@ -308,17 +323,19 @@ void plot(TString var, TString name){
   bkg = {
     merge_and_decorate(QCD,   "QCD",   kYellow),
     merge_and_decorate(DY,    "DY",    kRed-7),
-    merge_and_decorate(ZGamma,"ZGamma",kRed-9),
+    merge_and_decorate(VGamma,"VGamma",kRed-9),
     merge_and_decorate(WJets, "WJets", kGray+1),
     merge_and_decorate(ST,    "ST",    kCyan-7),
     merge_and_decorate(TTBar, "TTBar", kAzure+1),
     merge_and_decorate(TTW,   "TTW",   kAzure+2),
     merge_and_decorate(TTZ,   "TTZ",   kAzure+3),
     merge_and_decorate(WW,    "WW",    kGreen-3),
+    merge_and_decorate(WpWp,  "WpWp",  kGreen-4),
     merge_and_decorate(WZ,    "WZ",    kGreen-9),
     merge_and_decorate(ZZ,    "ZZ",    kGreen-10),
     merge_and_decorate(VVV,   "VVV",   kGreen),
     merge_and_decorate(Rare,  "Rare",  kMagenta),
+    merge_and_decorate(Higgs, "Higgs", kViolet),
   };
 
   //Remove null pointers:

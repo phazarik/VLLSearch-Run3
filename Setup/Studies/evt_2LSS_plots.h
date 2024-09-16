@@ -68,7 +68,7 @@ void AnaScript::Make2LSSPlots(){
   //#######################
   // Select the channel :
   //
-  basic_evt_selection = mm;
+  basic_evt_selection = ee;
   //
   //#######################
   
@@ -100,7 +100,8 @@ void AnaScript::Make2LSSPlots(){
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
       bjetSF = correctionlib_btagIDSF(Jet, "nom");
       
-      wt = lepIdIsoSF*triggerEff*bjetSF;
+      //wt = lepIdIsoSF*triggerEff*bjetSF;
+      wt = lepIdIsoSF*triggerEff;
 
       //Plotting corrections:
       h.scalef[0]->Fill(sf0, LightLepton.at(0).v.Pt());
@@ -114,7 +115,7 @@ void AnaScript::Make2LSSPlots(){
     h.evtweight[1]->Fill(triggerEff);
     h.evtweight[2]->Fill(bjetSF);
     h.evtweight[3]->Fill(wt);
-
+    
     //Finding the closest jet and plotting its deepjet score:
     LightLepton.at(0).btagscore = -1;
     LightLepton.at(1).btagscore = -1;
@@ -227,7 +228,7 @@ void AnaScript::Make2LSSPlots(){
   
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = topCR;
+    bool event_selection = baseline;
     //---------------------------------------------
     
     //------------------------
@@ -236,14 +237,16 @@ void AnaScript::Make2LSSPlots(){
     //double qcdscale = 0.284324926; //Global Scaling
     //if(_flag == "qcd") wt = wt*qcdscale;
 
-    if(_data==1){
-      lepIdIsoSF = 1.0;
-      triggerEff = 1.0;
-      bjetSF     = 1.0;
-      wt         = 1.0;
-    }
-
     if(event_selection){
+
+      //Making sure that data is not scaled from weights stored in memeory
+      if(_data != 0 ){
+	lepIdIsoSF = 1.0;
+	triggerEff = 1.0;
+	bjetSF     = 1.0;
+	wt         = 1.0;
+      }
+      
       h.nevt->Fill(3);
       h.nevt->Fill(4, wt);
       nEvtPass++;

@@ -26,6 +26,7 @@ float xmin;
 float xmax;
 int rebin;
 double QCDscale;
+double TOPscale;
 //Being used by decorations.h
 float globalSbyB;
 float globalObsbyExp;
@@ -72,23 +73,26 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
 
   //SET GLOBAL SETTINGS HERE:
   channel = "ee";
-  TString jobname = "hist_2LSS_2018UL_Aug26_topCR_"+channel;
+  TString jobname = "hist_2LSS_Sept16_baseline_nobsf_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "topCR_"+channel; //Don't use special symbols (folder name)
-  TString info = "top CR";
+  tag = "baseline_"+channel; //Don't use special symbols (folder name)
+  TString info = "baseline";
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
   else if(channel == "em") tag2 = info+" (e-#mu)";
+  else if(channel == "me") tag2 = info+" (#mu-e)";
   else if(channel == "mm") tag2 = info+" (#mu-#mu)";
   else DisplayText("Error! Please provide correct channel name!", 31);
 
-  QCDscale = 1.0;/*
+  QCDscale = 1.0;
+  TOPscale = 1.0;
+  /*
   //------------2024-08-07---------------//
   if     (channel == "ee") QCDscale = 0.70572926; //ee-channel
   else if(channel == "em") QCDscale = 0.25988226; //em-channel
@@ -99,14 +103,18 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   if     (channel == "ee") QCDscale = 0.49775447; //ee-channel
   else if(channel == "em") QCDscale = 0.27948709; //em-channel
   else if(channel == "mm") QCDscale = 0.20128545; //mm-channel
-  else DisplayText("Error! Please provide correct channel name!", 31);*/
+  else DisplayText("Error! Please provide correct channel name!", 31);
   //-------------------------------------//
   //------------2024-08-09-v2------------//
   if     (channel == "ee") QCDscale = 0.15881616; //ee-channel
   else if(channel == "em") QCDscale = 0.23838132; //em-channel
+  else if(channel == "me") QCDscale = 0.23838132; //em-channel
   else if(channel == "mm") QCDscale = 0.18179923; //mm-channel
-  else DisplayText("Error! Please provide correct channel name!", 31);
+  else DisplayText("Error! Please provide correct channel name!", 31);*/
   //-------------------------------------//
+
+  //------------2024-09-16------------//
+  //if(channel == "mm") TOPscale = 1.309116; //mm-channel
   
   struct plotdata {
     TString var;
@@ -167,13 +175,7 @@ void plot(TString var, TString name){
   //---------------------------------------------
     
   //Reading from files using: get_hist(var, sample, subsample, lumi)
-  vector<TH1F *> DY = {
-    get_hist(var, "DYJetsToLL", "M10to50", 5925.522),
-    get_hist(var, "DYJetsToLL", "M50",    30321.155),
-  };
-  vector<TH1F *>ZGamma={
-    get_hist(var, "ZGamma", "ZGToLLG_01J", 592588.5918)
-  };
+  //QCD processes:
   vector<TH1F *> QCD = {       
     get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
     get_hist(var, "QCD_MuEnriched", "30to50",         42.906),
@@ -185,7 +187,6 @@ void plot(TString var, TString name){
     get_hist(var, "QCD_MuEnriched", "470to600",   656872.156),
     get_hist(var, "QCD_MuEnriched", "600to800",  2060827.812),
     get_hist(var, "QCD_MuEnriched", "800to1000",11337379.457),
-
     get_hist(var, "QCD_EMEnriched", "15to20",      5.96666541),
     get_hist(var, "QCD_EMEnriched", "20to30",      2.92664338), //weird low stat bin
     get_hist(var, "QCD_EMEnriched", "30to50",      1.33001225),
@@ -195,6 +196,44 @@ void plot(TString var, TString name){
     get_hist(var, "QCD_EMEnriched", "170to300",  223.50433213),
     get_hist(var, "QCD_EMEnriched", "300toInf", 2007.24094203),
   };
+  //Bakcgrounds with single-top:
+  vector<TH1F *>ST = {
+    get_hist(var, "SingleTop", "s-channel_LeptonDecays",            5178074.5989), //old = 5456748.098),
+    get_hist(var, "SingleTop", "t-channel_AntiTop_InclusiveDecays", 1407728.544),
+    get_hist(var, "SingleTop", "t-channel_Top_InclusiveDecays",     1558659.612),
+    get_hist(var, "SingleTop", "tW_AntiTop_InclusiceDecays",         238357.428),
+    get_hist(var, "SingleTop", "tW_Top_InclusiveDecays",             245177.196)
+  };
+  vector<TH1F *>THX = {
+    get_hist(var, "Rare", "THQ",     93446130.4484), //39983860.190527),
+    get_hist(var, "Rare", "THW",     98902195.6088), //101122448.979592),
+  };
+  vector<TH1F *>TZq = {
+    get_hist(var, "Rare", "TZq_ll",  12649681.5287) //157598201.29612),
+  };
+  //Backgrounds with multiple tops:
+  vector<TH1F *>TTBar={
+    get_hist(var, "TTBar", "TTTo2L2Nu",        1642541.624),
+    get_hist(var, "TTBar", "TTToSemiLeptonic", 1304012.700),
+  };
+  vector<TH1F *>TTW ={
+    get_hist(var, "TTW", "TTWToLNu", 48514391.8292) //old:48627268.5
+  };
+  vector<TH1F *>TTZ ={
+    get_hist(var, "TTZ", "TTZToLL", 393271344.4028) //old:107659472.141
+  };
+  vector<TH1F *>TTX={
+    get_hist(var, "Rare", "TTHH",   751314800.9016), //745156482.861401),
+    get_hist(var, "Rare", "TTTJ",  1258178158.0272), //1246882793.01746),
+    get_hist(var, "Rare", "TTTT",  1589918422.0139), //1613891978.74181),
+    get_hist(var, "Rare", "TTTW",   672841187.6873), // 678385059.049712),
+    get_hist(var, "Rare", "TTWH",   435582822.0859), //435201401.050788),
+    get_hist(var, "Rare", "TTWW",   134953538.2416), //134857142.857143),
+    get_hist(var, "Rare", "TTWZ",   203431372.5490), //202686202.686203),
+    get_hist(var, "Rare", "TTZH",   442869796.2799), //440528634.361234),
+    get_hist(var, "Rare", "TTZZ",   359307359.3074), //358273381.29496),
+  };
+  //Backgrounds with single V:
   vector<TH1F *>WJets = {
     get_hist(var, "HTbinnedWJets", "70to100",      52100.910),
     get_hist(var, "HTbinnedWJets", "100to200",     41127.174),
@@ -205,58 +244,52 @@ void plot(TString var, TString name){
     get_hist(var, "HTbinnedWJets", "1200to2500", 5602003.457),
     get_hist(var, "HTbinnedWJets", "2500toInf", 79396214.989),
   };
-  vector<TH1F *>ST = {
-    get_hist(var, "SingleTop", "s-channel_LeptonDecays",            5456748.098),
-    get_hist(var, "SingleTop", "t-channel_AntiTop_InclusiveDecays", 1407728.544),
-    get_hist(var, "SingleTop", "t-channel_Top_InclusiveDecays",     1572627.866),
-    get_hist(var, "SingleTop", "tW_AntiTop_InclusiceDecays",         238357.428),
-    get_hist(var, "SingleTop", "tW_Top_InclusiveDecays",             245177.196)
+  vector<TH1F *>WGamma={
+    //get_hist(var, "WGamma", "WGToLNuG_Inclusive", 23896.3683),
+    get_hist(var, "WGamma", "WGToLNuG_01J", 23450.9243)
   };
-  vector<TH1F *>TTBar={
-    get_hist(var, "TTBar", "TTTo2L2Nu",        1642541.624),
-    get_hist(var, "TTBar", "TTToSemiLeptonic", 1304012.700),
+  vector<TH1F *> DY = {
+    get_hist(var, "DYJetsToLL", "M10to50", 5075.3797), //5925.522),
+    get_hist(var, "DYJetsToLL", "M50",    34451.2441)//30321.155)
   };
-  vector<TH1F *>TTW ={
-    get_hist(var, "TTW", "TTWToLNu", 48627268.5)
-  };
-  vector<TH1F *>TTZ ={
-    get_hist(var, "TTZ", "TTZToLL", 107659472.141)
-  };
-  vector<TH1F *>WW={
+  vector<TH1F *>ZGamma={
+    get_hist(var, "ZGamma", "ZGToLLG_01J", 592588.5918)
+  }; 
+  //Backgrounds with VV:
+  vector<TH1F *>VV={
     get_hist(var, "WW", "WWTo1L1Nu2Q", 787485.589),
     get_hist(var, "WW", "WWTo2L2Nu",   901172.227),
     get_hist(var, "WW", "WWTo4Q",      773049.853),
-  };
-  vector<TH1F *>WZ={
     get_hist(var, "WZ", "WZTo1L1Nu2Q", 805257.731),
     get_hist(var, "WZ", "WZTo2Q2L",   4499605.731),
     get_hist(var, "WZ", "WZTo3LNu",   1889798.538),
-  };
-  vector<TH1F *>ZZ={
     get_hist(var, "ZZ", "ZZTo2L2Nu", 58416512.631),
     get_hist(var, "ZZ", "ZZTo2Q2L",   7928149.608),
     get_hist(var, "ZZ", "ZZTo2Q2Nu",  4405016.452),
     get_hist(var, "ZZ", "ZZTo4L",    74330566.038),
   };
+  vector<TH1F *>WpWp={
+    get_hist(var, "WpWp", "WpWpJJEWK", 3041362.5304),
+    //get_hist(var, "WpWp", "WpWpJJQCD", 6313131.3131),
+  };
+  //Backgrounds with VVV:
   vector<TH1F *>VVV={
+    get_hist(var, "WWW", "Inclusive", 1112140.8712),
     get_hist(var, "WWZ", "Inclusive", 1452841.24194),
     get_hist(var, "WZZ", "Inclusive", 5254860.74619),
     get_hist(var, "ZZZ", "Inclusive", 16937669.376694),
   };
-  vector<TH1F *>Rare={
-    get_hist(var, "Rare", "THQ",     39983860.190527),
-    get_hist(var, "Rare", "THW",    101122448.979592),
-    get_hist(var, "Rare", "TTHH",   745156482.861401),
-    get_hist(var, "Rare", "TTTJ",  1246882793.01746),
-    get_hist(var, "Rare", "TTTT",  1613891978.74181),
-    get_hist(var, "Rare", "TTTW",   678385059.049712),
-    get_hist(var, "Rare", "TTWH",   435201401.050788),
-    get_hist(var, "Rare", "TTWW",   134857142.857143),
-    get_hist(var, "Rare", "TTWZ",   202686202.686203),
-    get_hist(var, "Rare", "TTZH",   440528634.361234),
-    get_hist(var, "Rare", "TTZZ",   358273381.29496),
-    get_hist(var, "Rare", "TZq_ll", 157598201.29612),
+  //Higgs processes:
+  vector<TH1F *>Higgs={
+    get_hist(var, "Higgs", "bbH_HToZZTo4L",      3533384497.3139),
+    get_hist(var, "Higgs", "GluGluHToZZTo4L",   28693528693.5287),
+    get_hist(var, "Higgs", "GluGluToZH_HToZZTo4L", 75554356.2066),
+    get_hist(var, "Higgs", "GluGluZH_HToWW_ZTo2L",344444108.7613),
+    get_hist(var, "Higgs", "ttHToNonbb",           34603366.3834),
+    get_hist(var, "Higgs", "VBF_HToZZTo4L",       472277227.7228),
+    get_hist(var, "Higgs", "VHToNonbb",            13166481.4209)
   };
+  //Data:
   vector<TH1F *>SingleMuon={
     get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
     get_hist(var, "SingleMuon", "SingleMuon_B", 59800),
@@ -275,18 +308,25 @@ void plot(TString var, TString name){
   //Merging the histograms from each samples and storing in a collection:
   bkg = {
     merge_and_decorate(QCD,   "QCD",       kYellow),
-    merge_and_decorate(DY,    "DY",        kRed-7),
-    merge_and_decorate(ZGamma,"Z#gamma",   kRed-9),
-    merge_and_decorate(WJets, "W+jets",    kGray+1),
+    //Top backgrounds: more top = darker blue
     merge_and_decorate(ST,    "Single t",  kCyan-7),
+    merge_and_decorate(TZq,   "tZq",       kCyan-2),
+    merge_and_decorate(THX,   "tH+X",      kViolet+1),
     merge_and_decorate(TTBar, "t#bar{t}",  kAzure+1),
     merge_and_decorate(TTW,   "t#bar{t}W", kAzure+2),
-    merge_and_decorate(TTZ,   "t#bar{t}Z", kAzure+3),
-    merge_and_decorate(WW,    "WW",        kGreen-3),
-    merge_and_decorate(WZ,    "WZ",        kGreen-9),
-    merge_and_decorate(ZZ,    "ZZ",        kGreen-10),
-    merge_and_decorate(VVV,   "VVV",       kGreen),
-    merge_and_decorate(Rare,  "Rare",      kMagenta),
+    merge_and_decorate(TTZ,   "t#bar{t}Z", kBlue-3),
+    merge_and_decorate(TTX,   "t#bar{t}+X",kBlue+1),
+    //Singe V backgrounds: red for Z, gray for W
+    merge_and_decorate(DY,    "DY",        kRed-7),
+    merge_and_decorate(WJets, "W+jets",    kGray+2),
+    merge_and_decorate(ZGamma,"Z#gamma",   kRed-9),
+    merge_and_decorate(WGamma,"W#gamma",   kGray+1),
+    //VV and VVV: more V: darker green
+    merge_and_decorate(VV,    "VV",        kGreen+1),
+    merge_and_decorate(WpWp,  "WpWp",      kGreen-5), //weird one
+    merge_and_decorate(VVV,   "VVV",       kGreen+3),
+    //Higgs:
+    merge_and_decorate(Higgs, "Higgs",     kMagenta),
   };
 
   //Remove null pointers:
@@ -341,6 +381,10 @@ void plot(TString var, TString name){
     sig2 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{400}");}
   }
   else if (channel == "em"){
+    sig1 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
+    sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{100}");}
+  }
+  else if (channel == "me"){
     sig1 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
     sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{100}");}
   }

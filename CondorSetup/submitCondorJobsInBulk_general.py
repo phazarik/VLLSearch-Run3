@@ -40,16 +40,18 @@ jsonfile = '../InputJsons/lumidata_2018.json'
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
-#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"]
+condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "Higgs", "WpWp", "WWW", "WGamma", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
+#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"] #MC only
 #condorsamples = ["SingleMuon", "EGamma"]
+#condorsamples = ["Higgs", "WpWp", "WWW", "WGamma"]
+#condorsamples = ["WW", "WGamma"]
 
 #_____________________________________________________________
 #
 #                     DO NOT TOUCH BELOW
 #_____________________________________________________________
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Aug20"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Sept10"
 
 else :
     if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"

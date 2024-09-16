@@ -1,8 +1,9 @@
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_2018_UL_2L.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_2018_UL_2LSS.h"
 #include "correction.h"
 
 auto btvjson2018      = correction::CorrectionSet::from_file("/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/POG/BTV/2018_UL/btagging.json.gz");
-auto bcjet2018        = btvjson2018->at("deepJet_comb");
+//auto bcjet2018        = btvjson2018->at("deepJet_comb");
+auto bcjet2018        = btvjson2018->at("deepJet_mujets");
 auto lightjet2018     = btvjson2018->at("deepJet_incl");
 
 auto btvjson2017      = correction::CorrectionSet::from_file("/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/POG/BTV/2017_UL/btagging.json.gz");
@@ -128,7 +129,7 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
       jet_prob_mc   = jet_eff;
     }
     else {    
-      jet_prob_data = 1-jet_eff*SFfromPOG;
+      jet_prob_data = 1-(jet_eff*SFfromPOG);
       jet_prob_mc   = 1-jet_eff;
     }
     

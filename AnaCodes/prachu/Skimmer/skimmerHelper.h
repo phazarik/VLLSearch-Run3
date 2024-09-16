@@ -262,7 +262,7 @@ void AnaScript::ReadBranch(){
     Jet_nMuons[i];
     //Jet_puId[i];
     //Jet_nConstituents[i];
-    Jet_hadronFlavour[i]; //Important for b-tagging corrections
+    if(_data==0) Jet_hadronFlavour[i]; //Important for b-tagging corrections, gen-only. Use it in the main code.
   }
 
   /*

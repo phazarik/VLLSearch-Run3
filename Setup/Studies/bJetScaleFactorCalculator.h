@@ -12,7 +12,7 @@ void AnaScript::MakebJetSFPlots(){
   if((int)LightLepton.size()==2){
     bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
     bool resonance_filter = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
-    if(resonance_filter){
+    if(resonance_filter && samesign){
       //Finding a triggerable object:
       for(int i=0; i<(int)LightLepton.size(); i++){
 	if(      fabs(LightLepton.at(i).id) == 11 && LightLepton.at(i).v.Pt() > 35 ) trigger = true;
