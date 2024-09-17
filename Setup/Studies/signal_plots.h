@@ -82,5 +82,54 @@ void AnaScript::MakeSignalPlots(float wt){
   else if(evt_2LSS)      h.sig[4]->Fill((int)5, wt); //2LSS events
   else if(evt_3L)        h.sig[4]->Fill((int)6, wt); //3L events
   else if(evt_4L_incl)   h.sig[4]->Fill((int)7, wt); //4L+ events
+
+
+  //----------------------------------------------------
+  //Specific acceptance study for Arnab [August, 2024]:
+  //Define specific region here.
+
+  bool signal_region = false;
+  bool mujj = false;
+
+  if(evt_1L2J_incl){
+
+    //mu-jj basic event selection:
+    mujj = (int)Muon.size()==1 && (int)Jet.size()>1;
+
+    if(mujj){
+
+      //Variables used in event selection:
+      float drmuj0 = Muon.at(0).v.DeltaR(Jet.at(0).v);
+      float drmuj1 = Muon.at(0).v.DeltaR(Jet.at(1).v);
+      float drj0j1 = Jet.at(0).v.DeltaR(Jet.at(1).v);
+      float dijet_mass = (Jet.at(0).v + Jet.at(1).v).M();
+      float HT=0; for(int i=0; i<(int)Jet.size(); i++) HT = HT + Jet.at(i).v.Pt();
+      float ST = Muon.at(0).v.Pt() + HT + metpt;
+      
+      //More selections:
+      bool vetoloose = (int)LightLepton.size()==1;
+      bool mjj_40    = dijet_mass > 40;
+      bool dr_selections = drmuj0>0.4 && drmuj1>0.4 && drj0j1>0.4;
+      bool no_bjet   = (int)MediumbJet.size()==0;
+
+      if(vetoloose && mjj_40 && dr_selections && no_bjet){
+	//SR pre-selection
+	bool mjj_50_110 = 50 < dijet_mass && dijet_mass < 110;
+	bool dr_2p6     = drj0j1 < 2.6;
+	bool ST_250     = ST > 250;
+
+	if(mjj_50_110 && dr_2p6 && ST_250) signal_region = true;	
+      }//baseline
+    }//mujj
+  }//1L2J
+
+  h.sig[5]                  ->Fill((int)0, wt); //All events, excluding the bad ones
+  if(evt_1L2J_incl) h.sig[5]->Fill((int)1, wt);
+  if(evt_2LOS)      h.sig[5]->Fill((int)2, wt);
+  if(evt_2LSS)      h.sig[5]->Fill((int)3, wt);
+  if(evt_3L)        h.sig[5]->Fill((int)4, wt);
+  if(evt_4L_incl)   h.sig[5]->Fill((int)5, wt);
+  if(mujj)          h.sig[5]->Fill((int)6, wt);
+  if(signal_region) h.sig[5]->Fill((int)7, wt);
   
 }

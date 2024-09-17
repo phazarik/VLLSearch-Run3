@@ -6,7 +6,8 @@ void AnaScript::Make2muSSPlots(){
     for(int i=0; i<(int)Jet.size(); i++){
 
       float jec = correctionlib_jetSF(Jet.at(i),"nom");
-      float jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+      //float jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+      float jer = correctionlib_jetRF(Jet.at(0),genJet,1.0,"nom");
           
       //Jet Energy Correction:
       Jet.at(i).v = Jet.at(i).v * jec;

@@ -19,17 +19,6 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceGenCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
 
-/*
-//Old Corrections:
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ApplyCorrections.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_preVFP.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2016UL_postVFP.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2017UL.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/ScaleFactors/ScaleFactors_2018UL.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/TriggerEfficiency.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/GetEventWeight.h"
-#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Corrections/bJetCorrections/JetEff_DeepJet_MediumWP_UL2018.h"*/
-
 //Correctionlib:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/applyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/TriggerEfficiency.h"
@@ -130,11 +119,17 @@ Bool_t AnaScript::Process(Long64_t entry)
   //
   // The return value is currently not used.
 
+  //------------------------------------------------------
+  //Initializing fReaders:
   fReader.SetLocalEntry(entry);
-  if(_data == 0)
-    fReader_MC  .SetLocalEntry(entry);
-  if(_data == 1)
-    fReader_Data.SetLocalEntry(entry);
+  if(_run3)  fReader_Run3.SetLocalEntry(entry);
+  else       fReader_Run2.SetLocalEntry(entry);
+  if(_data == 0){
+    fReader_MC.SetLocalEntry(entry);
+    if(!_run3) fReader_Run2_MC.SetLocalEntry(entry);
+    else       fReader_Run3_MC.SetLocalEntry(entry);
+  } 
+  //-------------------------------------------------------
 
   //Setting verbosity:
   time(&buffer);
@@ -146,6 +141,7 @@ Bool_t AnaScript::Process(Long64_t entry)
   if(_campaign == "2018_UL") _year = 2018;
   else if(_campaign == "2017_UL") _year = 2017;
   else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else if(_campaign == "Summer22") _year = 2022;
   else cout<<"main: Provide correct campaign name"<<endl;
 
   nEvtTotal++;
@@ -155,28 +151,41 @@ Bool_t AnaScript::Process(Long64_t entry)
   GoodEvt2016 = (_year==2016 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
 
   GoodEvt = GoodEvt2016 && GoodEvt2017 && GoodEvt2018;
+  if(_campaign=="Summer22") GoodEvt = true;
 
   if(GoodEvt){
     nEvtRan++; //only good events
     //h.nevt->Fill(1);
 
     triggerRes=true; //Always true for MC
-
-    if(_data==1){
-      triggerRes=false;
-      bool muon_trigger = false;
-      bool electron_trigger = false;
-      if     (_year==2016) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
-      else if(_year==2017) {muon_trigger = (*HLT_IsoMu27==1); electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);}
-      else if(_year==2018) {muon_trigger = (*HLT_IsoMu24==1); electron_trigger = (*HLT_Ele27_WPTight_Gsf==1);}
-
-      //Muons are preferrred over electrons.
-      //For the electron dataset, pick up only those events which do not fire a Muon trigger.
-      //Otherwise there will be overcounting.
-      triggerRes = muon_trigger || (!muon_trigger && electron_trigger);
-      if(_flag == "egamma" && muon_trigger) triggerRes = false; //To stop overcounting in the EGamma dataset.
+    muon_trigger       = false;
+    electron_trigger   = false;
+    overlapping_events = false;
+    
+    if     (_year==2016) {
+      muon_trigger     = (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+    else if(_year==2017) {
+      muon_trigger     = (*HLT_IsoMu27==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
+    }
+    else if(_year==2018) {
+      muon_trigger     = (*HLT_IsoMu24==1);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
     
+    overlapping_events = muon_trigger && electron_trigger;
+
+    if(_data==1){
+
+      //Strategy3:
+      if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
+      
+    }
+    
+    if(_campaign=="Summer22") triggerRes = true;
     if(triggerRes){
       nEvtTrigger++; //only triggered events
       //h.nevt->Fill(2);
@@ -251,9 +260,11 @@ Bool_t AnaScript::Process(Long64_t entry)
       bJet.clear();
       MediumbJet.clear();
       LooseLepton.clear();
+      LooseMuon.clear();
+      LooseElectron.clear();
       
       createLightLeptons();
-      createPhotons();
+      //createPhotons();
       createTaus();
       createJets();
 
@@ -262,86 +273,10 @@ Bool_t AnaScript::Process(Long64_t entry)
       //_______________________________________________________________________________________________________
       
       //                         Analysis block
-      //_______________________________________________________________________________________________________
+      //______________________________________________________________________________________________________
 
-      jec = 1.0;
-      jer = 1.0;
-      
-      //Selecting 2muSS events to fill:
-      bool basic_evt_selection = false;
-  
-      if((int)Muon.size()==2 && (int)Electron.size()==0){
-	if(Muon.at(0).v.Pt()>26 && Muon.at(0).charge == Muon.at(1).charge)
-	  basic_evt_selection = true;
-      }
-
-      bool isolated_leptons = false;
-      bool excluding_low_stats = false;
-      bool baseline = false;
-      bool highST = false;
-
-      if(basic_evt_selection){
-
-	//Correcting the four-vectors of jets:
-	if(_data == 0){
-	  for(int i=0; i<(int)Jet.size(); i++){
-	    jec = correctionlib_jetSF(Jet.at(i),"nom");
-	    jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
-	    Jet.at(i).v = Jet.at(i).v * jec;
-	    Jet.at(i).v = Jet.at(i).v * jer;
-	  }
-	}
-
-	//Defining local variables for event selection. (Not for filling the tree)
-	float dR_ = Muon.at(0).v.DeltaR(Muon.at(1).v);
-	TLorentzVector dilep_ = Muon.at(0).v + Muon.at(1).v;
-	float dilepeta_ = dilep_.Eta();
-	float HT_=0; for(int i=0; i<(int)Jet.size(); i++)  HT_ = HT_ +  Jet.at(i).v.Pt();
-	float LT_= dilep_.Pt();//Muon.at(0).v.Pt() + Muon.at(1).v.Pt();
-	float ST_ = HT_+LT_+metpt;
-	float STfrac_ = LT_/ST_;
-      
-	isolated_leptons = Muon.at(0).reliso03<0.15 && Muon.at(1).reliso03<0.20;
-	excluding_low_stats = fabs(dilepeta_)<3 && (0.4<dR_ && dR_<4.0) && metpt>20 && STfrac_<0.8 && HT_<500;
-	baseline = (Muon.at(0).v + Muon.at(1).v).M() > 20 && excluding_low_stats;
-	highST = baseline && isolated_leptons && ST_>150;
-		   
-      }
-
-      if(baseline){
-	nEvtPass++;
-
-	//Calculating event weight:
-	wt = 1.0;
-	sf_lepIdIso = 1.0;
-	sf_lepTrigEff = 1.0;
-	sf_btagEff = 1.0;
-
-	if(_data==0){
-
-	  //Muon Scale Factors:
-	  double sf0 = correctionlib_muonIDSF(Muon.at(0),"nom") * correctionlib_muonIsoSF(Muon.at(0),"nom");
-	  double sf1 = correctionlib_muonIDSF(Muon.at(1),"nom") * correctionlib_muonIsoSF(Muon.at(1),"nom");
-	  sf_lepIdIso = sf0*sf1;
-
-	  //Trigger efficiency:
-	  double ef0 = GetLeptonTriggerEfficiency(Muon.at(0));
-	  double ef1 = GetLeptonTriggerEfficiency(Muon.at(1));
-	  sf_lepTrigEff = 1-((1-ef0)*(1-ef1));
-
-	  //Corrections for bJet identification:
-	  //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
-	  sf_btagEff = correctionlib_btagIDSF(Jet, "nom");
-
-	  wt = sf_lepIdIso * sf_lepTrigEff;
-	  
-	}
-	
-	//Calculating other variables and writing in tree:
-	FillTree(mytree);
-
-      }
-      
+      //Calculating variables, selecting events  and writing in tree:
+      FillTree(mytree);     
       
     }//TriggeredEvts
   }//GoodEvt

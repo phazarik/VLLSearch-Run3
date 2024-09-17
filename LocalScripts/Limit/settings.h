@@ -1,8 +1,9 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "decorations.h"
 #include <string>
+#include <fstream>
+#include <iomanip>
 
 //Global variables being used by the class:
 extern TString input_path;
@@ -14,11 +15,7 @@ extern float globalSbyB;
 extern float globalObsbyExp;
 extern float globalObsbyExpErr;
 extern double QCDscale;
-extern double TOPscale;
 extern bool toZoom;
-
-//The following function are used by get_hist()
-extern TTree* GetFilteredTree(TTree *intree); //defined in the main code
 
 void SetLastBinAsOverflow(TH1F *hst){    
   int lastBin = hst->GetNbinsX();
@@ -83,11 +80,11 @@ TH1F *get_hist(
   //Tweaking the histogram:
   double datalumi = 59800; //pb^{-1}
   if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
-  else if (sample == "TTBar")                                   hst->Scale((datalumi/lumi)*TOPscale);
   else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
     
   SetLastBinAsOverflow(hst);
   hst->Rebin(rebin);
+  hst->SetName(sample+"_"+subsample);
 
   //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
   return hst;
@@ -145,7 +142,7 @@ TH1F* merge_and_decorate(vector<TH1F*>sample, TString samplename, int color) {
   }
   
   if(hist) {
-    SetHistoStyle(hist, color);
+    //SetHistoStyle(hist, color);
     hist->SetName(samplename);
     hist->SetTitle(samplename);
     return hist;
@@ -266,14 +263,6 @@ TH1F *GetRatio(TH1F *data, vector<TH1F*> bkg){
   float sumsqerr =  nobserr_frac*nobserr_frac + nbkgerr_frac*nbkgerr_frac;
   globalObsbyExpErr = globalObsbyExp*sqrt(sumsqerr);
   
-  // Remove bins where data is zero:
-  for (int bin = 1; bin <= data->GetNbinsX(); bin++) {
-    if (data->GetBinContent(bin) == 0) {
-      ratio->SetBinContent(bin, 0);
-      ratio->SetBinError(bin, 0);
-    }
-  }
-
   return ratio;
 }
 
@@ -357,34 +346,42 @@ void DisplayYieldsInBins(TH1F *data, TH1F*bkg){
   if(bkg ==nullptr) cout<<"Bkg is empty!" <<endl; 
   nbins = bkg->GetNbinsX();
   if(nbins != data->GetNbinsX()) cout<<"Shape mismatch between data and bkg!"<<endl;
-  cout << fixed << setprecision(2);
-  cout<<"--------------------"<<endl;
-  cout<<"Data and backgrounds"<<endl;
-  cout<<"--------------------"<<endl;
-  cout<<"nbin"<<"\t"<<"nobs"<<"\t"<<"nexp"<<"\t"<<"experr"<<endl;
+  ofstream fout("yields/obs_exp_experr.txt");
+
+  fout << fixed << setprecision(2);  
+  //cout<<"--------------------"<<endl;
+  //cout<<"Data and backgrounds"<<endl;
+  //cout<<"--------------------"<<endl;
+  //cout<<"nbin"<<"\t"<<"nobs"<<"\t"<<"nexp"<<"\t"<<"experr"<<endl;
   for(int bin=1; bin<=nbins; bin++){
     float nobs   = data->GetBinContent(bin);
     float nexp   = bkg ->GetBinContent(bin);
     float experr = bkg ->GetBinError(bin);
-    cout<<bin<<"\t"<<nobs<<"\t"<<nexp<<"\t"<<experr<<endl;
+    //cout<<bin<<"\t"<<nobs<<"\t"<<nexp<<"\t"<<experr<<endl;
+    fout<<bin<<"\t"<<nobs<<"\t"<<nexp<<"\t"<<experr<<endl;
   }
-  cout << defaultfloat << endl;
+  cout << "datafile created." <<defaultfloat << endl;
+  fout.close();
 }
 
 void DisplaySignalYieldsInBins(TH1F *sig){
   if(sig ==nullptr) cout<<"Signal is empty!" <<endl;
   nbins = sig->GetNbinsX();
-  cout << fixed << setprecision(2);
-  cout<<"------------------"<<endl;
-  cout<<sig->GetTitle()<<endl;
-  cout<<"------------------"<<endl;
-  cout<<"nbin"<<"\t"<<"nsig"<<"\t"<<"sigerr"<<endl;
+  TString signame = sig->GetName();
+  ofstream fout("yields/signal_"+signame+".txt"); 
+
+  fout << fixed << setprecision(2);
+  //cout<<"------------------"<<endl;
+  //cout<<signame<<endl;
+  //cout<<"------------------"<<endl;
+  //cout<<"nbin"<<"\t"<<"nsig"<<"\t"<<"sigerr"<<endl;
   for(int bin=1; bin<=nbins; bin++){
     float nsig   = sig->GetBinContent(bin);
     float sigerr = sig->GetBinError(bin);
-    cout<<bin<<"\t"<<nsig<<"\t"<<sigerr<<endl;
+    //cout<<bin<<"\t"<<nsig<<"\t"<<sigerr<<endl;
+    fout<<bin<<"\t"<<nsig<<"\t"<<sigerr<<endl;
   }
-  cout << defaultfloat << endl;
+  cout <<"File created for "<<signame<< defaultfloat << endl;
+  fout.close();
 }
-
 #endif // SETTINGS_H

@@ -166,12 +166,13 @@ void AnaScript::BookHistograms(){
   h.sig[1] = new TH1F("finalstates_for_LL", "finalstates for LL", 10, 0, 10);
   h.sig[2] = new TH1F("finalstates_for_LN", "finalstates for LN", 10, 0, 10);
   h.sig[3] = new TH1F("finalstates_for_NN", "finalstates for NN", 10, 0, 10);
-  h.sig[4] = new TH1F("finalstates_incldecay", "finalstates for inclusive decaymode", 10, 0, 10);*/
+  h.sig[4] = new TH1F("finalstates_incldecay", "finalstates for inclusive decaymode", 10, 0, 10);
+  h.sig[5] = new TH1F("acceptance_study", "acceptance: all, 1L2J, 2LOS, 2LSS, 3L, 4L, mujj, SR ", 10, 0, 10);*/
 
   //##############
   // Final states:
   //##############
-
+  
   h.evt2LSS[0]  = new TH1F("nlep", "nlep", 10, 0, 10);
   h.evt2LSS[1]  = new TH1F("njet", "njet", 10, 0, 10);
   h.evt2LSS[2]  = new TH1F("nbjet", "nbjet", 10, 0, 10);
@@ -217,12 +218,18 @@ void AnaScript::BookHistograms(){
   h.evt2LSS[37] = new TH1F("dphi_metlep_max", "dilep_metlep_max", 100, 0, 4);
   h.evt2LSS[38] = new TH1F("dphi_metlep_min", "dilep_metlep_min", 100, 0, 4);
 
-  h.evt2LSS[39] = new TH1F("ele0_hovere", "ele0_hovere", 200, 0, 0.2);
-  h.evt2LSS[40] = new TH1F("ele0_r9",     "ele0_r9",     200, 0, 2);
-  h.evt2LSS[41] = new TH1F("ele1_hovere", "ele1_hovere", 200, 0, 0.2);
-  h.evt2LSS[42] = new TH1F("ele1_r9",     "ele1_r9",     200, 0, 2);
+  h.evt2LSS[39] = new TH1F("2LSS_wt_leptonSF",  "Reco-ID-Iso Scale Factor",200,0,2);
+  h.evt2LSS[40] = new TH1F("2LSS_wt_trig","Trigger Scale Factor",200,0,2);
+  h.evt2LSS[41] = new TH1F("2LSS_wt_bjet","bJet weight",200,0,2);
+  h.evt2LSS[42] = new TH1F("2LSS_wt_evt", "Event weight",200,0,2);
   
-  for(int i=0; i<39; i++) h.evt2LSS[i]->Sumw2();
+  for(int i=0; i<43; i++) h.evt2LSS[i]->Sumw2();
+
+  h.scalef[0] = new TH2F("2LSS_lep0sfvPt", "lep0 SF v pT", 100, 0, 2, 500, 0, 500);
+  h.scalef[1] = new TH2F("2LSS_lep1sfvPt", "lep1 SF v pT", 100, 0, 2, 500, 0, 500);
+  h.scalef[2] = new TH2F("2LSS_lep0effvPt", "lep0 TrigEff v pT", 100, 0, 2, 500, 0, 500);
+  h.scalef[3] = new TH2F("2LSS_lep1effvPt", "lep1 TrigEff v pT", 100, 0, 2, 500, 0, 500);
+  for(int i=0; i<4; i++) h.scalef[i]->Sumw2();
 
   //Lepton flavor check
   h.flav[0] = new TH1F("all_lep_flav_abs", "abs(lep flav) (all)", 20, 0, 20);
@@ -241,7 +248,6 @@ void AnaScript::BookHistograms(){
   h.evtweight[12] = new TH1F("SS_trigwt","Trigger Scale Factor",200,0,2);
   h.evtweight[13] = new TH1F("SS_bjetwt","bJet weight",200,0,2);
   h.evtweight[14] = new TH1F("SS_evtwt", "Event weight",200,0,2);
-  for(int i=0; i<14; i++) h.evtweight[i]->Sumw2();
 
   //Trigger check:
   h.flag[0] = new TH1F("SS_HLT_IsoMu24",           "HLT_IsoMu24", 5, 0, 5);
@@ -278,7 +284,7 @@ void AnaScript::BookHistograms(){
   
   for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();*/
 
-  /*
+  
   h.btagsf[0] = new TH1F("JetHadronFlavor_all", "JetHadronFlavor_all", 10, -2, 8);
   //2D plots for bTagSF calculation:
   float x_bin_pT[10] = {20,30,50,70,100,140,200,300,600,1000};
@@ -288,6 +294,16 @@ void AnaScript::BookHistograms(){
   h.cJets[0] = new TH2F("cJet_PtEta","cJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.cJets[1] = new TH2F("cJet_Mis_PtEta","cJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.lJets[0] = new TH2F("LightJet_PtEta","LightJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
-  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);*/
+  h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
+
+  //Investigating bjets:
+  //1D plots: (btv_deepjet.h)
+  h.evtweight[15] = new TH1F("sfPOG_bcjet", "bcJet sf from POG",200,0,2);
+  h.evtweight[16] = new TH1F("sfPOG_ljet",  "lJet sf from POG", 200,0,2);
+  h.evtweight[17] = new TH1F("jeteff_btag", "bJet tagging efficiency",200,0,2);
+  h.evtweight[18] = new TH1F("jeteff_cmis", "cJet mistagging efficiency",200,0,2);
+  h.evtweight[19] = new TH1F("jeteff_lmis", "lJet mistagging efficiency",200,0,2);
+  h.evtweight[20] = new TH1F("jeteff_all",  "Jet efficiency (all)",200,0,2);
+  for(int i=0; i<21; i++) h.evtweight[i]->Sumw2();
   
 }

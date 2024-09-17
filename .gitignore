@@ -11,3 +11,4 @@
 *gz
 CondorSetup/previous_jobs/
 *.ipynb_checkpoints
+*backup.h

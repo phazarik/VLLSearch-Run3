@@ -46,15 +46,21 @@ TLegend *create_legend(double x1, double y1, double x2, double y2){
   lg1->SetTextSize(0.03);
   //Put globalSbyB as legend header:
   //TMathText *mathText = new TMathText(0.0, 0.0, Form("Global S/#sqrt{B} = %.2f", globalSbyB));
-  lg1->SetHeader(Form("Global S/#sqrt{B} = %.2f", globalSbyB));
+  //lg1->SetHeader(Form("Global S/#sqrt{B} = %.2f", globalSbyB));
   
   return lg1;
 }
 
 void SetLegendEntry(TLegend *lg, TH1F *hist){
   TString yield = Form("%d", (int)hist->Integral());
-  TString name  = hist->GetName();
+  TString name  = hist->GetTitle();
   TString text  = name + " [" + yield + "]";
+  lg->AddEntry(hist, text, "f");
+}
+
+void SetLegendEntry_nameonly(TLegend *lg, TH1F *hist){
+  TString name  = hist->GetTitle();
+  TString text  = name;
   lg->AddEntry(hist, text, "f");
 }
 
@@ -72,7 +78,7 @@ void SetHistoStyle(TH1F *h, int color){
   h->GetYaxis()->CenterTitle();
   h->GetYaxis()->SetNdivisions(606);
   h->GetYaxis()->SetLabelSize(0.04);
-  h->GetYaxis()->CenterTitle(true);
+  h->GetYaxis()->CenterTitle(false);
   //X-axis
   h->GetXaxis()->SetTitle("");
   h->GetXaxis()->SetTitleSize(0.04);
@@ -103,7 +109,8 @@ void SetRatioStyle(TH1F *srb, TString name){
   //srb->GetYaxis()->SetRangeUser(0, 1);
   //X-axis
   srb->GetXaxis()->SetTitle(name);
-  srb->GetXaxis()->SetTitleSize(0.16);
+  srb->GetXaxis()->SetTitleSize(0.15);
+  srb->GetXaxis()->SetTitleFont(42);
   srb->GetXaxis()->SetTitleOffset(1.00);
   srb->GetXaxis()->SetLabelSize(0.13);
   srb->GetXaxis()->SetLabelOffset(0.008);
@@ -123,6 +130,15 @@ void put_latex_text(TString text, float x, float y, int style, float size){
   latex->SetTextSize(size);
   latex->SetNDC();
   latex->DrawLatex(x, y, text);  
+}
+
+void draw_veto_region(TPad *pad, double xmin, double xmax){
+  double ymin = pad->GetUymin();
+  double ymax = pad->GetUymax();
+  TBox* veto = new TBox(xmin, ymin, xmax, ymax);
+  veto->SetFillColor(kGray+2);
+  veto->SetFillStyle(3001);
+  veto->Draw();
 }
 
 #endif // DECORATIONS_H

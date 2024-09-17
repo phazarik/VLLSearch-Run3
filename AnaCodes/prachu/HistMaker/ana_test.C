@@ -140,10 +140,12 @@ void ana_test(int sample=0)
     m_selec.SetSampleName("VLLS_mu_M100");
     m_selec.SetLumi(59800);
   }
-  
+
+  //-----------------
   //Testing on skim:
+  //-----------------
   else if(sample==999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug05/hst_DYJetsToLL_M50.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_DYJetsToLL_M50.root");
     hstfilename = "test_outputs/hst_DYJetsToLL_M50_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -154,7 +156,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(30321.155);
   }
   else if(sample==998){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug05/hst_QCD_EMEnriched_170to300.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_QCD_EMEnriched_170to300.root");
     hstfilename = "test_outputs/hst_qcd_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -165,7 +167,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==997){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug05/hst_TTBar_TTToSemiLeptonic.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_TTBar_TTToSemiLeptonic.root");
     hstfilename = "test_outputs/hst_ttbar_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -176,8 +178,8 @@ void ana_test(int sample=0)
     m_selec.SetLumi(10265.815);
   }
   else if(sample==-999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug05/hst_EGamma_EGamma_A.root");
-    hstfilename = "test_outputs/hst_EGammaA_skimmed.root";
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_EGamma_EGamma_*.root");
+    hstfilename = "test_outputs/hst_EGamma_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetCampaign("2018_UL");
     m_selec.SetMCwt(1);
@@ -187,8 +189,8 @@ void ana_test(int sample=0)
     m_selec.SetLumi(59800);
   }
   else if(sample==-998){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Aug05/hst_SingleMuon_SingleMuon_A.root");
-    hstfilename = "test_outputs/hst_SingleMuonA_skimmed.root";
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_SingleMuon_SingleMuon_*.root");
+    hstfilename = "test_outputs/hst_SingleMuon_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetCampaign("2018_UL");
     m_selec.SetMCwt(1);
@@ -197,7 +199,7 @@ void ana_test(int sample=0)
     m_selec.SetSampleName("SingleMuon_A");
     m_selec.SetLumi(59800);
   }
-  else if(sample==666){//Testing skimmed version.
+  else if(sample==666){//Testing skimmer
     chain->Add("/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/test_outputs/*.root");
     hstfilename = "test_outputs/hst_local_skimmed.root";
     m_selec.SetData(0);
@@ -243,15 +245,33 @@ void ana_test(int sample=0)
     m_selec.SetSampleName("DYJetsToLL_M50");
     m_selec.SetLumi(59800);
   }
+  //--------------------------
+  // Run3-2022 (nanoAODv12)
+  //--------------------------
+  //dataset=/SingleMuon/Run2022B-22Sep2023-v1/NANOAOD
   else if(sample==2022){
     chain->Add("/home/work/phazarik1/work/Run3TestSamples/SingleMuon/Run2022B-22Sep2023-v1/*root");
     hstfilename = "test_outputs/hst_Data_2022.root";
     m_selec.SetData(1);
-    m_selec.SetCampaign("2018_UL");
+    m_selec.SetCampaign("Summer22");
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
     m_selec.SetFlag(""); //flag=="doublet" removes invalid decay modes from VLLD files.
     m_selec.SetSampleName("SingleMuon");
+    m_selec.SetLumi(59800);
+  }
+  //--------------------------
+  // Legacy sample (nanoAODv7)
+  //--------------------------
+  else if(sample==700){
+    chain->Add("/home/work/phazarik1/public/RunII_LegacySamples/2016/VLLS/M100/F5557D8A-DA95-5D4C-91C6-40DBEFDA79E3.root");
+    hstfilename = "test_outputs/hst_VLLS_tau_M-100_legacy.root";
+    m_selec.SetData(0);
+    m_selec.SetCampaign("2018_UL");
+    m_selec.SetMCwt(1);
+    m_selec.SetLep(1);
+    m_selec.SetFlag("vlls_tau"); //flag=="doublet" removes invalid decay modes from VLLD files.
+    m_selec.SetSampleName("VLLS_tau_M-100");
     m_selec.SetLumi(59800);
   }
   else{

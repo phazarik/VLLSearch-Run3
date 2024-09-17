@@ -12,12 +12,20 @@ void AnaScript::Make2LSSPlots(){
     for(int i=0; i<(int)Jet.size(); i++){
       
       jec = correctionlib_jetSF(Jet.at(i),"nom");
-      jer = correctionlib_jetRF(Jet.at(0),genJet,*fixedGridRhoFastjetAll,"nom");
+      float rho = 0.0;
+      if(ptr_fixedGridRhoFastjetAll != nullptr) rho = **ptr_fixedGridRhoFastjetAll;
+      //cout<<"Test: rho= "<<rho<<endl;
+      //------------------------------------  Note  -----------------------------------------
+      //ptr_fixedGridRhoFastjetAll is a pointer to a TTreeReaderValue<Float_t>.
+      //*ptr_fixedGridRhoFastjetAll gives you the TTreeReaderValue<Float_t> object.
+      //**ptr_fixedGridRhoFastjetAll gives you the actual float value stored in that object.
+      jer = correctionlib_jetRF(Jet.at(0),genJet,rho,"nom");
+      //-------------------------------------------------------------------------------------
+      //jer = correctionlib_jetRF(Jet.at(0),genJet,1.0,"nom");
       
       //Jet Energy Correction:
       Jet.at(i).v = Jet.at(i).v * jec;
       Jet.at(i).v = Jet.at(i).v * jer;
-      
       h.evtweight[5]->Fill(jec);
       h.evtweight[6]->Fill(jer);
       h.evtweight[7]->Fill(jec*jer);
@@ -29,6 +37,7 @@ void AnaScript::Make2LSSPlots(){
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
+  bool me = false;
   bool mm = false;
 
   //Offline cuts on the leptons:
@@ -49,7 +58,7 @@ void AnaScript::Make2LSSPlots(){
       
       if(offline_trigger){
 	if(     flav0 == 13 && flav1 == 13){ n2muss++; mm = true; }
-	else if(flav0 == 13 && flav1 == 11){ nemuss++; em = true; }
+	else if(flav0 == 13 && flav1 == 11){ nemuss++; me = true; }
 	else if(flav0 == 11 && flav1 == 13){ nemuss++; em = true; }
 	else if(flav0 == 11 && flav1 == 11){ n2ess++;  ee = true; }
       }
@@ -59,7 +68,7 @@ void AnaScript::Make2LSSPlots(){
   //#######################
   // Select the channel :
   //
-  basic_evt_selection = mm;
+  basic_evt_selection = ee;
   //
   //#######################
   
@@ -70,35 +79,16 @@ void AnaScript::Make2LSSPlots(){
     double lepIdIsoSF = 1.0;
     double triggerEff = 1.0;
     double bjetSF = 1.0;
-    /*
-    if(_data==0){
-      double sf0 = Muon_2018UL_Reco(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-      double sf1 = Muon_2018UL_Reco(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-      scalefactor = sf0*sf1;
-      double ef0 = TrigEff_2018_IsoMu24_Data(Muon.at(0).v.Pt(), Muon.at(0).v.Eta());
-      double ef1 = TrigEff_2018_IsoMu24_Data(Muon.at(1).v.Pt(), Muon.at(1).v.Eta());
-      triggereff = 1-((1-ef0)*(1-ef1));
-      wt = scalefactor*triggereff;
-      //Corrections for Jets:
-      double jeteff = 1.0;
-      if(_campaign == "UL18") bjeteff = bTagEff_UL2018(Jet, 0); //Tweaking the SF from POG by 0 %
-      wt = wt*bjeteff;
-      }*/
 
     //Using correctionlib:
     if(_data==0){
-
+      
       //Corrections for muon reconstruction:
       //Options: "nom", "up", "down"
       double sf0 = 1.0; double sf1 = 1.0;
-      if(fabs(LightLepton.at(0).id) == 13){
-	sf0 = correctionlib_muonIDSF(LightLepton.at(0),"nom") * correctionlib_muonIsoSF(LightLepton.at(0),"nom");
-	sf1 = correctionlib_muonIDSF(LightLepton.at(1),"nom") * correctionlib_muonIsoSF(LightLepton.at(1),"nom");
-      }
-      else if(fabs(LightLepton.at(0).id) == 11){
-	sf0 = correctionlib_egmIDSF(LightLepton.at(0), "nom");
-	sf1 = correctionlib_egmIDSF(LightLepton.at(1), "nom");
-      }
+      sf0 = correctinlib_leptonSF(LightLepton.at(0), "nom");
+      sf1 = correctinlib_leptonSF(LightLepton.at(1), "nom");
+
       lepIdIsoSF = sf0*sf1;
 
       //Trigger efficiencies:
@@ -110,8 +100,15 @@ void AnaScript::Make2LSSPlots(){
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
       bjetSF = correctionlib_btagIDSF(Jet, "nom");
       
+      //wt = lepIdIsoSF*triggerEff*bjetSF;
       wt = lepIdIsoSF*triggerEff;
 
+      //Plotting corrections:
+      h.scalef[0]->Fill(sf0, LightLepton.at(0).v.Pt());
+      h.scalef[1]->Fill(sf1, LightLepton.at(1).v.Pt());
+      h.scalef[2]->Fill(ef0, LightLepton.at(0).v.Pt());
+      h.scalef[3]->Fill(ef1, LightLepton.at(1).v.Pt());
+     
     }
     
     h.evtweight[0]->Fill(lepIdIsoSF);
@@ -120,6 +117,8 @@ void AnaScript::Make2LSSPlots(){
     h.evtweight[3]->Fill(wt);
     
     //Finding the closest jet and plotting its deepjet score:
+    LightLepton.at(0).btagscore = -1;
+    LightLepton.at(1).btagscore = -1;
     float drmin0 = 1000; float drmin1=1000;
     int closest_Jet_index0=-1; int closest_Jet_index1=-1;
     for(int i=0; i<(int)Jet.size(); i++){
@@ -131,14 +130,12 @@ void AnaScript::Make2LSSPlots(){
 	closest_Jet_index0 = i;
 	LightLepton.at(0).btagscore = Jet.at(i).btagscore;
       }
-      else LightLepton.at(0).btagscore = -1;
       //Subleading muon:
       if(dr1temp < drmin1){
 	drmin1 = dr1temp;
 	closest_Jet_index1 = i;
 	LightLepton.at(1).btagscore = Jet.at(i).btagscore;
       }
-      else LightLepton.at(1).btagscore = -1;      
     }
 
     //Event level variabls:
@@ -206,28 +203,32 @@ void AnaScript::Make2LSSPlots(){
 	removed_dy_from_ee = false;
     }
     baseline = baseline && removed_dy_from_ee;
-    
-    //Picking a QCD enhanced region:
-    bool QCD_enhanced_region = baseline && ST<100 && (0.20<lep1_iso && lep1_iso<0.45);
-    bool QCD_CR = QCD_enhanced_region && metphi<0;
-    bool QCD_VR = QCD_enhanced_region && metphi>0;
-    
-    //Working region:
-    //bool isoregion = baseline && (lep1_iso<0.20 && lep1_sip3d<30); //Both leptons are isolated
-    bool isoregion = baseline && (lep1_iso<0.15 && lep1_sip3d<20); //Both leptons are isolated
-    bool highSTiso = isoregion && ST>100; //Outisde the QCD control region
-    bool highSTisoClean = highSTiso && fabs(dilep_eta)<5 && STfrac<0.8; 
 
-    //Controlling ttbar:
-    bool topEnhanced = highSTisoClean && nbjet>=1;
-    bool ttbarCR = highSTisoClean && nbjet>=2;
-    bool SR = highSTisoClean && nbjet==0;
 
-    //DY enhanced region for charge misID measurement:
+    //August 2024:
+    //Step1 : Reducing QCD by picking prompt, high ST events:
+    bool prompt = lep0_sip3d < 5 && lep1_sip3d < 10;
+    bool ST200  = baseline && prompt && ST>200;
 
+    //Step2: QCD scaling (orthogonal to promptHighST)
+    bool QCDregion = baseline && ST<100;
+    bool QCDCR = QCDregion && 0.05<lep0_iso && lep0_iso<0.15;
+    bool QCDVR = QCDregion && lep0_iso<0.04;
+    if(basic_evt_selection == ee){
+      QCDCR = QCDCR && STfrac<0.65;
+      QCDVR = QCDVR && STfrac<0.65;
+    }
+
+    //General SR:
+    bool generalSigR = ST200 && dilep_dR<4 && nbjet==0;
+
+    //TTbarCR:
+    bool topEnhanced = ST200 && nbjet > 0;
+    bool topCR = topEnhanced && dilep_dR<4 && nbjet>1;
+  
     //---------------------------------------------
     //Final event selection that used in the plots:
-    bool event_selection = basic_evt_selection;
+    bool event_selection = baseline;
     //---------------------------------------------
     
     //------------------------
@@ -236,9 +237,16 @@ void AnaScript::Make2LSSPlots(){
     //double qcdscale = 0.284324926; //Global Scaling
     //if(_flag == "qcd") wt = wt*qcdscale;
 
-    if(_data==1) wt = 1.0;
-
     if(event_selection){
+
+      //Making sure that data is not scaled from weights stored in memeory
+      if(_data != 0 ){
+	lepIdIsoSF = 1.0;
+	triggerEff = 1.0;
+	bjetSF     = 1.0;
+	wt         = 1.0;
+      }
+      
       h.nevt->Fill(3);
       h.nevt->Fill(4, wt);
       nEvtPass++;
@@ -288,6 +296,12 @@ void AnaScript::Make2LSSPlots(){
       h.evt2LSS[37]->Fill(dphi_metlep_max, wt);
       h.evt2LSS[38]->Fill(dphi_metlep_min, wt);
 
+      //Corrections:
+      h.evt2LSS[39]->Fill(lepIdIsoSF);
+      h.evt2LSS[40]->Fill(triggerEff);
+      h.evt2LSS[41]->Fill(bjetSF);
+      h.evt2LSS[42]->Fill(wt);
+
       //Special variables:
       if(fabs(LightLepton.at(0).id) == 11){
 	h.evt2LSS[39]->Fill(LightLepton.at(0).hovere, wt);
@@ -329,6 +343,7 @@ void AnaScript::Make2LSSPlots(){
 
     }//custom event selection
 
+    /*
     //Other calculations:
     
     //#########################
@@ -364,6 +379,7 @@ void AnaScript::Make2LSSPlots(){
 	if(sideband) h.chargeflip[2]->Fill((int)2, wt);
       }
     }//custom event selection
+    */
         
   }//Baseline event selection
 

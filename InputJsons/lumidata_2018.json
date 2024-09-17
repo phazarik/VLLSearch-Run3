@@ -38,7 +38,7 @@
     "SingleTop":{
 	"s-channel_LeptonDecays"           :5456748.098,
 	"t-channel_AntiTop_InclusiveDecays":1407728.544,
-	"t-channel_Top_InclusiveDecays"    :1572627.866,
+	"t-channel_Top_InclusiveDecays"    :1558659.612,
 	"tW_AntiTop_InclusiceDecays"       : 238357.428,
 	"tW_Top_InclusiveDecays"           : 245177.196
     },
@@ -47,14 +47,15 @@
 	"TTToSemiLeptonic":1304012.700
     },
     "TTW":{
-	"TTWToLNu":48627268.5
+	"TTWToLNu":48514391.8292
     },
     "TTZ":{
-	"TTZToLL":107659472.141
+	"TTZToLL":393271344.4028
     },
     "WW":{
-	"WWTo1L1Nu2Q":787485.589,
-	"WWTo4Q"     :773049.853
+	"WWTo1L1Nu2Q": 787485.589,
+	"WWTo2L2Nu"  : 901172.2272,
+	"WWTo4Q"     : 773049.853
     },
     "WZ":{
 	"WZTo1L1Nu2Q": 805257.731,
@@ -71,7 +72,7 @@
 	"ZGToLLG_01J": 592588.5918
     },
     "WWZ":{
-	"Inclusive":1452841.241945,
+	"Inclusive":        1452841.241945,
 	"WWZJetsTo4L2Nu":1932268988.87276
     },
     "WZZ":{
@@ -84,18 +85,38 @@
 	"Inclusive":1516.394181
     },
     "Rare":{
-	"THQ":39983860.190527,
-	"THW":101122448.979592,
-	"TTHH":745156482.861401,
-	"TTTJ":1246882793.01746,
-	"TTTT":1613891978.74181,
-	"TTTW":678385059.049712,
-	"TTWH":435201401.050788,
-	"TTWW":134857142.857143,
-	"TTWZ":202686202.686203,
-	"TTZH":440528634.361234,
-	"TTZZ":358273381.294964,
+	"THQ":    39983860.190527,
+	"THW":   101122448.979592,
+	"TTHH":  745156482.861401,
+	"TTTJ": 1246882793.01746,
+	"TTTT": 1613891978.74181,
+	"TTTW":  678385059.049712,
+	"TTWH":  435201401.050788,
+	"TTWW":  134857142.857143,
+	"TTWZ":  202686202.686203,
+	"TTZH":  440528634.361234,
+	"TTZZ":  358273381.294964,
 	"tZq_ll":157598201.296125
+    },
+    "Higgs":{
+	"GluGluHToZZTo4L":   28693528693.5287,
+	"GluGluToZH_HToZZTo4L": 75554356.206631,
+	"GluGluZH_HToWW_ZTo2L":344444108.761329,
+	"VHToNonbb":            13166481.420944,
+	"VBF_HToZZTo4L":       472277227.722772,
+	"bbH_HToZZTo4L":      3533384497.31389,
+	"ttHToNonbb":           34603366.383381
+    },
+    "WpWp":{
+	"WpWpJJEWK": 5277973.258269,
+	"WpWpJJQCD": 6313131.313131
+    },
+    "WWW":{
+	"Inclusive": 11620450.762829
+    },
+    "WGamma":{
+	"Inclusive":   320235.4158,
+	"WGToLNuG_01J": 59602.4012
     },
     "VLLS_ele":{
 	"M100":     512598.29,

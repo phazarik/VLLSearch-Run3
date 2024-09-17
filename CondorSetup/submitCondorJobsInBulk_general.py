@@ -32,30 +32,27 @@ campaign = "2018_UL"
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "hist"             #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'skimmed'     #Options: 'normal', 'skimmed'
+mode = "tree"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'skimmed'    #Options: 'normal', 'skimmed'
+jsonfile = '../InputJsons/lumidata_2018.json'
+#jsonfile = '../InputJsons/lumidata_legacy_2016.json'
 
 #################################
 # Select which samples to run on:
 #################################
-condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
-#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
-#condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu", "VLLS_tau"]
-#condorsamples = ["VLLD_mu"]
+condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "Higgs", "WpWp", "WWW", "WGamma", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
+#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"] #MC only
 #condorsamples = ["SingleMuon", "EGamma"]
-#condorsamples = ["Rare", "WJetsNLO", "WWZ", "WZZ", "ZZZ"]
-#condorsamples = ["Rare", "WWZ", "WZZ", "ZZZ"]
+#condorsamples = ["Higgs", "WpWp", "WWW", "WGamma"]
+#condorsamples = ["WW", "WGamma"]
 
 #_____________________________________________________________
 #
 #                     DO NOT TOUCH BELOW
 #_____________________________________________________________
 
-#jsonfile = '../InputJsons/sample_database.json'
-jsonfile = '../InputJsons/lumidata_2018.json'
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Sept10"
 
-if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Aug05"
-#if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2L_2018UL_Jun17"
 else :
     if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"
     elif "2017" in campaign: nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2017"
@@ -129,6 +126,8 @@ for sample, subs in samplelist.items():
                     if not ('VLL' in sample):
                         if campaign == '2016preVFP_UL':    input_path = input_path+"/preVFP"
                         elif campaign == '2016postVFP_UL': input_path = input_path+"/postVFP"
+
+                    if sample == "VLLS_legacy": input_path = "/home/work/phazarik1/public/RunII_LegacySamples/2016/VLLS"
 
 
                 try: list_dirs = os.listdir(input_path)

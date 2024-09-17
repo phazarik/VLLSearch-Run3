@@ -16,6 +16,10 @@ auto muonjson2016preVFP = correction::CorrectionSet::from_file("/home/work/phaza
 auto muoniso2016preVFP  = muonjson2016preVFP->at("NUM_TightRelIso_DEN_MediumID");
 auto muonid2016preVFP   = muonjson2016preVFP->at("NUM_MediumID_DEN_genTracks");
 
+//auto muonjson2022 = correction::CorrectionSet::from_file("/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/POG/MUO/2022_27Jun2023/muon_Z.json");
+//auto muoniso2022  = muonjson2022->at("NUM_TightRelIso_DEN_MediumID");
+//auto muonid2022   = muonjson2022->at("NUM_MediumID_DEN_genTracks");
+
 
 float AnaScript::correctionlib_muonIDSF(Particle muon, string mode){
 
@@ -46,7 +50,8 @@ float AnaScript::correctionlib_muonIDSF(Particle muon, string mode){
     if(_campaign=="2018_UL")             sf = muonid2018->evaluate(values);
     else if(_campaign=="2017_UL")        sf = muonid2017->evaluate(values); 
     else if(_campaign=="2016postVFP_UL") sf = muonid2016postVFP->evaluate(values); 
-    else if(_campaign=="2016preVFP_UL")  sf = muonid2016preVFP->evaluate(values); 
+    else if(_campaign=="2016preVFP_UL")  sf = muonid2016preVFP->evaluate(values);
+    else if(_campaign=="Summer22")       return 1.0;
     else cout<<"muon.h : Warning: Provide correct campaign name!"<<endl;
   }
   return sf;
@@ -72,10 +77,11 @@ float AnaScript::correctionlib_muonIsoSF(Particle muon, string mode){
   
   float sf = 1.0;
   if( pt >15. && fabs(eta)<2.4){
-    if(_campaign=="2018_UL" )            sf = muonid2018->evaluate(values); 
-    else if(_campaign=="2017_UL" )       sf = muonid2017->evaluate(values); 
-    else if(_campaign=="2016postVFP_UL") sf = muonid2016postVFP->evaluate(values); 
-    else if(_campaign=="2016preVFP_UL")  sf = muonid2016preVFP->evaluate(values);
+    if(_campaign=="2018_UL" )            sf = muoniso2018->evaluate(values); 
+    else if(_campaign=="2017_UL" )       sf = muoniso2017->evaluate(values); 
+    else if(_campaign=="2016postVFP_UL") sf = muoniso2016postVFP->evaluate(values); 
+    else if(_campaign=="2016preVFP_UL")  sf = muoniso2016preVFP->evaluate(values);
+    else if(_campaign=="Summer22")       return 1.0;
     else cout<<"muon.h : Warning: Provide correct campaign name!"<<endl;
   }
   return sf;
