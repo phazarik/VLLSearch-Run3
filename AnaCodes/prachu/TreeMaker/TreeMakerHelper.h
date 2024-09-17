@@ -1,6 +1,7 @@
 void AnaScript::InitializeBranches(TTree *tree){
 
   //Counts:
+  tree->Branch("channel",   &channel,  "nchannel/I",      32000);
   tree->Branch("nlep",      &nlep,      "nlep/I",      32000);
   tree->Branch("njet",      &njet,      "njet/I",      32000);
   tree->Branch("nbjet",     &nbjet,     "nbjet/I",     32000);
@@ -18,6 +19,7 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("lep1_eta",  &lep1_eta,  "lep1_eta/F",  32000);
   tree->Branch("lep1_phi",  &lep1_phi,  "lep1_phi/F",  32000);
   tree->Branch("lep1_iso",  &lep1_iso,  "lep1_iso/F",  32000);
+  tree->Branch("lep1_sip3d",&lep1_sip3d,"lep0_sip3d/F",32000);
   tree->Branch("lep1_mt",   &lep1_mt,   "lep1_mt/F",   32000);
 
   //Dilepton system:
@@ -50,10 +52,10 @@ void AnaScript::InitializeBranches(TTree *tree){
   //Corrections:
   tree->Branch("jec",           &jec,           "jec/F",           32000);
   tree->Branch("jer",           &jer,           "jer/F",           32000);
-  tree->Branch("sf_lepIdIso",   &sf_lepIdIso,   "sf_lepIdIso/D",   32000);
-  tree->Branch("sf_lepTrigEff", &sf_lepTrigEff, "sf_lepTrigEff/D", 32000);
-  tree->Branch("sf_btagEff",    &sf_btagEff,    "sf_btagEff/D",    32000);
-  tree->Branch("wt",            &wt,            "wt/D",            32000);
+  tree->Branch("wt_leptonSF",   &sf_lepIdIso,   "sf_lepIdIso/D",   32000);
+  tree->Branch("wt_trig",       &sf_lepTrigEff, "sf_lepTrigEff/D", 32000);
+  tree->Branch("wt_bjet",       &sf_btagEff,    "sf_btagEff/D",    32000);
+  tree->Branch("weight",        &event_weight,  "event_weight/D",  32000);
 }
 
 void AnaScript::FillTree(TTree *tree){
@@ -83,7 +85,7 @@ void AnaScript::FillTree(TTree *tree){
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
-  bool me = false
+  bool me = false;
   bool mm = false;
   
   //Offline cuts on the leptons:
@@ -110,11 +112,16 @@ void AnaScript::FillTree(TTree *tree){
       }
     }
   }
+
+  if(mm)      channel = (UInt_t)0;
+  else if(me) channel = (UInt_t)1;
+  else if(em) channel = (UInt_t)2;
+  else if(ee) channel = (UInt_t)3;
   
   //#######################
   // Select the channel :
   //
-  basic_evt_selection = mm;
+  basic_evt_selection = mm || me || em || ee;
   //
   //#######################
 
@@ -144,13 +151,14 @@ void AnaScript::FillTree(TTree *tree){
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
       bjetSF = correctionlib_btagIDSF(Jet, "nom");
       
-      wt = sf_lepIdIso*sf_lepTrigEff;
+      //wt = sf_lepIdIso*sf_lepTrigEff;
     }
 
     //Setting up the global variables:
     sf_lepIdIso   = lepIdIsoSF;
     sf_lepTrigEff = triggerEff;
     sf_btagEff    = bjetSF;
+    event_weight  = lepIdIsoSF*triggerEff;
     
     //Integers:
     nlep  = (UInt_t)LightLepton.size();
@@ -162,11 +170,13 @@ void AnaScript::FillTree(TTree *tree){
     lep0_eta = (Float_t)LightLepton.at(0).v.Eta();
     lep0_phi = (Float_t)LightLepton.at(0).v.Phi();
     lep0_iso = (Float_t)LightLepton.at(0).reliso03;
+    lep0_sip3d = (Float_t)LightLepton.at(0).sip3d;
     lep0_mt  = (Float_t)transv_mass(LightLepton.at(0).v.E(), LightLepton.at(0).v.Phi(), metpt, metphi);
     lep1_pt  = (Float_t)LightLepton.at(1).v.Pt();
     lep1_eta = (Float_t)LightLepton.at(1).v.Eta();
     lep1_phi = (Float_t)LightLepton.at(1).v.Phi();
     lep1_iso = (Float_t)LightLepton.at(1).reliso03;
+    lep1_sip3d = (Float_t)LightLepton.at(1).sip3d;
     lep1_mt  = (Float_t)transv_mass(LightLepton.at(1).v.E(), LightLepton.at(1).v.Phi(), metpt, metphi);
 
     //Dilepton system:
@@ -204,7 +214,7 @@ void AnaScript::FillTree(TTree *tree){
 
     //Vetoing DY in case of ee channel:
     bool removed_dy_from_ee = true;
-    if(basic_evt_selection == ee){
+    if(ee){
       if(76 < dilep_mass && dilep_mass < 106)
 	removed_dy_from_ee = false;
     }

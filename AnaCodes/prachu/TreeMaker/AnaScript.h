@@ -641,6 +641,7 @@ private:
 
   //The variables to be put in the root files are global.
   //They should be decalred here.
+  UInt_t  channel;
   UInt_t  nlep;
   UInt_t  njet;
   UInt_t  nbjet;
@@ -683,7 +684,7 @@ private:
   Double_t sf_lepIdIso;
   Double_t sf_lepTrigEff;
   Double_t sf_btagEff;
-  Double_t wt;
+  Double_t event_weight;
   
   ClassDef(AnaScript,0);
 

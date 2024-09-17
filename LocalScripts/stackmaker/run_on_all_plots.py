@@ -38,7 +38,7 @@ p = [
     PlotData(var="lep0_mt",    name="m_{ T}(L_{0}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep0_iso",   name="reliso03 (L_{0})",   nbins=1000, xmin=0, xmax=10, rebin=5),
     PlotData(var="lep0_sip3d", name="sip3d (L_{0})",      nbins=500, xmin=0, xmax=50, rebin=20),
-    PlotData(var="lep0_deepjet", name="DeepJet score (J near L_{0})", nbins=300, xmin=-1, xmax=2, rebin=10),
+    #PlotData(var="lep0_deepjet", name="DeepJet score (J near L_{0})", nbins=300, xmin=-1, xmax=2, rebin=10),
 
     PlotData(var="lep1_pt",    name="p_{T}(L_{1}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_eta",   name="#eta(L_{1})",        nbins=200, xmin=-4, xmax=4, rebin=5),
@@ -46,7 +46,7 @@ p = [
     PlotData(var="lep1_mt",    name="m_{ T}(L_{1}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_iso",   name="reliso03 (L_{1})",   nbins=1000, xmin=0, xmax=10, rebin=5),
     PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=20),
-    PlotData(var="lep1_deepjet", name="DeepJet score (J near L_{1})", nbins=300, xmin=-1, xmax=2, rebin=10),
+    #PlotData(var="lep1_deepjet", name="DeepJet score (J near L_{1})", nbins=300, xmin=-1, xmax=2, rebin=10),
 
     PlotData(var="dilep_pt",   name="p_{T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="dilep_eta",  name="#eta_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
@@ -55,20 +55,20 @@ p = [
     PlotData(var="dilep_deta", name="|#Delta#eta(L_{0}, L_{1})|", nbins=200, xmin=0, xmax=6, rebin=5),
     PlotData(var="dilep_dphi", name="#Delta#phi(L_{0}, L_{1})", nbins=200, xmin=0, xmax=6, rebin=5),
     PlotData(var="dilep_dR",   name="#Delta R(L_{0}, L_{1})",   nbins=200, xmin=0, xmax=6, rebin=5),
-
     PlotData(var="dilep_ptratio",   name="p_{T1} / p_{T0}",    nbins=200, xmin=0, xmax=1, rebin=5),
+
     PlotData(var="dphi_metlep0",    name="#Delta#phi(L_{0}, p_{T}^{miss})", nbins=200, xmin=0, xmax=4, rebin=5),
     PlotData(var="dphi_metlep1",    name="#Delta#phi(L_{1}, p_{T}^{miss})", nbins=200, xmin=0, xmax=4, rebin=5),
     PlotData(var="dphi_metdilep",   name="#Delta#phi(LL, p_{T}^{miss})", nbins=200, xmin=0, xmax=4, rebin=5),
     PlotData(var="dphi_metlep_max", name="max(#Delta#phi(L, p_{T}^{miss}))", nbins=200, xmin=0, xmax=4, rebin=5),
     PlotData(var="dphi_metlep_min", name="min(#Delta#phi(L, p_{T}^{miss}))", nbins=200, xmin=0, xmax=4, rebin=5),
 
-    PlotData(var="all_lep_flav_abs", name="L |id|",  nbins=20, xmin=0, xmax=20, rebin=1),
-    PlotData(var="lep0_flav_abs",    name="L_{0} |id|", nbins=20, xmin=0, xmax=20, rebin=1),
-    PlotData(var="lep1_flav_abs",    name="L_{1} |id|", nbins=20, xmin=0, xmax=20, rebin=1),
-    PlotData(var="all_lep_flav_raw", name="L id",       nbins=40, xmin=-20, xmax=20, rebin=1),
-    PlotData(var="lep0_flav_raw",    name="L_{0} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
-    PlotData(var="lep1_flav_raw",    name="L_{1} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
+    #PlotData(var="all_lep_flav_abs", name="L |id|",  nbins=20, xmin=0, xmax=20, rebin=1),
+    #PlotData(var="lep0_flav_abs",    name="L_{0} |id|", nbins=20, xmin=0, xmax=20, rebin=1),
+    #PlotData(var="lep1_flav_abs",    name="L_{1} |id|", nbins=20, xmin=0, xmax=20, rebin=1),
+    #PlotData(var="all_lep_flav_raw", name="L id",       nbins=40, xmin=-20, xmax=20, rebin=1),
+    #PlotData(var="lep0_flav_raw",    name="L_{0} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
+    #PlotData(var="lep1_flav_raw",    name="L_{1} id",    nbins=40, xmin=-20, xmax=20, rebin=1),
 
     PlotData(var="2LSS_wt_leptonSF", name="Lepton IdIso SF", nbins=200, xmin=0, xmax=2, rebin=1),
     PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=1),

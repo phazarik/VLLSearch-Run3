@@ -72,16 +72,16 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
-  channel = "ee";
-  TString jobname = "hist_2LSS_Sept16_baseline_nobsf_"+channel;
+  channel = "mm";
+  TString jobname = "tree_2LSSinclusive_baseline_Sept17_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
   toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "baseline_"+channel; //Don't use special symbols (folder name)
-  TString info = "baseline";
+  tag = "baseline_tree_"+channel; //Don't use special symbols (folder name)
+  TString info = "baseline (tree)";
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.

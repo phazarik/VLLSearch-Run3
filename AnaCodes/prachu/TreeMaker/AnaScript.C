@@ -172,16 +172,17 @@ Bool_t AnaScript::Process(Long64_t entry)
     }
     else if(_year==2018) {
       muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1) || (*HLT_Ele27_WPTight_Gsf);
+      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
     }
     
     overlapping_events = muon_trigger && electron_trigger;
 
     if(_data==1){
-      triggerRes = (muon_trigger || electron_trigger);
-      //This is the union of both datasets (may overlap).
-      //Removing the overlapping events from the EGamma dataset as follows:
-      if(_flag == "egamma" && overlapping_events) triggerRes = false;
+
+      //Strategy3:
+      if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
+      
     }
     
     if(_campaign=="Summer22") triggerRes = true;
