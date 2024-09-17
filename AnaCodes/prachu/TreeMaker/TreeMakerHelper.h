@@ -83,6 +83,7 @@ void AnaScript::FillTree(TTree *tree){
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
+  bool me = false
   bool mm = false;
   
   //Offline cuts on the leptons:
@@ -103,7 +104,7 @@ void AnaScript::FillTree(TTree *tree){
       
       if(offline_trigger){
 	if(     flav0 == 13 && flav1 == 13){ mm = true; }
-	else if(flav0 == 13 && flav1 == 11){ em = true; }
+	else if(flav0 == 13 && flav1 == 11){ me = true; }
 	else if(flav0 == 11 && flav1 == 13){ em = true; }
 	else if(flav0 == 11 && flav1 == 11){ ee = true; }
       }
@@ -120,37 +121,36 @@ void AnaScript::FillTree(TTree *tree){
   if(basic_evt_selection){
 
     //Calculating event weights:
-    wt = 1.0;
-    sf_lepIdIso = 1.0;
-    sf_lepTrigEff = 1.0;
-    sf_btagEff = 1.0;
+    double wt = 1.0;
+    double lepIdIsoSF = 1.0;
+    double triggerEff = 1.0;
+    double bjetSF = 1.0;
 
     if(_data==0){
       //Corrections for lepton reconstruction:
       //Options: "nom", "up", "down"
       double sf0 = 1.0; double sf1 = 1.0;
-      if(fabs(LightLepton.at(0).id) == 13){
-	sf0 = correctionlib_muonIDSF(LightLepton.at(0),"nom") * correctionlib_muonIsoSF(LightLepton.at(0),"nom");
-	sf1 = correctionlib_muonIDSF(LightLepton.at(1),"nom") * correctionlib_muonIsoSF(LightLepton.at(1),"nom");
-      }
-      else if(fabs(LightLepton.at(0).id) == 11){
-	sf0 = correctionlib_egmIDSF(LightLepton.at(0), "nom");
-	sf1 = correctionlib_egmIDSF(LightLepton.at(1), "nom");
-      }
-      sf_lepIdIso = sf0*sf1;
+      sf0 = correctinlib_leptonSF(LightLepton.at(0), "nom");
+      sf1 = correctinlib_leptonSF(LightLepton.at(1), "nom");
+
+      lepIdIsoSF = sf0*sf1;
 
       //Trigger efficiencies:
       double ef0 = GetLeptonTriggerEfficiency(LightLepton.at(0));
       double ef1 = GetLeptonTriggerEfficiency(LightLepton.at(1));
-      sf_lepTrigEff = 1-((1-ef0)*(1-ef1));
+      triggerEff = 1-((1-ef0)*(1-ef1));
 
       //Corrections for bJet identification:
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
-      sf_btagEff = correctionlib_btagIDSF(Jet, "nom");
+      bjetSF = correctionlib_btagIDSF(Jet, "nom");
       
       wt = sf_lepIdIso*sf_lepTrigEff;
     }
-	
+
+    //Setting up the global variables:
+    sf_lepIdIso   = lepIdIsoSF;
+    sf_lepTrigEff = triggerEff;
+    sf_btagEff    = bjetSF;
     
     //Integers:
     nlep  = (UInt_t)LightLepton.size();
@@ -182,8 +182,8 @@ void AnaScript::FillTree(TTree *tree){
     dilep_ptratio = (Float_t)lep1_pt/lep0_pt;
 
     //Event level:
-    HT=0; for(Int_t i=0; i<(Int_t)Jet.size();  i++) HT = HT +  Jet.at(i).v.Pt();
-    LT=0; for(Int_t i=0; i<(Int_t)LightLepton.size(); i++) LT = LT + LightLepton.at(i).v.Pt();
+    HT=0; for(Int_t i=0; i<(Int_t)Jet.size(); i++) HT = HT + Jet.at(i).v.Pt();
+    LT= LightLepton.at(0).v.Pt() + LightLepton.at(1).v.Pt();
     STvis = HT + LT;
     ST = HT + LT + metpt;
     HTMETllpt = HT + metpt + dilep_pt;

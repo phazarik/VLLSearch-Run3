@@ -576,6 +576,7 @@ public:
   //--------------------------------------------------------------------------
 
   //ForCorrectionlib:
+  double correctinlib_leptonSF(Particle lepton, string mode);
   float correctionlib_muonIDSF(Particle muon, string mode);
   float correctionlib_muonIsoSF(Particle muon, string mode);
   float correctionlib_egmIDSF(Particle electron, string mode);
