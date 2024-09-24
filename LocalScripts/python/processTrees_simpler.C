@@ -3,7 +3,7 @@
 #include <TH1F.h>
 #include <iostream>
 
-void processTrees(const char* inputFilename, const char* outputFilename, int channelval) {
+void processTrees_simpler(const char* inputFilename, const char* outputFilename, int channelval) {
   // Opening the ROOT file
   TFile *file = TFile::Open(inputFilename);
   if (!file || file->IsZombie()) {
@@ -20,6 +20,7 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
   }
 
   // Setting branch addresses with updated types
+  /*
   Int_t channel, nlep, njet, nbjet;
   Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
   Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
@@ -27,6 +28,16 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
   Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
   Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
   Double_t wt_leptonSF, wt_trig, wt_bjet, weight;
+  Float_t nnscore1;*/
+
+  Long64_t channel, nlep, njet, nbjet;
+  Double_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
+  Double_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
+  Double_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
+  Double_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
+  Double_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
+  Double_t wt_leptonSF, wt_trig, wt_bjet, weight;
+  Double_t nnscore1;
 
   tree->SetBranchAddress("channel", &channel);
   tree->SetBranchAddress("nlep", &nlep);
@@ -71,6 +82,7 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
   tree->SetBranchAddress("wt_trig", &wt_trig);
   tree->SetBranchAddress("wt_bjet", &wt_bjet);
   tree->SetBranchAddress("weight", &weight);
+  tree->SetBranchAddress("nnscore_qcd_vlldmu", &nnscore1);
 
   // Defining histograms with their respective binning
   TH1F *hist_channel = new TH1F("channel", "channel", 10, 0, 10); hist_channel->Sumw2();
@@ -122,6 +134,8 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
   TH1F *hist_wt_trig = new TH1F("2LSS_wt_trig", "wt_trig", 200, 0, 2); hist_wt_trig->Sumw2();
   TH1F *hist_wt_bjet = new TH1F("2LSS_wt_bjet", "wt_bjet", 200, 0, 2); hist_wt_bjet->Sumw2();
   TH1F *hist_weight = new TH1F("2LSS_wt_evt", "weight", 200, 0, 2);    hist_weight->Sumw2();
+
+  TH1F *hist_nnscore1 = new TH1F("nnscore_qcd_vlldmu", "nnscore_qcd_vlldmu", 200, 0, 1); hist_nnscore1->Sumw2();
 
   // Event loop:
   Long64_t nentries = tree->GetEntries();
@@ -180,6 +194,7 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
       hist_wt_trig->Fill(wt_trig, 1.0);
       hist_wt_bjet->Fill(wt_bjet, 1.0);
       hist_weight->Fill(weight, 1.0);
+      hist_nnscore1->Fill(nnscore1, weight);
     }
   }
 
@@ -226,6 +241,7 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
   hist_wt_trig->Write();
   hist_wt_bjet->Write();
   hist_weight->Write();
+  hist_nnscore1->Write();
 
   // Close files
   outputFile->Close();
