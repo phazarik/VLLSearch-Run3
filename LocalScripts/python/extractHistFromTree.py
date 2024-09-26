@@ -6,12 +6,14 @@ start_time = time.time()
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--jobname',type=str, required=True,  help='Condor job name')
+parser.add_argument('--dump',   type=str, required=True,  help='Output job name')
 parser.add_argument('--channel',type=str, required=True,  help='Mention channel name: ee, em, me or mm')
 parser.add_argument('--test',   type=bool,required=False, help='Run for only one sample')
 parser.add_argument('--dryrun', type=bool,required=False, help='Print statments')
 args=parser.parse_args()
 
 jobname = args.jobname
+dump    = args.dump
 channel = args.channel
 test    = args.test
 dryrun  = args.dryrun
@@ -79,9 +81,9 @@ def extractHistFromTree(jobname, channel):
 
     for s in samples:
         print("Making histograms for \033[33m"+s+ "\033[0m ...")
-        indir = "../input_trees/" + jobname + "/"
+        indir = "../input_trees_modified/" + jobname + "/"
         #indir = "../input_trees_modified/" + jobname + "/"
-        outdir = "../input_hists/"+jobname+"_"+channel+"/"
+        outdir = "../input_hists/"+dump+"/"
         inputfilename = indir+"tree_" + s + ".root"
         outputfilename = outdir+"hst_" + s + ".root"
 
@@ -91,9 +93,9 @@ def extractHistFromTree(jobname, channel):
             continue
 
         # Generating the output directory
-        if not test: os.makedirs(outdir, exist_ok=True)
+        os.makedirs(outdir, exist_ok=True)
         arguments = f'"{inputfilename}", "{outputfilename}", {chval}'
-        processline = f"root -q -b -l 'processTrees.C({arguments})'"
+        processline = f"root -q -b -l 'processTrees_simpler.C({arguments})'"
         if dryrun: print(processline)
         else:  os.system(processline)
         

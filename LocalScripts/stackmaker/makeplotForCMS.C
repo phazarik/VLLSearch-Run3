@@ -67,21 +67,22 @@ void plot(TString var, TString name);
 //------------------------------------------------
 
 void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
+//void makeplotForCMS(TString _var = "nnscore_qcd_vlldmu", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
 //void makeplotForCMS(){
   time_t start, end;
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
   channel = "mm";
-  TString jobname = "tree_2LSSinclusive_baseline_Sept17_"+channel;
+  TString jobname = "hist_2LSS_TopCRv2_Sept26_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "baseline_tree_"+channel; //Don't use special symbols (folder name)
-  TString info = "baseline (tree)";
+  tag = "top_crv2_"+channel; //Don't use special symbols (folder name)
+  TString info = "top CR";
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
@@ -112,6 +113,9 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   else if(channel == "mm") QCDscale = 0.18179923; //mm-channel
   else DisplayText("Error! Please provide correct channel name!", 31);*/
   //-------------------------------------//
+  //------------2024-09-25, with NN-------------//
+  if     (channel == "mm") QCDscale = 0.1574915; //mm-channel
+  else DisplayText("Error! Please provide correct channel name!", 31);
 
   //------------2024-09-16------------//
   //if(channel == "mm") TOPscale = 1.309116; //mm-channel
@@ -470,8 +474,8 @@ void plot(TString var, TString name){
     if(sig3) cout<<setw(15)<<left<<sig3->GetTitle()<<"\t"<<sig3->Integral()<<"\\pm"<<GetStatUncertainty(sig3)<<endl;
     cout<<defaultfloat<<endl;
 
-    DisplayYieldsInBins(allbkg, allbkg);
-    DisplaySignalYieldsInBins(sig2);
+    //DisplayYieldsInBins(allbkg, allbkg);
+    //DisplaySignalYieldsInBins(sig2);
 
   }
   //-----------------------------------------------------------------------------
@@ -508,7 +512,7 @@ void plot(TString var, TString name){
   dummy->GetYaxis()->SetTitleOffset(1.00);
   dummy->GetYaxis()->SetLabelSize(0.05);
   dummy->GetYaxis()->SetTickSize(0.02);
-  dummy->GetYaxis()->SetRangeUser(0.1, 10E6);
+  dummy->GetYaxis()->SetRangeUser(0.1, 10E5); //10E8 for baseline, #10E5 for topCR
   dummy->GetXaxis()->SetTickSize(0.02);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
   dummy->SetStats(0);
