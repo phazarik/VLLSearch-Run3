@@ -147,54 +147,55 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     // Put event selections here.
     bool event_selection = false;
     bool channel_selection = channel == channelval; //This decides the channel
+    Double_t wt = wt_leptonSF*wt_trig*wt_bjet;
 
     event_selection = channel_selection;
     //-----------------------------------------------
     
     if(event_selection){
       hist_channel->Fill(channel, 1.0);
-      hist_nlep->Fill(nlep, weight);
-      hist_njet->Fill(njet, weight);
-      hist_nbjet->Fill(nbjet, weight);
-      hist_lep0_pt->Fill(lep0_pt, weight);
-      hist_lep0_eta->Fill(lep0_eta, weight);
-      hist_lep0_phi->Fill(lep0_phi, weight);
-      hist_lep0_iso->Fill(lep0_iso, weight);
-      hist_lep0_sip3d->Fill(lep0_sip3d, weight);
-      hist_lep0_mt->Fill(lep0_mt, weight);
-      hist_lep1_pt->Fill(lep1_pt, weight);
-      hist_lep1_eta->Fill(lep1_eta, weight);
-      hist_lep1_phi->Fill(lep1_phi, weight);
-      hist_lep1_iso->Fill(lep1_iso, weight);
-      hist_lep1_sip3d->Fill(lep1_sip3d, weight);
-      hist_lep1_mt->Fill(lep1_mt, weight);
-      hist_dilep_pt->Fill(dilep_pt, weight);
-      hist_dilep_eta->Fill(dilep_eta, weight);
-      hist_dilep_phi->Fill(dilep_phi, weight);
-      hist_dilep_mass->Fill(dilep_mass, weight);
-      hist_dilep_mt->Fill(dilep_mt, weight);
-      hist_dilep_deta->Fill(dilep_eta, weight);
-      hist_dilep_dphi->Fill(dilep_phi, weight);
-      hist_dilep_dR->Fill(dilep_dR, weight);
-      hist_dilep_ptratio->Fill(dilep_ptratio, weight);
-      hist_HT->Fill(HT, weight);
-      hist_LT->Fill(LT, weight);
-      hist_STvis->Fill(STvis, weight);
-      hist_ST->Fill(ST, weight);
-      hist_STfrac->Fill(STfrac, weight);
-      hist_HTMETllpt->Fill(HTMETllpt, weight);
-      hist_metpt->Fill(metpt, weight);
-      hist_metphi->Fill(metphi, weight);
-      hist_dphi_metlep0->Fill(dphi_metlep0, weight);
-      hist_dphi_metlep1->Fill(dphi_metlep1, weight);
-      hist_dphi_metdilep->Fill(dphi_metdilep, weight);
-      hist_dphi_metlep_max->Fill(dphi_metlep_max, weight);
-      hist_dphi_metlep_min->Fill(dphi_metlep_min, weight);
+      hist_nlep->Fill(nlep, wt);
+      hist_njet->Fill(njet, wt);
+      hist_nbjet->Fill(nbjet, wt);
+      hist_lep0_pt->Fill(lep0_pt, wt);
+      hist_lep0_eta->Fill(lep0_eta, wt);
+      hist_lep0_phi->Fill(lep0_phi, wt);
+      hist_lep0_iso->Fill(lep0_iso, wt);
+      hist_lep0_sip3d->Fill(lep0_sip3d, wt);
+      hist_lep0_mt->Fill(lep0_mt, wt);
+      hist_lep1_pt->Fill(lep1_pt, wt);
+      hist_lep1_eta->Fill(lep1_eta, wt);
+      hist_lep1_phi->Fill(lep1_phi, wt);
+      hist_lep1_iso->Fill(lep1_iso, wt);
+      hist_lep1_sip3d->Fill(lep1_sip3d, wt);
+      hist_lep1_mt->Fill(lep1_mt, wt);
+      hist_dilep_pt->Fill(dilep_pt, wt);
+      hist_dilep_eta->Fill(dilep_eta, wt);
+      hist_dilep_phi->Fill(dilep_phi, wt);
+      hist_dilep_mass->Fill(dilep_mass, wt);
+      hist_dilep_mt->Fill(dilep_mt, wt);
+      hist_dilep_deta->Fill(dilep_eta, wt);
+      hist_dilep_dphi->Fill(dilep_phi, wt);
+      hist_dilep_dR->Fill(dilep_dR, wt);
+      hist_dilep_ptratio->Fill(dilep_ptratio, wt);
+      hist_HT->Fill(HT, wt);
+      hist_LT->Fill(LT, wt);
+      hist_STvis->Fill(STvis, wt);
+      hist_ST->Fill(ST, wt);
+      hist_STfrac->Fill(STfrac, wt);
+      hist_HTMETllpt->Fill(HTMETllpt, wt);
+      hist_metpt->Fill(metpt, wt);
+      hist_metphi->Fill(metphi, wt);
+      hist_dphi_metlep0->Fill(dphi_metlep0, wt);
+      hist_dphi_metlep1->Fill(dphi_metlep1, wt);
+      hist_dphi_metdilep->Fill(dphi_metdilep, wt);
+      hist_dphi_metlep_max->Fill(dphi_metlep_max, wt);
+      hist_dphi_metlep_min->Fill(dphi_metlep_min, wt);
       hist_wt_leptonSF->Fill(wt_leptonSF, 1.0);
       hist_wt_trig->Fill(wt_trig, 1.0);
       hist_wt_bjet->Fill(wt_bjet, 1.0);
-      hist_weight->Fill(weight, 1.0);
-      hist_nnscore1->Fill(nnscore1, weight);
+      hist_weight->Fill(wt, 1.0);
+      hist_nnscore1->Fill(nnscore1, wt);
     }
   }
 

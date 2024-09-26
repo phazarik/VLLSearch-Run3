@@ -74,15 +74,15 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
 
   //SET GLOBAL SETTINGS HERE:
   channel = "mm";
-  TString jobname = "hist_2LSS_qcdVR_Sept25_"+channel;
+  TString jobname = "hist_2LSS_TopCRv2_Sept26_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "qcdvr"+channel; //Don't use special symbols (folder name)
-  TString info = "QCD VR";
+  tag = "top_crv2_"+channel; //Don't use special symbols (folder name)
+  TString info = "top CR";
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
@@ -512,7 +512,7 @@ void plot(TString var, TString name){
   dummy->GetYaxis()->SetTitleOffset(1.00);
   dummy->GetYaxis()->SetLabelSize(0.05);
   dummy->GetYaxis()->SetTickSize(0.02);
-  dummy->GetYaxis()->SetRangeUser(0.1, 10E8);
+  dummy->GetYaxis()->SetRangeUser(0.1, 10E5); //10E8 for baseline, #10E5 for topCR
   dummy->GetXaxis()->SetTickSize(0.02);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
   dummy->SetStats(0);
