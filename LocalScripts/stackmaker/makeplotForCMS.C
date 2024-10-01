@@ -73,15 +73,15 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
-  channel = "mm";
-  TString jobname = "hist_2LSS_TopCRv2_Sept26_"+channel;
+  channel = "me";
+  TString jobname = "hist_2LSSinclusive_topCR_Oct01_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "top_crv2_"+channel; //Don't use special symbols (folder name)
+  tag = "topCR_"+channel; //Don't use special symbols (folder name)
   TString info = "top CR";
 
   //DON'T TOUCH BELOW:
@@ -114,11 +114,17 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   else DisplayText("Error! Please provide correct channel name!", 31);*/
   //-------------------------------------//
   //------------2024-09-25, with NN-------------//
-  if     (channel == "mm") QCDscale = 0.1574915; //mm-channel
-  else DisplayText("Error! Please provide correct channel name!", 31);
+  //if     (channel == "mm") QCDscale = 0.1574915; //mm-channel
+  //else DisplayText("Error! Please provide correct channel name!", 31);
 
   //------------2024-09-16------------//
   //if(channel == "mm") TOPscale = 1.309116; //mm-channel
+
+  //----------------2024-10-01----------------//
+  if(channel == "mm")      QCDscale = 0.152628;
+  else if(channel == "me") QCDscale = 0.093506;
+  else if(channel == "em") QCDscale = 0.172164;
+  else if(channel == "ee") QCDscale = 0.303176;
   
   struct plotdata {
     TString var;
@@ -164,6 +170,9 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
 //-----------------------------------
 
 void plot(TString var, TString name){
+
+  Double_t ymin = 0.1;
+  Double_t ymax = 10E5;
   
   //rebin = 1; //overriding rebin
   //cout<<"Test : toZoom = "<<toZoom;
@@ -512,7 +521,7 @@ void plot(TString var, TString name){
   dummy->GetYaxis()->SetTitleOffset(1.00);
   dummy->GetYaxis()->SetLabelSize(0.05);
   dummy->GetYaxis()->SetTickSize(0.02);
-  dummy->GetYaxis()->SetRangeUser(0.1, 10E5); //10E8 for baseline, #10E5 for topCR
+  dummy->GetYaxis()->SetRangeUser(ymin, ymax); //10E8 for baseline, #10E5 for topCR
   dummy->GetXaxis()->SetTickSize(0.02);
   if(toZoom) dummy->GetXaxis()->SetRangeUser(xmin, xmax);
   dummy->SetStats(0);

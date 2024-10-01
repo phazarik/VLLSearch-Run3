@@ -18,7 +18,9 @@ p = [
     #PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=5),
     #PlotData(var="2LSS_wt_bjet", name="bJet weight",           nbins=200, xmin=0, xmax=2, rebin=5),
     #PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=5),
-    PlotData(var="nnscore_qcd_vlldmu", name="NNScore (QCD vs VLLD#mu)", nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="nnscore_qcd_vlldmu",  name="NNScore (QCD vs VLLD-#mu)", nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="nnscore_qcd_vlldele", name="NNScore (QCD vs VLLD-ele)", nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="nnscore_qcd_vlld_combined", name="NNScore (QCD vs VLLD combined)", nbins=200, xmin=0, xmax=1, rebin=5),
     
     PlotData(var="nlep",    name="N_{L}",                 nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="njet",    name="N_{J}",                 nbins=10, xmin=0, xmax=10, rebin=1),
@@ -74,7 +76,7 @@ p = [
     PlotData(var="2LSS_wt_leptonSF", name="Lepton IdIso SF", nbins=200, xmin=0, xmax=2, rebin=1),
     PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=1),
     PlotData(var="2LSS_wt_bjet", name="bJet weight", nbins=200, xmin=0, xmax=2, rebin=1),
-    PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=1),
+    PlotData(var="2LSS_wt_evt",   name="Event weight", nbins=200, xmin=0, xmax=2, rebin=1),
 
     PlotData(var="dilep_mass", name="M_{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     #PlotData(var="nnscore_qcd_vlldmu", name="NNScore (QCD vs VLLD#mu)", nbins=200, xmin=0, xmax=1, rebin=1),

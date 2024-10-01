@@ -12,11 +12,12 @@ from tensorflow.keras.layers import Dense
 #Global parameters:
 jobname = 'tree_2LSSinclusive_baseline_Sept17'
 indir = '../../input_trees/'
-outdir = f'../../input_trees_modified/{jobname}_main'
+outdir = f'../../input_trees_modified/{jobname}_evalSept30'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    'QCD-VLLD_mu-classifier':'nnscore_qcd_vlldmu'
+    'qcd-vs-vlld-mu-m400-sept30'  :'nnscore_qcd_vlld_mu_m400',
+    'qcd-vs-vlld-ele-m400-sept30' :'nnscore_qcd_vlld_ele_m400',
 }
 
 #-------------------------------------------
@@ -47,7 +48,7 @@ def ApplyMinMax(X, modelname):
     maxval = np.loadtxt(max_filename)
     
     #print('Min from txt: ', minval)
-    p#rint('Max from txt: ', maxval)
+    #print('Max from txt: ', maxval)
     
     # Calculate the difference
     diff = maxval - minval
@@ -125,13 +126,14 @@ for f in list_of_files:
         y = models[modelname].predict(X_scaled)
         df[scorename] = y
 
-        break #model
+        #break #model
 
     write_df_into_file(df, os.path.join(outdir, f))
     list_success.append(f)
     
     print(f'\033[1;33mFile written: {outfile}\033[0m')
-
+    #break #file
+    
 end_time = time.time()
 time_taken = end_time-start_time
 
