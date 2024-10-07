@@ -73,16 +73,16 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
-  channel = "me";
-  TString jobname = "hist_2LSSinclusive_topCR_Oct01_"+channel;
+  channel = "mm";
+  TString jobname = "hist_2LSS_SE2_Oct03_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = true;
+  toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "topCR_"+channel; //Don't use special symbols (folder name)
-  TString info = "top CR";
+  tag = "SE2_reliso_"+channel; //Don't use special symbols (folder name)
+  TString info = "";
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
@@ -94,37 +94,17 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   QCDscale = 1.0;
   TOPscale = 1.0;
   /*
-  //------------2024-08-07---------------//
-  if     (channel == "ee") QCDscale = 0.70572926; //ee-channel
-  else if(channel == "em") QCDscale = 0.25988226; //em-channel
-  else if(channel == "mm") QCDscale = 0.18630010; //mm-channel
-  else DisplayText("Error! Please provide correct channel name!", 31);
-  //-------------------------------------//
-  //------------2024-08-09---------------//
-  if     (channel == "ee") QCDscale = 0.49775447; //ee-channel
-  else if(channel == "em") QCDscale = 0.27948709; //em-channel
-  else if(channel == "mm") QCDscale = 0.20128545; //mm-channel
-  else DisplayText("Error! Please provide correct channel name!", 31);
-  //-------------------------------------//
-  //------------2024-08-09-v2------------//
-  if     (channel == "ee") QCDscale = 0.15881616; //ee-channel
-  else if(channel == "em") QCDscale = 0.23838132; //em-channel
-  else if(channel == "me") QCDscale = 0.23838132; //em-channel
-  else if(channel == "mm") QCDscale = 0.18179923; //mm-channel
-  else DisplayText("Error! Please provide correct channel name!", 31);*/
-  //-------------------------------------//
-  //------------2024-09-25, with NN-------------//
-  //if     (channel == "mm") QCDscale = 0.1574915; //mm-channel
-  //else DisplayText("Error! Please provide correct channel name!", 31);
-
-  //------------2024-09-16------------//
-  //if(channel == "mm") TOPscale = 1.309116; //mm-channel
-
   //----------------2024-10-01----------------//
   if(channel == "mm")      QCDscale = 0.152628;
   else if(channel == "me") QCDscale = 0.093506;
   else if(channel == "em") QCDscale = 0.172164;
-  else if(channel == "ee") QCDscale = 0.303176;
+  else if(channel == "ee") QCDscale = 0.303176;*/
+
+  //----------------2024-10-03----------------//
+  if(channel == "mm")      QCDscale = 0.155758;
+  else if(channel == "me") QCDscale = 0.094731;
+  else if(channel == "em") QCDscale = 0.192381;
+  else if(channel == "ee") QCDscale = 0.303599;
   
   struct plotdata {
     TString var;
@@ -394,8 +374,8 @@ void plot(TString var, TString name){
     sig2 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{400}");}
   }
   else if (channel == "em"){
-    sig1 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
-    sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{100}");}
+    sig1 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD e_{100}");}
+    sig2 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD #mu_{100}");}
   }
   else if (channel == "me"){
     sig1 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
@@ -629,7 +609,9 @@ void plot(TString var, TString name){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);
     TString err = Form("%.3f", globalObsbyExpErr);
     legendheader = val+" #pm "+err;
-    cout<<defaultfloat<<"Obs/Exp = "<<globalObsbyExp<<" ± "<<globalObsbyExpErr<<"\n"<<endl;
+    cout << fixed << setprecision(3);
+    cout << "Obs/Exp = " << globalObsbyExp << " ± " << globalObsbyExpErr << "\n";
+    cout << defaultfloat << endl;
   }
   else cout<<legendheader<<"\n"<<endl; 
   lg->SetHeader(legendheader);

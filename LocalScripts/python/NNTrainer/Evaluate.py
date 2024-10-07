@@ -10,9 +10,10 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
 
 #Global parameters:
-jobname = 'tree_2LSSinclusive_baseline_Sept17'
+#jobname = 'tree_2LSSinclusive_baseline_Sept17'
+jobname = 'tree_2LSS_baseline_Oct03'
 indir = '../../input_trees/'
-outdir = f'../../input_trees_modified/{jobname}_evalSept30'
+outdir = f'../../input_trees_modified/{jobname}_evalOct03'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {

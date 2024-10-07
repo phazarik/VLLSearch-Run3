@@ -30,7 +30,7 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   Double_t wt_leptonSF, wt_trig, wt_bjet, weight;
   Float_t nnscore1;*/
 
-  Long64_t channel, nlep, njet, nbjet;
+  Long64_t channel, trigger, nlep, njet, nbjet;
   Double_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
   Double_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
   Double_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
@@ -40,6 +40,7 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   Double_t nnscore1, nnscore2, nnscoreCombined;
 
   tree->SetBranchAddress("channel", &channel);
+  tree->SetBranchAddress("trigger", &trigger);
   tree->SetBranchAddress("nlep", &nlep);
   tree->SetBranchAddress("njet", &njet);
   tree->SetBranchAddress("nbjet", &nbjet);
@@ -87,6 +88,7 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
 
   // Defining histograms with their respective binning
   TH1F *hist_channel = new TH1F("channel", "channel", 10, 0, 10); hist_channel->Sumw2();
+  TH1F *hist_trigger = new TH1F("trigger", "trigger", 10, 0, 10); hist_trigger->Sumw2();
   TH1F *hist_nlep = new TH1F("nlep", "nlep",          10, 0, 10); hist_nlep->Sumw2();
   TH1F *hist_njet = new TH1F("njet", "njet",          10, 0, 10); hist_njet->Sumw2();
   TH1F *hist_nbjet = new TH1F("nbjet", "nbjet",       10, 0, 10); hist_nbjet->Sumw2();
@@ -159,6 +161,7 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     
     if(event_selection){
       hist_channel->Fill(channel, 1.0);
+      hist_trigger->Fill(trigger, 1.0);
       hist_nlep->Fill(nlep, wt);
       hist_njet->Fill(njet, wt);
       hist_nbjet->Fill(nbjet, wt);
@@ -208,6 +211,8 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
 
   // Save histograms to a new ROOT file
   TFile *outputFile = new TFile(outputFilename, "RECREATE");
+  hist_channel->Write();
+  hist_trigger->Write();
   hist_nlep->Write();
   hist_njet->Write();
   hist_nbjet->Write();
