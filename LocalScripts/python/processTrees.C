@@ -80,6 +80,10 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
     {.branchname_ = "wt_bjet",     .nbins_ = 200, .xmin_ = 0, .xmax_ = 2, .branchtype_ = 'D'},
     {.branchname_ = "weight",      .nbins_ = 200, .xmin_ = 0, .xmax_ = 2, .branchtype_ = 'D'},
 
+    {.branchname_ = "nnscore_qcd_vlldmu", .nbins_ = 200, .xmin_ = 0, .xmax_ = 1, .branchtype_ = 'F'},
+    {.branchname_ = "nnscore_qcd_vlldele", .nbins_ = 200, .xmin_ = 0, .xmax_ = 1, .branchtype_ = 'F'},
+    {.branchname_ = "nnscore_qcd_vlld_combined", .nbins_ = 200, .xmin_ = 0, .xmax_ = 1, .branchtype_ = 'F'},
+    
   };
 
   //-------------------------------------
@@ -92,18 +96,18 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
     float xmax = plots[i].xmax_;
 
     if (plots[i].branchtype_ == 'I') {
-        plots[i].branchdata_ = new Int_t;
-        tree->SetBranchAddress(branchname, (Int_t*)plots[i].branchdata_);
+      plots[i].branchdata_ = new Long64_t;//Int_t;
+      tree->SetBranchAddress(branchname, (Long64_t*)plots[i].branchdata_);
     }
     else if (plots[i].branchtype_ == 'F') {
-        plots[i].branchdata_ = new Float_t;
-        tree->SetBranchAddress(branchname, (Float_t*)plots[i].branchdata_);
+      plots[i].branchdata_ = new Double_t;//Float_t;
+      tree->SetBranchAddress(branchname, (Double_t*)plots[i].branchdata_);
     }
     else if (plots[i].branchtype_ == 'D') {
-        plots[i].branchdata_ = new Double_t;
-        tree->SetBranchAddress(branchname, (Double_t*)plots[i].branchdata_);
+      plots[i].branchdata_ = new Double_t;
+      tree->SetBranchAddress(branchname, (Double_t*)plots[i].branchdata_);
     }
-
+    
     //Replacing the nullptr in the collection:
     plots[i].hist_ = new TH1F(branchname, branchname, nbins, xmin, xmax);
     plots[i].hist_->Sumw2();
@@ -128,7 +132,7 @@ void processTrees(const char* inputFilename, const char* outputFilename, int cha
       //2. Dereferencing to get the value.
       //3. Stpring the value in the local variable.
       if (branchname == "weight")  wt      = *(Double_t*)plots[i].branchdata_;
-      if (branchname == "channel") channel = *(Int_t*)plots[i].branchdata_;     
+      if (branchname == "channel") channel = *(Long64_t*)plots[i].branchdata_;     
     }
 
     //Put event selection using the local variables:

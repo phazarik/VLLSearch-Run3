@@ -111,4 +111,4 @@ extractHistFromTree(jobname, channel)
 
 end_time = time.time()
 time_taken = end_time-start_time
-print(f"\n\033[33mDone!\nTotal time taken = {time_taken:.2f} seconds.\033[0m")
+print(f"\n\033[33mtime taken = {time_taken:.2f} seconds.\033[0m")

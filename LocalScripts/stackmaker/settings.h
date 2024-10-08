@@ -20,7 +20,9 @@ extern bool toZoom;
 //The following function are used by get_hist()
 extern TTree* GetFilteredTree(TTree *intree); //defined in the main code
 
-void SetLastBinAsOverflow(TH1F *hst){    
+void SetLastBinAsOverflow(TH1F *hst){
+
+  //Handle overlow:
   int lastBin = hst->GetNbinsX();
   double content  = hst->GetBinContent(lastBin);
   double error    = hst->GetBinError(lastBin);
@@ -31,6 +33,18 @@ void SetLastBinAsOverflow(TH1F *hst){
   
   hst->SetBinContent(lastBin, updated_content);
   hst->SetBinError(lastBin, updated_error);
+
+  //Handle underflow:
+  double content_first  = hst->GetBinContent(1);
+  double error_first    = hst->GetBinError(1);
+  double underflow      = hst->GetBinContent(0);
+
+  double updated_content_first = content_first + underflow;
+  double updated_error_first = std::sqrt(error_first*error_first + underflow*underflow);
+
+  hst->SetBinContent(1, updated_content_first);
+  hst->SetBinError(1, updated_error_first);
+  
 }
 
 bool file_exists(TString filename){
@@ -77,6 +91,10 @@ TH1F *get_hist(
     return nullptr;
   }
 
+  //Note: Handle overflow before scaling.
+  SetLastBinAsOverflow(hst);
+  hst->Rebin(rebin);
+
   float scalefactor = 0;
   //float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
 
@@ -85,9 +103,6 @@ TH1F *get_hist(
   if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
   else if (sample == "TTBar")                                   hst->Scale((datalumi/lumi)*TOPscale);
   else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
-    
-  SetLastBinAsOverflow(hst);
-  hst->Rebin(rebin);
 
   //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
   return hst;

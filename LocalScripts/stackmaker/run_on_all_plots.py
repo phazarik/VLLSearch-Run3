@@ -18,7 +18,11 @@ p = [
     #PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=5),
     #PlotData(var="2LSS_wt_bjet", name="bJet weight",           nbins=200, xmin=0, xmax=2, rebin=5),
     #PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=5),
-    PlotData(var="nnscore_qcd_vlldmu", name="NNScore (QCD vs VLLD#mu)", nbins=200, xmin=0, xmax=1, rebin=5),
+    #PlotData(var="lep0_sip3d", name="sip3d (L_{0})",      nbins=500, xmin=0, xmax=50, rebin=5),
+    #PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=5),
+    PlotData(var="nnscore_qcd_vlldmu",  name="NNScore (QCD vs VLLD-#mu)", nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="nnscore_qcd_vlldele", name="NNScore (QCD vs VLLD-ele)", nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="nnscore_qcd_vlld_combined", name="NNScore (QCD vs VLLD combined)", nbins=200, xmin=0, xmax=1, rebin=5),
     
     PlotData(var="nlep",    name="N_{L}",                 nbins=10, xmin=0, xmax=10, rebin=1),
     PlotData(var="njet",    name="N_{J}",                 nbins=10, xmin=0, xmax=10, rebin=1),
@@ -38,7 +42,7 @@ p = [
     PlotData(var="lep0_phi",   name="#phi(L_{0})",        nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="lep0_mt",    name="m_{ T}(L_{0}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep0_iso",   name="reliso03 (L_{0})",   nbins=1000, xmin=0, xmax=10, rebin=5),
-    PlotData(var="lep0_sip3d", name="sip3d (L_{0})",      nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep0_sip3d", name="sip3d (L_{0})",      nbins=500, xmin=0, xmax=50, rebin=5),
     #PlotData(var="lep0_deepjet", name="DeepJet score (J near L_{0})", nbins=300, xmin=-1, xmax=2, rebin=10),
 
     PlotData(var="lep1_pt",    name="p_{T}(L_{1}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
@@ -46,7 +50,7 @@ p = [
     PlotData(var="lep1_phi",   name="#phi(L_{1})",        nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="lep1_mt",    name="m_{ T}(L_{1}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     PlotData(var="lep1_iso",   name="reliso03 (L_{1})",   nbins=1000, xmin=0, xmax=10, rebin=5),
-    PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=20),
+    PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=5),
     #PlotData(var="lep1_deepjet", name="DeepJet score (J near L_{1})", nbins=300, xmin=-1, xmax=2, rebin=10),
 
     PlotData(var="dilep_pt",   name="p_{T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
@@ -74,7 +78,7 @@ p = [
     PlotData(var="2LSS_wt_leptonSF", name="Lepton IdIso SF", nbins=200, xmin=0, xmax=2, rebin=1),
     PlotData(var="2LSS_wt_trig", name="Trigger efficiency SF", nbins=200, xmin=0, xmax=2, rebin=1),
     PlotData(var="2LSS_wt_bjet", name="bJet weight", nbins=200, xmin=0, xmax=2, rebin=1),
-    PlotData(var="2LSS_wt_evt",   name="Event weight (leptonSF * trigger)", nbins=200, xmin=0, xmax=2, rebin=1),
+    PlotData(var="2LSS_wt_evt",   name="Event weight", nbins=200, xmin=0, xmax=2, rebin=1),
 
     PlotData(var="dilep_mass", name="M_{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
     #PlotData(var="nnscore_qcd_vlldmu", name="NNScore (QCD vs VLLD#mu)", nbins=200, xmin=0, xmax=1, rebin=1),
@@ -89,8 +93,10 @@ start_time = time.time()
 # Accessing elements of the vector
 count = 0
 for i, plot_data in enumerate(p):
-    
+
+    #if i==2: break
     count = count+1
+    
     print(f'\n\033[93mPlot no: {count}\033[0m')
     #print(plot_data.var, plot_data.name, plot_data.nbins, plot_data.xmin, plot_data.xmax, plot_data.rebin)
 
@@ -107,7 +113,6 @@ for i, plot_data in enumerate(p):
     #print("Executing :" + processline + " ... ", end = "\n")
     os.system(processline)
     #print("\033[033mSuccess.\033[0m")
-    #if i==4: break
     #break
 
 end_time = time.time()
