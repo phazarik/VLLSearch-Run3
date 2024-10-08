@@ -37,7 +37,7 @@ TCanvas* CreateCanvas();
 //##########################
 //          Main
 //##########################
-void makeLimitPlot(const TString& filename, const TString &modelname) {
+void makeLimitPlot(TString filename="combinelimits_sigmaB/limits_sigmaB_VLLD_mu.txt", TString modelname="VLLD-#mu") {
    
   vector<LimitData> limits = ReadDataFromFile(filename);
   int nPoints = limits.size();
@@ -93,7 +93,7 @@ void makeLimitPlot(const TString& filename, const TString &modelname) {
   graph_2sigma->Draw("3 same");
   graph_1sigma->Draw("3 same");
   graph_exp->Draw("L same");
-  //graph_obs->Draw("LP same");
+  graph_obs->Draw("LP same");
   graph_theory->Draw("L same");
 
   // Create and draw legend
@@ -111,6 +111,7 @@ void makeLimitPlot(const TString& filename, const TString &modelname) {
   // Set logarithmic scale and update canvas
   c1->SetLogy();
   c1->Update();
+  c1->SaveAs("demo.png");
 }
 
 //###################
@@ -161,7 +162,7 @@ void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax) {
   graph->GetYaxis()->SetTitleOffset(1.15);
   graph->GetYaxis()->SetTickSize(0.02);
   graph->GetYaxis()->SetRangeUser(ymin, ymax);
-  graph->GetXaxis()->SetTitle("M (GeV)");
+  graph->GetXaxis()->SetTitle("M_{VLL} (GeV)");
   graph->GetXaxis()->SetTitleSize(0.05);
   graph->GetXaxis()->SetTitleOffset(0.98);
   graph->GetXaxis()->SetLabelSize(0.04);

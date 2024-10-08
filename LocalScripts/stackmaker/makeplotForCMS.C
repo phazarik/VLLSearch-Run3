@@ -66,8 +66,8 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
-//void makeplotForCMS(TString _var = "nnscore_qcd_vlldmu", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
+//void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
+void makeplotForCMS(TString _var = "nnscore_qcd_vlld_combined", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
 //void makeplotForCMS(){
   time_t start, end;
   time(&start);
@@ -77,7 +77,7 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   TString jobname = "hist_2LSS_SE2_Oct03_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = true;
+  toSave = false;
   toLog = true;
   toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
@@ -382,7 +382,7 @@ void plot(TString var, TString name){
     sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{100}");}
   }
   else if (channel == "mm"){
-    sig1 = get_hist(var, "VLLD", "mu_M100", 6560.41);    if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
+    sig1 = get_hist(var, "VLLD", "mu_M100", 6622.84);    if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
     sig2 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD #mu_{400}");}
   }
   sig3 = nullptr;//get_hist(var, "VLLD", "ele_M300", 85061.86);
@@ -421,7 +421,8 @@ void plot(TString var, TString name){
   //ON SCREEN DISPLAYS:
   //For the data and background file: nObs, nExp, nExpErr
   //For the signal file: nSig, nSigErr
-  if(var == "dilep_mass"){
+  //if(var == "dilep_mass"){
+  if(var == "nnscore_qcd_vlld_combined"){
     cout << fixed << setprecision(2);
 
     // Output for Obs/Exp file
@@ -463,8 +464,8 @@ void plot(TString var, TString name){
     if(sig3) cout<<setw(15)<<left<<sig3->GetTitle()<<"\t"<<sig3->Integral()<<"\\pm"<<GetStatUncertainty(sig3)<<endl;
     cout<<defaultfloat<<endl;
 
-    //DisplayYieldsInBins(allbkg, allbkg);
-    //DisplaySignalYieldsInBins(sig2);
+    DisplayYieldsInBins(allbkg, allbkg);
+    DisplaySignalYieldsInBins(sig1);
 
   }
   //-----------------------------------------------------------------------------
