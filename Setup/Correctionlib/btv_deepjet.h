@@ -72,7 +72,7 @@ float AnaScript::correctionlib_btagWPSFfromPOG(Particle jet, string mode){
       else                  { sf = lightjet2016preVFP->evaluate(values); }
     }
     else if( _campaign=="Summer22" ) return 1.0;
-    else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
+    else cout<<"btv_deepjet.h POG: Provide correct campaign name!"<<endl;
   }
   
   return sf;
@@ -84,8 +84,7 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
   
   float probability_mc = 1.0;
   float probability_data = 1.0;
-  
-  
+
   //btag SF is basically an event reweighting procedure
   for (int i = 0; i < (int)Jet.size(); i++){
     float jet_prob_mc   = 1.0;
@@ -97,14 +96,13 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
       jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i));
       h.evtweight[20]->Fill(jet_eff);
     }
-    else {
-      jet_eff = 1.0;
+    else { jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i)); //Using the same numbers for now
       cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
     }
-
+    
     //SFfromPOG
     float SFfromPOG = correctionlib_btagWPSFfromPOG(Jet.at(i), mode);
-
+    
     //DeepJetWPThreshold (https://btv-wiki.docs.cern.ch/ScaleFactors/#useful-links)
     //  Year          L           M          T
     //  2018         0.0490     0.2783     0.7100

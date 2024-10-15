@@ -188,7 +188,7 @@ void ana_test(int sample=0)
     cout<<"Invalid argument!"<<endl;
   }
 
-  std::cout<<"Output file is "<<treefilename<<std::endl;
+  std::cout<<"\nOutput file is "<<treefilename<<std::endl;
   m_selec.SetTreeFileName(treefilename);
   m_selec.SetVerbose(0);//set verbosity level for output.
   

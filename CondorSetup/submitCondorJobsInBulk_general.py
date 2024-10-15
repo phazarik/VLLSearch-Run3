@@ -29,6 +29,7 @@ debug  = args.debug #for debugging the condor-script
 #Global settings:
 #################
 campaign = "2018_UL"
+#campaign = "2016preVFP_UL"
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
@@ -43,8 +44,9 @@ jsonfile = '../InputJsons/lumidata_2018.json'
 condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "Higgs", "WpWp", "WWW", "WGamma", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
 #condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"] #MC only
 #condorsamples = ["SingleMuon", "EGamma"]
-#condorsamples = ["Higgs", "WpWp", "WWW", "WGamma"]
+#condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
 #condorsamples = ["WW", "WGamma"]
+#condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"]
 
 #_____________________________________________________________
 #

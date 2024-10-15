@@ -28,6 +28,9 @@
 #include <bitset>
 #include <time.h>
 
+//For pasring json files:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/nlohmann/json.hpp"
+using json = nlohmann::json;
 
 class AnaScript : public TSelector {
 
@@ -385,6 +388,14 @@ public :
 
   //Jetflavor:
   TTreeReaderArray<int_or_char> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+
+  //Pileup:
+  TTreeReaderValue<Int_t> Pileup_nPU          = {fReader_MC, "Pileup_nPU"};
+  TTreeReaderValue<Int_t> Pileup_sumEOOT      = {fReader_MC, "Pileup_sumEOOT"};
+  TTreeReaderValue<Int_t> Pileup_sumLOOT      = {fReader_MC, "Pileup_sumLOOT"};
+  TTreeReaderValue<Float_t> Pileup_nTrueInt   = {fReader_MC, "Pileup_nTrueInt"};
+  TTreeReaderValue<Float_t> Pileup_pudensity  = {fReader_MC, "Pileup_pudensity"};
+  TTreeReaderValue<Float_t> Pileup_gpudensity = {fReader_MC, "Pileup_gpudensity"};
   
   //_________________________________________________________________________
   
@@ -575,6 +586,10 @@ public:
   //for skimmer
   void ReadBranch();
   void ActivateBranch(TTree *t);
+
+  //--------------------------------------------------------------------------
+  json loadJson();
+  bool checkJson(bool isData, int runno, int lumisection);
   
 protected:
   Hists h;
@@ -601,7 +616,7 @@ private:
   vector<Particle> LooseLepton, LooseMuon, LooseElectron; //Loose objects
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
   int n2muss, n2ess, nemuss;
   int nbasicpass, nadvancedpass, nbasicpass2, nadvancedpass2; //For Uttsavi
@@ -613,6 +628,9 @@ private:
 
   //For signal:
   bool bad_event;
+
+  //json:
+  json jsondata;
 
   time_t start, end, buffer;
   int batch_index, batch_size;

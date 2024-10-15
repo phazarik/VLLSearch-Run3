@@ -15,6 +15,9 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/ProduceRecoCollection.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/Skimmer/skimmerHelper.h"
 
+//json:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/nlohmann/json_setup.h"
+
 void AnaScript::Begin(TTree * /*tree*/)
 {
   TString option = GetOption();
@@ -22,7 +25,26 @@ void AnaScript::Begin(TTree * /*tree*/)
 
 void AnaScript::SlaveBegin(TTree *tree)
 {
+  //---------------------------------------------------
+  //Set Campaign manually : (important for corrections)
+  //_campaign = "2018_UL";
+  //_campaign = "2017_UL";
+  //_campaign = "2016preVFP_UL";
+  //_campaign = "2016postVFP_UL";
+  //---------------------------------------------------
   time(&start);
+
+  //Setting parameters:
+  cout<<"Campaign set to: "<<_campaign<<endl;
+  //Setting year (overriding SetYear());
+  if     (_campaign == "2018_UL") _year = 2018;
+  else if(_campaign == "2017_UL") _year = 2017;
+  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else if(_campaign == "Summer22") _year = 2022;
+  else cout<<"main: Provide correct campaign name"<<endl;
+  cout<<"Year set to: "<<_year<<endl;
+
+  jsondata = loadJson();
   cout<<"\nn-events \t time_taken (sec)"<<endl;
   batch_index = 0;
   batch_size = 10000;
@@ -32,7 +54,8 @@ void AnaScript::SlaveBegin(TTree *tree)
   nEvtRan = 0;
   nEvtTrigger=0;
   nEvtPass=0;
-  nEvtBad=0; 
+  nEvtBad=0;
+  nThrown=0;
 
   evt_wt = 1.0;
   evt_trigger = false;
@@ -55,6 +78,7 @@ void AnaScript::SlaveTerminate()
   float goodevtfrac = ((float)nEvtRan)/((float)nEvtTotal);
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
   float passevtfrac = ((float)nEvtPass)/((float)nEvtTotal);
+  float notgoldenevtfrac  = ((float)nThrown)/((float)nEvtTotal);
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
@@ -62,6 +86,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtRan = "<<nEvtRan<<" ("<<goodevtfrac*100<<" %)"<<endl;
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtSkimmed = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
+  if(_data!=0) cout<<"nEvents not in golden json = "<<nThrown<<" ("<<notgoldenevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
   
   time(&end);
@@ -114,13 +139,6 @@ Bool_t AnaScript::Process(Long64_t entry)
   if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
   else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
-  //Setting year (overriding SetYear());
-  if(_campaign == "2018_UL") _year = 2018;
-  else if(_campaign == "2017_UL") _year = 2017;
-  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
-  else if(_campaign == "Summer22") _year = 2022;
-  else cout<<"main: Provide correct campaign name"<<endl;
-
   nEvtTotal++;
   
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -155,6 +173,18 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       triggerRes = true;
     }*/
+
+    if(_data !=0 ){
+      //Throw awaying bad data that are not included in the GoldenJson:
+      int runno = (int)*run;
+      int lumisection = (int)*luminosityBlock;
+      bool golden_event = checkJson(true, runno, lumisection);
+      if(!golden_event){
+	nThrown++;
+	//cout<<"Event not in golden json: "<<nEvtTotal<<endl;
+	//triggerRes = false; //Keep everything
+      }
+    }
     
     if(triggerRes){
       nEvtTrigger++; //only triggered events

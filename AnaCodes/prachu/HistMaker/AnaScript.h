@@ -28,6 +28,10 @@
 #include <bitset>
 #include <time.h>
 
+//For pasring json files:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/nlohmann/json.hpp"
+using json = nlohmann::json;
+
 class AnaScript : public TSelector {
 
 public:
@@ -385,6 +389,14 @@ public :
 
   //Jetflavor:
   TTreeReaderArray<int_or_char> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+
+  //Pileup:
+  TTreeReaderValue<Int_t> Pileup_nPU          = {fReader_MC, "Pileup_nPU"};
+  TTreeReaderValue<Int_t> Pileup_sumEOOT      = {fReader_MC, "Pileup_sumEOOT"};
+  TTreeReaderValue<Int_t> Pileup_sumLOOT      = {fReader_MC, "Pileup_sumLOOT"};
+  TTreeReaderValue<Float_t> Pileup_nTrueInt   = {fReader_MC, "Pileup_nTrueInt"};
+  TTreeReaderValue<Float_t> Pileup_pudensity  = {fReader_MC, "Pileup_pudensity"};
+  TTreeReaderValue<Float_t> Pileup_gpudensity = {fReader_MC, "Pileup_gpudensity"};
   
   //_________________________________________________________________________
   
@@ -640,7 +652,7 @@ public:
     TH1F *jet[10];TH1F *bjet[10];
     //For spcific studies:
     TH1F *basic[50];
-    TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[50];
+    TH1F *vll[10]; TH1F *vln[10]; TH1F *sig[10];
     TH1F *evt2LSS[55];
     TH1F *gen2LSS[50];
     TH1F *evt2muSS[50];
@@ -701,6 +713,7 @@ public:
   double correctionlib_btagMCeff_2018UL(Particle jet);
   float correctionlib_btagWPSFfromPOG(Particle jet, string mode);
   float correctionlib_btagIDSF(vector<Particle> Jet, string mode);
+  float correctionlib_pileupWt(float nTrueInt, string mode);
   
   //--------------------------------------------------------------------------
 
@@ -712,6 +725,9 @@ public:
   double TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron);
   
   //--------------------------------------------------------------------------
+  json loadJson();
+  bool checkJson(bool isData, int runno, int lumisection);
+  
   
 protected:
   Hists h;
@@ -742,7 +758,7 @@ private:
   //bool _run3;
   
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
   int n2muss, n2ess, nemuss;
   int nbasicpass, nadvancedpass, nbasicpass2, nadvancedpass2; //For Uttsavi
@@ -752,6 +768,9 @@ private:
 
   //Weights:
   double evt_wt;
+
+  //json:
+  json jsondata;
 
   time_t start, end, buffer;
 

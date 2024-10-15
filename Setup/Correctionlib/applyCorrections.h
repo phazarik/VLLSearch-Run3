@@ -2,6 +2,7 @@
 #include "egamma.h"
 #include "jetmet.h"
 #include "btv_deepjet.h"
+#include "pileup.h"
 
 double AnaScript::correctinlib_leptonSF(Particle lepton, string mode){
   int id = fabs(lepton.id);

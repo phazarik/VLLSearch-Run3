@@ -79,6 +79,7 @@ void AnaScript::Make2LSSPlots(){
     double lepIdIsoSF = 1.0;
     double triggerEff = 1.0;
     double bjetSF = 1.0;
+    double pileupwt = 1.0;
 
     //Using correctionlib:
     if(_data==0){
@@ -88,13 +89,17 @@ void AnaScript::Make2LSSPlots(){
       double sf0 = 1.0; double sf1 = 1.0;
       sf0 = correctinlib_leptonSF(LightLepton.at(0), "nom");
       sf1 = correctinlib_leptonSF(LightLepton.at(1), "nom");
-
       lepIdIsoSF = sf0*sf1;
 
       //Trigger efficiencies:
-      double ef0 = GetLeptonTriggerEfficiency(LightLepton.at(0));
-      double ef1 = GetLeptonTriggerEfficiency(LightLepton.at(1));
+      double ef0 = 1.0; double ef1 = 1.0;
+      ef0 = GetLeptonTriggerEfficiency(LightLepton.at(0));
+      ef1 = GetLeptonTriggerEfficiency(LightLepton.at(1));
       triggerEff = 1-((1-ef0)*(1-ef1));
+
+      //Pileup weight:
+      pileupwt = (double)correctionlib_pileupWt(*Pileup_nTrueInt, "nom");
+      //cout<<"pileup wt = "<<pileupwt<<endl;
 
       //Corrections for bJet identification:
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
@@ -113,8 +118,9 @@ void AnaScript::Make2LSSPlots(){
     
     h.evtweight[0]->Fill(lepIdIsoSF);
     h.evtweight[1]->Fill(triggerEff);
-    h.evtweight[2]->Fill(bjetSF);
-    h.evtweight[3]->Fill(wt);
+    h.evtweight[2]->Fill(pileupwt);
+    h.evtweight[3]->Fill(bjetSF);
+    h.evtweight[4]->Fill(wt);
     
     //Finding the closest jet and plotting its deepjet score:
     LightLepton.at(0).btagscore = -1;
@@ -137,7 +143,7 @@ void AnaScript::Make2LSSPlots(){
 	LightLepton.at(1).btagscore = Jet.at(i).btagscore;
       }
     }
-
+    
     //Event level variabls:
     //Counts:
     UInt_t nlep  = (UInt_t)LightLepton.size();
@@ -328,8 +334,9 @@ void AnaScript::Make2LSSPlots(){
       h.evtweight[10]->Fill(jec*jer);
       h.evtweight[11]->Fill(lepIdIsoSF);
       h.evtweight[12]->Fill(triggerEff);
-      h.evtweight[13]->Fill(bjetSF);
-      h.evtweight[14]->Fill(wt);
+      h.evtweight[13]->Fill(pileupwt);
+      h.evtweight[14]->Fill(bjetSF);
+      h.evtweight[15]->Fill(wt);
 
       //Trigger check:
       h.flag[0]->Fill(*HLT_IsoMu24, wt);
@@ -342,7 +349,7 @@ void AnaScript::Make2LSSPlots(){
       if(overlapping_events) h.flag[4]->Fill((int)3, wt); //Should not appear in EGamma dataset
 
     }//custom event selection
-
+    
     /*
     //Other calculations:
     

@@ -29,6 +29,9 @@
 #include <time.h>
 //#include <RtypesCore.h>
 
+//For pasring json files:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/nlohmann/json.hpp"
+using json = nlohmann::json;
 
 class AnaScript : public TSelector {
 
@@ -284,7 +287,7 @@ public :
   TTreeReaderArray<Bool_t>  Photon_mvaID_WP90 =  {fReader, "Photon_mvaID_WP90"};
   TTreeReaderArray<Bool_t>  Photon_pixelSeed =   {fReader, "Photon_pixelSeed"};
   TTreeReaderArray<UChar_t> Photon_seedGain =    {fReader, "Photon_seedGain"};
-
+  
   //PuppiMET
   TTreeReaderValue<Float_t> PuppiMET_phi =                {fReader, "PuppiMET_phi"};
   //TTreeReaderValue<Float_t> PuppiMET_phiJERDown =         {fReader, "PuppiMET_phiJERDown"};
@@ -386,6 +389,14 @@ public :
 
   //Jetflavor:
   TTreeReaderArray<int_or_char> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+
+  //Pileup:
+  TTreeReaderValue<Int_t> Pileup_nPU          = {fReader_MC, "Pileup_nPU"};
+  TTreeReaderValue<Int_t> Pileup_sumEOOT      = {fReader_MC, "Pileup_sumEOOT"};
+  TTreeReaderValue<Int_t> Pileup_sumLOOT      = {fReader_MC, "Pileup_sumLOOT"};
+  TTreeReaderValue<Float_t> Pileup_nTrueInt   = {fReader_MC, "Pileup_nTrueInt"};
+  TTreeReaderValue<Float_t> Pileup_pudensity  = {fReader_MC, "Pileup_pudensity"};
+  TTreeReaderValue<Float_t> Pileup_gpudensity = {fReader_MC, "Pileup_gpudensity"};
   
   //_________________________________________________________________________
   
@@ -586,6 +597,7 @@ public:
   double correctionlib_btagMCeff_2018UL(Particle jet);
   float correctionlib_btagWPSFfromPOG(Particle jet, string mode);
   float correctionlib_btagIDSF(vector<Particle> Jet, string mode);
+  float correctionlib_pileupWt(float nTrueInt, string mode);
   
   //--------------------------------------------------------------------------
 
@@ -597,6 +609,8 @@ public:
   double TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron);
   
   //--------------------------------------------------------------------------
+  json loadJson();
+  bool checkJson(bool isData, int runno, int lumisection);
   
 protected:
   Hists h;
@@ -621,7 +635,7 @@ private:
   vector<Particle> LooseLepton, LooseMuon, LooseElectron; //Loose objects
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
   int n4l, n3l, n2lss, n2los, n1l2j, n1l1j, n1l0j;
 
   //FinalStates:
@@ -634,6 +648,9 @@ private:
 
   time_t start, end, buffer;
 
+  //json:
+  json jsondata;
+
   //For treemaker:
   const char *_TreeFileName;
   TFile *_TreeFile;
@@ -642,6 +659,7 @@ private:
   //The variables to be put in the root files are global.
   //They should be decalred here.
   UInt_t  channel;
+  UInt_t  trigger;
   UInt_t  nlep;
   UInt_t  njet;
   UInt_t  nbjet;
@@ -683,6 +701,7 @@ private:
   Float_t jer;
   Double_t sf_lepIdIso;
   Double_t sf_lepTrigEff;
+  Double_t wt_pileup;
   Double_t sf_btagEff;
   Double_t event_weight;
   

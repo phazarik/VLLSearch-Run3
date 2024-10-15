@@ -278,7 +278,7 @@ void ana_test(int sample=0)
     cout<<"Invalid argument!"<<endl;
   }
 
-  std::cout<<"Output : "<<hstfilename<<std::endl;
+  std::cout<<"\nOutput : "<<hstfilename<<std::endl;
   m_selec.SetHstFileName(hstfilename);
   //m_selec.SetSumFileName(sumfilename);
   m_selec.SetVerbose(0);//set verbosity level for output.

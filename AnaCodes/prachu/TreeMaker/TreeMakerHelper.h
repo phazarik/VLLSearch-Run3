@@ -1,7 +1,8 @@
 void AnaScript::InitializeBranches(TTree *tree){
 
   //Counts:
-  tree->Branch("channel",   &channel,  "nchannel/I",      32000);
+  tree->Branch("channel",   &channel,   "nchannel/I",  32000);
+  tree->Branch("trigger",   &trigger,   "ntrigger/I",  32000);
   tree->Branch("nlep",      &nlep,      "nlep/I",      32000);
   tree->Branch("njet",      &njet,      "njet/I",      32000);
   tree->Branch("nbjet",     &nbjet,     "nbjet/I",     32000);
@@ -54,8 +55,14 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("jer",           &jer,           "jer/F",           32000);
   tree->Branch("wt_leptonSF",   &sf_lepIdIso,   "sf_lepIdIso/D",   32000);
   tree->Branch("wt_trig",       &sf_lepTrigEff, "sf_lepTrigEff/D", 32000);
+  tree->Branch("wt_pileup",     &wt_pileup,     "wt_pileup/D",     32000);
   tree->Branch("wt_bjet",       &sf_btagEff,    "sf_btagEff/D",    32000);
   tree->Branch("weight",        &event_weight,  "event_weight/D",  32000);
+
+  //tree->Branch("HLT_IsoMu24",           &HLT_IsoMu24,           "HLT_IsoMu24/O");
+  //tree->Branch("HLT_IsoMu27",           &HLT_IsoMu27,           "HLT_IsoMu27/O" );
+  //tree->Branch("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, "HLT_Ele27_WPTight_Gsf/O");
+  //tree->Branch("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf, "HLT_Ele32_WPTight_Gsf/O");
 }
 
 void AnaScript::FillTree(TTree *tree){
@@ -117,11 +124,18 @@ void AnaScript::FillTree(TTree *tree){
   else if(me) channel = (UInt_t)1;
   else if(em) channel = (UInt_t)2;
   else if(ee) channel = (UInt_t)3;
+
+  if(*HLT_IsoMu24==1 && *HLT_Ele32_WPTight_Gsf==0)      trigger = (UInt_t)0; //Muon fires but not electron
+  else if(*HLT_IsoMu24==0 && *HLT_Ele32_WPTight_Gsf==1) trigger = (UInt_t)1; //Electron fires, but not muon
+  else if(*HLT_IsoMu24==1 && *HLT_Ele32_WPTight_Gsf==1) trigger = (UInt_t)2; //Both fire
+  else if(*HLT_IsoMu24==0 && *HLT_Ele32_WPTight_Gsf==0) trigger = (UInt_t)3; //None fire
+  else cout<<"Something is wrong with triggers"<<endl;
+  
   
   //#######################
   // Select the channel :
   //
-  basic_evt_selection = mm || me || em || ee;
+  basic_evt_selection = mm || me || em || ee ;
   //
   //#######################
 
@@ -131,6 +145,7 @@ void AnaScript::FillTree(TTree *tree){
     double wt = 1.0;
     double lepIdIsoSF = 1.0;
     double triggerEff = 1.0;
+    double pileupwt = 1.0;
     double bjetSF = 1.0;
 
     if(_data==0){
@@ -142,10 +157,12 @@ void AnaScript::FillTree(TTree *tree){
 
       lepIdIsoSF = sf0*sf1;
 
-      //Trigger efficiencies:
+      //Trigger efficiencies:3
       double ef0 = GetLeptonTriggerEfficiency(LightLepton.at(0));
       double ef1 = GetLeptonTriggerEfficiency(LightLepton.at(1));
       triggerEff = 1-((1-ef0)*(1-ef1));
+
+      pileupwt = (double)correctionlib_pileupWt(*Pileup_nTrueInt, "nom");
 
       //Corrections for bJet identification:
       //Options: "nom", "upUncorrelated", "upCorrelated", "downUncorrelated", "downCorrelated"
@@ -154,11 +171,17 @@ void AnaScript::FillTree(TTree *tree){
       //wt = sf_lepIdIso*sf_lepTrigEff;
     }
 
+    //-------------------------
+    // If some variables need 
+    // corrections, do it here
+    //-------------------------
+
     //Setting up the global variables:
     sf_lepIdIso   = lepIdIsoSF;
     sf_lepTrigEff = triggerEff;
+    wt_pileup     = pileupwt;
     sf_btagEff    = bjetSF;
-    event_weight  = lepIdIsoSF*triggerEff;
+    event_weight  = lepIdIsoSF*triggerEff*pileupwt;
     
     //Integers:
     nlep  = (UInt_t)LightLepton.size();

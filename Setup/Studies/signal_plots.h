@@ -123,13 +123,25 @@ void AnaScript::MakeSignalPlots(float wt){
     }//mujj
   }//1L2J
 
-  h.sig[5]                  ->Fill((int)0, wt); //All events, excluding the bad ones
-  if(evt_1L2J_incl) h.sig[5]->Fill((int)1, wt);
-  if(evt_2LOS)      h.sig[5]->Fill((int)2, wt);
-  if(evt_2LSS)      h.sig[5]->Fill((int)3, wt);
-  if(evt_3L)        h.sig[5]->Fill((int)4, wt);
-  if(evt_4L_incl)   h.sig[5]->Fill((int)5, wt);
-  if(mujj)          h.sig[5]->Fill((int)6, wt);
-  if(signal_region) h.sig[5]->Fill((int)7, wt);
-  
+  h.sig[5]                  ->Fill((int)0, 1.0); //All events, excluding the bad ones
+  if(evt_1L2J_incl) h.sig[5]->Fill((int)1, 1.0);
+  if(evt_2LOS)      h.sig[5]->Fill((int)2, 1.0);
+  if(evt_2LSS)      h.sig[5]->Fill((int)3, 1.0);
+  if(evt_3L)        h.sig[5]->Fill((int)4, 1.0);
+  if(evt_4L_incl)   h.sig[5]->Fill((int)5, 1.0);
+  if(mujj)          h.sig[5]->Fill((int)6, 1.0);
+  if(signal_region) h.sig[5]->Fill((int)7, 1.0);
+
+  //With b-jet selection:
+  h.sig[6]                  ->Fill((int)0, 1.0); //All events, excluding the bad ones
+  if((int)MediumbJet.size()==0){
+    if(evt_1L2J_incl) h.sig[6]->Fill((int)1, 1.0);
+    if(evt_2LOS)      h.sig[6]->Fill((int)2, 1.0);
+    if(evt_2LSS)      h.sig[6]->Fill((int)3, 1.0);
+    if(evt_3L)        h.sig[6]->Fill((int)4, 1.0);
+    if(evt_4L_incl)   h.sig[6]->Fill((int)5, 1.0);
+    if(mujj)          h.sig[6]->Fill((int)6, 1.0);
+    if(signal_region) h.sig[6]->Fill((int)7, 1.0);
+  }
+
 }

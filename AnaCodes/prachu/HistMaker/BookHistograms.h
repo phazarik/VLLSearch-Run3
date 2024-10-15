@@ -3,9 +3,10 @@ void AnaScript::BookHistograms(){
   h.nevt = new TH1F("nEvents", "0-nEvtTotal, 1-nEvtRan, 2-nEvtTrigger, 3-nEvtPass, 4-nEvtPass(wt)",5,0,5); //h.nevt->Sumw2();
   h.evtweight[0] = new TH1F("wt_SF","Reco-ID-Iso Scale Factor",200,0,2);
   h.evtweight[1] = new TH1F("wt_trigger","Trigger Scale Factor",200,0,2);
-  h.evtweight[2] = new TH1F("wt_bjet","bJet weight",200,0,2);
-  h.evtweight[3] = new TH1F("wt_evt","Event weight",200,0,2);
-  h.evtweight[4] = new TH1F("wt_lumi","LumiScale",3000,0,3000);
+  h.evtweight[2] = new TH1F("wt_pileup","pileup weight",200,0,2);
+  h.evtweight[3] = new TH1F("wt_bjet","bJet weight",200,0,2);
+  h.evtweight[4] = new TH1F("wt_evt","Event weight",200,0,2);
+  //h.evtweight[4] = new TH1F("wt_lumi","LumiScale",3000,0,3000);
   h.evtweight[5] = new TH1F("wt_jec","Jet Energy Correction for each Jet",200,0,2);
   h.evtweight[6] = new TH1F("wt_jer","Jet Energy Resolution Correction for each Jet",200,0,2);
   h.evtweight[7] = new TH1F("wt_jecjer","JEC*JER for each Jet",200,0,2);
@@ -140,7 +141,6 @@ void AnaScript::BookHistograms(){
   
   for(int i=0; i<44; i++)h.basic[i]->Sumw2();
 
-  /*
   //--------------------------------------------------------------------------------
   //SignalStudy:
   h.sig[0] = new TH1F("genPart_pdgId_all", "genPart_pdgId_all", 2000, -1000, 1000);
@@ -167,7 +167,8 @@ void AnaScript::BookHistograms(){
   h.sig[2] = new TH1F("finalstates_for_LN", "finalstates for LN", 10, 0, 10);
   h.sig[3] = new TH1F("finalstates_for_NN", "finalstates for NN", 10, 0, 10);
   h.sig[4] = new TH1F("finalstates_incldecay", "finalstates for inclusive decaymode", 10, 0, 10);
-  h.sig[5] = new TH1F("acceptance_study", "acceptance: all, 1L2J, 2LOS, 2LSS, 3L, 4L, mujj, SR ", 10, 0, 10);*/
+  h.sig[5] = new TH1F("acceptance_study", "acceptance: all, 1L2J, 2LOS, 2LSS, 3L, 4L, mujj, SR ", 10, 0, 10);
+  h.sig[6] = new TH1F("bjet_acceptance_study", "acceptance: all, 1L2J, 2LOS, 2LSS, 3L, 4L, mujj, SR ", 10, 0, 10);
 
   //##############
   // Final states:
@@ -241,13 +242,14 @@ void AnaScript::BookHistograms(){
   for(int i=0; i<6; i++) h.flav[i]->Sumw2();
 
   //Weights check:
-  h.evtweight[8]  = new TH1F("SS_jec",   "Jet Energy Correction for each Jet",200,0,2);
-  h.evtweight[9]  = new TH1F("SS_jer",   "Jet Energy Resolution Correction for each Jet",200,0,2);
-  h.evtweight[10] = new TH1F("SS_jecjer","JEC*JER for each Jet",200,0,2);
-  h.evtweight[11] = new TH1F("SS_SFwt",  "Reco-ID-Iso Scale Factor",200,0,2);
-  h.evtweight[12] = new TH1F("SS_trigwt","Trigger Scale Factor",200,0,2);
-  h.evtweight[13] = new TH1F("SS_bjetwt","bJet weight",200,0,2);
-  h.evtweight[14] = new TH1F("SS_evtwt", "Event weight",200,0,2);
+  h.evtweight[8]  = new TH1F("SS_jec",     "Jet Energy Correction for each Jet",200,0,2);
+  h.evtweight[9]  = new TH1F("SS_jer",     "Jet Energy Resolution Correction for each Jet",200,0,2);
+  h.evtweight[10] = new TH1F("SS_jecjer",  "JEC*JER for each Jet",200,0,2);
+  h.evtweight[11] = new TH1F("SS_SFwt",    "Reco-ID-Iso Scale Factor",200,0,2);
+  h.evtweight[12] = new TH1F("SS_trigwt",  "Trigger Scale Factor",200,0,2);
+  h.evtweight[13] = new TH1F("SS_pileupwt","pileup weight",200,0,2);
+  h.evtweight[14] = new TH1F("SS_bjetwt",  "bJet weight",200,0,2);
+  h.evtweight[15] = new TH1F("SS_evtwt",   "Event weight",200,0,2);
 
   //Trigger check:
   h.flag[0] = new TH1F("SS_HLT_IsoMu24",           "HLT_IsoMu24", 5, 0, 5);
@@ -284,7 +286,7 @@ void AnaScript::BookHistograms(){
   
   for(int i=0; i<19; i++) h.gen2LSS[i]->Sumw2();*/
 
-  
+  /*
   h.btagsf[0] = new TH1F("JetHadronFlavor_all", "JetHadronFlavor_all", 10, -2, 8);
   //2D plots for bTagSF calculation:
   float x_bin_pT[10] = {20,30,50,70,100,140,200,300,600,1000};
@@ -295,7 +297,8 @@ void AnaScript::BookHistograms(){
   h.cJets[1] = new TH2F("cJet_Mis_PtEta","cJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.lJets[0] = new TH2F("LightJet_PtEta","LightJet_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
   h.lJets[1] = new TH2F("LightJet_Mis_PtEta","LightJet_Mis_PtEta",(sizeof(x_bin_pT)/ sizeof(x_bin_pT[0])-1),x_bin_pT,(sizeof(y_bin_eta)/sizeof(y_bin_eta[0])-1),y_bin_eta);
-
+  */
+  
   //Investigating bjets:
   //1D plots: (btv_deepjet.h)
   h.evtweight[15] = new TH1F("sfPOG_bcjet", "bcJet sf from POG",200,0,2);

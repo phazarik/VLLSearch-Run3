@@ -23,6 +23,9 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/applyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/TriggerEfficiency.h"
 
+//json:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/nlohmann/json_setup.h"
+
 void AnaScript::Begin(TTree * /*tree*/)
 {
   TString option = GetOption();
@@ -30,8 +33,26 @@ void AnaScript::Begin(TTree * /*tree*/)
 
 void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 {
-  
+  //-------------------------------------------
+  //Set Campaign : (important for corrections)
+  //_campaign = "2018_UL";
+  //_campaign = "2017_UL";
+  //_campaign = "2016preVFP_UL";
+  //_campaign = "2016postVFP_UL";
+  //-------------------------------------------
+
   time(&start);
+
+  //Setting parameters:
+  cout<<"Campaign set to: "<<_campaign<<endl;
+  if(_campaign == "2018_UL") _year = 2018;
+  else if(_campaign == "2017_UL") _year = 2017;
+  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else if(_campaign == "Summer22") _year = 2022;
+  else cout<<"main: Provide correct campaign name"<<endl;
+  cout<<"Year set to: "<<_year<<endl;
+
+  jsondata = loadJson();
   cout<<"\nn-events \t time_taken (sec)"<<endl;
 
   TString option = GetOption();
@@ -40,7 +61,8 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
   nEvtTrigger=0;
   nEvtPass=0;
   nEvtBad=0; //Events flagged out because of invalid decay
-
+  nThrown=0;
+  
   //Counters:
   n4l=0;
   n3l=0;
@@ -52,14 +74,6 @@ void AnaScript::SlaveBegin(TTree *tree /*tree*/)
 
   evt_wt = 1.0;
   bad_event = false;
-
-  //-------------------------------------------
-  //Set Campaign : (important for corrections)
-  //_campaign = "2018_UL";
-  //_campaign = "2017_UL";
-  //_campaign = "2016preVFP_UL";
-  //_campaign = "2016postVFP_UL";
-  //-------------------------------------------
 
   //Call the function to book the histograms we declared in Hists.
   BookHistograms();
@@ -79,6 +93,7 @@ void AnaScript::SlaveTerminate()
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
   float passevtfrac = ((float)nEvtPass)/((float)nEvtTotal);
   float badevtfrac  = ((float)nEvtBad)/((float)nEvtTotal);//for VLLD
+  float notgoldenevtfrac  = ((float)nThrown)/((float)nEvtTotal); //for data
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
@@ -87,6 +102,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
+  if(_data!=0) cout<<"nEvents not in golden json = "<<nThrown<<" ("<<notgoldenevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
   
   time(&end);
@@ -137,13 +153,6 @@ Bool_t AnaScript::Process(Long64_t entry)
   if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
   else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
 
-  //Setting year (overriding SetYear());
-  if(_campaign == "2018_UL") _year = 2018;
-  else if(_campaign == "2017_UL") _year = 2017;
-  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
-  else if(_campaign == "Summer22") _year = 2022;
-  else cout<<"main: Provide correct campaign name"<<endl;
-
   nEvtTotal++;
   
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -177,12 +186,27 @@ Bool_t AnaScript::Process(Long64_t entry)
     
     overlapping_events = muon_trigger && electron_trigger;
 
-    if(_data==1){
+    if(_data!=0){
 
-      //Strategy3:
-      if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      //Strategy 1: Only considering the non-overlapping parts.
+      //if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      //if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
+
+      //Strategy 2: Include the overlap in the muon dataset.
+      if(_flag != "egamma") triggerRes = muon_trigger; //For the SingleMuon dataset, including overlap.
       if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
-      
+
+      //Strategy3: Write everything and handle the trigger later.
+      //triggerRes = true;
+
+      //Throw awaying bad data that are not included in the GoldenJson:
+      int runno = (int)*run;
+      int lumisection = (int)*luminosityBlock;
+      bool golden_event = checkJson(true, runno, lumisection);
+      if(!golden_event){
+	nThrown++;
+	triggerRes = false;
+      }
     }
     
     if(_campaign=="Summer22") triggerRes = true;

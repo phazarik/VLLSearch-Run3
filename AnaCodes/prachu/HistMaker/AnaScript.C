@@ -41,14 +41,37 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/applyCorrections.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/TriggerEfficiency.h"
 
+//json:
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/nlohmann/json_setup.h"
+
 void AnaScript::Begin(TTree * /*tree*/)
 {
   TString option = GetOption();
 }
 
 void AnaScript::SlaveBegin(TTree * /*tree*/)
-{ 
+{
+  //---------------------------------------------------
+  //Set Campaign manually : (important for corrections)
+  //_campaign = "2018_UL";
+  //_campaign = "2017_UL";
+  //_campaign = "2016preVFP_UL";
+  //_campaign = "2016postVFP_UL";
+  //---------------------------------------------------
+  
   time(&start);
+
+  //Setting parameters:
+  cout<<"Campaign set to: "<<_campaign<<endl;
+  //Setting year (overriding SetYear());
+  if     (_campaign == "2018_UL") _year = 2018;
+  else if(_campaign == "2017_UL") _year = 2017;
+  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
+  else if(_campaign == "Summer22") _year = 2022;
+  else cout<<"main: Provide correct campaign name"<<endl;
+  cout<<"Year set to: "<<_year<<endl;
+
+  jsondata = loadJson();
   cout<<"\nn-events \t time_taken (sec)"<<endl;
 
   TString option = GetOption();
@@ -56,7 +79,8 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   nEvtRan = 0;
   nEvtTrigger=0;
   nEvtPass=0;
-  nEvtBad=0; 
+  nEvtBad=0;
+  nThrown=0;
 
   //Counters:
   n4l=0;
@@ -80,21 +104,9 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   bad_event = false;
   evt_trigger = false;
 
-  //---------------------------------------------------
-  //Set Campaign manually : (important for corrections)
-  //_campaign = "2018_UL";
-  //_campaign = "2017_UL";
-  //_campaign = "2016preVFP_UL";
-  //_campaign = "2016postVFP_UL";
-  //---------------------------------------------------
-
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
 
-  if(_flag=="doublet")     cout<<"Removing invalid VLLD decay modes ..."<<endl;
-  else if(_flag=="egamma") cout<<"Removing overlapping events from EGamma ..."<<endl;
-  //else if(_flag=="qcd") cout<<"Scaling QCD files ..."<<endl;
-  //else if(_flag=="dy") cout<<"Scaling DY files ..."<<endl;
 }
 
 void AnaScript::SlaveTerminate()
@@ -106,6 +118,7 @@ void AnaScript::SlaveTerminate()
   float trigevtfrac = ((float)nEvtTrigger)/((float)nEvtTotal);
   float passevtfrac = ((float)nEvtPass)/((float)nEvtTotal);
   float badevtfrac  = ((float)nEvtBad)/((float)nEvtTotal);//for VLLD
+  float notgoldenevtfrac  = ((float)nThrown)/((float)nEvtTotal); //for data
 
   cout<<"---------------------------------------------"<<endl;
   cout<<"Summary:"<<endl;
@@ -114,6 +127,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
+  if(_data!=0) cout<<"nEvents not in golden json = "<<nThrown<<" ("<<notgoldenevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
   cout<<"Additional counters:"<<endl;
   cout<<"n4l   = "<<   n4l<<endl;
@@ -174,13 +188,6 @@ Bool_t AnaScript::Process(Long64_t entry)
   double time_taken_so_far = double(buffer-start);
   if(_verbosity==0 && nEvtTotal%10000==0)     cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
   else if(_verbosity>0 && nEvtTotal%10000==0) cout<<nEvtTotal<<" \t "<<time_taken_so_far<<endl;
-
-  //Setting year (overriding SetYear());
-  if(_campaign == "2018_UL") _year = 2018;
-  else if(_campaign == "2017_UL") _year = 2017;
-  else if((_campaign == "2016preVFP_UL") || (_campaign == "2016postVFP_UL")) _year = 2016;
-  else if(_campaign == "Summer22") _year = 2022;
-  else cout<<"main: Provide correct campaign name"<<endl;
 
   nEvtTotal++;
   h.nevt->Fill(0);
@@ -258,8 +265,16 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       //Strategy3:
       if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
-      if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset  
-      
+      if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
+
+      //Throw awaying bad data that are not included in the GoldenJson:
+      int runno = (int)*run;
+      int lumisection = (int)*luminosityBlock;
+      bool golden_event = checkJson(true, runno, lumisection);
+      if(!golden_event){
+	nThrown++;
+	triggerRes = false;
+      }
     }
     
     if(_campaign=="Summer22") triggerRes = true;
@@ -414,7 +429,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       //evt_wt is also calculated alongwith.
       //This is done before any plotting.
 
-      //EventSelection(); //This is where trigger is applied.
+      EventSelection(); //This is where trigger is applied.
       //if(_data==0) evt_wt = getEventWeight(); //Event weight is set for MC only.
       //else evt_wt = 1.0;
       //---------------------------------------------------------------- 

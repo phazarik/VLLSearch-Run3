@@ -13,9 +13,9 @@ void AnaScript::Make2muSSPlots(){
       Jet.at(i).v = Jet.at(i).v * jec;
       Jet.at(i).v = Jet.at(i).v * jer;
 
-      h.evtweight[5]->Fill(jec);
-      h.evtweight[6]->Fill(jer);
-      h.evtweight[7]->Fill(jec*jer);
+      //h.evtweight[5]->Fill(jec);
+      //h.evtweight[6]->Fill(jer);
+      //h.evtweight[7]->Fill(jec*jer);
     }
   }
   //##################################################################################################

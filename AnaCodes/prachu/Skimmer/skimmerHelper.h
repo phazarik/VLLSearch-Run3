@@ -11,7 +11,7 @@ void AnaScript::ActivateBranch(TTree *t){
   t->SetBranchStatus(activeBranchName, 1);
 
   if(_data==0){
-    for(auto activeBranchName : {"nGenPart","GenPart_*","nGenJet","GenJet_*","nGenVisTau","GenVisTau_*","GenMET_phi","GenMET_pt"})
+    for(auto activeBranchName : {"nGenPart","GenPart_*","nGenJet","GenJet_*","nGenVisTau","GenVisTau_*","GenMET_phi","GenMET_pt", "Pileup*"})
       t->SetBranchStatus(activeBranchName, 1);
   }
 }
@@ -100,6 +100,14 @@ void AnaScript::ReadBranch(){
   //*PuppiMET_ptUnclusteredUp;
   *PuppiMET_sumEt;
 
+  if(_data==0){
+    *Pileup_nPU;
+    *Pileup_sumEOOT;
+    *Pileup_sumLOOT;
+    *Pileup_nTrueInt;
+    *Pileup_gpudensity;
+  }
+  
   //Electron Branches:
   *nElectron;
   for(unsigned int i=0;i<(unsigned int)*nElectron;i++){
