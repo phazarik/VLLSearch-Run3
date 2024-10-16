@@ -46,12 +46,14 @@ private:
   using int_or_char  = UChar_t;
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;
+  using uint_or_int  = Int_t;
   */
   //Run2
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
+  using uint_or_int  = UInt_t;
   
 public :
   TTreeReader     fReader;  //!the tree reader
@@ -59,6 +61,7 @@ public :
   TTreeReader     fReader_Run3;
   TTreeReader     fReader_MC;    //reads the MC branches
   TTreeReader     fReader_Run2_MC;
+  TTreeReader     fReader_Run2_MC_nonQCD;
   TTreeReader     fReader_Run3_MC;
   TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
 
@@ -459,6 +462,19 @@ public :
   TTreeReaderArray<Float_t> Photon_pfRelIso03_all_quadratic = {fReader_Run3, "Photon_pfRelIso03_all_quadratic"};
   TTreeReaderArray<Float_t> Photon_pfRelIso03_chg_quadratic = {fReader_Run3, "Photon_pfRelIso03_chg_quadratic"};
 
+  //__________________________________________________________________________________________________________
+
+  //                                  SPECIAL BRANCHES NOT AVAILABLE IN QCD
+  //----------------------------------------------------------------------------------------------------------
+
+  TTreeReaderValue<Float_t> LHEWeight_originalXWGTUP = {fReader_Run2_MC_nonQCD, "LHEWeight_originalXWGTUP"};
+  TTreeReaderValue<uint_or_int>   nLHEPdfWeight      = {fReader_Run2_MC_nonQCD, "nLHEPdfWeight"};
+  TTreeReaderArray<Float_t> LHEPdfWeight             = {fReader_Run2_MC_nonQCD, "LHEPdfWeight"};
+  TTreeReaderValue<uint_or_int>nLHEReweightingWeight = {fReader_Run2_MC_nonQCD, "nLHEReweightingWeight"};
+  TTreeReaderArray<Float_t> LHEReweightingWeight     = {fReader_Run2_MC_nonQCD, "LHEReweightingWeight"};
+  TTreeReaderValue<uint_or_int>   nLHEScaleWeight    = {fReader_Run2_MC_nonQCD, "nLHEScaleWeight"};
+  TTreeReaderArray<Float_t> LHEScaleWeight           = {fReader_Run2_MC_nonQCD, "LHEScaleWeight"};
+
   //---------------------------------------------------------------------------------------------------------
   // Declare (global) pointers to keep the variables which are of the same type, but different names (e.g. Rho variables). Assign the address of the right TTreeReaderValue (or Array) to the pointers in the Init function.
   //---------------------------------------------------------------------------------------------------------
@@ -470,6 +486,14 @@ public :
   TTreeReaderValue<Float_t>* ptr_fixedGridRhoFastjetCentralNeutral = nullptr;
   TTreeReaderArray<Float_t>* ptr_Photon_pfRelIso03_all = nullptr;
   TTreeReaderArray<Float_t>* ptr_Photon_pfRelIso03_chg = nullptr;
+
+  TTreeReaderValue<Float_t>*     ptr_LHEWeight_originalXWGTUP = nullptr;
+  TTreeReaderValue<uint_or_int>* ptr_nLHEPdfWeight            = nullptr;
+  TTreeReaderArray<Float_t>*     ptr_LHEPdfWeight             = nullptr;
+  TTreeReaderValue<uint_or_int>* ptr_nLHEReweightingWeight    = nullptr;
+  TTreeReaderArray<Float_t>*     ptr_LHEReweightingWeight     = nullptr;
+  TTreeReaderValue<uint_or_int>* ptr_nLHEScaleWeight          = nullptr;
+  TTreeReaderArray<Float_t>*     ptr_LHEScaleWeight           = nullptr;
   
   //__________________________________________________________________________________________________________
   //__________________________________________________________________________________________________________
@@ -754,8 +778,18 @@ void AnaScript::Init(TTree *tree)
     ptr_fixedGridRhoFastjetCentralNeutral =       &fixedGridRhoFastjetCentralNeutral;
     ptr_Photon_pfRelIso03_all =                   &Photon_pfRelIso03_all;
     ptr_Photon_pfRelIso03_chg =                   &Photon_pfRelIso03_chg;
-  }
 
+    if (_flag!= "qcd"){
+      ptr_LHEWeight_originalXWGTUP = &LHEWeight_originalXWGTUP;
+      ptr_nLHEPdfWeight            = &nLHEPdfWeight;
+      ptr_LHEPdfWeight             = &LHEPdfWeight;
+      ptr_nLHEReweightingWeight    = &nLHEReweightingWeight;
+      ptr_LHEReweightingWeight     = &LHEReweightingWeight;
+      ptr_nLHEScaleWeight          = &nLHEScaleWeight;
+      ptr_LHEScaleWeight           = &LHEScaleWeight;
+    }
+  }
+  
   //for treemaker
   _TreeFile = new TFile(_TreeFileName, "RECREATE");
   _TreeFile->SetCompressionAlgorithm(2);

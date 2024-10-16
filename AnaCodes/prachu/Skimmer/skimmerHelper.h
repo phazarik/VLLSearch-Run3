@@ -7,12 +7,15 @@ void AnaScript::ActivateBranch(TTree *t){
   //DON'T USE THIS FUNCTION if you want to keep the same tree structure in the skimmed file.
   //Keepting the same structure is helpful, because the same analysis script works on it.
   
-  for(auto activeBranchName : {"run","luminosityBlock","event", "HLT_IsoMu20","HLT_IsoMu24","HLT_IsoMu27","HLT_Ele32_WPTight_Gsf","HLT_Ele27_WPTight_Gsf","Flag_*","nMuon","Muon_*","nElectron","Electron_*","nTau","Tau_*","nJet","Jet_*","MET_*","PuppiMET_*","nTrigObj","TrigObj_*", "nPhoton", "Photon_*", "*fixed*"})
+  for(auto activeBranchName : {"run","luminosityBlock","event", "HLT_IsoMu20","HLT_IsoMu24","HLT_IsoMu27","HLT_Ele32_WPTight_Gsf","HLT_Ele27_WPTight_Gsf","Flag_*","nMuon","Muon_*","nElectron","Electron_*","nTau","Tau_*","nJet","Jet_*","MET_*","PuppiMET_*","nTrigObj","TrigObj_*", "nPhoton", "Photon_*", "*fixed*", "PV*"})
   t->SetBranchStatus(activeBranchName, 1);
 
   if(_data==0){
-    for(auto activeBranchName : {"nGenPart","GenPart_*","nGenJet","GenJet_*","nGenVisTau","GenVisTau_*","GenMET_phi","GenMET_pt", "Pileup*"})
+    for(auto activeBranchName : {"nGenPart","GenPart_*","nGenJet","GenJet_*","nGenVisTau","GenVisTau_*","GenMET_phi","GenMET_pt", "Pileup*"})  //"*LHE*Weight*" is not avaiable in QCD multijet backgrounds.
       t->SetBranchStatus(activeBranchName, 1);
+    if(_flag != "qcd"){
+      for(auto activeBranchName : {"*LHE*Weight*"}) t->SetBranchStatus(activeBranchName, 1);
+    }
   }
 }
 
@@ -100,12 +103,30 @@ void AnaScript::ReadBranch(){
   //*PuppiMET_ptUnclusteredUp;
   *PuppiMET_sumEt;
 
+  //PV
+  *PV_npvs;
+  *PV_npvsGood;
+  *PV_x;
+  *PV_y;
+  *PV_z;
+
   if(_data==0){
     *Pileup_nPU;
     *Pileup_sumEOOT;
     *Pileup_sumLOOT;
     *Pileup_nTrueInt;
     *Pileup_gpudensity;
+    
+    if(_flag != "qcd"){
+      **ptr_LHEWeight_originalXWGTUP;
+      **ptr_nLHEPdfWeight;
+      for(unsigned int i=0; i<(unsigned int)**ptr_nLHEPdfWeight; i++)          (*ptr_LHEPdfWeight)[i];
+      **ptr_nLHEReweightingWeight;
+      for(unsigned int i=0; i<(unsigned int)**ptr_nLHEReweightingWeight; i++ ) (*ptr_LHEReweightingWeight)[i];
+      **ptr_nLHEScaleWeight;
+      for(unsigned int i=0; i<(unsigned int)**ptr_nLHEScaleWeight; i++ )       (*ptr_LHEScaleWeight)[i];
+    }
+    
   }
   
   //Electron Branches:

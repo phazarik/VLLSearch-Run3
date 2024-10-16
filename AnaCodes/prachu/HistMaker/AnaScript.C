@@ -178,7 +178,10 @@ Bool_t AnaScript::Process(Long64_t entry)
   else       fReader_Run2.SetLocalEntry(entry);
   if(_data == 0){
     fReader_MC.SetLocalEntry(entry);
-    if(!_run3) fReader_Run2_MC.SetLocalEntry(entry);
+    if(!_run3) {
+      fReader_Run2_MC.SetLocalEntry(entry);
+      if(_flag != "qcd") fReader_Run2_MC_nonQCD.SetLocalEntry(entry);
+    }
     else       fReader_Run3_MC.SetLocalEntry(entry);
   } 
   //------------------------------------------------------

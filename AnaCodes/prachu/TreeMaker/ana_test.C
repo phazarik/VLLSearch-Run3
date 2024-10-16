@@ -99,7 +99,7 @@ void ana_test(int sample=0)
 
   //Testing on skim:
   else if(sample==999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_DYJetsToLL_M50.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Oct15/skim_DYJetsToLL_M50.root");
     treefilename = "test_outputs/tree_DYJetsToLL_M50_skimmed.root";
     m_selec.SetData(0);
     m_selec.SetCampaign("2018_UL");
@@ -110,7 +110,7 @@ void ana_test(int sample=0)
     m_selec.SetLumi(30321.155);
   }
   else if(sample==-999){
-    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Sept10/hst_EGamma_EGamma_*.root");
+    chain->Add("/home/work/phazarik1/work/CondorDump/hadded/skim_2LSS_2018UL_Oct15/skim_EGamma_EGamma_*.root");
     treefilename = "test_outputs/tree_EGamma_skimmed.root";
     m_selec.SetData(1);
     m_selec.SetCampaign("2018_UL");

@@ -44,13 +44,16 @@ private:
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
   using int_or_short = Short_t;
-  using int_or_ushort = UShort_t;*/
+  using int_or_ushort = UShort_t;
+  using uint_or_int  = Int_t;
+*/
   
   //Run2
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
+  using uint_or_int  = UInt_t;
   
 public :
   TTreeReader     fReader;  //!the tree reader
@@ -58,6 +61,7 @@ public :
   TTreeReader     fReader_Run3;
   TTreeReader     fReader_MC;    //reads the MC branches
   TTreeReader     fReader_Run2_MC;
+  TTreeReader     fReader_Run2_MC_nonQCD;
   TTreeReader     fReader_Run3_MC;
   TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
 
@@ -304,6 +308,13 @@ public :
   //TTreeReaderValue<Float_t> PuppiMET_ptUnclusteredUp =    {fReader, "PuppiMET_ptUnclusteredUp"};
   TTreeReaderValue<Float_t> PuppiMET_sumEt =              {fReader, "PuppiMET_sumEt"};
 
+  //PV
+  TTreeReaderValue<int_or_char> PV_npvs = {fReader, "PV_npvs"};
+  TTreeReaderValue<int_or_char> PV_npvsGood = {fReader, "PV_npvsGood"};
+  TTreeReaderValue<Float_t> PV_x = {fReader, "PV_x"};
+  TTreeReaderValue<Float_t> PV_y = {fReader, "PV_y"};
+  TTreeReaderValue<Float_t> PV_z = {fReader, "PV_z"};
+
   //Tau
   TTreeReaderValue<iterator> nTau = {fReader, "nTau"};
   TTreeReaderArray<Float_t> Tau_chargedIso = {fReader, "Tau_chargedIso"};
@@ -458,6 +469,16 @@ public :
   TTreeReaderArray<Float_t> Photon_pfRelIso03_all_quadratic = {fReader_Run3, "Photon_pfRelIso03_all_quadratic"};
   TTreeReaderArray<Float_t> Photon_pfRelIso03_chg_quadratic = {fReader_Run3, "Photon_pfRelIso03_chg_quadratic"};
 
+  //----------------------------------------------------------------------------------------------------------
+  //non-QCD only:
+  TTreeReaderValue<Float_t> LHEWeight_originalXWGTUP = {fReader_Run2_MC_nonQCD, "LHEWeight_originalXWGTUP"};
+  TTreeReaderValue<uint_or_int>   nLHEPdfWeight      = {fReader_Run2_MC_nonQCD, "nLHEPdfWeight"};
+  TTreeReaderArray<Float_t> LHEPdfWeight             = {fReader_Run2_MC_nonQCD, "LHEPdfWeight"};
+  TTreeReaderValue<uint_or_int>nLHEReweightingWeight = {fReader_Run2_MC_nonQCD, "nLHEReweightingWeight"};
+  TTreeReaderArray<Float_t> LHEReweightingWeight     = {fReader_Run2_MC_nonQCD, "LHEReweightingWeight"};
+  TTreeReaderValue<uint_or_int>   nLHEScaleWeight    = {fReader_Run2_MC_nonQCD, "nLHEScaleWeight"};
+  TTreeReaderArray<Float_t> LHEScaleWeight           = {fReader_Run2_MC_nonQCD, "LHEScaleWeight"};
+
   //---------------------------------------------------------------------------------------------------------
   // Declare (global) pointers to keep the variables which are of the same type, but different names (e.g. Rho variables). Assign the address of the right TTreeReaderValue (or Array) to the pointers in the Init function.
   //---------------------------------------------------------------------------------------------------------
@@ -469,6 +490,14 @@ public :
   TTreeReaderValue<Float_t>* ptr_fixedGridRhoFastjetCentralNeutral = nullptr;
   TTreeReaderArray<Float_t>* ptr_Photon_pfRelIso03_all = nullptr;
   TTreeReaderArray<Float_t>* ptr_Photon_pfRelIso03_chg = nullptr;
+  
+  TTreeReaderValue<Float_t>*     ptr_LHEWeight_originalXWGTUP = nullptr;
+  TTreeReaderValue<uint_or_int>* ptr_nLHEPdfWeight            = nullptr;
+  TTreeReaderArray<Float_t>*     ptr_LHEPdfWeight             = nullptr;
+  TTreeReaderValue<uint_or_int>* ptr_nLHEReweightingWeight    = nullptr;
+  TTreeReaderArray<Float_t>*     ptr_LHEReweightingWeight     = nullptr;
+  TTreeReaderValue<uint_or_int>* ptr_nLHEScaleWeight          = nullptr;
+  TTreeReaderArray<Float_t>*     ptr_LHEScaleWeight           = nullptr;
   
   //__________________________________________________________________________________________________________
   //__________________________________________________________________________________________________________
@@ -660,9 +689,12 @@ void AnaScript::Init(TTree *tree)
   else       fReader_Run2.SetTree(tree);
   
   if(_data == 0){              //If the input file is MC, activate fReader_MC 
-    fReader_MC                .SetTree(tree);
-    if(!_run3) fReader_Run2_MC.SetTree(tree);
-    else       fReader_Run3_MC.SetTree(tree);
+    fReader_MC.SetTree(tree);
+    if(!_run3) {
+      fReader_Run2_MC.SetTree(tree);
+      if(_flag != "qcd") fReader_Run2_MC_nonQCD.SetTree(tree);
+    }
+    else fReader_Run3_MC.SetTree(tree);
   }
 
   // Assigning address to the pointers for variables that have different names in Run2 and Run3.
@@ -684,6 +716,16 @@ void AnaScript::Init(TTree *tree)
     ptr_fixedGridRhoFastjetCentralNeutral =       &fixedGridRhoFastjetCentralNeutral;
     ptr_Photon_pfRelIso03_all =                   &Photon_pfRelIso03_all;
     ptr_Photon_pfRelIso03_chg =                   &Photon_pfRelIso03_chg;
+    
+    if (_flag!= "qcd"){
+      ptr_LHEWeight_originalXWGTUP = &LHEWeight_originalXWGTUP;
+      ptr_nLHEPdfWeight            = &nLHEPdfWeight;
+      ptr_LHEPdfWeight             = &LHEPdfWeight;
+      ptr_nLHEReweightingWeight    = &nLHEReweightingWeight;
+      ptr_LHEReweightingWeight     = &LHEReweightingWeight;
+      ptr_nLHEScaleWeight          = &nLHEScaleWeight;
+      ptr_LHEScaleWeight           = &LHEScaleWeight;
+    }
   }
   
   //for skimmer
