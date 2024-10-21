@@ -37,7 +37,12 @@ TCanvas* CreateCanvas();
 //##########################
 //          Main
 //##########################
-void makeLimitPlot(TString filename="combinelimits_sigmaB/limits_sigmaB_VLLD_mu.txt", TString modelname="VLLD-#mu") {
+void makeLimitPlot(TString tag="scaled_mm", TString modelname="VLLD-#mu") {
+
+  TString filename = "combinelimits_sigmaB/"+tag+"/limits_sigmaB_VLLD_mu_"+tag+".txt";
+  TString outname = "demo_"+tag+".png";
+
+  //.x makeLimitPlot.C("scaled_mm", "VLLD-#mu")
    
   vector<LimitData> limits = ReadDataFromFile(filename);
   int nPoints = limits.size();

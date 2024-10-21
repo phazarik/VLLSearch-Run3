@@ -74,14 +74,14 @@ void makeplotForCMS(TString _var = "nnscore_qcd_vlld_combined", TString _name = 
 
   //SET GLOBAL SETTINGS HERE:
   channel = "mm";
-  TString jobname = "hist_2LSS_SE2_Oct03_"+channel;
+  TString jobname = "hist_2LSS_SE2_Oct11_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = false;
+  toSave = true;
   toLog = true;
   toOverlayData = false;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "SE2_reliso_"+channel; //Don't use special symbols (folder name)
+  tag = "SE2_v1_"+channel; //Don't use special symbols (folder name)
   TString info = "";
 
   //DON'T TOUCH BELOW:

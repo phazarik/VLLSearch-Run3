@@ -36,8 +36,8 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   Double_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
   Double_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
   Double_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-  Double_t wt_leptonSF, wt_trig, wt_bjet, weight;
-  Double_t nnscore1, nnscore2, nnscoreCombined;
+  Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
+  Double_t nnscore1, nnscore2, nnscore3, nnscore4;
 
   tree->SetBranchAddress("channel", &channel);
   tree->SetBranchAddress("trigger", &trigger);
@@ -81,10 +81,13 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   tree->SetBranchAddress("dphi_metlep_min", &dphi_metlep_min);
   tree->SetBranchAddress("wt_leptonSF", &wt_leptonSF);
   tree->SetBranchAddress("wt_trig", &wt_trig);
+  tree->SetBranchAddress("wt_pileup", &wt_pileup);
   tree->SetBranchAddress("wt_bjet", &wt_bjet);
   tree->SetBranchAddress("weight", &weight);
-  tree->SetBranchAddress("nnscore_qcd_vlld_mu_m400",  &nnscore1);
-  tree->SetBranchAddress("nnscore_qcd_vlld_ele_m400", &nnscore2);
+  tree->SetBranchAddress("nnscore_qcd_vlldele_100",     &nnscore1);
+  tree->SetBranchAddress("nnscore_qcd_vlldele_200_800", &nnscore2);
+  tree->SetBranchAddress("nnscore_qcd_vlldmu_100",      &nnscore3);
+  tree->SetBranchAddress("nnscore_qcd_vlldmu_200_800",  &nnscore4);
 
   // Defining histograms with their respective binning
   TH1F *hist_channel = new TH1F("channel", "channel", 10, 0, 10); hist_channel->Sumw2();
@@ -106,7 +109,6 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   TH1F *hist_lep1_iso =   new TH1F("lep1_iso",   "lep1_iso",   200, 0, 0.2); hist_lep1_iso->Sumw2();
   TH1F *hist_lep1_sip3d = new TH1F("lep1_sip3d", "lep1_sip3d", 200, 0, 50);  hist_lep1_sip3d->Sumw2();
   TH1F *hist_lep1_mt =    new TH1F("lep1_mt",    "lep1_mt",     50, 0, 500); hist_lep1_mt->Sumw2();
-
 
   TH1F *hist_dilep_pt = new TH1F("dilep_pt", "dilep_pt", 50, 0, 500);        hist_dilep_pt->Sumw2();
   TH1F *hist_dilep_eta = new TH1F("dilep_eta", "dilep_eta", 100, -10, 10);   hist_dilep_eta->Sumw2();
@@ -134,13 +136,15 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   TH1F *hist_dphi_metlep_min = new TH1F("dphi_metlep_min", "dphi_metlep_min", 100, 0, 4); hist_dphi_metlep_min->Sumw2();
 
   TH1F *hist_wt_leptonSF = new TH1F("2LSS_wt_leptonSF", "wt_leptonSF", 200, 0, 2); hist_wt_leptonSF->Sumw2();
-  TH1F *hist_wt_trig = new TH1F("2LSS_wt_trig", "wt_trig", 200, 0, 2); hist_wt_trig->Sumw2();
-  TH1F *hist_wt_bjet = new TH1F("2LSS_wt_bjet", "wt_bjet", 200, 0, 2); hist_wt_bjet->Sumw2();
-  TH1F *hist_weight = new TH1F("2LSS_wt_evt", "weight", 200, 0, 2);    hist_weight->Sumw2();
+  TH1F *hist_wt_trig     = new TH1F("2LSS_wt_trig",     "wt_trig",     200, 0, 2); hist_wt_trig->Sumw2();
+  TH1F *hist_wt_pileup   = new TH1F("2LSS_wt_pileup",   "wt_pileup",   200, 0, 2); hist_wt_pileup->Sumw2();
+  TH1F *hist_wt_bjet     = new TH1F("2LSS_wt_bjet",     "wt_bjet",     200, 0, 2); hist_wt_bjet->Sumw2();
+  TH1F *hist_weight      = new TH1F("2LSS_wt_evt",      "weight",      200, 0, 2); hist_weight->Sumw2();
 
-  TH1F *hist_nnscore1 = new TH1F("nnscore_qcd_vlldmu",  "nnscore_qcd_vlldmu",  200, 0, 1); hist_nnscore1->Sumw2();
-  TH1F *hist_nnscore2 = new TH1F("nnscore_qcd_vlldele", "nnscore_qcd_vlldele", 200, 0, 1); hist_nnscore2->Sumw2();
-  TH1F *hist_nnscoreComb = new TH1F("nnscore_qcd_vlld_combined", "nnscore_qcd_vlld_combined", 200, 0, 1); hist_nnscoreComb->Sumw2();
+  TH1F *hist_nnscore1 = new TH1F("nnscore_qcd_vlldele_100",     "nnscore_qcd_vlldele_100",     200, 0, 1); hist_nnscore1->Sumw2();
+  TH1F *hist_nnscore2 = new TH1F("nnscore_qcd_vlldele_200_800", "nnscore_qcd_vlldele_200_800", 200, 0, 1); hist_nnscore2->Sumw2();
+  TH1F *hist_nnscore3 = new TH1F("nnscore_qcd_vlldmu_100",      "nnscore_ttbar_vlldmu_100",    200, 0, 1); hist_nnscore3->Sumw2();
+  TH1F *hist_nnscore4 = new TH1F("nnscore_qcd_vlldmu_200_800",  "nnscore_qcd_vlldmu_200_800",  200, 0, 1); hist_nnscore4->Sumw2();
 
   // Event loop:
   Long64_t nentries = tree->GetEntries();
@@ -152,9 +156,9 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     // Put event selections here.
     bool event_selection = false;
     bool channel_selection = channel == channelval; //This decides the channel
-    Double_t wt = wt_leptonSF*wt_trig*wt_bjet;
-    //Double_t wt = wt_leptonSF*wt_trig;
-    nnscoreCombined = nnscore1*nnscore2;
+    //Double_t wt = wt_leptonSF*wt_trig*wt_pileup*wt_bjet;
+    Double_t wt = wt_leptonSF*wt_trig*wt_pileup;
+    //nnscoreCombined = nnscore1*nnscore2*nnscore3;
 
     event_selection = channel_selection;
     //-----------------------------------------------
@@ -201,11 +205,13 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
       hist_dphi_metlep_min->Fill(dphi_metlep_min, wt);
       hist_wt_leptonSF->Fill(wt_leptonSF, 1.0);
       hist_wt_trig->Fill(wt_trig, 1.0);
+      hist_wt_pileup->Fill(wt_pileup, 1.0);
       hist_wt_bjet->Fill(wt_bjet, 1.0);
       hist_weight->Fill(wt, 1.0);
       hist_nnscore1->Fill(nnscore1, wt);
       hist_nnscore2->Fill(nnscore2, wt);
-      hist_nnscoreComb->Fill(nnscoreCombined, wt);
+      hist_nnscore3->Fill(nnscore3, wt);
+      hist_nnscore4->Fill(nnscore4, wt);
     }
   }
 
@@ -252,11 +258,13 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   hist_dphi_metlep_min->Write();
   hist_wt_leptonSF->Write();
   hist_wt_trig->Write();
+  hist_wt_pileup->Write();
   hist_wt_bjet->Write();
   hist_weight->Write();
   hist_nnscore1->Write();
   hist_nnscore2->Write();
-  hist_nnscoreComb->Write();
+  hist_nnscore3->Write();
+  hist_nnscore4->Write();
 
   // Close files
   outputFile->Close();

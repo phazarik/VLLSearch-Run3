@@ -22,6 +22,7 @@ p = [
     #PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=5),
     PlotData(var="nnscore_qcd_vlldmu",  name="NNScore (QCD vs VLLD-#mu)", nbins=200, xmin=0, xmax=1, rebin=5),
     PlotData(var="nnscore_qcd_vlldele", name="NNScore (QCD vs VLLD-ele)", nbins=200, xmin=0, xmax=1, rebin=5),
+    PlotData(var="nnscore_ttbar_vlldmu", name="NNScore (t#bar{t} vs VLLD-ele)", nbins=200, xmin=0, xmax=1, rebin=5),
     PlotData(var="nnscore_qcd_vlld_combined", name="NNScore (QCD vs VLLD combined)", nbins=200, xmin=0, xmax=1, rebin=5),
     
     PlotData(var="nlep",    name="N_{L}",                 nbins=10, xmin=0, xmax=10, rebin=1),

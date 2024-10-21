@@ -6,19 +6,21 @@ import tensorflow as tf
 import scipy.sparse as sparse #for numpy.array - pd.dataframe column conversion
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve,auc
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense
+from keras import layers
+#from keras import Sequential
+#from tensorflow.keras.layers import Dense
 
 #Global parameters:
-#jobname = 'tree_2LSSinclusive_baseline_Sept17'
-jobname = 'tree_2LSS_baseline_Oct03'
-indir = '../../input_trees/'
-outdir = f'../../input_trees_modified/{jobname}_evalOct03'
+jobname = 'tree_2LSS_2018UL_baseline_Oct16'
+indir = '../../input_trees'
+outdir = f'../../input_trees_modified/{jobname}_evalOct21'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    'qcd-vs-vlld-mu-m400-sept30'  :'nnscore_qcd_vlld_mu_m400',
-    'qcd-vs-vlld-ele-m400-sept30' :'nnscore_qcd_vlld_ele_m400',
+    'qcd-vs-vlld-ele-m100-oct21'    :'nnscore_qcd_vlldele_100',
+    'qcd-vs-vlld-ele-m200-800-oct21':'nnscore_qcd_vlldele_200_800',
+    'qcd-vs-vlld-mu-m100-oct21'     :'nnscore_qcd_vlldmu_100',
+    'qcd-vs-vlld-mu-m200-800-oct21' :'nnscore_qcd_vlldmu_200_800'
 }
 
 #-------------------------------------------
@@ -76,9 +78,7 @@ print('Functions loaded.')
 models = {}
 scaling_params = {}
 for modelname, scorename in modeldict.items():
-    model_filename = f'{modelname}/model_{modelname}.h5'
-    
-    # Load model
+    model_filename = f'{modelname}/model_{modelname}.keras' 
     models[modelname] = tf.keras.models.load_model(model_filename)
     print(f'Model loaded: {modelname}')
 
@@ -88,7 +88,7 @@ print('Models loaded.')
 # Evaluation beings here:
 list_of_files = os.listdir(os.path.join(indir, jobname))
 #train_var = ['njet', 'nbjet', 'dilep_mt', 'dilep_dR', 'HTMETllpt', 'STfrac', 'dphi_metdilep', 'dphi_metlep_max', 'dphi_metlep_min']
-train_var = ['njet', 'dilep_mt', 'dilep_dR', 'dilep_dphi', 'HTMETllpt', 'HT', 'STfrac', 'dphi_metlep0', 'dphi_metdilep', 'dphi_metlep_max', 'dphi_metlep_min']
+#train_var = ['njet', 'dilep_mt', 'dilep_dR', 'dilep_dphi', 'HTMETllpt', 'HT', 'STfrac', 'dphi_metlep0', 'dphi_metdilep', 'dphi_metlep_max', 'dphi_metlep_min']
 # The list of training variables has to match with the trainning part.
 
 print('\nStarting evaluation ... (hold on, this will take a while)\n')
@@ -112,13 +112,28 @@ for f in list_of_files:
         print(f'\033[31mSkipping: File is empty: {filepath}\033[0m')
         list_failed.append(f)
         continue
-
-    #Step2: Turn it into X matrix, y will be predicted by the models:
-    X= df[train_var].values
     
-    #Step3 Load the model and evaulate:
-    for modelname, scorename in modeldict.items():       
+    #Step2 Load the model:
+    for modelname, scorename in modeldict.items():
 
+        #Step 2.1: pick which variables to read, and turn those into a numpy array: 
+        train_var = []
+
+        if modelname in ['qcd-vs-vlld-mu-m200-800-oct21', 'qcd-vs-vlld-ele-m200-800-oct21', 'qcd-vs-vlld-mu-m100-oct21', 'qcd-vs-vlld-ele-m100-oct21']:
+            train_var = [
+                'njet',
+                'dilep_dR',
+                'dilep_ptratio',
+                'HT',
+                'LT',
+                'STfrac',
+                'metpt',
+                'dphi_metlep0',
+                'dphi_metdilep'
+            ]
+        
+        X= df[train_var].values
+        
         print(f'Predicting score for model: {modelname}')
         X_scaled = ApplyMinMax(X, modelname)
         print(f'X is scaled with min-max values for model: {modelname}')

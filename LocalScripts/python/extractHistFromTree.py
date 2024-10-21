@@ -8,8 +8,8 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--jobname',type=str, required=True,  help='Condor job name')
 parser.add_argument('--dump',   type=str, required=True,  help='Output job name')
 parser.add_argument('--channel',type=str, required=True,  help='Mention channel name: ee, em, me or mm')
-parser.add_argument('--test',   type=bool,required=False, help='Run for only one sample')
-parser.add_argument('--dryrun', type=bool,required=False, help='Print statments')
+parser.add_argument('--test', action='store_true', help='Run for only one sample (optional)')
+parser.add_argument('--dryrun', action='store_true', help='Print statements (optional)')
 args=parser.parse_args()
 
 jobname = args.jobname
@@ -82,7 +82,7 @@ def extractHistFromTree(jobname, channel):
     for s in samples:
         print("Making histograms for \033[33m"+s+ "\033[0m ...")
         indir = "../input_trees_modified/" + jobname + "/"
-        #indir = "../input_trees_modified/" + jobname + "/"
+        #indir = "../input_trees/" + jobname + "/"
         outdir = "../input_hists/"+dump+"/"
         inputfilename = indir+"tree_" + s + ".root"
         outputfilename = outdir+"hst_" + s + ".root"
