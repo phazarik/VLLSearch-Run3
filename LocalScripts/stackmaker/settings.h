@@ -13,8 +13,7 @@ extern int rebin;
 extern float globalSbyB;
 extern float globalObsbyExp;
 extern float globalObsbyExpErr;
-extern double QCDscale;
-extern double TOPscale;
+extern double QCDscale, TOPscale, DYscale;
 extern bool toZoom;
 
 //The following function are used by get_hist()
@@ -102,6 +101,7 @@ TH1F *get_hist(
   double datalumi = 59800; //pb^{-1}
   if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
   else if (sample == "TTBar")                                   hst->Scale((datalumi/lumi)*TOPscale);
+  else if (sample == "DYJetsToLL")                              hst->Scale((datalumi/lumi)*DYscale);
   else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
 
   //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
@@ -399,6 +399,30 @@ void DisplaySignalYieldsInBins(TH1F *sig){
     float sigerr = sig->GetBinError(bin);
     cout<<bin<<"\t"<<nsig<<"\t"<<sigerr<<endl;
   }
+  cout << defaultfloat << endl;
+}
+
+void DisplayYieldsInBins(TH1F *hst){
+  if(hst ==nullptr) cout<<"Hist is empty!" <<endl;
+  nbins = hst->GetNbinsX();
+  cout << fixed << setprecision(2);
+  cout<<"------------------"<<endl;
+  cout<<hst->GetName()<<endl;
+  cout<<"------------------"<<endl;
+  float total = 0;
+  /*
+  cout<<"nbin"<<"\t"<<"nhst"<<"\t"<<"hsterr"<<endl;
+  for(int bin=1; bin<=nbins; bin++){
+    float nhst   = hst->GetBinContent(bin);
+    float hsterr = hst->GetBinError(bin);
+    cout<<bin<<"\t"<<nhst<<"\t"<<hsterr<<endl;
+    }*/
+  for(int bin=0; bin<=nbins; bin++){
+    float nhst   = hst->GetBinContent(bin);
+    cout<<nhst<<endl;
+    total = total + nhst;
+  }
+  cout<<"Total = "<<total<<endl;
   cout << defaultfloat << endl;
 }
 

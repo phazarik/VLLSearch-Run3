@@ -25,8 +25,7 @@ int nbins;
 float xmin;
 float xmax;
 int rebin;
-double QCDscale;
-double TOPscale;
+double QCDscale, TOPscale, DYscale;
 //Being used by decorations.h
 float globalSbyB;
 float globalObsbyExp;
@@ -36,7 +35,7 @@ bool toSave;
 bool toLog;
 bool toOverlayData;
 bool toZoom;
-TString tag, tag2; //Additional info while saving the plots
+TString tag, tag2, tag3; //Additional info while saving the plots
 TString channel;
 
 //Declaring ROOT objects here for memory management.
@@ -67,22 +66,24 @@ void plot(TString var, TString name);
 //------------------------------------------------
 
 //void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
-void makeplotForCMS(TString _var = "nnscore_qcd_vlld_combined", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
-//void makeplotForCMS(){
+//void makeplotForCMS(TString _var = "nnscore_qcd_vlldmu_200_800", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
+void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL} (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 1){
+  //void makeplotForCMS(){
   time_t start, end;
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
-  channel = "mm";
-  TString jobname = "hist_2LSS_SE2_Oct11_"+channel;
+  channel = "ee";
+  TString jobname = "hist_2LSS_dyEnhanced_chwt_Oct24_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
   toSave = true;
   toLog = true;
-  toOverlayData = false;
+  toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "SE2_v1_"+channel; //Don't use special symbols (folder name)
-  TString info = "";
+  tag = "topCR_"+channel; //Don't use special symbols (folder name)
+  TString info = "t#bar{t} CR";
+  tag3 = "";
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
@@ -90,15 +91,11 @@ void makeplotForCMS(TString _var = "nnscore_qcd_vlld_combined", TString _name = 
   else if(channel == "me") tag2 = info+" (#mu-e)";
   else if(channel == "mm") tag2 = info+" (#mu-#mu)";
   else DisplayText("Error! Please provide correct channel name!", 31);
-
+  //tag2 = info +" (ee)";
+  
   QCDscale = 1.0;
   TOPscale = 1.0;
-  /*
-  //----------------2024-10-01----------------//
-  if(channel == "mm")      QCDscale = 0.152628;
-  else if(channel == "me") QCDscale = 0.093506;
-  else if(channel == "em") QCDscale = 0.172164;
-  else if(channel == "ee") QCDscale = 0.303176;*/
+  DYscale  = 1.0;
 
   //----------------2024-10-03----------------//
   if(channel == "mm")      QCDscale = 0.155758;
@@ -120,7 +117,7 @@ void makeplotForCMS(TString _var = "nnscore_qcd_vlld_combined", TString _name = 
     //Rebin can be overwritten inside the plot loop.
     //{.var="dilep_mass", .name="M_{ll} (GeV)",  200, 0, 200, 2},
     //{.var="lep0_iso",   .name="Leading lepton reliso03",  1000, 0, 10, 5},
-    //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
+    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="dilep_ptratio", .name="p_{T1} / p_{T0}", 200, 0, 1, 5}
   };
 
@@ -152,7 +149,7 @@ void makeplotForCMS(TString _var = "nnscore_qcd_vlld_combined", TString _name = 
 void plot(TString var, TString name){
 
   Double_t ymin = 0.1;
-  Double_t ymax = 10E5;
+  Double_t ymax = 10E9;
   
   //rebin = 1; //overriding rebin
   //cout<<"Test : toZoom = "<<toZoom;
@@ -353,6 +350,7 @@ void plot(TString var, TString name){
   allbkg->SetFillStyle(3013);
   allbkg->SetFillColor(kGray+3);
   allbkg->SetMarkerSize(0); //No marker
+  allbkg->SetName("All bkg");
 
   //Debugging yield and uncertainty:
   //cout << fixed << setprecision(2);
@@ -369,26 +367,24 @@ void plot(TString var, TString name){
  
   //######################################################################
   // Managing signal:
+  // Using M-400 as a refernce, where I expect to improve the limit.
   if(channel == "ee"){
-    sig1 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD e_{100}");}
-    sig2 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{400}");}
+    sig1 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
+    sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{100}");}
   }
   else if (channel == "em"){
-    sig1 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD e_{100}");}
-    sig2 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD #mu_{100}");}
+    sig1 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
+    sig2 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{400}");}
   }
   else if (channel == "me"){
-    sig1 = get_hist(var, "VLLD", "mu_M100",  6622.84);   if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
-    sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD e_{100}");}
+    sig1 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
+    sig2 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{400}");}
   }
   else if (channel == "mm"){
-    sig1 = get_hist(var, "VLLD", "mu_M100", 6622.84);    if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD #mu_{100}");}
-    sig2 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD #mu_{400}");}
+    sig1 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
+    sig2 = get_hist(var, "VLLD", "mu_M100", 6622.84);    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{100}");}   
   }
-  sig3 = nullptr;//get_hist(var, "VLLD", "ele_M300", 85061.86);
-  //if(sig1) {SetHistoStyle(sig1, kRed+2); sig1->SetTitle("VLLD e_{100}");}
-  //if(sig2) {SetHistoStyle(sig2, kRed+0); sig2->SetTitle("VLLD #mu_{100}");}
-  //if(sig3) {SetHistoStyle(sig3, kRed+2); sig3->SetTitle("VLLD e_{300}");}
+  sig3 = nullptr;
 
   vector<TH1F*> sigvec = {sig1, sig2, sig3};
 
@@ -422,51 +418,76 @@ void plot(TString var, TString name){
   //For the data and background file: nObs, nExp, nExpErr
   //For the signal file: nSig, nSigErr
   //if(var == "dilep_mass"){
-  if(var == "nnscore_qcd_vlld_combined"){
-    cout << fixed << setprecision(2);
+  cout << fixed << setprecision(2);
+  /*
+  // Output for Obs/Exp file
+  cout << "\nObs/Exp file:" << endl;
+  cout << setw(10) << left << "Obs"
+       << setw(10) << left << "Exp"
+       << setw(10) << left << "ExpErr" << endl;
+  cout << setw(10) << left << allbkg->Integral()
+       << setw(10) << left << allbkg->Integral()
+       << setw(10) << left << GetStatUncertainty(allbkg) << endl;
+  // Output for the data and signal file: name, nSig, nSigErr
+  cout <<"\nSignal yields:"  << endl;
+  cout << setw(15) << left  << "Name"
+       << setw(15) << right << "nSig"
+       << setw(10) << right << "nSigErr" << endl;
 
-    // Output for Obs/Exp file
-    cout << "\nObs/Exp file:" << endl;
-    cout << setw(10) << left << "Obs"
-	 << setw(10) << left << "Exp"
-	 << setw(10) << left << "ExpErr" << endl;
-    cout << setw(10) << left << allbkg->Integral()
-	 << setw(10) << left << allbkg->Integral()
-	 << setw(10) << left << GetStatUncertainty(allbkg) << endl;
-    // Output for the data and signal file: name, nSig, nSigErr
-    cout <<"\nSignal yields:"  << endl;
-    cout << setw(15) << left  << "Name"
-	 << setw(15) << right << "nSig"
-	 << setw(10) << right << "nSigErr" << endl;
+  for (int s = 0; s<(int)sigvec.size(); s++) {
+    if(sigvec[s]){
+      cout << setw(15) << left <<  sigvec[s]->GetTitle()
+	   << setw(15) << right << sigvec[s]->Integral()
+	   << setw(10) << right << GetStatUncertainty(sigvec[s]) << endl;
+    }
+  }
+  cout << defaultfloat << endl;
 
-    for (int s = 0; s<(int)sigvec.size(); s++) {
-      if(sigvec[s]){
-	cout << setw(15) << left <<  sigvec[s]->GetTitle()
-	     << setw(15) << right << sigvec[s]->Integral()
-	     << setw(10) << right << GetStatUncertainty(sigvec[s]) << endl;
+  //Yield for each background:
+  DisplayText("Yields with uncertainty for each sample:", 33);
+  cout<<fixed<<setprecision(2);
+  Double_t sum_bkg = 0; Double_t sum_bkg_sqerr = 0;
+  for(int i=(int)bkg.size()-1; i>=0; i--){
+    cout<<setw(15)<<left<<bkg[i]->GetTitle()<<"\t"<<bkg[i]->Integral()<<"\\pm"<<GetStatUncertainty(bkg[i])<<endl;
+    sum_bkg += bkg[i]->Integral();
+    sum_bkg_sqerr += pow(GetStatUncertainty(bkg[i]), 2);
+  }
+  cout<<setw(15)<<left<<"Total bkg\t"<<sum_bkg<<"\\pm"<<sqrt(sum_bkg_sqerr)<<endl;
+  if(toOverlayData) cout<<setw(15)<<left<<"Data\t"<<right<<hst_data->Integral()<<"\\pm"<<GetStatUncertainty(hst_data)<<endl;
+  if(sig1) cout<<setw(15)<<left<<sig1->GetTitle()<<"\t"<<sig1->Integral()<<"\\pm"<<GetStatUncertainty(sig1)<<endl;
+  if(sig2) cout<<setw(15)<<left<<sig2->GetTitle()<<"\t"<<sig2->Integral()<<"\\pm"<<GetStatUncertainty(sig2)<<endl;
+  if(sig3) cout<<setw(15)<<left<<sig3->GetTitle()<<"\t"<<sig3->Integral()<<"\\pm"<<GetStatUncertainty(sig3)<<endl;
+  cout<<defaultfloat<<endl;*/
+
+  if(var == "HT") DisplayYieldsInBins(hst_data, allbkg);
+  //DisplaySignalYieldsInBins(sig1);
+  
+  //Chargeflip-rate calculation:
+  if(var == "chargeflip_num"){
+    cout<<"\n---------- charge-flip rate -------------"<<endl;
+    cout <<"\nNumerators: "<<hst_data->GetName()<<endl;
+    DisplayYieldsInBins(hst_data);
+    cout <<"\nNumerators: "<<allbkg->GetName()<<endl;
+    DisplayYieldsInBins(allbkg);
+    for(int i=0; i<(int)bkg.size(); i++){
+      if(TString(bkg[i]->GetName()) == "DY"){
+	cout <<"\nNumerators: "<<bkg[i]->GetName()<<endl;
+	DisplayYieldsInBins(bkg[i]);
       }
     }
-    cout << defaultfloat << endl;
-
-    //Yield for each background:
-    DisplayText("Yields with uncertainty for each sample:", 33);
-    cout<<fixed<<setprecision(2);
-    Double_t sum_bkg = 0; Double_t sum_bkg_sqerr = 0;
-    for(int i=(int)bkg.size()-1; i>=0; i--){
-      cout<<setw(15)<<left<<bkg[i]->GetTitle()<<"\t"<<bkg[i]->Integral()<<"\\pm"<<GetStatUncertainty(bkg[i])<<endl;
-      sum_bkg += bkg[i]->Integral();
-      sum_bkg_sqerr += pow(GetStatUncertainty(bkg[i]), 2);
+  }
+  if(var == "chargeflip_den"){
+    cout<<"\n---------- charge-flip rate -------------"<<endl;
+    cout <<"\nDenominators: "<<hst_data->GetName()<<endl;
+    DisplayYieldsInBins(hst_data);
+    cout <<"\nDenominators: "<<allbkg->GetName()<<endl;
+    DisplayYieldsInBins(allbkg);
+    for(int i=0; i<(int)bkg.size(); i++){
+      if (TString(bkg[i]->GetName()) == "DY"){
+	cout <<"\nDenominators: "<<bkg[i]->GetName()<<endl;
+	DisplayYieldsInBins(bkg[i]);
+      }
     }
-    cout<<setw(15)<<left<<"Total bkg\t"<<sum_bkg<<"\\pm"<<sqrt(sum_bkg_sqerr)<<endl;
-    if(toOverlayData) cout<<setw(15)<<left<<"Data\t"<<right<<hst_data->Integral()<<"\\pm"<<GetStatUncertainty(hst_data)<<endl;
-    if(sig1) cout<<setw(15)<<left<<sig1->GetTitle()<<"\t"<<sig1->Integral()<<"\\pm"<<GetStatUncertainty(sig1)<<endl;
-    if(sig2) cout<<setw(15)<<left<<sig2->GetTitle()<<"\t"<<sig2->Integral()<<"\\pm"<<GetStatUncertainty(sig2)<<endl;
-    if(sig3) cout<<setw(15)<<left<<sig3->GetTitle()<<"\t"<<sig3->Integral()<<"\\pm"<<GetStatUncertainty(sig3)<<endl;
-    cout<<defaultfloat<<endl;
-
-    DisplayYieldsInBins(allbkg, allbkg);
-    DisplaySignalYieldsInBins(sig1);
-
   }
   //-----------------------------------------------------------------------------
   //---------------------------------------------
@@ -548,13 +569,6 @@ void plot(TString var, TString name){
   globalObsbyExp =0;
   if(toOverlayData){
     ratiohist = GetRatio(hst_data, bkg);
-    SetRatioStyle(ratiohist, name);
-    ratiohist->GetYaxis()->SetTitle("obs/exp");
-    ratiohist->GetYaxis()->SetTitleSize(0.15);
-    ratiohist->GetYaxis()->SetTitleOffset(0.43);
-    ratiohist->GetYaxis()->SetLabelSize(0.13);
-    ratiohist->GetYaxis()->SetRangeUser(0, 2.2);
-    if(toZoom) ratiohist->GetXaxis()->SetRangeUser(xmin, xmax);
   
     //Setting up a horizontal line on the ratiopad:
     float xlow  = ratiohist->GetXaxis()->GetBinLowEdge(1);
@@ -569,14 +583,39 @@ void plot(TString var, TString name){
     err->SetStats(0);
     if(toZoom) err->GetXaxis()->SetRangeUser(xmin, xmax);
 
+    /*
+    //HT binned scale-factors
+    TH1F* data_minus_bkg = (TH1F *)hst_data->Clone();
+    for(int i=0; i<(int)bkg.size(); i++){
+      if(TString (bkg[i]->GetName()) != "DY"){
+	data_minus_bkg->Add(bkg[i], -1);
+      }
+    }
+    ratiohist->Reset();
+    for(int i=0; i<(int)bkg.size(); i++){
+      if(TString (bkg[i]->GetName()) == "DY"){
+	data_minus_bkg->Divide(bkg[i]);
+	ratiohist = data_minus_bkg;
+      }
+      }*/
+    
     //Drawing everything in the proper order:
+    SetRatioStyle(ratiohist, name);
+    ratiohist->GetYaxis()->SetTitle("obs/exp");
+    //ratiohist->GetYaxis()->SetTitle("SF (in HT)");
+    ratiohist->GetYaxis()->SetTitleSize(0.15);
+    ratiohist->GetYaxis()->SetTitleOffset(0.43);
+    ratiohist->GetYaxis()->SetLabelSize(0.13);
+    ratiohist->GetYaxis()->SetRangeUser(0, 2.2);
+    if(toZoom) ratiohist->GetXaxis()->SetRangeUser(xmin, xmax);
+
     ratiohist->Draw("ep"); //Inheriting the settings from the ratio hist.
     err->Draw("SAME P E2");
     line->Draw("same");
     ratiohist->Draw("ep same"); //I want the ratio to be on top.
     canvas->Update();
   }
-  if(channel=="ee" && var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
+  //if(channel=="ee" && var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
   
   mainPad->cd();
   
@@ -590,6 +629,7 @@ void plot(TString var, TString name){
   put_text("Preliminary", 0.27, 0.83, 52, 0.05);    // Smaller preliminary label
   put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05); // Integrated luminosity on the right
   put_latex_text(tag2, 0.17, 0.78, 42, 0.04); //Additional information
+  put_latex_text(tag3, 0.17, 0.73, 42, 0.04); //Additional information
 
   TLegend *lg = create_legend(0.48, 0.52, 0.94, 0.89);
   lg->SetNColumns(2);
@@ -624,6 +664,8 @@ void plot(TString var, TString name){
   
   //Make a new folder and put all the plots there:
   if(toSave){
+    //dump_folder = "overlays_and_others";
+    //filename = "overlays_and_others/HT_binned_corrections_to_DY";
     createFolder(dump_folder);
     canvas->SaveAs(filename+".png");
     //canvas->Clear();

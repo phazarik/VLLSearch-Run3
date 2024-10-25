@@ -39,6 +39,8 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
   Double_t nnscore1, nnscore2, nnscore3, nnscore4;
 
+  vector<float> mybins; //for custom binning:
+
   tree->SetBranchAddress("channel", &channel);
   tree->SetBranchAddress("trigger", &trigger);
   tree->SetBranchAddress("nlep", &nlep);
@@ -119,8 +121,9 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   TH1F *hist_dilep_dphi = new TH1F("dilep_dphi", "dilep_dphi", 100, 0, 6);   hist_dilep_dphi->Sumw2();
   TH1F *hist_dilep_dR = new TH1F("dilep_dR", "dilep_dR", 100, 0, 6);         hist_dilep_dR->Sumw2();
   TH1F *hist_dilep_ptratio = new TH1F("dilep_ptratio", "dilep_ptratio", 100, 0, 1); hist_dilep_ptratio->Sumw2();
-  
-  TH1F *hist_HT = new TH1F("HT", "HT", 20, 0, 500);                      hist_HT->Sumw2();
+
+  mybins = {0, 25, 50, 100, 200, 300, 400, 500};
+  TH1F *hist_HT = new TH1F("HT", "HT", (int)mybins.size()-1, &mybins[0]);hist_HT->Sumw2();
   TH1F *hist_LT = new TH1F("LT", "LT", 20, 0, 500);                      hist_LT->Sumw2();
   TH1F *hist_STvis = new TH1F("STvis", "STvis", 50, 0, 500);             hist_STvis->Sumw2();
   TH1F *hist_ST = new TH1F("ST", "ST", 50, 0, 500);                      hist_ST->Sumw2();
@@ -146,6 +149,13 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   TH1F *hist_nnscore3 = new TH1F("nnscore_qcd_vlldmu_100",      "nnscore_ttbar_vlldmu_100",    200, 0, 1); hist_nnscore3->Sumw2();
   TH1F *hist_nnscore4 = new TH1F("nnscore_qcd_vlldmu_200_800",  "nnscore_qcd_vlldmu_200_800",  200, 0, 1); hist_nnscore4->Sumw2();
 
+
+  //Flagging specific samples:
+  std::string filename(inputFilename);
+  std::string baseFilename = filename.substr(filename.find_last_of("/\\") + 1);
+  bool correctDY = baseFilename.find("DYJetsToLL") != std::string::npos;
+  if(correctDY) cout<<"Correcting DY events in Zpt bins (ee)"<<endl;
+  
   // Event loop:
   Long64_t nentries = tree->GetEntries();
   for (Long64_t i = 0; i < nentries; i++) {
@@ -158,6 +168,34 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     bool channel_selection = channel == channelval; //This decides the channel
     //Double_t wt = wt_leptonSF*wt_trig*wt_pileup*wt_bjet;
     Double_t wt = wt_leptonSF*wt_trig*wt_pileup;
+
+    if(channelval == 3){//For ee chnannel only
+      if (correctDY) {
+	float Zpt = dilep_pt;
+	Double_t chmid_wt = 1.0;
+	if (0 < Zpt && Zpt < 10)         chmid_wt = 1.2790;
+	else if (10 < Zpt && Zpt < 20)   chmid_wt = 1.3047;
+	else if (20 < Zpt && Zpt < 30)   chmid_wt = 1.2914;
+	else if (30 < Zpt && Zpt < 50)   chmid_wt = 1.2739;
+	else if (50 < Zpt && Zpt < 75)   chmid_wt = 1.2930;
+	else if (75 < Zpt && Zpt < 100)  chmid_wt = 1.2709;
+	else if (100 < Zpt && Zpt < 200) chmid_wt = 1.3816;
+	else if (200 < Zpt && Zpt < 350) chmid_wt = 1.3841;
+	else if (350 < Zpt && Zpt < 500) chmid_wt = 1.2945;
+	else                             chmid_wt = 1.3622;
+	wt = wt * chmid_wt;
+	Double_t HT_wt = 1.0;
+	if(HT < 25)                   HT_wt = 1.1827;
+	else if(25 < HT  && HT < 50)  HT_wt = 0.7869;
+	else if(50 < HT  && HT < 100) HT_wt = 0.6265;
+	else if(100 < HT && HT < 200) HT_wt = 0.5623;
+	else if(200 < HT && HT < 300) HT_wt = 0.5440;
+	else if(300 < HT && HT < 500) HT_wt = 0.5675;
+	else                          HT_wt = 0.5534;
+	wt = wt * HT_wt;
+      }
+    }
+    
     //nnscoreCombined = nnscore1*nnscore2*nnscore3;
 
     event_selection = channel_selection;
