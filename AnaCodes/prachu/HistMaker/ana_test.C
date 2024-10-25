@@ -45,7 +45,7 @@ void ana_test(int sample=0)
     m_selec.SetCampaign("2018_UL");
     m_selec.SetMCwt(1);
     m_selec.SetLep(1);
-    m_selec.SetFlag("");
+    m_selec.SetFlag("dy");
     m_selec.SetSampleName("DYJetsToLL_M50");
     m_selec.SetLumi(30321.155);
   }

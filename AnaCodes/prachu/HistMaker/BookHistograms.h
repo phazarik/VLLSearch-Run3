@@ -35,10 +35,10 @@ void AnaScript::BookHistograms(){
   h.count[2] = new TH1F("overlap_ofIsoEle27", "0-27pass, 1-27fail, 2-32pass, 3-32fail, 4-bothpass, 5-bothfail", 10, 0, 10);
 
   //Charge-flip measurement:
-  h.chargeflip[0] = new TH1F("chargeflip_rate_lowpt",  "0=All, 1=onZ, 2=sideband (low pt)",  5, 0, 5);
-  h.chargeflip[1] = new TH1F("chargeflip_rate_medpt",  "0=All, 1=onZ, 2=sideband (med pt)",  5, 0, 5);
-  h.chargeflip[2] = new TH1F("chargeflip_rate_highpt", "0=All, 1=onZ, 2=sideband (high pt)", 5, 0, 5);
-  for(int i=0; i<3; i++) h.chargeflip[i]->Sumw2();
+  //h.chargeflip[0] = new TH1F("chargeflip_rate_lowpt",  "0=All, 1=onZ, 2=sideband (low pt)",  5, 0, 5);
+  //h.chargeflip[1] = new TH1F("chargeflip_rate_medpt",  "0=All, 1=onZ, 2=sideband (med pt)",  5, 0, 5);
+  //h.chargeflip[2] = new TH1F("chargeflip_rate_highpt", "0=All, 1=onZ, 2=sideband (high pt)", 5, 0, 5);
+  //for(int i=0; i<3; i++) h.chargeflip[i]->Sumw2();
   
   //############################################
   //Object level plots: (before event selection)
@@ -258,6 +258,12 @@ void AnaScript::BookHistograms(){
   h.flag[3] = new TH1F("SS_HLT_Ele32_WPTight_Gsf", "HLT_Ele32_WPTight_Gsf", 5, 0, 5);
   h.flag[4] = new TH1F("SS_overlap",               "0:all, 1:mu, 2:ele, 3:overlap", 5, 0, 5);
   for(int i=0; i<5; i++) h.flag[i]->Sumw2();
+
+  //Charge misID calculation:
+  vector<float> ZpTbins = {0, 10, 20, 30, 50, 75, 100, 200, 350, 500, 1000};
+  h.chargeflip[0] = new TH1F("chargeflip_den", "chargeflip_den", ZpTbins.size()-1, &ZpTbins[0]);
+  h.chargeflip[1] = new TH1F("chargeflip_num", "chargeflip_num", ZpTbins.size()-1, &ZpTbins[0]);
+  for(int i=0; i<2; i++) h.chargeflip[i]->Sumw2();
   
   /*
   //Gen-Level study:

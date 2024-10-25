@@ -33,18 +33,18 @@ campaign = "2018_UL"
 lumi = 59800 #pb^{-1}
 #process_signal = True
 dumpdir = "/home/work/phazarik1/work/CondorDump"
-mode = "skim"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
-file_type = 'normal'    #Options: 'normal', 'skimmed'
+mode = "hist"            #Options: 'hist', 'skim', 'tree'. Edit the runana file accordingly.
+file_type = 'skimmed'    #Options: 'normal', 'skimmed'
 jsonfile = '../InputJsons/lumidata_2018.json'
 #jsonfile = '../InputJsons/lumidata_legacy_2016.json'
 
 #################################
 # Select which samples to run on:
 #################################
-#condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "Higgs", "WpWp", "WWW", "WGamma", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
+condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "Higgs", "WpWp", "WWW", "WGamma", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu","SingleMuon", "EGamma"]
 #condorsamples = ["DYJetsToLL", "ZGamma", "HTbinnedWJets", "QCD_MuEnriched", "QCD_EMEnriched", "SingleTop", "TTBar", "TTW", "TTZ", "WW", "WZ", "ZZ", "Rare", "WWZ", "WZZ", "ZZZ", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"] #MC only
 #condorsamples = ["SingleMuon", "EGamma"]
-condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
+#condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
 #condorsamples = ["WW", "WGamma"]
 #condorsamples = ["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"]
 
@@ -54,6 +54,7 @@ condorsamples = ["QCD_MuEnriched", "QCD_EMEnriched"]
 #_____________________________________________________________
 
 if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_2LSS_2018UL_Oct15"
+if file_type == 'skimmed' : nanoAOD_path = "/home/work/phazarik1/work/CondorDump/output/skim_eeZwindow_2018UL_Sept22"
 
 else :
     if "2018" in campaign:   nanoAOD_path = "/home/work/alaha1/public/RunII_ULSamples/2018"

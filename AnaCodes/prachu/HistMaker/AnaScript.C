@@ -18,6 +18,7 @@ using namespace std;
 #include "/home/work/phazarik1/work/Analysis-Run3/AnaCodes/prachu/HistMaker/BookHistograms.h"
 //#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Others/forUttsavi.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/basic_study.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Studies/measurement_chargemisid.h"
 
 //DON'T CHANGE THE FOLLOWING:
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/CustomFunctions.h"
@@ -62,6 +63,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   time(&start);
 
   //Setting parameters:
+  if(_flag == "dy") cout<<"Scaling DY for charge misID"<<endl;
   cout<<"Campaign set to: "<<_campaign<<endl;
   //Setting year (overriding SetYear());
   if     (_campaign == "2018_UL") _year = 2018;
@@ -442,10 +444,11 @@ Bool_t AnaScript::Process(Long64_t entry)
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
-      Make2LSSPlots();
+      //Make2LSSPlots();
       //MakebJetSFPlots();
       //if(!bad_event) MakeSignalPlots(1.0);
-
+      CalculateChargeMisID();
+      
       /*
       //lumiscaling:
       //if(_data == 2018)	evt_wt = evt_wt*(59800/_lumi);

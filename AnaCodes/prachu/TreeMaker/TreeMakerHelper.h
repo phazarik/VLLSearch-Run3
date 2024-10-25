@@ -235,13 +235,14 @@ void AnaScript::FillTree(TTree *tree){
     basic_evt_selection = basic_evt_selection && dilep_mass>15;
     bool baseline = basic_evt_selection;
 
+    /*
     //Vetoing DY in case of ee channel:
     bool removed_dy_from_ee = true;
     if(ee){
       if(76 < dilep_mass && dilep_mass < 106)
 	removed_dy_from_ee = false;
     }
-    baseline = baseline && removed_dy_from_ee;
+    baseline = baseline && removed_dy_from_ee;*/
 
     bool prompt = lep0_sip3d < 5 && lep1_sip3d < 10;
     bool ST200  = baseline && prompt && ST>200;

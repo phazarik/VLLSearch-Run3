@@ -555,6 +555,7 @@ public :
   void Make_gen2LSS_plots(float wt);
   void Make2muSSPlots();
   void Make2LSSPlots();
+  void CalculateChargeMisID();
   void MakebJetSFPlots();
   void MakePlotsForUttsavi();
   TString ParticleName(int pdgid);

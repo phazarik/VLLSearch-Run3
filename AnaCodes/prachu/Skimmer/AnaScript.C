@@ -283,6 +283,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       bool keep_this_event = false;
 
+      /*
       //2LSS skim:
       if((int)LightLepton.size()==2){
 	//Condition 1: SS
@@ -299,6 +300,23 @@ Bool_t AnaScript::Process(Long64_t entry)
 	bool reject_low_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
 	
 	if(trigger && reject_low_resonances && samesign) keep_this_event = true;
+	}*/
+
+      //Charge mismeasurement rate:
+      if((int)Electron.size()==2){
+
+	bool trigger = false;
+	for(int i=0; i<(int)Electron.size(); i++){
+	  int lepton_id = fabs(Electron.at(i).id);
+	  float lepton_pt = Electron.at(i).v.Pt();
+	  if(lepton_id == 11 && lepton_pt > 35) trigger = true;
+	}
+	
+	float dilep_mass = (Electron.at(0).v + Electron.at(1).v).M();
+	float ptratio = Electron.at(1).v.Pt() / Electron.at(0).v.Pt();
+	bool Zwindow = 76 < dilep_mass && dilep_mass < 106 && ptratio > 0.7;
+	
+	if(trigger && Zwindow) keep_this_event = true;
       }
 
       if(bad_event) keep_this_event = false;
