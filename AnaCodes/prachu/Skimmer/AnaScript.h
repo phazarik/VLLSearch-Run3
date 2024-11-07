@@ -440,11 +440,30 @@ public :
   TTreeReaderValue<Bool_t> Flag_trkPOG_logErrorTooManyClusters = {fReader, "Flag_trkPOG_logErrorTooManyClusters"};
   TTreeReaderValue<Bool_t> Flag_METFilters = {fReader, "Flag_METFilters"};
 
-  //HLT paths that we are intereted in:
+  //-------------------------------------
+  // HLT paths that we are intereted in:
+  //-------------------------------------
+  
+  //Triggers I am using:
+  //For 2016:
+  TTreeReaderValue<Bool_t> HLT_SingleMuon = {fReader, "HLT_IsoMu24"};
+  TTreeReaderValue<Bool_t> HLT_SingleEle  = {fReader, "HLT_Ele27_WPTight_Gsf"};
+
+  //For 2017:
+  //TTreeReaderValue<Bool_t> HLT_SingleMuon = {fReader, "HLT_IsoMu27"};
+  //TTreeReaderValue<Bool_t> HLT_SingleEle  = {fReader, "HLT_Ele35_WPTight_Gsf"};
+  
+  //Additional triggers I am keeping:
   TTreeReaderValue<Bool_t> HLT_IsoMu24 = {fReader, "HLT_IsoMu24"};
   TTreeReaderValue<Bool_t> HLT_IsoMu27 = {fReader, "HLT_IsoMu27"};
   TTreeReaderValue<Bool_t> HLT_Ele27_WPTight_Gsf = {fReader, "HLT_Ele27_WPTight_Gsf"};
-  TTreeReaderValue<Bool_t> HLT_Ele32_WPTight_Gsf = {fReader, "HLT_Ele32_WPTight_Gsf"};
+  //TTreeReaderValue<Bool_t> HLT_Ele32_WPTight_Gsf = {fReader, "HLT_Ele32_WPTight_Gsf"} //Not available in 2017
+  //TTreeReaderValue<Bool_t> HLT_Ele35_WPTight_Gsf = {fReader, "HLT_Ele35_WPTight_Gsf"}; //not in 2016
+  
+  // Note on trigger paths:
+  // For 2018: HLT_IsoMu24 and HLT_Ele32_WPTight_Gsf; offline_cuts: 26, 35
+  // For 2017: HLT_IsoMu27 and HLT_Ele35_WPTight_Gsf; offline_cuts: 32, 37
+  // For 2016: HLT_IsoMu24 and HLT_Ele32_WPTight_Gsf; offline_cuts: 26, 35
 
   //__________________________________________________________________________________________________________
 
@@ -716,7 +735,8 @@ void AnaScript::Init(TTree *tree)
     ptr_fixedGridRhoFastjetCentralNeutral =       &fixedGridRhoFastjetCentralNeutral;
     ptr_Photon_pfRelIso03_all =                   &Photon_pfRelIso03_all;
     ptr_Photon_pfRelIso03_chg =                   &Photon_pfRelIso03_chg;
-    
+
+    //Not for 2016:
     if (_flag!= "qcd"){
       ptr_LHEWeight_originalXWGTUP = &LHEWeight_originalXWGTUP;
       ptr_nLHEPdfWeight            = &nLHEPdfWeight;

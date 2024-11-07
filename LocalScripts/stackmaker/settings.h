@@ -2,6 +2,8 @@
 #define SETTINGS_H
 
 #include "decorations.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 #include <string>
 
 //Global variables being used by the class:
@@ -15,6 +17,8 @@ extern float globalObsbyExp;
 extern float globalObsbyExpErr;
 extern double QCDscale, TOPscale, DYscale;
 extern bool toZoom;
+extern nlohmann::json lumiData;
+extern double datalumi;
 
 //The following function are used by get_hist()
 extern TTree* GetFilteredTree(TTree *intree); //defined in the main code
@@ -97,12 +101,31 @@ TH1F *get_hist(
   float scalefactor = 0;
   //float scalefactor = ((TH1F *)file->Get("wt_lumi"))->GetMean();
 
-  //Tweaking the histogram:
-  double datalumi = 59800; //pb^{-1}
+  //------------------------------------------------------------------
+  //Extract luminsoity from json file and scale the histogram:
+  //------------------------------------------------------------------
+  
+  double jsonlumi = 0;
+  try    {jsonlumi = lumiData.at(sample.Data()).at(subsample.Data()).get<double>();}
+  catch (const json::out_of_range& e) {
+    DisplayText("Luminosity data not found for " + sample + " " + subsample, 31);
+    return nullptr;
+  }
+  catch (const json::exception& e) {
+    DisplayText("Luminosity data not found for " + sample + " " + subsample, 31);
+    return nullptr;
+  }
+  if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
+
+  //Additional scaling on MC:
+  if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale(QCDscale);
+  else if (sample == "TTBar")                                   hst->Scale(TOPscale);
+  else if (sample == "DYJetsToLL")                              hst->Scale(DYscale);
+  /*
   if (sample == "QCD_MuEnriched" || sample == "QCD_EMEnriched") hst->Scale((datalumi/lumi)*QCDscale);
   else if (sample == "TTBar")                                   hst->Scale((datalumi/lumi)*TOPscale);
   else if (sample == "DYJetsToLL")                              hst->Scale((datalumi/lumi)*DYscale);
-  else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);
+  else if(sample != "SingleMuon" || sample != "EGamma")         hst->Scale( datalumi/lumi);*/
 
   //cout<<"Hist "+var+" for "+sample+"_"+subsample+" loaded and scaled to : "+scalefactor<<endl;
   return hst;
@@ -424,6 +447,16 @@ void DisplayYieldsInBins(TH1F *hst){
   }
   cout<<"Total = "<<total<<endl;
   cout << defaultfloat << endl;
+}
+
+// Function to initialize the JSON data
+void loadLuminosityData(string jsonfilepath) {
+  std::ifstream jsonFile(jsonfilepath);
+  if (jsonFile.is_open()) {
+    jsonFile >> lumiData;
+    jsonFile.close(); 
+  }
+  else DisplayText("Failed to open JSON file for luminosity data.", 31);
 }
 
 #endif // SETTINGS_H

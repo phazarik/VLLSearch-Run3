@@ -174,23 +174,15 @@ Bool_t AnaScript::Process(Long64_t entry)
     electron_trigger   = false;
     overlapping_events = false;
     
-    if     (_year==2016) {
-      muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
-    }
-    else if(_year==2017) {
-      muon_trigger     = (*HLT_IsoMu27==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
-    }
-    else if(_year==2018) {
-      muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
-    }
+    muon_trigger =     (*HLT_SingleMuon==1);
+    electron_trigger = (*HLT_SingleEle==1);
     
     overlapping_events = muon_trigger && electron_trigger;
 
     if(_data!=0){
-
+      
+      triggerRes = false;
+      
       //Strategy 1: Only considering the non-overlapping parts.
       //if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
       //if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset

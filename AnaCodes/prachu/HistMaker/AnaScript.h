@@ -434,12 +434,31 @@ public :
   TTreeReaderValue<Bool_t> Flag_trkPOG_logErrorTooManyClusters = {fReader, "Flag_trkPOG_logErrorTooManyClusters"};
   TTreeReaderValue<Bool_t> Flag_METFilters = {fReader, "Flag_METFilters"};
 
-  //HLT paths that we are intereted in:
+  //-------------------------------------
+  // HLT paths that we are intereted in:
+  //-------------------------------------
+  
+  //Triggers I am using:
+  //For 2016:
+  TTreeReaderValue<Bool_t> HLT_SingleMuon = {fReader, "HLT_IsoMu24"};
+  TTreeReaderValue<Bool_t> HLT_SingleEle  = {fReader, "HLT_Ele27_WPTight_Gsf"};
+
+  //For 2017:
+  //TTreeReaderValue<Bool_t> HLT_SingleMuon = {fReader, "HLT_IsoMu27"};
+  //TTreeReaderValue<Bool_t> HLT_SingleEle  = {fReader, "HLT_Ele35_WPTight_Gsf"};
+
+  //Additional triggers I am keeping:
   TTreeReaderValue<Bool_t> HLT_IsoMu24 = {fReader, "HLT_IsoMu24"};
   TTreeReaderValue<Bool_t> HLT_IsoMu27 = {fReader, "HLT_IsoMu27"};
   TTreeReaderValue<Bool_t> HLT_Ele27_WPTight_Gsf = {fReader, "HLT_Ele27_WPTight_Gsf"};
-  TTreeReaderValue<Bool_t> HLT_Ele32_WPTight_Gsf = {fReader, "HLT_Ele32_WPTight_Gsf"};
-
+  //TTreeReaderValue<Bool_t> HLT_Ele32_WPTight_Gsf = {fReader, "HLT_Ele32_WPTight_Gsf"} //Not available in 2017
+  //TTreeReaderValue<Bool_t> HLT_Ele35_WPTight_Gsf = {fReader, "HLT_Ele35_WPTight_Gsf"}; //not in 2016
+  
+  // Note on trigger paths:
+  // For 2018: HLT_IsoMu24 and HLT_Ele32_WPTight_Gsf; offline_cuts: 26, 35
+  // For 2017: HLT_IsoMu27 and HLT_Ele35_WPTight_Gsf; offline_cuts: 32, 37
+  // For 2016: HLT_IsoMu24 and HLT_Ele32_WPTight_Gsf; offline_cuts: 26, 35
+  
   //__________________________________________________________________________________________________________
 
   //                                  SPECIAL BRANCHES THAT CHANGED NAME
@@ -736,6 +755,8 @@ public:
   //float correctionlib_egmIsoSF(float pt, float eta, string mode);
   float correctionlib_jetSF(Particle jet, string mode);
   float correctionlib_jetRF(Particle jet, vector<Particle> genJet, float rho, string mode);
+  double correctionlib_btagMCeff_2016preVFP_UL(Particle jet);
+  double correctionlib_btagMCeff_2016postVFP_UL(Particle jet);
   double correctionlib_btagMCeff_2018UL(Particle jet);
   float correctionlib_btagWPSFfromPOG(Particle jet, string mode);
   float correctionlib_btagIDSF(vector<Particle> Jet, string mode);

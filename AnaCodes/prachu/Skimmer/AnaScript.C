@@ -283,7 +283,6 @@ Bool_t AnaScript::Process(Long64_t entry)
 
       bool keep_this_event = false;
 
-      /*
       //2LSS skim:
       if((int)LightLepton.size()==2){
 	//Condition 1: SS
@@ -293,34 +292,43 @@ Bool_t AnaScript::Process(Long64_t entry)
 	for(int i=0; i<(int)LightLepton.size(); i++){
 	  int lepton_id = fabs(LightLepton.at(i).id);
 	  float lepton_pt = LightLepton.at(i).v.Pt();
-	  if(lepton_id == 11 && lepton_pt > 35) trigger = true;
+	  
+	  // Note: offline pT cuts:
+	  // 2016: Muon > 26, Electron > 35
+	  // 2017: Muon > 32, Electron > 27
+	  // 2018: Muon > 26, Electron > 35
 	  if(lepton_id == 13 && lepton_pt > 26) trigger = true;
+	  if(lepton_id == 11 && lepton_pt > 35) trigger = true;
 	}
 	//Condition 3: low-res veto
 	bool reject_low_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
 	
 	if(trigger && reject_low_resonances && samesign) keep_this_event = true;
-	}*/
-
-      //Charge mismeasurement rate:
-      if((int)Electron.size()==2){
-
-	bool trigger = false;
-	for(int i=0; i<(int)Electron.size(); i++){
-	  int lepton_id = fabs(Electron.at(i).id);
-	  float lepton_pt = Electron.at(i).v.Pt();
-	  if(lepton_id == 11 && lepton_pt > 35) trigger = true;
-	}
-	
-	float dilep_mass = (Electron.at(0).v + Electron.at(1).v).M();
-	float ptratio = Electron.at(1).v.Pt() / Electron.at(0).v.Pt();
-	bool Zwindow = 76 < dilep_mass && dilep_mass < 106 && ptratio > 0.7;
-	
-	if(trigger && Zwindow) keep_this_event = true;
       }
 
-      if(bad_event) keep_this_event = false;
+      /*
+      //Charge mismeasurement rate:
+      if((int)Electron.size()==2){
       
+      bool trigger = false;
+      for(int i=0; i<(int)Electron.size(); i++){
+      int lepton_id = fabs(Electron.at(i).id);
+      float lepton_pt = Electron.at(i).v.Pt();
+      if(lepton_id == 11 && lepton_pt > 35) trigger = true;
+      }
+	  
+      float dilep_mass = (Electron.at(0).v + Electron.at(1).v).M();
+      float ptratio = Electron.at(1).v.Pt() / Electron.at(0).v.Pt();
+      bool Zwindow = 76 < dilep_mass && dilep_mass < 106 && ptratio > 0.7;
+	  
+      if(trigger && Zwindow) keep_this_event = true;
+      }*/
+      
+      
+      //-------------------
+      // Filling the tree
+      //-------------------
+      if(bad_event) keep_this_event = false;
       if(keep_this_event){
 	nEvtPass++;
 	skimTree->Fill();

@@ -16,6 +16,8 @@
 #include "TLine.h"
 #include "settings.h"
 #include "decorations.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 using namespace std;
 
 //Global variables need to be declared here.
@@ -37,6 +39,8 @@ bool toOverlayData;
 bool toZoom;
 TString tag, tag2, tag3; //Additional info while saving the plots
 TString channel;
+json lumiData;
+double datalumi;
 
 //Declaring ROOT objects here for memory management.
 TH1F *dummy;
@@ -65,9 +69,9 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-//void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
+void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
 //void makeplotForCMS(TString _var = "nnscore_qcd_vlldmu_200_800", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
-void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL} (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 1){
+//void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL} (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 1){
   //void makeplotForCMS(){
   time_t start, end;
   time(&start);
@@ -77,13 +81,17 @@ void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL}
   TString jobname = "hist_2LSS_dyEnhanced_chwt_Oct24_"+channel;
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = true;
+  toSave = false;
   toLog = true;
   toOverlayData = true;
   toZoom = false; //forcefully zooms on the x axis.
-  tag = "topCR_"+channel; //Don't use special symbols (folder name)
-  TString info = "t#bar{t} CR";
+  tag = "dy_"+channel; //Don't use special symbols (folder name)
+  TString info = "Drell-Yan CR";
   tag3 = "";
+
+  //Load json data for lumi:
+  datalumi = 59800;
+  loadLuminosityData("../../InputJsons/lumidata_2018.json");
 
   //DON'T TOUCH BELOW:
   if     (channel == "ee") tag2 = info+" (e-e)"; //This appears on the plot.
@@ -117,7 +125,7 @@ void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL}
     //Rebin can be overwritten inside the plot loop.
     //{.var="dilep_mass", .name="M_{ll} (GeV)",  200, 0, 200, 2},
     //{.var="lep0_iso",   .name="Leading lepton reliso03",  1000, 0, 10, 5},
-    {.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
+    //{.var="HT",       .name="HT (GeV)",       200, 0, 200, 1},
     //{.var="dilep_ptratio", .name="p_{T1} / p_{T0}", 200, 0, 1, 5}
   };
 
@@ -369,20 +377,20 @@ void plot(TString var, TString name){
   // Managing signal:
   // Using M-400 as a refernce, where I expect to improve the limit.
   if(channel == "ee"){
-    sig1 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
-    sig2 = get_hist(var, "VLLD", "ele_M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{100}");}
+    sig1 = get_hist(var, "VLLD_ele", "M400", 270022.05); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
+    sig2 = get_hist(var, "VLLD_ele", "M100", 6560.41);   if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{100}");}
   }
   else if (channel == "em"){
-    sig1 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
-    sig2 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{400}");}
+    sig1 = get_hist(var, "VLLD_ele", "M400", 270022.05); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
+    sig2 = get_hist(var, "VLLD_mu", "M400", 267905.18);  if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{400}");}
   }
   else if (channel == "me"){
-    sig1 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
-    sig2 = get_hist(var, "VLLD", "ele_M400", 270022.05); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{400}");}
+    sig1 = get_hist(var, "VLLD_mu", "M400", 267905.18);  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
+    sig2 = get_hist(var, "VLLD_ele", "M400", 270022.05); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{400}");}
   }
   else if (channel == "mm"){
-    sig1 = get_hist(var, "VLLD", "mu_M400", 267905.18);  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
-    sig2 = get_hist(var, "VLLD", "mu_M100", 6622.84);    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{100}");}   
+    sig1 = get_hist(var, "VLLD_mu", "M400", 267905.18);  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
+    sig2 = get_hist(var, "VLLD_mu", "M100", 6622.84);    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{100}");}   
   }
   sig3 = nullptr;
 

@@ -125,10 +125,10 @@ void AnaScript::FillTree(TTree *tree){
   else if(em) channel = (UInt_t)2;
   else if(ee) channel = (UInt_t)3;
 
-  if(*HLT_IsoMu24==1 && *HLT_Ele32_WPTight_Gsf==0)      trigger = (UInt_t)0; //Muon fires but not electron
-  else if(*HLT_IsoMu24==0 && *HLT_Ele32_WPTight_Gsf==1) trigger = (UInt_t)1; //Electron fires, but not muon
-  else if(*HLT_IsoMu24==1 && *HLT_Ele32_WPTight_Gsf==1) trigger = (UInt_t)2; //Both fire
-  else if(*HLT_IsoMu24==0 && *HLT_Ele32_WPTight_Gsf==0) trigger = (UInt_t)3; //None fire
+  if(*HLT_SingleMuon==1 && *HLT_SingleEle==0)      trigger = (UInt_t)0; //Muon fires but not electron
+  else if(*HLT_SingleMuon==0 && *HLT_SingleEle==1) trigger = (UInt_t)1; //Electron fires, but not muon
+  else if(*HLT_SingleMuon==1 && *HLT_SingleEle==1) trigger = (UInt_t)2; //Both fire
+  else if(*HLT_SingleMuon==0 && *HLT_SingleEle==0) trigger = (UInt_t)3; //None fire
   else cout<<"Something is wrong with triggers"<<endl;
   
   

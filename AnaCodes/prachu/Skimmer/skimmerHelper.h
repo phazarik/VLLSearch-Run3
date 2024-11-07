@@ -7,9 +7,15 @@ void AnaScript::ActivateBranch(TTree *t){
   //DON'T USE THIS FUNCTION if you want to keep the same tree structure in the skimmed file.
   //Keepting the same structure is helpful, because the same analysis script works on it.
   
-  for(auto activeBranchName : {"run","luminosityBlock","event", "HLT_IsoMu20","HLT_IsoMu24","HLT_IsoMu27","HLT_Ele32_WPTight_Gsf","HLT_Ele27_WPTight_Gsf","Flag_*","nMuon","Muon_*","nElectron","Electron_*","nTau","Tau_*","nJet","Jet_*","MET_*","PuppiMET_*","nTrigObj","TrigObj_*", "nPhoton", "Photon_*", "*fixed*", "PV*"})
-  t->SetBranchStatus(activeBranchName, 1);
+  for(auto activeBranchName : {"run","luminosityBlock","event","Flag_*","nMuon","Muon_*","nElectron","Electron_*","nTau","Tau_*","nJet","Jet_*","MET_*","PuppiMET_*","nTrigObj","TrigObj_*", "nPhoton", "Photon_*", "*fixed*", "PV*"})
+    t->SetBranchStatus(activeBranchName, 1);
 
+  /*
+  //Trigger_paths:
+  for(auto activeBranchName : {"HLT_IsoMu20","HLT_IsoMu24","HLT_IsoMu27","HLT_Ele32_WPTight_Gsf","HLT_Ele27_WPTight_Gsf"})
+  t->SetBranchStatus(activeBranchName, 1);*/
+  for(auto activeBranchName : {"HLT_IsoMu*", "HLT_Ele*"}) t->SetBranchStatus(activeBranchName, 1);
+  
   if(_data==0){
     for(auto activeBranchName : {"nGenPart","GenPart_*","nGenJet","GenJet_*","nGenVisTau","GenVisTau_*","GenMET_phi","GenMET_pt", "Pileup*"})  //"*LHE*Weight*" is not avaiable in QCD multijet backgrounds.
       t->SetBranchStatus(activeBranchName, 1);
@@ -32,9 +38,12 @@ void AnaScript::ReadBranch(){
   *event;
 
   //HLT;
+  *HLT_SingleMuon;
+  *HLT_SingleEle;
   *HLT_IsoMu24;
   *HLT_IsoMu27;
-  *HLT_Ele32_WPTight_Gsf;
+  //*HLT_Ele32_WPTight_Gsf; //Not available in 2017
+  //*HLT_Ele35_WPTight_Gsf; //Not in 2016
   *HLT_Ele27_WPTight_Gsf;
   
   //Flags
@@ -116,7 +125,7 @@ void AnaScript::ReadBranch(){
     *Pileup_sumLOOT;
     *Pileup_nTrueInt;
     *Pileup_gpudensity;
-    
+
     if(_flag != "qcd"){
       **ptr_LHEWeight_originalXWGTUP;
       **ptr_nLHEPdfWeight;

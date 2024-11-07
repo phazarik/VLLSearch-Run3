@@ -203,10 +203,6 @@ Bool_t AnaScript::Process(Long64_t entry)
   h.hist[2]->Fill(*Flag_HBHENoiseFilter);
   h.hist[3]->Fill(*Flag_EcalDeadCellTriggerPrimitiveFilter);
   h.hist[4]->Fill(*Flag_BadPFMuonFilter);
-  h.hist[5]->Fill(*HLT_IsoMu24);
-  h.hist[6]->Fill(*HLT_IsoMu27);
-  h.hist[7]->Fill(*HLT_Ele27_WPTight_Gsf);
-  h.hist[8]->Fill(*HLT_Ele32_WPTight_Gsf);
   
   GoodEvt2018 = (_year==2018 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
   GoodEvt2017 = (_year==2017 ? *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter && *Flag_HBHENoiseIsoFilter && *Flag_EcalDeadCellTriggerPrimitiveFilter && *Flag_BadPFMuonFilter && (_data ? *Flag_eeBadScFilter : 1) : 1);
@@ -225,18 +221,8 @@ Bool_t AnaScript::Process(Long64_t entry)
     electron_trigger   = false;
     overlapping_events = false;
 
-    if     (_year==2016) {
-      muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
-    }
-    else if(_year==2017) {
-      muon_trigger     = (*HLT_IsoMu27==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
-    }
-    else if(_year==2018) {
-      muon_trigger     = (*HLT_IsoMu24==1);
-      electron_trigger = (*HLT_Ele32_WPTight_Gsf==1);
-    }
+    muon_trigger =     (*HLT_SingleMuon==1);
+    electron_trigger = (*HLT_SingleEle==1);
 
     overlapping_events = muon_trigger && electron_trigger;
     
@@ -245,32 +231,21 @@ Bool_t AnaScript::Process(Long64_t entry)
     if(electron_trigger)   h.count[0]->Fill(2); else h.count[0]->Fill(3);
     if(overlapping_events) h.count[0]->Fill(4);
 
-    //Investigaring the electron trigger:
-    if(*HLT_Ele27_WPTight_Gsf==1) h.count[2]->Fill(0);    else h.count[2]->Fill(1);
-    if(*HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(2);    else h.count[2]->Fill(3);
-    if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(4); //bothpass
-    if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(5); //bothfail
-    if(*HLT_Ele27_WPTight_Gsf==1 && *HLT_Ele32_WPTight_Gsf==0) h.count[2]->Fill(6); //only 27 pass
-    if(*HLT_Ele27_WPTight_Gsf==0 && *HLT_Ele32_WPTight_Gsf==1) h.count[2]->Fill(7); //only 32 pass
-
     //Update triggerRes only in case of data.
     if(_data !=0){
-      
-      //Strategy 1:
-      //triggerRes = false;
-      //triggerRes = (muon_trigger || electron_trigger);
-      //This is the union of both datasets (may overlap).
-      //Removing the overlapping events from the EGamma dataset as follows:
-      if(_flag == "egamma" && overlapping_events) triggerRes = false;
-      
-      //Strategy2: Either electron32 trigger, or muon26 trigger.
-      //triggerRes = false;
-      //if(muon_trigger && !electron_trigger)      triggerRes = true;
-      //else if(!muon_trigger && electron_trigger) triggerRes = true;
 
-      //Strategy3:
-      if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      triggerRes = false;
+      
+      //Strategy 1: Only considering the non-overlapping parts.
+      //if(_flag != "egamma") triggerRes = muon_trigger && !electron_trigger; //For the SingleMuon dataset
+      //if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
+
+      //Strategy 2: Include the overlap in the muon dataset.
+      if(_flag != "egamma") triggerRes = muon_trigger; //For the SingleMuon dataset, including overlap.
       if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
+
+      //Strategy3: Write everything and handle the trigger later.
+      //triggerRes = true;
 
       //Throw awaying bad data that are not included in the GoldenJson:
       int runno = (int)*run;
@@ -444,10 +419,10 @@ Bool_t AnaScript::Process(Long64_t entry)
       //                         Analysis block
       //_______________________________________________________________________________________________________
 
-      //Make2LSSPlots();
+      Make2LSSPlots();
       //MakebJetSFPlots();
       //if(!bad_event) MakeSignalPlots(1.0);
-      CalculateChargeMisID();
+      //CalculateChargeMisID();
       
       /*
       //lumiscaling:

@@ -1,7 +1,6 @@
 void AnaScript::Make2LSSPlots(){
   
   //This function is intended to run for 2LSS events which pass a trigger.
-  //The event selections are defined in EVentSelections.h
   //This function is called in the main C file.
 
   //##################################################################################################
@@ -33,7 +32,7 @@ void AnaScript::Make2LSSPlots(){
   }
   //##################################################################################################
   
-  //Picking events with exactly 2muons with same-sign, where the leading muon pT>26 GeV.
+  //Picking 2LSS events
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
@@ -41,8 +40,8 @@ void AnaScript::Make2LSSPlots(){
   bool mm = false;
 
   //Offline cuts on the leptons:
-  float ptcut_mu  = 26; if(_campaign=="2017_UL") ptcut_mu = 32;
-  float ptcut_ele = 35;
+  float ptcut_mu  = 26; if(_campaign=="2017_UL") ptcut_mu  = 29;
+  float ptcut_ele = 35; if(_campaign=="2017_UL") ptcut_ele = 37;
   
   if(LightLepton.size() == 2){
     if(LightLepton.at(0).charge == LightLepton.at(1).charge){
@@ -68,7 +67,7 @@ void AnaScript::Make2LSSPlots(){
   //#######################
   // Select the channel :
   //
-  basic_evt_selection = ee;
+  basic_evt_selection = mm;
   //
   //#######################
   
@@ -339,6 +338,7 @@ void AnaScript::Make2LSSPlots(){
       h.evtweight[15]->Fill(wt);
 
       //Trigger check:
+      /*
       h.flag[0]->Fill(*HLT_IsoMu24, wt);
       h.flag[1]->Fill(*HLT_IsoMu27, wt);
       h.flag[2]->Fill(*HLT_Ele27_WPTight_Gsf, wt);
@@ -346,7 +346,7 @@ void AnaScript::Make2LSSPlots(){
       h.flag[4]->Fill((int)0, wt);
       if(muon_trigger)       h.flag[4]->Fill((int)1, wt);
       if(electron_trigger)   h.flag[4]->Fill((int)2, wt);
-      if(overlapping_events) h.flag[4]->Fill((int)3, wt); //Should not appear in EGamma dataset
+      if(overlapping_events) h.flag[4]->Fill((int)3, wt);*/ //Should not appear in EGamma dataset
 
     }//custom event selection
     

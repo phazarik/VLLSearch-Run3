@@ -1,3 +1,5 @@
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_2016preVFP_UL.h"
+#include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_2016postVFP_UL.h"
 #include "/home/work/phazarik1/work/Analysis-Run3/Setup/Correctionlib/local/bJet/JetEff_DeepJet_MediumWP_2018_UL_2LSS.h"
 #include "correction.h"
 
@@ -96,8 +98,20 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
       jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i));
       h.evtweight[20]->Fill(jet_eff);
     }
-    else { jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i)); //Using the same numbers for now
-      cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
+    else if(_campaign=="2017_UL"){
+      jet_eff = correctionlib_btagMCeff_2018UL(Jet.at(i));
+      h.evtweight[20]->Fill(jet_eff);
+    }
+    else if(_campaign=="2016preVFP_UL"){
+      jet_eff = correctionlib_btagMCeff_2016preVFP_UL(Jet.at(i));
+      h.evtweight[20]->Fill(jet_eff);
+    }
+    else if(_campaign=="2016postVFP_UL"){
+      jet_eff = correctionlib_btagMCeff_2016postVFP_UL(Jet.at(i));
+      h.evtweight[20]->Fill(jet_eff);
+    }
+    else {
+      cout<<"btv_deepjet.h : Provide correct btag SF file!"<<endl;
     }
     
     //SFfromPOG
@@ -116,7 +130,7 @@ float AnaScript::correctionlib_btagIDSF(vector<Particle> Jet, string mode){
     else if (_campaign =="2016preVFP_UL")  WPth=0.2598;
     else if (_campaign =="2016postVFP_UL") WPth=0.2489;
     else if (_campaign =="Summer22")       return 1.0;
-    else cout<<"btv_deepjet.h : Provide correct campaign name!"<<endl;
+    else cout<<"btv_deepjet.h : Provide correct b-tag working point!"<<endl;
 
     //Skipping trailing jets.
     //if(i>2) return 1.0;

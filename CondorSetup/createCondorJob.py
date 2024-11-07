@@ -196,7 +196,7 @@ with open(condorfile, 'w') as file:
 condorfile = "submitJobsCondor_"+USER+"_"+samplename+"_"+timestamp+".condor"
 main_processline = "condor_submit "+condorfile
 
-print("\n______"+samplename+"______")
+print("\n\033[33m______"+samplename+"______\033[0m")
 print("Input directory : "+INDIR)
 print("Output directory: "+OUTDIR)
 print("Code directory: "+codedir)
