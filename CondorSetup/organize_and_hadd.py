@@ -40,6 +40,7 @@ for folder in samples:
         'M10To50':'M10to50',
         'Inclusice':'Inclusive',
         'WZTo2L2Q':'WZTo2Q2L',
+        'TTWToLnu':'TTWToLNu',
         'SingleElectronBpreVFP_ver2':'SingleElectron_B',
         'SingleElectronCpreVFP':'SingleElectron_C',
         'SingleElectronDpreVFP':'SingleElectron_D',

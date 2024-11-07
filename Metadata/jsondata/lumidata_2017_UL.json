@@ -1,0 +1,138 @@
+{
+  "DYJetsToLL": {
+    "M10to50": 3679.7517,
+    "M50": 34454.5857
+  },
+  "QCD_EMEnriched": {
+    "15to20": 6.0173,
+    "20to30": 2.8934,
+    "30to50": 1.3626,
+    "50to80": 5.136,
+    "80to120": 27.7834,
+    "120to170": 148.7347,
+    "170to300": 221.3117,
+    "300toInf": 2006.2808
+  },
+  "QCD_MuEnriched": {
+    "20to30": 25.4622,
+    "30to50": 42.8339,
+    "50to80": 106.6739,
+    "80to120": 514.1565,
+    "120to170": 1867.9066,
+    "170to300": 10365.884,
+    "300to470": 94830.3635,
+    "470to600": 566134.0963,
+    "600to800": 2178500.831,
+    "800to1000": 23838939.043
+  },
+  "SingleTop": {
+    "s-channel_LeptonDecays": 3641711.2299,
+    "t-channel_AntiTop_InclusiveDecays": 1027425.2907,
+    "t-channel_Top_InclusiveDecays": 1145529.1005,
+    "tW_AntiTop_InclusiveDecays": 238357.4285,
+    "tW_Top_InclusiveDecays": 245177.1957
+  },
+  "TTBar": {
+    "TTTo2L2Nu": 1208789.2174,
+    "TTToSemiLeptonic": 947205.343
+  },
+  "TTW": {
+    "TTWToLNu": 33149540.39
+  },
+  "TTZ": {
+    "TTZToLL": 398861810.391
+  },
+  "Rare": {
+    "THQ": 8309808.7175,
+    "THW": 27598137.0592,
+    "TTHH": 540946656.6491,
+    "TTTJ": 890790135.8832,
+    "TTTT": 1063070741.5074,
+    "TTTW": 490329610.4604,
+    "TTWH": 107800175.2848,
+    "TTWW": 99785561.1151,
+    "TTWZ": 1633986.9281,
+    "TTZH": 310008857.3959,
+    "TTZZ": 235930735.9307,
+    "tZq_ll": 4632696.3907
+  },
+  "HTbinnedWJets": {
+    "Inclusive": 1465.0549,
+    "70to100": 35071.9984,
+    "100to200": 37939.5744,
+    "200to400": 125094.6124,
+    "400to600": 120344.9164,
+    "600to800": 509210.101,
+    "800to1200": 1032146.6531,
+    "1200to2500": 4107275.7131,
+    "2500toInf": 448788417.8653
+  },
+  "WJetsNLO": {
+    "Inclusive": 0.0,
+    "100to250": 0.0,
+    "250to400": 0.0,
+    "400to600": 0.0,
+    "600toInf": 0.0
+  },
+  "WGamma": {
+    "WGToLnuG_01J": 71820.5849
+  },
+  "ZGamma": {
+    "ZGToLLG_01J": 592017.1519
+  },
+  "WW": {
+    "WWTo1L1Nu2Q": 780829.1553,
+    "WWTo2L2Nu": 635076.6456,
+    "WWTo4Q": 771138.3773
+  },
+  "WpWp": {
+    "WpWpJJEWK": 3041362.5304,
+    "WpWpJJQCD": 0.0
+  },
+  "WZ": {
+    "WZTo1L1Nu2Q": 799841.2456,
+    "WZTo2L2Q": 4580695.3236,
+    "WZTo3LNu": 1989528.959
+  },
+  "ZZ": {
+    "ZZTo2L2Nu": 41937769.5625,
+    "ZZTo2Q2L": 7972318.6605,
+    "ZZTo2Q2Nu": 1097019.5643,
+    "ZZTo4L": 75009811.3208
+  },
+  "WWW": {
+    "Inclusive": 792400.3707
+  },
+  "WWZ": {
+    "Inclusive": 1042765.0849
+  },
+  "WZZ": {
+    "Inclusive": 5219828.3412
+  },
+  "ZZZ": {
+    "Inclusive": 12059620.5962
+  },
+  "Higgs": {
+    "bbH_HToZZTo4L": 3783023791.251,
+    "GluGluHToZZTo4L": 30463980463.9805,
+    "GluGluToZH": 74872320.7402,
+    "GluGluZH": 3561166918.429,
+    "ttHToNonbb": 23942346.5534,
+    "VBF_HToZZTo4L": 494059405.9406,
+    "VHToNonbb": 9475416.8029
+  },
+  "SingleMuon": {
+    "SingleMuon_B": 41480,
+    "SingleMuon_C": 41480,
+    "SingleMuon_D": 41480,
+    "SingleMuon_E": 41480,
+    "SingleMuon_F": 41480
+  },
+  "SingleElectron": {
+    "SingleElectron_B": 41480,
+    "SingleElectron_C": 41480,
+    "SingleElectron_D": 41480,
+    "SingleElectron_E": 41480,
+    "SingleElectron_F": 41480
+  }
+}
