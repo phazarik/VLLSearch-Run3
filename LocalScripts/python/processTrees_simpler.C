@@ -3,7 +3,7 @@
 #include <TH1F.h>
 #include <iostream>
 
-void processTrees_simpler(const char* inputFilename, const char* outputFilename, int channelval) {
+void processTrees_simpler(const char* inputFilename, const char* outputFilename, const char* campaign, int channelval) {
   // Opening the ROOT file
   TFile *file = TFile::Open(inputFilename);
   if (!file || file->IsZombie()) {
@@ -169,32 +169,35 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     //Double_t wt = wt_leptonSF*wt_trig*wt_pileup*wt_bjet;
     Double_t wt = wt_leptonSF*wt_trig*wt_pileup;
 
+    
     if(channelval == 3){//For ee chnannel only
       if (correctDY) {
 	float Zpt = dilep_pt;
 	Double_t chmid_wt = 1.0;
-	if (0 < Zpt && Zpt < 10)         chmid_wt = 1.2790;
-	else if (10 < Zpt && Zpt < 20)   chmid_wt = 1.3047;
-	else if (20 < Zpt && Zpt < 30)   chmid_wt = 1.2914;
-	else if (30 < Zpt && Zpt < 50)   chmid_wt = 1.2739;
-	else if (50 < Zpt && Zpt < 75)   chmid_wt = 1.2930;
-	else if (75 < Zpt && Zpt < 100)  chmid_wt = 1.2709;
-	else if (100 < Zpt && Zpt < 200) chmid_wt = 1.3816;
-	else if (200 < Zpt && Zpt < 350) chmid_wt = 1.3841;
-	else if (350 < Zpt && Zpt < 500) chmid_wt = 1.2945;
-	else                             chmid_wt = 1.3622;
-	wt = wt * chmid_wt;
-	Double_t HT_wt = 1.0;
-	if(HT < 25)                   HT_wt = 1.1827;
-	else if(25 < HT  && HT < 50)  HT_wt = 0.7869;
-	else if(50 < HT  && HT < 100) HT_wt = 0.6265;
-	else if(100 < HT && HT < 200) HT_wt = 0.5623;
-	else if(200 < HT && HT < 300) HT_wt = 0.5440;
-	else if(300 < HT && HT < 500) HT_wt = 0.5675;
-	else                          HT_wt = 0.5534;
-	wt = wt * HT_wt;
-      }
-    }
+	if(string(campaign) == "2018_UL"){
+	  if (0 < Zpt && Zpt < 10)         chmid_wt = 1.2790;
+	  else if (10 < Zpt && Zpt < 20)   chmid_wt = 1.3047;
+	  else if (20 < Zpt && Zpt < 30)   chmid_wt = 1.2914;
+	  else if (30 < Zpt && Zpt < 50)   chmid_wt = 1.2739;
+	  else if (50 < Zpt && Zpt < 75)   chmid_wt = 1.2930;
+	  else if (75 < Zpt && Zpt < 100)  chmid_wt = 1.2709;
+	  else if (100 < Zpt && Zpt < 200) chmid_wt = 1.3816;
+	  else if (200 < Zpt && Zpt < 350) chmid_wt = 1.3841;
+	  else if (350 < Zpt && Zpt < 500) chmid_wt = 1.2945;
+	  else                             chmid_wt = 1.3622;
+	  wt = wt * chmid_wt;
+	  Double_t HT_wt = 1.0;
+	  if(HT < 25)                   HT_wt = 1.1827;
+	  else if(25 < HT  && HT < 50)  HT_wt = 0.7869;
+	  else if(50 < HT  && HT < 100) HT_wt = 0.6265;
+	  else if(100 < HT && HT < 200) HT_wt = 0.5623;
+	  else if(200 < HT && HT < 300) HT_wt = 0.5440;
+	  else if(300 < HT && HT < 500) HT_wt = 0.5675;
+	  else                          HT_wt = 0.5534;
+	  wt = wt * HT_wt;
+	}// 2018_UL
+      }// CorrectDY
+    }// ee channel
     
     //nnscoreCombined = nnscore1*nnscore2*nnscore3;
 

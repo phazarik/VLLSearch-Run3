@@ -7,16 +7,18 @@ start_time = time.time()
 parser=argparse.ArgumentParser()
 parser.add_argument('--jobname',type=str, required=True,  help='Condor job name')
 parser.add_argument('--dump',   type=str, required=True,  help='Output job name')
+parser.add_argument('--campaign',type=str, required=True,  help='Mention campaign')
 parser.add_argument('--channel',type=str, required=True,  help='Mention channel name: ee, em, me or mm')
 parser.add_argument('--test', action='store_true', help='Run for only one sample (optional)')
 parser.add_argument('--dryrun', action='store_true', help='Print statements (optional)')
 args=parser.parse_args()
 
-jobname = args.jobname
-dump    = args.dump
-channel = args.channel
-test    = args.test
-dryrun  = args.dryrun
+jobname  = args.jobname
+dump     = args.dump
+campaign = args.campaign
+channel  = args.channel
+test     = args.test
+dryrun   = args.dryrun
 
 def extractHistFromTree(jobname, channel):
 
@@ -33,13 +35,13 @@ def extractHistFromTree(jobname, channel):
         "QCD_MuEnriched_20to30","QCD_MuEnriched_30to50","QCD_MuEnriched_50to80", "QCD_MuEnriched_80to120", "QCD_MuEnriched_120to170","QCD_MuEnriched_170to300", "QCD_MuEnriched_300to470", "QCD_MuEnriched_470to600","QCD_MuEnriched_600to800", "QCD_MuEnriched_800to1000", "QCD_EMEnriched_15to20","QCD_EMEnriched_20to30","QCD_EMEnriched_30to50","QCD_EMEnriched_50to80", "QCD_EMEnriched_80to120", "QCD_EMEnriched_120to170","QCD_EMEnriched_170to300", "QCD_EMEnriched_300toInf",
 
         #Single-t samples:
-        "SingleTop_s-channel_LeptonDecays","SingleTop_t-channel_AntiTop_InclusiveDecays","SingleTop_t-channel_Top_InclusiveDecays","SingleTop_tW_AntiTop_InclusiceDecays","SingleTop_tW_Top_InclusiveDecays",
+        "SingleTop_s-channel_LeptonDecays","SingleTop_t-channel_AntiTop_InclusiveDecays","SingleTop_t-channel_Top_InclusiveDecays","SingleTop_tW_AntiTop_InclusiveDecays","SingleTop_tW_Top_InclusiveDecays",
 
         #TH+X samples:
         "Rare_THQ", "Rare_THW",
 
         #TZq:
-        "Rare_TZq_ll",
+        "Rare_tZq_ll",
         
         #ttbar samples:
         "TTBar_TTTo2L2Nu","TTBar_TTToSemiLeptonic",
@@ -58,7 +60,7 @@ def extractHistFromTree(jobname, channel):
         "WW_WWTo1L1Nu2Q","WW_WWTo2L2Nu","WW_WWTo4Q","WZ_WZTo1L1Nu2Q","WZ_WZTo2Q2L","WZ_WZTo3LNu","ZZ_ZZTo2L2Nu","ZZ_ZZTo2Q2L","ZZ_ZZTo2Q2Nu","ZZ_ZZTo4L",
 
         #WpWp:
-        "WpWp_WpWpJJEWK","WpWp_WpWpJJQCD",
+        "WpWp_WpWpJJEWK",
 
         #VVV samples:
         "WWW_Inclusive","WWZ_Inclusive","WZZ_Inclusive","ZZZ_Inclusive",
@@ -73,14 +75,14 @@ def extractHistFromTree(jobname, channel):
         "VLLD_mu_M100","VLLD_mu_M200","VLLD_mu_M300","VLLD_mu_M400","VLLD_mu_M600","VLLD_mu_M800","VLLD_mu_M1000",
 
         #Data:
-        "SingleMuon_SingleMuon_A","SingleMuon_SingleMuon_B","SingleMuon_SingleMuon_C","SingleMuon_SingleMuon_D",
-        "EGamma_EGamma_A","EGamma_EGamma_B","EGamma_EGamma_C","EGamma_EGamma_D"
+        "SingleMuon_SingleMuon_A","SingleMuon_SingleMuon_B","SingleMuon_SingleMuon_C","SingleMuon_SingleMuon_D","SingleMuon_SingleMuon_E","SingleMuon_SingleMuon_F","SingleMuon_SingleMuon_G",
+        "EGamma_EGamma_A","EGamma_EGamma_B","EGamma_EGamma_C","EGamma_EGamma_D","EGamma_EGamma_E","EGamma_EGamma_F","EGamma_EGamma_G"
     ]
 
     prev_time = start_time
 
     for s in samples:
-        #if "DYJetsToLL" not in s: continue
+        #if "tZq" not in s: continue
         print("Making histograms for \033[33m"+s+ "\033[0m ...")
         indir = "../input_trees_modified/" + jobname + "/"
         #indir = "../input_trees/" + jobname + "/"
@@ -95,7 +97,7 @@ def extractHistFromTree(jobname, channel):
 
         # Generating the output directory
         os.makedirs(outdir, exist_ok=True)
-        arguments = f'"{inputfilename}", "{outputfilename}", {chval}'
+        arguments = f'"{inputfilename}", "{outputfilename}", "{campaign}", {chval}'
         processline = f"root -q -b -l 'processTrees_simpler.C({arguments})'"
         if dryrun: print(processline)
         else:  os.system(processline)
