@@ -166,36 +166,35 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     // Put event selections here.
     bool event_selection = false;
     bool channel_selection = channel == channelval; //This decides the channel
-    //Double_t wt = wt_leptonSF*wt_trig*wt_pileup*wt_bjet;
-    Double_t wt = wt_leptonSF*wt_trig*wt_pileup;
+    Double_t wt = wt_leptonSF*wt_trig*wt_pileup*wt_bjet;
+    //Double_t wt = wt_leptonSF*wt_trig*wt_pileup;
 
     
     if(channelval == 3){//For ee chnannel only
       if (correctDY) {
 	float Zpt = dilep_pt;
-	Double_t chmid_wt = 1.0;
 	if(string(campaign) == "2018_UL"){
-	  if (0 < Zpt && Zpt < 10)         chmid_wt = 1.2790;
-	  else if (10 < Zpt && Zpt < 20)   chmid_wt = 1.3047;
-	  else if (20 < Zpt && Zpt < 30)   chmid_wt = 1.2914;
-	  else if (30 < Zpt && Zpt < 50)   chmid_wt = 1.2739;
-	  else if (50 < Zpt && Zpt < 75)   chmid_wt = 1.2930;
-	  else if (75 < Zpt && Zpt < 100)  chmid_wt = 1.2709;
-	  else if (100 < Zpt && Zpt < 200) chmid_wt = 1.3816;
-	  else if (200 < Zpt && Zpt < 350) chmid_wt = 1.3841;
-	  else if (350 < Zpt && Zpt < 500) chmid_wt = 1.2945;
-	  else                             chmid_wt = 1.3622;
-	  wt = wt * chmid_wt;
 	  Double_t HT_wt = 1.0;
-	  if(HT < 25)                   HT_wt = 1.1827;
-	  else if(25 < HT  && HT < 50)  HT_wt = 0.7869;
-	  else if(50 < HT  && HT < 100) HT_wt = 0.6265;
-	  else if(100 < HT && HT < 200) HT_wt = 0.5623;
-	  else if(200 < HT && HT < 300) HT_wt = 0.5440;
-	  else if(300 < HT && HT < 500) HT_wt = 0.5675;
-	  else                          HT_wt = 0.5534;
+	  if(HT < 25)                   HT_wt = 1.5243;
+	  else if(25 < HT  && HT < 50)  HT_wt = 1.0233;
+	  else if(50 < HT  && HT < 100) HT_wt = 0.8203;
+	  else if(100 < HT && HT < 200) HT_wt = 0.7536;
+	  else if(200 < HT && HT < 300) HT_wt = 0.7366;
+	  else if(300 < HT && HT < 400) HT_wt = 0.7684;
+	  else                          HT_wt = 0.7809;
 	  wt = wt * HT_wt;
-	}// 2018_UL
+	}
+	else if (string(campaign)== "2016preVFP_UL"){
+	  Double_t HT_wt = 1.0;
+	  if(HT < 25)                     HT_wt = 0.9708;
+	  else if(25 <= HT  && HT < 50)   HT_wt = 0.6535;
+	  else if(50 <= HT  && HT < 100)  HT_wt = 0.5180;
+	  else if(100 <= HT && HT < 200)  HT_wt = 0.4765;
+	  else if(200 <= HT && HT < 300)  HT_wt = 0.3906;
+	  else if(300 <= HT && HT < 400)  HT_wt = 0.6887;
+	  else                            HT_wt = 0.3395; //Including overlay
+	  wt = wt * HT_wt;
+	}
       }// CorrectDY
     }// ee channel
     

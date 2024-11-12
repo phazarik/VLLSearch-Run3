@@ -16,6 +16,9 @@
 #include "TLine.h"
 #include "settings.h"
 #include "decorations.h"
+#include "setglobalparameters.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 using namespace std;
 
 //Global variables need to be declared here.
@@ -38,8 +41,11 @@ TH1F *dummy;
 bool toSave;
 bool toLog;
 bool toOverlayData;
-TString tag, tag2, tag3; //Additional info while saving the plots
+TString tag, tag2, tag3, info; //Additional info while saving the plots
 TString channel;
+json lumiData;
+double datalumi;
+TString campaign, campaign_name;
 
 void reset_if_not_null(TH1F *hist){
   if(hist != nullptr)
@@ -59,32 +65,26 @@ void makeoverlayForCMS(){
 
   //SET GLOBAL SETTINGS HERE:
   channel = "ee";
-  //TString jobname = "hist_2LSS_dyEnhanced_chwt_Oct24_"+channel;
-  TString jobname = "hist_eeZwindow_2018UL_Sept24_"+channel;
+  TString jobname = "hist_2LSS_2018UL_drellyanCR_Nov12_"+channel;
+  campaign = "2018_UL";
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
-  toSave = true;
-  toLog = true;
-  toOverlayData = true;
-  toZoom = false; //forcefully zooms on the x axis.
-  tag = "DY"+channel; //Don't use special symbols (folder name)
-  tag2 = "76 < M_{ee} < 106";
-  tag3 = "p_{T1}/p_{T0} > 0.70";
   
-  QCDscale = 1.0;
-  TOPscale = 1.0;
-  DYscale  = 1.0;
-  rebin = 1;
+  toSave = false;
+  toOverlayData = true;
 
-  //----------------2024-10-03----------------//
-  if(channel == "mm")      QCDscale = 0.155758;
-  else if(channel == "me") QCDscale = 0.094731;
-  else if(channel == "em") QCDscale = 0.192381;
-  else if(channel == "ee") QCDscale = 0.303599;
+  tag = "DY"+channel; //Don't use special symbols (folder name)
+  info = "76 < M_{ee} < 106";
+  tag3 = "p_{T1}/p_{T0} > 0.70";
+
+  InitializeValues();
+  SetLumi();
+  
+  rebin = 1;
 
   //CUSTOMIZE THE FOLLOWING ACCORDING TO YOUR NEEDS:
   //Extract histograms:
-  
+  /*
   vector<TH1F*> num = return_hist("chargeflip_num");
   vector<TH1F*> den = return_hist("chargeflip_den");
 
@@ -139,9 +139,8 @@ void makeoverlayForCMS(){
     cout<< chMisID_dy  ->GetBinContent(bin)<<"\t"<< chMisID_dy  ->GetBinError(bin)<<"\t";
     cout<< scalefactor ->GetBinContent(bin)<<"\t"<< scalefactor ->GetBinError(bin)<<endl;   
   }
-  cout<<defaultfloat<<endl;
+  cout<<defaultfloat<<endl;*/
 
-  /*
   //HT binned scale-factors:
   vector<TH1F*> hst = return_hist("HT");
   TH1F *hst_data, *hst_others, *hst_dy;
@@ -156,22 +155,24 @@ void makeoverlayForCMS(){
   }
 
   //Print out information:
-  int nbins = hst_data->GetNbinsX();
-  cout<<"nbin \tData \tOthers \tDY"<<endl;
+  int nbins = hst_dy->GetNbinsX();
+  cout << "bin \tRange \tData \tOthers \tDY" << endl;
   cout<<fixed<<setprecision(1);
-  for(int bin=0; bin<=nbins+2; bin++){
-    cout<<bin<<"\t";
+  for(int bin=0; bin<=nbins+3; bin++){
+    double bin_low = hst_dy->GetBinLowEdge(bin);
+    double bin_high = bin_low + hst_dy->GetBinWidth(bin);
+    cout << bin << "\t[" << bin_low << " - " << bin_high << "]\t";
     cout<< hst_data   ->GetBinContent(bin)<<"\t";
     cout<< hst_others ->GetBinContent(bin)<<"\t";
     cout<< hst_dy     ->GetBinContent(bin)<<endl;
   }
-  cout<<defaultfloat<<endl;*/
-
+  cout<<defaultfloat<<endl;
   
   //---------
   // Drawing 
   //---------
 
+  /*
   canvas = create_canvas("HT", "HT", 600, 600); // Square canvas
 
   // Create the mainPad to occupy the top 70% of the canvas
@@ -206,7 +207,7 @@ void makeoverlayForCMS(){
   dummy->GetXaxis()->SetRangeUser(0, 1000);
   dummy->SetStats(0);
   dummy->Draw("hist");
-  
+
   chMisID_data -> Draw("AP SAME");
   chMisID_dy   -> Draw("AP SAME");
   dummy->Draw("sameaxis");
@@ -236,7 +237,8 @@ void makeoverlayForCMS(){
   mainPad->cd();
   put_text("CMS", 0.17, 0.83, 62, 0.07);
   put_text("Preliminary", 0.27, 0.83, 52, 0.05);
-  put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05);
+  if(campaign == "2016preVFP_UL") put_latex_text(campaign_name, 0.62, 0.94, 42, 0.05);
+  if(campaign == "2018_UL")       put_latex_text(campaign_name, 0.74, 0.94, 42, 0.05);
   put_latex_text(tag2, 0.17, 0.78, 42, 0.04);
   put_latex_text(tag3, 0.17, 0.73, 42, 0.04);
   canvas->Update();
@@ -244,13 +246,13 @@ void makeoverlayForCMS(){
   //Creating legend:
   TLegend *lg = create_legend(0.80, 0.70, 0.94, 0.89);
   lg->SetNColumns(1);
-  lg->AddEntry(chMisID_data, "data", "f");
-  lg->AddEntry(chMisID_dy, "MC", "f");
+  //lg->AddEntry(chMisID_data, "data", "f");
+  //lg->AddEntry(chMisID_dy, "MC", "f");
   lg->SetHeader("");
   lg->Draw();
 
   createFolder("overlays_and_others");
-  canvas->SaveAs("overlays_and_others/electron_charge-flip_rate.png");
+  canvas->SaveAs("overlays_and_others/electron_charge-flip_rate.png");*/
   
   //Done!
   time(&end);
@@ -267,131 +269,135 @@ vector<TH1F*> return_hist(TString var){
   bkg.clear();
 
   //Reading histograms:
+  //QCD processes:
   vector<TH1F *> QCD = {       
-    get_hist(var, "QCD_MuEnriched", "20to30",         23.893),
-    get_hist(var, "QCD_MuEnriched", "30to50",         42.906),
-    get_hist(var, "QCD_MuEnriched", "50to80",        105.880),
-    get_hist(var, "QCD_MuEnriched", "80to120",       508.715),
-    get_hist(var, "QCD_MuEnriched", "120to170",     1802.854),
-    get_hist(var, "QCD_MuEnriched", "170to300",    10265.815),
-    get_hist(var, "QCD_MuEnriched", "300to470",    95249.242),
-    get_hist(var, "QCD_MuEnriched", "470to600",   656872.156),
-    get_hist(var, "QCD_MuEnriched", "600to800",  2060827.812),
-    get_hist(var, "QCD_MuEnriched", "800to1000",11337379.457),
-    get_hist(var, "QCD_EMEnriched", "15to20",      5.96666541),
-    get_hist(var, "QCD_EMEnriched", "20to30",      2.92664338), //weird low stat bin
-    get_hist(var, "QCD_EMEnriched", "30to50",      1.33001225),
-    get_hist(var, "QCD_EMEnriched", "50to80",      5.28031791),
-    get_hist(var, "QCD_EMEnriched", "80to120",    25.76427755),
-    get_hist(var, "QCD_EMEnriched", "120to170",  145.33569605),
-    get_hist(var, "QCD_EMEnriched", "170to300",  223.50433213),
-    get_hist(var, "QCD_EMEnriched", "300toInf", 2007.24094203),
+    get_hist(var, "QCD_MuEnriched", "20to30"),
+    get_hist(var, "QCD_MuEnriched", "30to50"),
+    get_hist(var, "QCD_MuEnriched", "50to80"),
+    get_hist(var, "QCD_MuEnriched", "80to120"),
+    get_hist(var, "QCD_MuEnriched", "120to170"),
+    get_hist(var, "QCD_MuEnriched", "170to300"),
+    get_hist(var, "QCD_MuEnriched", "300to470"),
+    get_hist(var, "QCD_MuEnriched", "470to600"),
+    get_hist(var, "QCD_MuEnriched", "600to800"),
+    get_hist(var, "QCD_MuEnriched", "800to1000"),
+    get_hist(var, "QCD_EMEnriched", "15to20"),
+    get_hist(var, "QCD_EMEnriched", "20to30"),
+    get_hist(var, "QCD_EMEnriched", "30to50"),
+    get_hist(var, "QCD_EMEnriched", "50to80"),
+    get_hist(var, "QCD_EMEnriched", "80to120"),
+    get_hist(var, "QCD_EMEnriched", "120to170"),
+    get_hist(var, "QCD_EMEnriched", "170to300"),
+    get_hist(var, "QCD_EMEnriched", "300toInf"),
   };
   //Bakcgrounds with single-top:
   vector<TH1F *>ST = {
-    get_hist(var, "SingleTop", "s-channel_LeptonDecays",            5178074.5989), //old = 5456748.098),
-    get_hist(var, "SingleTop", "t-channel_AntiTop_InclusiveDecays", 1407728.544),
-    get_hist(var, "SingleTop", "t-channel_Top_InclusiveDecays",     1558659.612),
-    get_hist(var, "SingleTop", "tW_AntiTop_InclusiceDecays",         238357.428),
-    get_hist(var, "SingleTop", "tW_Top_InclusiveDecays",             245177.196)
+    get_hist(var, "SingleTop", "s-channel_LeptonDecays"),
+    get_hist(var, "SingleTop", "t-channel_AntiTop_InclusiveDecays"),
+    get_hist(var, "SingleTop", "t-channel_Top_InclusiveDecays"),
+    //get_hist(var, "SingleTop", "tW_AntiTop_InclusiveDecays"),
+    get_hist(var, "SingleTop", "tW_AntiTop_InclusiceDecays"),
+    get_hist(var, "SingleTop", "tW_Top_InclusiveDecays")
   };
   vector<TH1F *>THX = {
-    get_hist(var, "Rare", "THQ",     93446130.4484), //39983860.190527),
-    get_hist(var, "Rare", "THW",     98902195.6088), //101122448.979592),
+    get_hist(var, "Rare", "THQ"),
+    get_hist(var, "Rare", "THW"),
   };
   vector<TH1F *>TZq = {
-    get_hist(var, "Rare", "TZq_ll",  12649681.5287) //157598201.29612),
+    get_hist(var, "Rare", "tZq_ll"),
   };
   //Backgrounds with multiple tops:
   vector<TH1F *>TTBar={
-    get_hist(var, "TTBar", "TTTo2L2Nu",        1642541.624),
-    get_hist(var, "TTBar", "TTToSemiLeptonic", 1304012.700),
+    get_hist(var, "TTBar", "TTTo2L2Nu"),
+    get_hist(var, "TTBar", "TTToSemiLeptonic"),
   };
   vector<TH1F *>TTW ={
-    get_hist(var, "TTW", "TTWToLNu", 48514391.8292) //old:48627268.5
+    get_hist(var, "TTW", "TTWToLNu")
   };
   vector<TH1F *>TTZ ={
-    get_hist(var, "TTZ", "TTZToLL", 393271344.4028) //old:107659472.141
+    get_hist(var, "TTZ", "TTZToLL")
   };
   vector<TH1F *>TTX={
-    get_hist(var, "Rare", "TTHH",   751314800.9016), //745156482.861401),
-    get_hist(var, "Rare", "TTTJ",  1258178158.0272), //1246882793.01746),
-    get_hist(var, "Rare", "TTTT",  1589918422.0139), //1613891978.74181),
-    get_hist(var, "Rare", "TTTW",   672841187.6873), // 678385059.049712),
-    get_hist(var, "Rare", "TTWH",   435582822.0859), //435201401.050788),
-    get_hist(var, "Rare", "TTWW",   134953538.2416), //134857142.857143),
-    get_hist(var, "Rare", "TTWZ",   203431372.5490), //202686202.686203),
-    get_hist(var, "Rare", "TTZH",   442869796.2799), //440528634.361234),
-    get_hist(var, "Rare", "TTZZ",   359307359.3074), //358273381.29496),
+    get_hist(var, "Rare", "TTHH"),
+    get_hist(var, "Rare", "TTTJ"),
+    get_hist(var, "Rare", "TTTT"),
+    get_hist(var, "Rare", "TTTW"),
+    get_hist(var, "Rare", "TTWH"),
+    get_hist(var, "Rare", "TTWW"),
+    get_hist(var, "Rare", "TTWZ"),
+    get_hist(var, "Rare", "TTZH"),
+    get_hist(var, "Rare", "TTZZ")
   };
   //Backgrounds with single V:
   vector<TH1F *>WJets = {
-    get_hist(var, "HTbinnedWJets", "70to100",      52100.910),
-    get_hist(var, "HTbinnedWJets", "100to200",     41127.174),
-    get_hist(var, "HTbinnedWJets", "200to400",    172265.183),
-    get_hist(var, "HTbinnedWJets", "400to600",    163821.083),
-    get_hist(var, "HTbinnedWJets", "600to800",    708793.021),
-    get_hist(var, "HTbinnedWJets", "800to1200",  1481985.193),
-    get_hist(var, "HTbinnedWJets", "1200to2500", 5602003.457),
-    get_hist(var, "HTbinnedWJets", "2500toInf", 79396214.989),
+    get_hist(var, "HTbinnedWJets", "70to100"),
+    get_hist(var, "HTbinnedWJets", "100to200"),
+    get_hist(var, "HTbinnedWJets", "200to400"),
+    get_hist(var, "HTbinnedWJets", "400to600"),
+    get_hist(var, "HTbinnedWJets", "600to800"),
+    get_hist(var, "HTbinnedWJets", "800to1200"),
+    get_hist(var, "HTbinnedWJets", "1200to2500"),
+    get_hist(var, "HTbinnedWJets", "2500toInf"),
   };
   vector<TH1F *>WGamma={
-    //get_hist(var, "WGamma", "WGToLNuG_Inclusive", 23896.3683),
-    get_hist(var, "WGamma", "WGToLNuG_01J", 23450.9243)
+    get_hist(var, "WGamma", "WGToLNuG_01J")
   };
   vector<TH1F *> DY = {
-    get_hist(var, "DYJetsToLL", "M10to50", 5075.3797), //5925.522),
-    get_hist(var, "DYJetsToLL", "M50",    34451.2441)//30321.155)
+    get_hist(var, "DYJetsToLL", "M10to50"),
+    get_hist(var, "DYJetsToLL", "M50")
   };
   vector<TH1F *>ZGamma={
-    get_hist(var, "ZGamma", "ZGToLLG_01J", 592588.5918)
+    get_hist(var, "ZGamma", "ZGToLLG_01J")
   }; 
   //Backgrounds with VV:
   vector<TH1F *>VV={
-    get_hist(var, "WW", "WWTo1L1Nu2Q", 787485.589),
-    get_hist(var, "WW", "WWTo2L2Nu",   901172.227),
-    get_hist(var, "WW", "WWTo4Q",      773049.853),
-    get_hist(var, "WZ", "WZTo1L1Nu2Q", 805257.731),
-    get_hist(var, "WZ", "WZTo2Q2L",   4499605.731),
-    get_hist(var, "WZ", "WZTo3LNu",   1889798.538),
-    get_hist(var, "ZZ", "ZZTo2L2Nu", 58416512.631),
-    get_hist(var, "ZZ", "ZZTo2Q2L",   7928149.608),
-    get_hist(var, "ZZ", "ZZTo2Q2Nu",  4405016.452),
-    get_hist(var, "ZZ", "ZZTo4L",    74330566.038),
+    get_hist(var, "WW", "WWTo1L1Nu2Q"),
+    get_hist(var, "WW", "WWTo2L2Nu"),
+    get_hist(var, "WW", "WWTo4Q"),
+    get_hist(var, "WZ", "WZTo1L1Nu2Q"),
+    get_hist(var, "WZ", "WZTo2Q2L"),
+    get_hist(var, "WZ", "WZTo3LNu"),
+    get_hist(var, "ZZ", "ZZTo2L2Nu"),
+    get_hist(var, "ZZ", "ZZTo2Q2L"),
+    get_hist(var, "ZZ", "ZZTo2Q2Nu"),
+    get_hist(var, "ZZ", "ZZTo4L"),
   };
   vector<TH1F *>WpWp={
-    get_hist(var, "WpWp", "WpWpJJEWK", 3041362.5304),
-    //get_hist(var, "WpWp", "WpWpJJQCD", 6313131.3131),
+    get_hist(var, "WpWp", "WpWpJJEWK"),
   };
   //Backgrounds with VVV:
   vector<TH1F *>VVV={
-    get_hist(var, "WWW", "Inclusive", 1112140.8712),
-    get_hist(var, "WWZ", "Inclusive", 1452841.24194),
-    get_hist(var, "WZZ", "Inclusive", 5254860.74619),
-    get_hist(var, "ZZZ", "Inclusive", 16937669.376694),
+    get_hist(var, "WWW", "Inclusive"),
+    get_hist(var, "WWZ", "Inclusive"),
+    get_hist(var, "WZZ", "Inclusive"),
+    get_hist(var, "ZZZ", "Inclusive"),
   };
   //Higgs processes:
   vector<TH1F *>Higgs={
-    get_hist(var, "Higgs", "bbH_HToZZTo4L",      3533384497.3139),
-    get_hist(var, "Higgs", "GluGluHToZZTo4L",   28693528693.5287),
-    get_hist(var, "Higgs", "GluGluToZH_HToZZTo4L", 75554356.2066),
-    get_hist(var, "Higgs", "GluGluZH_HToWW_ZTo2L",344444108.7613),
-    get_hist(var, "Higgs", "ttHToNonbb",           34603366.3834),
-    get_hist(var, "Higgs", "VBF_HToZZTo4L",       472277227.7228),
-    get_hist(var, "Higgs", "VHToNonbb",            13166481.4209)
+    get_hist(var, "Higgs", "bbH_HToZZTo4L"),
+    get_hist(var, "Higgs", "GluGluHToZZTo4L"),
+    get_hist(var, "Higgs", "GluGluToZH_HToZZTo4L"),
+    get_hist(var, "Higgs", "GluGluZH_HToWW_ZTo2L"),
+    get_hist(var, "Higgs", "ttHToNonbb"),
+    get_hist(var, "Higgs", "VBF_HToZZTo4L"),
+    get_hist(var, "Higgs", "VHToNonbb")
   };
   //Data:
   vector<TH1F *>SingleMuon={
-    get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
-    get_hist(var, "SingleMuon", "SingleMuon_B", 59800),
-    get_hist(var, "SingleMuon", "SingleMuon_C", 59800),
-    get_hist(var, "SingleMuon", "SingleMuon_D", 59800),
+    get_hist(var, "SingleMuon", "SingleMuon_A"),
+    get_hist(var, "SingleMuon", "SingleMuon_B"),
+    get_hist(var, "SingleMuon", "SingleMuon_C"),
+    get_hist(var, "SingleMuon", "SingleMuon_D"),
+    //get_hist(var, "SingleMuon", "SingleMuon_E"),
+    //get_hist(var, "SingleMuon", "SingleMuon_F"),
   };
   vector<TH1F *>EGamma={
-    get_hist(var, "EGamma", "EGamma_A", 59800),
-    get_hist(var, "EGamma", "EGamma_B", 59800),
-    get_hist(var, "EGamma", "EGamma_C", 59800),
-    get_hist(var, "EGamma", "EGamma_D", 59800),
+    get_hist(var, "EGamma", "EGamma_A"),
+    get_hist(var, "EGamma", "EGamma_B"),
+    get_hist(var, "EGamma", "EGamma_C"),
+    get_hist(var, "EGamma", "EGamma_D"),
+    //get_hist(var, "EGamma", "EGamma_E"),
+    //get_hist(var, "EGamma", "EGamma_F"),
   };
 
   bkg = {

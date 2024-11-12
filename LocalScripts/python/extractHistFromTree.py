@@ -23,7 +23,7 @@ dryrun   = args.dryrun
 def extractHistFromTree(jobname, channel):
 
     chval = -1
-    if channel == 'mm':   chval = 0
+    if channel   == 'mm':   chval = 0
     elif channel == 'me': chval = 1
     elif channel == 'em': chval = 2
     elif channel == 'ee': chval = 3
@@ -87,6 +87,11 @@ def extractHistFromTree(jobname, channel):
         indir = "../input_trees_modified/" + jobname + "/"
         #indir = "../input_trees/" + jobname + "/"
         outdir = "../input_hists/"+dump+"/"
+
+        ### name exceptions:
+        if '2018' in campaign:
+            if 'tW_AntiTop_InclusiveDecays' in s: s = s.replace('tW_AntiTop_InclusiveDecays', 'tW_AntiTop_InclusiceDecays')
+        
         inputfilename = indir+"tree_" + s + ".root"
         outputfilename = outdir+"hst_" + s + ".root"
 

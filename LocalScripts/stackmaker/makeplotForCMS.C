@@ -72,6 +72,7 @@ void plot(TString var, TString name);
 //------------------------------------------------
 
 void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
+//void makeplotForCMS(TString _var = "HT", TString _name = "HT (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 1000, int _rebin = 1){
 //void makeplotForCMS(TString _var = "nnscore_qcd_vlldmu_200_800", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
 //void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL} (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 1){
   //void makeplotForCMS(){
@@ -79,16 +80,16 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
-  channel = "ee";
-  TString jobname = "hist_2LSS_2016preVFP_baseline_Nov10_"+channel;
-  campaign = "2016preVFP_UL";
+  channel = "mm";
+  TString jobname = "hist_2LSS_2018UL_qcdCR_Nov12_"+channel;
+  campaign = "2018_UL";
   input_path = "../input_hists/"+jobname;
   
-  toSave = true;
-  toOverlayData = false;
+  toSave = false;
+  toOverlayData = true;
 
-  tag = campaign+"_baseline_"+channel; //folder name
-  info = "Baseline"; //Event selection
+  tag = campaign+"_topCR_"+channel; //folder name
+  info = "t#bar{t} CR"; //Event selection
   tag3 = ""; //Additional info
 
   InitializeValues();
@@ -140,7 +141,7 @@ void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (Ge
 void plot(TString var, TString name){
 
   Double_t ymin = 0.1;
-  Double_t ymax = 10E6;
+  Double_t ymax = 10E5;
   
   //rebin = 1; //overriding rebin
   //cout<<"Test : toZoom = "<<toZoom;
@@ -182,7 +183,8 @@ void plot(TString var, TString name){
     get_hist(var, "SingleTop", "s-channel_LeptonDecays"),
     get_hist(var, "SingleTop", "t-channel_AntiTop_InclusiveDecays"),
     get_hist(var, "SingleTop", "t-channel_Top_InclusiveDecays"),
-    get_hist(var, "SingleTop", "tW_AntiTop_InclusiveDecays"),
+    //get_hist(var, "SingleTop", "tW_AntiTop_InclusiveDecays"),
+    get_hist(var, "SingleTop", "tW_AntiTop_InclusiceDecays"),
     get_hist(var, "SingleTop", "tW_Top_InclusiveDecays")
   };
   vector<TH1F *>THX = {
@@ -270,20 +272,20 @@ void plot(TString var, TString name){
   };
   //Data:
   vector<TH1F *>SingleMuon={
-    //get_hist(var, "SingleMuon", "SingleMuon_A", 59800),
+    get_hist(var, "SingleMuon", "SingleMuon_A"),
     get_hist(var, "SingleMuon", "SingleMuon_B"),
     get_hist(var, "SingleMuon", "SingleMuon_C"),
     get_hist(var, "SingleMuon", "SingleMuon_D"),
-    get_hist(var, "SingleMuon", "SingleMuon_E"),
-    get_hist(var, "SingleMuon", "SingleMuon_F"),
+    //get_hist(var, "SingleMuon", "SingleMuon_E"),
+    //get_hist(var, "SingleMuon", "SingleMuon_F"),
   };
   vector<TH1F *>EGamma={
-    //get_hist(var, "EGamma", "EGamma_A", 59800),
+    get_hist(var, "EGamma", "EGamma_A"),
     get_hist(var, "EGamma", "EGamma_B"),
     get_hist(var, "EGamma", "EGamma_C"),
     get_hist(var, "EGamma", "EGamma_D"),
-    get_hist(var, "EGamma", "EGamma_E"),
-    get_hist(var, "EGamma", "EGamma_F"),
+    //get_hist(var, "EGamma", "EGamma_E"),
+    //get_hist(var, "EGamma", "EGamma_F"),
   };
   
   //DisplayText("Reading done.", 33);
@@ -379,9 +381,9 @@ void plot(TString var, TString name){
   }
   sig3 = nullptr;
 
-  /*
   vector<TH1F*> sigvec = {sig1, sig2, sig3};
-  for (int i=0; i<(int)sigvec.size(); i++){
+  /*
+    for (int i=0; i<(int)sigvec.size(); i++){
     if(!sigvec[i]) cout<<"Signal "<<i<<" is null!"<<endl;
     }*/
   //######################################################################
@@ -413,49 +415,50 @@ void plot(TString var, TString name){
   //ON SCREEN DISPLAYS:
   //For the data and background file: nObs, nExp, nExpErr
   //For the signal file: nSig, nSigErr
-  //if(var == "dilep_mass"){
-  cout << fixed << setprecision(2);
-  /*
-  // Output for Obs/Exp file
-  cout << "\nObs/Exp file:" << endl;
-  cout << setw(10) << left << "Obs"
-       << setw(10) << left << "Exp"
-       << setw(10) << left << "ExpErr" << endl;
-  cout << setw(10) << left << allbkg->Integral()
-       << setw(10) << left << allbkg->Integral()
-       << setw(10) << left << GetStatUncertainty(allbkg) << endl;
-  // Output for the data and signal file: name, nSig, nSigErr
-  cout <<"\nSignal yields:"  << endl;
-  cout << setw(15) << left  << "Name"
-       << setw(15) << right << "nSig"
-       << setw(10) << right << "nSigErr" << endl;
+  if(var == "dilep_mass"){
+    cout << fixed << setprecision(2);
+  
+    // Output for Obs/Exp file
+    cout << "\nObs/Exp file:" << endl;
+    cout << setw(10) << left << "Obs"
+	 << setw(10) << left << "Exp"
+	 << setw(10) << left << "ExpErr" << endl;
+    cout << setw(10) << left << allbkg->Integral()
+	 << setw(10) << left << allbkg->Integral()
+	 << setw(10) << left << GetStatUncertainty(allbkg) << endl;
+    // Output for the data and signal file: name, nSig, nSigErr
+    cout <<"\nSignal yields:"  << endl;
+    cout << setw(15) << left  << "Name"
+	 << setw(15) << right << "nSig"
+	 << setw(10) << right << "nSigErr" << endl;
 
-  for (int s = 0; s<(int)sigvec.size(); s++) {
-    if(sigvec[s]){
-      cout << setw(15) << left <<  sigvec[s]->GetTitle()
-	   << setw(15) << right << sigvec[s]->Integral()
-	   << setw(10) << right << GetStatUncertainty(sigvec[s]) << endl;
+    for (int s = 0; s<(int)sigvec.size(); s++) {
+      if(sigvec[s]){
+	cout << setw(15) << left <<  sigvec[s]->GetTitle()
+	     << setw(15) << right << sigvec[s]->Integral()
+	     << setw(10) << right << GetStatUncertainty(sigvec[s]) << endl;
+      }
     }
-  }
-  cout << defaultfloat << endl;
+    cout << defaultfloat << endl;
+  
+    //Yield for each background:
+    DisplayText("Yields with uncertainty for each sample:", 33);
+    cout<<fixed<<setprecision(2);
+    Double_t sum_bkg = 0; Double_t sum_bkg_sqerr = 0;
+    for(int i=(int)bkg.size()-1; i>=0; i--){
+      cout<<setw(15)<<left<<bkg[i]->GetTitle()<<"\t"<<bkg[i]->Integral()<<"\\pm"<<GetStatUncertainty(bkg[i])<<endl;
+      sum_bkg += bkg[i]->Integral();
+      sum_bkg_sqerr += pow(GetStatUncertainty(bkg[i]), 2);
+    }
+    cout<<setw(15)<<left<<"Total bkg\t"<<sum_bkg<<"\\pm"<<sqrt(sum_bkg_sqerr)<<endl;
+    if(toOverlayData) cout<<setw(15)<<left<<"Data\t"<<right<<hst_data->Integral()<<"\\pm"<<GetStatUncertainty(hst_data)<<endl;
+    if(sig1) cout<<setw(15)<<left<<sig1->GetTitle()<<"\t"<<sig1->Integral()<<"\\pm"<<GetStatUncertainty(sig1)<<endl;
+    if(sig2) cout<<setw(15)<<left<<sig2->GetTitle()<<"\t"<<sig2->Integral()<<"\\pm"<<GetStatUncertainty(sig2)<<endl;
+    if(sig3) cout<<setw(15)<<left<<sig3->GetTitle()<<"\t"<<sig3->Integral()<<"\\pm"<<GetStatUncertainty(sig3)<<endl;
+    cout<<defaultfloat<<endl;
+  }//For dilep_mass
 
-  //Yield for each background:
-  DisplayText("Yields with uncertainty for each sample:", 33);
-  cout<<fixed<<setprecision(2);
-  Double_t sum_bkg = 0; Double_t sum_bkg_sqerr = 0;
-  for(int i=(int)bkg.size()-1; i>=0; i--){
-    cout<<setw(15)<<left<<bkg[i]->GetTitle()<<"\t"<<bkg[i]->Integral()<<"\\pm"<<GetStatUncertainty(bkg[i])<<endl;
-    sum_bkg += bkg[i]->Integral();
-    sum_bkg_sqerr += pow(GetStatUncertainty(bkg[i]), 2);
-  }
-  cout<<setw(15)<<left<<"Total bkg\t"<<sum_bkg<<"\\pm"<<sqrt(sum_bkg_sqerr)<<endl;
-  if(toOverlayData) cout<<setw(15)<<left<<"Data\t"<<right<<hst_data->Integral()<<"\\pm"<<GetStatUncertainty(hst_data)<<endl;
-  if(sig1) cout<<setw(15)<<left<<sig1->GetTitle()<<"\t"<<sig1->Integral()<<"\\pm"<<GetStatUncertainty(sig1)<<endl;
-  if(sig2) cout<<setw(15)<<left<<sig2->GetTitle()<<"\t"<<sig2->Integral()<<"\\pm"<<GetStatUncertainty(sig2)<<endl;
-  if(sig3) cout<<setw(15)<<left<<sig3->GetTitle()<<"\t"<<sig3->Integral()<<"\\pm"<<GetStatUncertainty(sig3)<<endl;
-  cout<<defaultfloat<<endl;*/
-
-  if(var == "HT") DisplayYieldsInBins(hst_data, allbkg);
+  //if(var == "HT") DisplayYieldsInBins(hst_data, allbkg);
   //DisplaySignalYieldsInBins(sig1);
   
   //Chargeflip-rate calculation:
@@ -611,7 +614,7 @@ void plot(TString var, TString name){
     ratiohist->Draw("ep same"); //I want the ratio to be on top.
     canvas->Update();
   }
-  //if(channel=="ee" && var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
+  if(channel=="ee" && var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
   
   mainPad->cd();
   

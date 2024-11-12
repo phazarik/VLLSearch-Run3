@@ -136,7 +136,8 @@ void draw_veto_region(TPad *pad, double xmin, double xmax){
   double ymin = pad->GetUymin();
   double ymax = pad->GetUymax();
   TBox* veto = new TBox(xmin, ymin, xmax, ymax);
-  veto->SetFillColor(kGray+2);
+  //veto->SetFillColor(kGray+2);
+  veto->SetFillColor(kRed);
   veto->SetFillStyle(3001);
   veto->Draw();
 }

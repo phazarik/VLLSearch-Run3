@@ -108,7 +108,7 @@
 	"ttHToNonbb":           34603366.383381
     },
     "WpWp":{
-	"WpWpJJEWK": 3041362.5304,
+	"WpWpJJEWK": 3041362.5304
     },
     "WWW":{
 	"Inclusive": 1112140.8712
@@ -171,15 +171,15 @@
 	"M400":   45822297.89
     },
     "SingleMuon":{
-	"SingleMuon_A":59800,
-	"SingleMuon_B":59800,
-	"SingleMuon_C":59800,
-	"SingleMuon_D":59800
+	"SingleMuon_A":59830,
+	"SingleMuon_B":59830,
+	"SingleMuon_C":59830,
+	"SingleMuon_D":59830
     },
     "EGamma":{
-	"EGamma_A":59800,
-	"EGamma_B":59800,
-	"EGamma_C":59800,
-	"EGamma_D":59800
+	"EGamma_A":59830,
+	"EGamma_B":59830,
+	"EGamma_C":59830,
+	"EGamma_D":59830
     }
 }

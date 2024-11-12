@@ -118,6 +118,7 @@ TH1F *get_hist(
     DisplayText("Luminosity data not found for " + sample + " " + subsample, 31);
     return nullptr;
   }
+  
   if(sample!="SingleMuon" || sample!="EGamma" || sample!="SingleElectron") hst->Scale( datalumi/jsonlumi);
 
   //Additional scaling on MC:
