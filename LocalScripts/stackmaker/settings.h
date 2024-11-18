@@ -32,9 +32,10 @@ void SetLastBinAsOverflow(TH1F *hst){
   double content  = hst->GetBinContent(lastBin);
   double error    = hst->GetBinError(lastBin);
   double overflow = hst->GetBinContent(lastBin + 1);
+  double overflow_err = hst->GetBinError(lastBin + 1);
 
   double updated_content = content+overflow;
-  double updated_error = std::sqrt(error*error + overflow*overflow);
+  double updated_error = std::sqrt(error * error + overflow_err * overflow_err);
   
   hst->SetBinContent(lastBin, updated_content);
   hst->SetBinError(lastBin, updated_error);
@@ -43,9 +44,10 @@ void SetLastBinAsOverflow(TH1F *hst){
   double content_first  = hst->GetBinContent(1);
   double error_first    = hst->GetBinError(1);
   double underflow      = hst->GetBinContent(0);
+  double underflow_err  = hst->GetBinError(0);
 
   double updated_content_first = content_first + underflow;
-  double updated_error_first = std::sqrt(error_first*error_first + underflow*underflow);
+  double updated_error_first = std::sqrt(error_first*error_first + underflow_err*underflow_err);
 
   hst->SetBinContent(1, updated_content_first);
   hst->SetBinError(1, updated_error_first);

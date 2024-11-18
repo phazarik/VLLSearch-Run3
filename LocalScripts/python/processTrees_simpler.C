@@ -39,8 +39,6 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
   Double_t nnscore1, nnscore2, nnscore3, nnscore4;
 
-  vector<float> mybins; //for custom binning:
-
   tree->SetBranchAddress("channel", &channel);
   tree->SetBranchAddress("trigger", &trigger);
   tree->SetBranchAddress("nlep", &nlep);
@@ -92,6 +90,9 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   tree->SetBranchAddress("nnscore_qcd_vlldmu_200_800",  &nnscore4);
 
   // Defining histograms with their respective binning
+  vector<float> mybins; //for custom binning:
+  mybins = {0, 25, 50, 100, 200, 300, 400, 500};
+  
   TH1F *hist_channel = new TH1F("channel", "channel", 10, 0, 10); hist_channel->Sumw2();
   TH1F *hist_trigger = new TH1F("trigger", "trigger", 10, 0, 10); hist_trigger->Sumw2();
   TH1F *hist_nlep = new TH1F("nlep", "nlep",          10, 0, 10); hist_nlep->Sumw2();
@@ -112,25 +113,24 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   TH1F *hist_lep1_sip3d = new TH1F("lep1_sip3d", "lep1_sip3d", 200, 0, 50);  hist_lep1_sip3d->Sumw2();
   TH1F *hist_lep1_mt =    new TH1F("lep1_mt",    "lep1_mt",     50, 0, 500); hist_lep1_mt->Sumw2();
 
-  TH1F *hist_dilep_pt = new TH1F("dilep_pt", "dilep_pt", 50, 0, 500);        hist_dilep_pt->Sumw2();
+  TH1F *hist_dilep_pt = new TH1F("dilep_pt", "dilep_pt", (int)mybins.size()-1, &mybins[0]); hist_dilep_pt->Sumw2();
   TH1F *hist_dilep_eta = new TH1F("dilep_eta", "dilep_eta", 100, -10, 10);   hist_dilep_eta->Sumw2();
   TH1F *hist_dilep_phi = new TH1F("dilep_phi", "dilep_phi", 100, -4, 4);     hist_dilep_phi->Sumw2();
   TH1F *hist_dilep_mass = new TH1F("dilep_mass", "dilep_mass", 50, 0, 500);  hist_dilep_mass->Sumw2();
-  TH1F *hist_dilep_mt = new TH1F("dilep_mt", "dilep_mt", 50, 0, 500);        hist_dilep_mt->Sumw2();
+  TH1F *hist_dilep_mt = new TH1F("dilep_mt", "dilep_mt", (int)mybins.size()-1, &mybins[0]); hist_dilep_mt->Sumw2();
   TH1F *hist_dilep_deta = new TH1F("dilep_deta", "dilep_deta", 100, 0, 6);   hist_dilep_deta->Sumw2();
   TH1F *hist_dilep_dphi = new TH1F("dilep_dphi", "dilep_dphi", 100, 0, 6);   hist_dilep_dphi->Sumw2();
   TH1F *hist_dilep_dR = new TH1F("dilep_dR", "dilep_dR", 100, 0, 6);         hist_dilep_dR->Sumw2();
   TH1F *hist_dilep_ptratio = new TH1F("dilep_ptratio", "dilep_ptratio", 100, 0, 1); hist_dilep_ptratio->Sumw2();
 
-  mybins = {0, 25, 50, 100, 200, 300, 400, 500};
-  TH1F *hist_HT = new TH1F("HT", "HT", (int)mybins.size()-1, &mybins[0]);hist_HT->Sumw2();
-  TH1F *hist_LT = new TH1F("LT", "LT", 20, 0, 500);                      hist_LT->Sumw2();
-  TH1F *hist_STvis = new TH1F("STvis", "STvis", 50, 0, 500);             hist_STvis->Sumw2();
-  TH1F *hist_ST = new TH1F("ST", "ST", 50, 0, 500);                      hist_ST->Sumw2();
-  TH1F *hist_STfrac = new TH1F("STfrac", "STfrac", 100, 0, 1.1);         hist_STfrac->Sumw2();
-  TH1F *hist_HTMETllpt = new TH1F("HTMETllpt", "HTMETllpt", 50, 0, 500); hist_HTMETllpt->Sumw2();
-  TH1F *hist_metpt = new TH1F("metpt", "metpt", 50, 0, 500);             hist_metpt->Sumw2();
-  TH1F *hist_metphi = new TH1F("metphi", "metphi", 100, -4, 4);          hist_metphi->Sumw2();
+  TH1F *hist_HT = new TH1F("HT", "HT", (int)mybins.size()-1, &mybins[0]);          hist_HT->Sumw2();
+  TH1F *hist_LT = new TH1F("LT", "LT", (int)mybins.size()-1, &mybins[0]);          hist_LT->Sumw2();
+  TH1F *hist_STvis = new TH1F("STvis", "STvis", (int)mybins.size()-1, &mybins[0]); hist_STvis->Sumw2();
+  TH1F *hist_ST = new TH1F("ST", "ST", (int)mybins.size()-1, &mybins[0]);          hist_ST->Sumw2();
+  TH1F *hist_STfrac = new TH1F("STfrac", "STfrac", 100, 0, 1.1);                   hist_STfrac->Sumw2();
+  TH1F *hist_HTMETllpt = new TH1F("HTMETllpt", "HTMETllpt", (int)mybins.size()-1, &mybins[0]); hist_HTMETllpt->Sumw2();
+  TH1F *hist_metpt = new TH1F("metpt", "metpt",(int)mybins.size()-1, &mybins[0]);  hist_metpt->Sumw2();
+  TH1F *hist_metphi = new TH1F("metphi", "metphi", 100, -4, 4);                    hist_metphi->Sumw2();
 
   TH1F *hist_dphi_metlep0 = new TH1F("dphi_metlep0", "dphi_metlep0", 100, 0, 4);          hist_dphi_metlep0->Sumw2();
   TH1F *hist_dphi_metlep1 = new TH1F("dphi_metlep1", "dphi_metlep1", 100, 0, 4);          hist_dphi_metlep1->Sumw2();
@@ -153,8 +153,10 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
   //Flagging specific samples:
   std::string filename(inputFilename);
   std::string baseFilename = filename.substr(filename.find_last_of("/\\") + 1);
-  bool correctDY = baseFilename.find("DYJetsToLL") != std::string::npos;
-  if(correctDY) cout<<"Correcting DY events in Zpt bins (ee)"<<endl;
+  bool correctDY    = baseFilename.find("DYJetsToLL") != std::string::npos;
+  bool correctTTBar = baseFilename.find("TTBar") != std::string::npos;
+  if(correctDY)    cout<<"Correcting DY events in HT bins (ee)"<<endl;
+  if(correctTTBar) cout<<"Correcting TTBar events in LT bins (all channels)"<<endl;
   
   // Event loop:
   Long64_t nentries = tree->GetEntries();
@@ -169,9 +171,9 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
     Double_t wt = wt_leptonSF*wt_trig*wt_pileup*wt_bjet;
     //Double_t wt = wt_leptonSF*wt_trig*wt_pileup;
 
-    
-    if(channelval == 3){//For ee chnannel only
-      if (correctDY) {
+    //Corrections for individual backgrounds in bins:
+    if (correctDY) {
+      if(channelval == 3){//For ee channel only
 	float Zpt = dilep_pt;
 	if(string(campaign) == "2018_UL"){
 	  Double_t HT_wt = 1.0;
@@ -197,7 +199,79 @@ void processTrees_simpler(const char* inputFilename, const char* outputFilename,
 	}
       }// CorrectDY
     }// ee channel
-    
+
+    if(correctTTBar){
+      Double_t metpt_wt = 1.0;
+      Double_t LT_wt = 1.0;
+      //2018_UL
+      if(string(campaign) == "2018_UL"){
+	if(channelval == 0){
+	  if(metpt < 25)                        metpt_wt = 0.9484;
+	  else if(25 <= metpt  && metpt < 50)   metpt_wt = 1.3137;
+	  else if(50 <= metpt  && metpt < 100)  metpt_wt = 1.1517;
+	  else if(100 <= metpt && metpt < 200)  metpt_wt = 1.0123;
+	  else if(200 <= metpt && metpt < 300)  metpt_wt = 0.5368;
+	  else if(300 <= metpt && metpt < 400)  metpt_wt = 1.4167;
+	  else                                  metpt_wt = 1.3333;	  
+	  if(LT < 25)                     LT_wt = 1.0;
+	  else if(25 <= LT  && LT < 50)   LT_wt = 0.9849;
+	  else if(50 <= LT  && LT < 100)  LT_wt = 1.0499;
+	  else if(100 <= LT && LT < 200)  LT_wt = 0.9357;
+	  else if(200 <= LT && LT < 300)  LT_wt = 0.5187;
+	  else if(300 <= LT && LT < 400)  LT_wt = 3.5517;
+	  else                            LT_wt = 3.6000;
+	}
+	if(channelval == 1){
+	  if(metpt < 25)                        metpt_wt = 2.0000;
+	  else if(25 <= metpt  && metpt < 50)   metpt_wt = 1.3069;
+	  else if(50 <= metpt  && metpt < 100)  metpt_wt = 1.1179;
+	  else if(100 <= metpt && metpt < 200)  metpt_wt = 0.8601;
+	  else if(200 <= metpt && metpt < 300)  metpt_wt = 1.5763;
+	  else if(300 <= metpt && metpt < 400)  metpt_wt = 4.2857;
+	  else                                  metpt_wt = 1.0000;
+	  if(LT < 25)                     LT_wt = 1.0;
+	  else if(25 <= LT  && LT < 50)   LT_wt = 1.0654;
+	  else if(50 <= LT  && LT < 100)  LT_wt = 0.9621;
+	  else if(100 <= LT && LT < 200)  LT_wt = 0.9581;
+	  else if(200 <= LT && LT < 300)  LT_wt = 1.2041;
+	  else if(300 <= LT && LT < 400)  LT_wt = 2.6957;
+	  else                            LT_wt = 3.9333;
+	}
+	if(channelval == 2){
+	  if(metpt < 25)                        metpt_wt = 0.5616;
+	  else if(25 <= metpt  && metpt < 50)   metpt_wt = 0.9085;
+	  else if(50 <= metpt  && metpt < 100)  metpt_wt = 1.1194;
+	  else if(100 <= metpt && metpt < 200)  metpt_wt = 1.1936;
+	  else if(200 <= metpt && metpt < 300)  metpt_wt = 0.3019;
+	  else if(300 <= metpt && metpt < 400)  metpt_wt = 2.6000;
+	  else                                  metpt_wt = 0.1111;
+	  if(LT < 25)                     LT_wt = 1.0;
+	  else if(25 <= LT  && LT < 50)   LT_wt = 1.0000;
+	  else if(50 <= LT  && LT < 100)  LT_wt = 1.0206;
+	  else if(100 <= LT && LT < 200)  LT_wt = 0.9510;
+	  else if(200 <= LT && LT < 300)  LT_wt = 1.219; //combined
+	  else if(300 <= LT && LT < 400)  LT_wt = 1.219; //combined
+	  else                            LT_wt = 1.219; //combined
+	}
+	if(channelval == 3){
+	  if(metpt < 25)                        metpt_wt = 6.2500;
+	  else if(25 <= metpt  && metpt < 50)   metpt_wt = 1.7385;
+	  else if(50 <= metpt  && metpt < 100)  metpt_wt = 1.3454;
+	  else if(100 <= metpt && metpt < 200)  metpt_wt = 1.1655;
+	  else if(200 <= metpt && metpt < 300)  metpt_wt = 0.3091;
+	  else if(300 <= metpt && metpt < 400)  metpt_wt = 1.5; //combined
+	  else                                  metpt_wt = 1.5; //combined
+	  if(LT < 25)                     LT_wt = 1.0;
+	  else if(25 <= LT  && LT < 50)   LT_wt = 3.5000;
+	  else if(50 <= LT  && LT < 100)  LT_wt = 0.8952;
+	  else if(100 <= LT && LT < 200)  LT_wt = 0.8986;
+	  else if(200 <= LT && LT < 300)  LT_wt = 1.8962;
+	  else if(300 <= LT && LT < 400)  LT_wt = 1.8462;
+	  else                            LT_wt = 1.5000;
+	}
+      }//end 2018
+      wt = wt * metpt_wt * LT_wt;
+    }
     //nnscoreCombined = nnscore1*nnscore2*nnscore3;
 
     event_selection = channel_selection;

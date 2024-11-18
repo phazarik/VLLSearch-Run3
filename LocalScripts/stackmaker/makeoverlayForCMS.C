@@ -65,7 +65,7 @@ void makeoverlayForCMS(){
 
   //SET GLOBAL SETTINGS HERE:
   channel = "ee";
-  TString jobname = "hist_2LSS_2018UL_drellyanCR_Nov12_"+channel;
+  TString jobname = "hist_2LSS_2018UL_topCR_METscaled_Nov17_"+channel;
   campaign = "2018_UL";
   input_path = "../input_hists/"+jobname;
   globalSbyB = 0;
@@ -142,29 +142,45 @@ void makeoverlayForCMS(){
   cout<<defaultfloat<<endl;*/
 
   //HT binned scale-factors:
-  vector<TH1F*> hst = return_hist("HT");
-  TH1F *hst_data, *hst_others, *hst_dy;
+  vector<TH1F*> hst = return_hist("LT");
+  TH1F *hst_data, *hst_others, *hst_mc;
   for(int i=0; i<(int)hst.size(); i++){
     if(i==0){
       hst_others = (TH1F *)hst[i]->Clone();
       hst_others->Reset();
     }
-    if(TString(hst[i]->GetName())=="DY")        hst_dy   = hst[i];
+    if(TString(hst[i]->GetName())=="t#bar{t}")  hst_mc   = hst[i];
     else if(TString(hst[i]->GetName())=="Data") hst_data = hst[i];
     else hst_others->Add(hst[i]);
   }
 
   //Print out information:
-  int nbins = hst_dy->GetNbinsX();
-  cout << "bin \tRange \tData \tOthers \tDY" << endl;
+  int nbins = hst_mc->GetNbinsX();
+  cout << "bin \tRange \tData \tOthers \tMC" << endl;
   cout<<fixed<<setprecision(1);
   for(int bin=0; bin<=nbins+3; bin++){
-    double bin_low = hst_dy->GetBinLowEdge(bin);
-    double bin_high = bin_low + hst_dy->GetBinWidth(bin);
+    double bin_low = hst_mc->GetBinLowEdge(bin);
+    double bin_high = bin_low + hst_mc->GetBinWidth(bin);
     cout << bin << "\t[" << bin_low << " - " << bin_high << "]\t";
     cout<< hst_data   ->GetBinContent(bin)<<"\t";
     cout<< hst_others ->GetBinContent(bin)<<"\t";
-    cout<< hst_dy     ->GetBinContent(bin)<<endl;
+    cout<< hst_mc     ->GetBinContent(bin)<<endl;
+  }
+  cout<<defaultfloat<<endl;
+
+  //Printing them individually:
+  cout<<fixed<<setprecision(1);
+  cout<<"\nData"<<endl;
+  for(int bin=1; bin<=nbins; bin++){
+    cout<< hst_data->GetBinContent(bin)<<"\n";
+  }
+  cout<<"\nOthers"<<endl;
+  for(int bin=1; bin<=nbins; bin++){
+    cout<< hst_others->GetBinContent(bin)<<"\n";
+  }
+  cout<<"\nMC to scale"<<endl;
+  for(int bin=1; bin<=nbins; bin++){
+    cout<< hst_mc->GetBinContent(bin)<<"\n";
   }
   cout<<defaultfloat<<endl;
   
@@ -388,16 +404,16 @@ vector<TH1F*> return_hist(TString var){
     get_hist(var, "SingleMuon", "SingleMuon_B"),
     get_hist(var, "SingleMuon", "SingleMuon_C"),
     get_hist(var, "SingleMuon", "SingleMuon_D"),
-    //get_hist(var, "SingleMuon", "SingleMuon_E"),
-    //get_hist(var, "SingleMuon", "SingleMuon_F"),
+    get_hist(var, "SingleMuon", "SingleMuon_E"),
+    get_hist(var, "SingleMuon", "SingleMuon_F"),
   };
   vector<TH1F *>EGamma={
     get_hist(var, "EGamma", "EGamma_A"),
     get_hist(var, "EGamma", "EGamma_B"),
     get_hist(var, "EGamma", "EGamma_C"),
     get_hist(var, "EGamma", "EGamma_D"),
-    //get_hist(var, "EGamma", "EGamma_E"),
-    //get_hist(var, "EGamma", "EGamma_F"),
+    get_hist(var, "EGamma", "EGamma_E"),
+    get_hist(var, "EGamma", "EGamma_F"),
   };
 
   bkg = {

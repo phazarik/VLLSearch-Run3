@@ -30,21 +30,24 @@ vector<LimitData> ReadDataFromFile(const TString& filename);
 void StyleGraph(TGraph* graph, int color, int lineStyle = 1, int lineWidth = 2);
 void StyleUncertaintyBand(TGraphAsymmErrors* graph, int fillColor);
 void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax);
-void AddCMSLabel(TCanvas* canvas);
+void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel);
 TLegend* CreateLegend();
 TCanvas* CreateCanvas();
 
 //##########################
 //          Main
 //##########################
-void makeLimitPlot(TString tag="scaled_mm", TString modelname="VLLD-#mu") {
-
-  TString filename = "combinelimits_sigmaB/"+tag+"/limits_sigmaB_VLLD_mu_"+tag+".txt";
-  TString outname = "demo_"+tag+".png";
-
-  //.x makeLimitPlot.C("scaled_mm", "VLLD-#mu")
-   
-  vector<LimitData> limits = ReadDataFromFile(filename);
+void makeLimitPlot(
+		   TString filename="sigmaB_limits_VLLD_mu_2018UL_SE1_mm.txt",
+		   TString modelname="VLLD-#mu",
+		   TString campaign="Run2_UL",
+		   TString channel="#mu#mu channel",
+		   TString outfile="demo_limit_VLLDmu_2018UL_SE1_mm.png",
+		   float ymin=10e-3,
+		   float ymax=10e2
+		   )
+{   
+  vector<LimitData> limits = ReadDataFromFile("sigmaBlimits/"+filename);
   int nPoints = limits.size();
   if (limits.empty()) return;
 
@@ -72,7 +75,7 @@ void makeLimitPlot(TString tag="scaled_mm", TString modelname="VLLD-#mu") {
     graph_2sigma->SetPoint(i, mass, exp);
     graph_2sigma->SetPointError(i, 0, 0, exp - exp_2down, exp_2up - exp);
 
-    // Seting expected, observed and thoery lines:
+    // Seting expected, observed, and theory lines:
     graph_exp->SetPoint(i, mass, exp);
     graph_obs->SetPoint(i, mass, obs);
     graph_theory->SetPoint(i, mass, theory);
@@ -88,17 +91,17 @@ void makeLimitPlot(TString tag="scaled_mm", TString modelname="VLLD-#mu") {
   StyleGraph(graph_theory, kRed, 1, 3);
   graph_theory->SetMarkerStyle(20);
 
-  // Draw on canvas: dummy.
+  // Draw on canvas
   graph_theory->Draw("AL");
   graph_theory->SetTitle("");
   graph_theory->GetYaxis()->SetTitle("95% CL limit on #sigma B [pb]");
-  SetAxisTitlesAndRange(graph_theory, 10e-3, 10e2);
+  SetAxisTitlesAndRange(graph_theory, ymin, ymax);
 
   // Draw other graphs
   graph_2sigma->Draw("3 same");
   graph_1sigma->Draw("3 same");
   graph_exp->Draw("L same");
-  graph_obs->Draw("LP same");
+  //graph_obs->Draw("LP same");
   graph_theory->Draw("L same");
 
   // Create and draw legend
@@ -111,12 +114,12 @@ void makeLimitPlot(TString tag="scaled_mm", TString modelname="VLLD-#mu") {
   legend->Draw();
 
   // Add CMS label
-  AddCMSLabel(c1);
+  AddCMSLabel(c1, campaign, channel);
 
   // Set logarithmic scale and update canvas
   c1->SetLogy();
   c1->Update();
-  c1->SaveAs("demo.png");
+  c1->SaveAs(outfile);
 }
 
 //###################
@@ -150,7 +153,7 @@ vector<LimitData> ReadDataFromFile(const TString& filename) {
   return limits;
 }
 
-void StyleGraph(TGraph* graph, int color, int lineStyle = 1, int lineWidth = 2) {
+void StyleGraph(TGraph* graph, int color, int lineStyle, int lineWidth) {
   graph->SetLineColor(color);
   graph->SetLineStyle(lineStyle);
   graph->SetLineWidth(lineWidth);
@@ -172,10 +175,10 @@ void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax) {
   graph->GetXaxis()->SetTitleOffset(0.98);
   graph->GetXaxis()->SetLabelSize(0.04);
   graph->GetXaxis()->SetTickSize(0.02);
-  gStyle->SetCanvasPreferGL(true);//Enabling anti-aliasing
+  gStyle->SetCanvasPreferGL(true);  // Enabling anti-aliasing
 }
 
-void AddCMSLabel(TCanvas* canvas) {
+void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel) {
   TLatex latex;
   latex.SetNDC();
   latex.SetTextSize(0.06);
@@ -187,8 +190,11 @@ void AddCMSLabel(TCanvas* canvas) {
   latex.SetTextFont(42);
 
   latex.SetTextSize(0.04);
-  latex.DrawLatex(0.70, 0.96, "59.8 fb^{-1} (13 TeV)");
+  if(     string(campaign) == "Run2_UL")       latex.DrawLatex(0.72, 0.96, "137 fb^{-1} (13 TeV)");
+  else if(string(campaign) == "2018_UL")       latex.DrawLatex(0.74, 0.96, "59.8 fb^{-1} (2018)");
+  else if(string(campaign) == "2016preVFP_UL") latex.DrawLatex(0.61, 0.96, "19.7 fb^{-1} (2016-preVFP)");
   latex.DrawLatex(0.17, 0.81, "Asymptotic. Stat only");
+  latex.DrawLatex(0.17, 0.76, channel);
 }
 
 TLegend* CreateLegend() {

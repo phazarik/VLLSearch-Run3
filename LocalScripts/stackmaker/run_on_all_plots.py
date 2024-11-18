@@ -31,11 +31,11 @@ p = [
 
     PlotData(var="HT",      name="H_{ T} (GeV)",          nbins=200, xmin=0, xmax=200, rebin=1),
     PlotData(var="LT",      name="L_{T} (GeV)",           nbins=200, xmin=0, xmax=200, rebin=1),
-    PlotData(var="STvis",   name="H_{ T} + L_{T} (GeV)",  nbins=200, xmin=0, xmax=200, rebin=5),
-    PlotData(var="ST",      name="S_{T} (GeV)",           nbins=200, xmin=0, xmax=200, rebin=5),
+    PlotData(var="STvis",   name="H_{ T} + L_{T} (GeV)",  nbins=200, xmin=0, xmax=200, rebin=1),
+    PlotData(var="ST",      name="S_{T} (GeV)",           nbins=200, xmin=0, xmax=200, rebin=1),
     PlotData(var="STfrac",  name="L_{T}/S_{T}",           nbins=200, xmin=0, xmax=1.2, rebin=5),
-    PlotData(var="HTMETllpt", name="H_{ T} + p_{T}^{miss} + p_{T}^{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=5),
-    PlotData(var="metpt",   name="p_{T}^{miss} (GeV)",    nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="HTMETllpt", name="H_{ T} + p_{T}^{miss} + p_{T}^{LL} (GeV)", nbins=200, xmin=0, xmax=200, rebin=1),
+    PlotData(var="metpt",   name="p_{T}^{miss} (GeV)",    nbins=200, xmin=0, xmax=200, rebin=1),
     PlotData(var="metphi",  name="#phi^{miss}",         nbins=200, xmin=-4, xmax=4, rebin=5),
 
     PlotData(var="lep0_pt",    name="p_{T}(L_{0}) (GeV)", nbins=200, xmin=0, xmax=200, rebin=2),
@@ -54,10 +54,10 @@ p = [
     PlotData(var="lep1_sip3d", name="sip3d (L_{1})",      nbins=500, xmin=0, xmax=50, rebin=5),
     #PlotData(var="lep1_deepjet", name="DeepJet score (J near L_{1})", nbins=300, xmin=-1, xmax=2, rebin=10),
 
-    PlotData(var="dilep_pt",   name="p_{T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="dilep_pt",   name="p_{T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=1),
     PlotData(var="dilep_eta",  name="#eta_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
     PlotData(var="dilep_phi",  name="#phi_{LL}",        nbins=200, xmin=-4, xmax=4, rebin=5),
-    PlotData(var="dilep_mt",   name="m_{ T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=2),
+    PlotData(var="dilep_mt",   name="m_{ T}^{LL} (GeV)",   nbins=200, xmin=0, xmax=200, rebin=1),
     PlotData(var="dilep_deta", name="|#Delta#eta(L_{0}, L_{1})|", nbins=200, xmin=0, xmax=6, rebin=5),
     PlotData(var="dilep_dphi", name="#Delta#phi(L_{0}, L_{1})", nbins=200, xmin=0, xmax=6, rebin=5),
     PlotData(var="dilep_dR",   name="#Delta R(L_{0}, L_{1})",   nbins=200, xmin=0, xmax=6, rebin=5),

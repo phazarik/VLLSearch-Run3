@@ -71,25 +71,28 @@ void plot(TString var, TString name);
 // Main function where the variables are decided
 //------------------------------------------------
 
-void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
-//void makeplotForCMS(TString _var = "HT", TString _name = "HT (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 1000, int _rebin = 1){
-//void makeplotForCMS(TString _var = "nnscore_qcd_vlldmu_200_800", TString _name = "NNScore", int _nbins = 100, float _xmin = 0.0, float _xmax = 100, int _rebin = 5){
-//void makeplotForCMS(TString _var = "chargeflip_num", TString _name = "p_{T}^{LL} (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 1){
-  //void makeplotForCMS(){
+//void makeplotForCMS(TString _var = "dilep_mass", TString _name = "Dilep mass (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 200, int _rebin = 2){
+void makeplotForCMS(TString _var = "HT", TString _name = "HT (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 1000, int _rebin = 1){
+//void makeplotForCMS(TString _var = "nbjet", TString _name = "nbjet", int _nbins = 10, float _xmin = 0.0, float _xmax = 10, int _rebin = 1){
+//void makeplotForCMS(TString _var = "LT", TString _name = "LT (GeV)", int _nbins = 200, float _xmin = 0.0, float _xmax = 1000, int _rebin = 1){
+//void makeplotForCMS(TString _var = "metpt", TString _name = "p_{T}^{ miss}", int _nbins = 200, float _xmin = 0.0, float _xmax = 1000, int _rebin = 1){
+//void makeplotForCMS(){
+  
   time_t start, end;
   time(&start);
 
   //SET GLOBAL SETTINGS HERE:
-  channel = "mm";
-  TString jobname = "hist_2LSS_2018UL_qcdCR_Nov12_"+channel;
+  channel = "em";
+  //TString jobname = "hist_2LSS_2018UL_lowHTCR_Nov18_"+channel;
+  TString jobname = "hist_2LSS_2018UL_SE1_Nov18_"+channel;
   campaign = "2018_UL";
   input_path = "../input_hists/"+jobname;
   
-  toSave = false;
-  toOverlayData = true;
+  toSave = true;
+  toOverlayData = false;
 
-  tag = campaign+"_topCR_"+channel; //folder name
-  info = "t#bar{t} CR"; //Event selection
+  tag = campaign+"_SE1_"+channel; //folder name
+  info = "SR1 (HT>100)"; //Event selection
   tag3 = ""; //Additional info
 
   InitializeValues();
@@ -365,7 +368,7 @@ void plot(TString var, TString name){
   // Using M-400 as a refernce, where I expect to improve the limit.
   if(channel == "ee"){
     sig1 = get_hist(var, "VLLD_ele", "M400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
-    sig2 = get_hist(var, "VLLD_ele", "M100"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{100}");}
+    sig2 = get_hist(var, "VLLD_ele", "M200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD e_{200}");}
   }
   else if (channel == "em"){
     sig1 = get_hist(var, "VLLD_ele", "M400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD e_{400}");}
@@ -377,7 +380,7 @@ void plot(TString var, TString name){
   }
   else if (channel == "mm"){
     sig1 = get_hist(var, "VLLD_mu", "M400");  if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetTitle("VLLD #mu_{400}");}
-    sig2 = get_hist(var, "VLLD_mu", "M100");  if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{100}");}   
+    sig2 = get_hist(var, "VLLD_mu", "M200");  if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetTitle("VLLD #mu_{200}");}
   }
   sig3 = nullptr;
 
@@ -582,26 +585,30 @@ void plot(TString var, TString name){
     err->SetStats(0);
     if(toZoom) err->GetXaxis()->SetRangeUser(xmin, xmax);
 
-    /*
-    //HT binned scale-factors
-    TH1F* data_minus_bkg = (TH1F *)hst_data->Clone();
-    for(int i=0; i<(int)bkg.size(); i++){
-      if(TString (bkg[i]->GetName()) != "DY"){
-	data_minus_bkg->Add(bkg[i], -1);
+    //-----------------------------
+    // Special corrections in bins:
+    //-----------------------------
+    
+    if(var == "LT"){
+      TH1F* data_minus_bkg = (TH1F *)hst_data->Clone();
+      for(int i=0; i<(int)bkg.size(); i++){
+	if(TString (bkg[i]->GetName()) != "t#bar{t}"){
+	  data_minus_bkg->Add(bkg[i], -1);
+	}
+      }
+      ratiohist->Reset();
+      for(int i=0; i<(int)bkg.size(); i++){
+	if(TString (bkg[i]->GetName()) == "t#bar{t}"){
+	  data_minus_bkg->Divide(bkg[i]);
+	  ratiohist = data_minus_bkg;
+	}
       }
     }
-    ratiohist->Reset();
-    for(int i=0; i<(int)bkg.size(); i++){
-      if(TString (bkg[i]->GetName()) == "DY"){
-	data_minus_bkg->Divide(bkg[i]);
-	ratiohist = data_minus_bkg;
-      }
-      }*/
     
     //Drawing everything in the proper order:
     SetRatioStyle(ratiohist, name);
     ratiohist->GetYaxis()->SetTitle("obs/exp");
-    //ratiohist->GetYaxis()->SetTitle("SF (in HT)");
+    if(var == "LT") ratiohist->GetYaxis()->SetTitle("SF");
     ratiohist->GetYaxis()->SetTitleSize(0.15);
     ratiohist->GetYaxis()->SetTitleOffset(0.43);
     ratiohist->GetYaxis()->SetLabelSize(0.13);
