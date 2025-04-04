@@ -8,7 +8,6 @@
 *dict*.h
 *pyc
 *.ipynb_checkpoints
-*txt
 *png
 *zip
 *gz
