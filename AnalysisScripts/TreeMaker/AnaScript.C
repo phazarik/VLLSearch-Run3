@@ -127,13 +127,13 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++;
 
     triggerRes         = true; //default, always true for MC
-    muon_trigger       = false;
-    electron_trigger   = false;
-    overlapping_events = false;
+    muon_trigger       = *HLT_SingleMuon;
+    electron_trigger   = *HLT_SingleEle;
+    overlapping_events = muon_trigger && electron_trigger;
 
     if(_data !=0){
       //Applying trigger on data:
-      if(_flag != "egamma") triggerRes = muon_trigger; //For the SingleMuon dataset, including overlap.
+      if(_flag == "muon")   triggerRes = muon_trigger; //For the SingleMuon dataset, including overlap.
       if(_flag == "egamma") triggerRes = electron_trigger && !muon_trigger; //For the EGamma dataset
 
       //Throw awaying bad data that are not included in the GoldenJson:

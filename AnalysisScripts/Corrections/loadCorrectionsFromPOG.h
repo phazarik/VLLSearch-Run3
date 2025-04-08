@@ -160,9 +160,9 @@ double AnaScript::returnMuonIDSF(Particle muon, TString mode){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[031mError: No mathing SF (muon ID), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign << "\033[0m"<< endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing SF (muon ID), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign << "\033[0m"<< endl;
+  return 1.0;
 }
 
 double AnaScript::returnMuonIsoSF(Particle muon, TString mode){
@@ -185,9 +185,9 @@ double AnaScript::returnMuonIsoSF(Particle muon, TString mode){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[031mError: No mathing SF (muon Iso), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign <<"\033[0m"<<endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing SF (muon Iso), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign <<"\033[0m"<<endl;
+  return 1.0;
 }
 
 double AnaScript::returnElectronIDSF(Particle ele, TString mode){
@@ -212,9 +212,9 @@ double AnaScript::returnElectronIDSF(Particle ele, TString mode){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[033mError: No mathing SF (ele ID), pt = " << pt << ", eta=" << eta <<", phi=" << phi << ", campaign=" << _campaign <<"\033[0m"<<endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing SF (ele ID), pt = " << pt << ", eta=" << eta <<", phi=" << phi << ", campaign=" << _campaign <<"\033[0m"<<endl;
+  return 1.0;
 }
 
 double AnaScript::returnJetJECSF(Particle jet, TString mode){
@@ -237,9 +237,9 @@ double AnaScript::returnJetJECSF(Particle jet, TString mode){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[033mError: No mathing SF (jet JEC), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign <<"\033[0m"<<endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing SF (jet JEC), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign <<"\033[0m"<<endl;
+  return 1.0;
 }
 
 double AnaScript::returnJetJERSF(Particle jet, TString mode){
@@ -262,9 +262,9 @@ double AnaScript::returnJetJERSF(Particle jet, TString mode){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[033mError: No mathing SF (jet JEC), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign <<"\033[0m"<<endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing SF (jet JEC), pt = " << pt << ", eta=" << eta << ", campaign=" << _campaign <<"\033[0m"<<endl;
+  return 1.0;
 }
 
 double AnaScript::returnJetPtResSF(Particle jet){
@@ -289,9 +289,9 @@ double AnaScript::returnJetPtResSF(Particle jet){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[033mError: No mathing SF (jet pTres), pt = " << pt << ", eta = " << eta <<", rho = "<<rhoval<<", campaign=" << _campaign <<"\033[0m"<<endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing SF (jet pTres), pt = " << pt << ", eta = " << eta <<", rho = "<<rhoval<<", campaign=" << _campaign <<"\033[0m"<<endl;
+  return 1.0;
 }
 
 double AnaScript::returnbJetTaggingSFPOG(Particle jet, TString mode){
@@ -316,9 +316,9 @@ double AnaScript::returnbJetTaggingSFPOG(Particle jet, TString mode){
       else continue;
     }
   }
-  // If no campaign matches or no range matches after the loop, return -1.0
-  cout << "\033[033mError: No mathing eff (btagging), pt = " << pt << ", eta=" << eta << ", flavor = "<< flavor << ", campaign=" << _campaign <<"\033[0m"<<endl;
-  return -1.0;
+  // If no campaign matches or no range matches after the loop, return 1.0
+  //cout << "\033[033mWarning: No mathing eff (btagging), pt = " << pt << ", eta=" << eta << ", flavor = "<< flavor << ", campaign=" << _campaign <<"\033[0m"<<endl;
+  return 1.0;
 }
 
 double AnaScript::returnPileUpWt(TString mode){
@@ -339,7 +339,7 @@ double AnaScript::returnPileUpWt(TString mode){
       else continue;
     }
   }
-  cout << "\033[033mError: Pileup weight not found for nTrueInt = " << ntrueInteractions <<"\033[0m"<<endl;
-  return -1.0;
+  //cout << "\033[033mWarning: Pileup weight not found for nTrueInt = " << ntrueInteractions <<"\033[0m"<<endl;
+  return 1.0;
 }
 

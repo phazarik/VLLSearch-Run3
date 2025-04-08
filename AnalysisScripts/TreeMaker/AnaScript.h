@@ -43,15 +43,13 @@ public :
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;
   using uint_or_int   = Int_t;
-
   /*
   //For NanoAODv11- (example: Run3Summer22 Data)
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
-  using uint_or_int  = UInt_t;
-  */
+  using uint_or_int  = UInt_t;*/
 
   //Read only the important branches:
   TTreeReaderValue<UInt_t> run = {fReader, "run"};
@@ -62,10 +60,10 @@ public :
   TTreeReaderArray<int_or_char> Electron_cutBased = {fReader, "Electron_cutBased"};
   TTreeReaderArray<Bool_t> Electron_cutBased_HEEP = {fReader, "Electron_cutBased_HEEP"};
   TTreeReaderArray<UChar_t> Electron_lostHits = {fReader, "Electron_lostHits"};
-  TTreeReaderArray<Bool_t> Electron_mvaIso_WP80 = {fReader, "Electron_mvaIso_WP80"};
-  TTreeReaderArray<Bool_t> Electron_mvaIso_WP90 = {fReader, "Electron_mvaIso_WP90"};
-  TTreeReaderArray<Bool_t> Electron_mvaNoIso_WP80 = {fReader, "Electron_mvaNoIso_WP80"};
-  TTreeReaderArray<Bool_t> Electron_mvaNoIso_WP90 = {fReader, "Electron_mvaNoIso_WP90"};
+  //TTreeReaderArray<Bool_t> Electron_mvaIso_WP80 = {fReader, "Electron_mvaIso_WP80"};
+  //TTreeReaderArray<Bool_t> Electron_mvaIso_WP90 = {fReader, "Electron_mvaIso_WP90"};
+  //TTreeReaderArray<Bool_t> Electron_mvaNoIso_WP80 = {fReader, "Electron_mvaNoIso_WP80"};
+  //TTreeReaderArray<Bool_t> Electron_mvaNoIso_WP90 = {fReader, "Electron_mvaNoIso_WP90"};
   TTreeReaderArray<UChar_t> Electron_seedGain = {fReader, "Electron_seedGain"};
   TTreeReaderArray<Int_t> Electron_charge = {fReader, "Electron_charge"};
   TTreeReaderArray<Int_t> Electron_pdgId = {fReader, "Electron_pdgId"};
@@ -93,13 +91,13 @@ public :
   TTreeReaderArray<UChar_t> Jet_nConstituents = {fReader, "Jet_nConstituents"};
   TTreeReaderArray<int_or_char> Jet_nElectrons = {fReader, "Jet_nElectrons"};
   TTreeReaderArray<int_or_char> Jet_nMuons = {fReader, "Jet_nMuons"};
-  TTreeReaderArray<int_or_char> Jet_nSVs = {fReader, "Jet_nSVs"};
+  //TTreeReaderArray<int_or_char> Jet_nSVs = {fReader, "Jet_nSVs"};
   TTreeReaderArray<int_or_short> Jet_electronIdx1 = {fReader, "Jet_electronIdx1"};
   TTreeReaderArray<int_or_short> Jet_electronIdx2 = {fReader, "Jet_electronIdx2"};
   TTreeReaderArray<int_or_short> Jet_muonIdx1 = {fReader, "Jet_muonIdx1"};
   TTreeReaderArray<int_or_short> Jet_muonIdx2 = {fReader, "Jet_muonIdx2"};
-  TTreeReaderArray<int_or_short> Jet_svIdx1 = {fReader, "Jet_svIdx1"};
-  TTreeReaderArray<int_or_short> Jet_svIdx2 = {fReader, "Jet_svIdx2"};
+  //TTreeReaderArray<int_or_short> Jet_svIdx1 = {fReader, "Jet_svIdx1"};
+  //TTreeReaderArray<int_or_short> Jet_svIdx2 = {fReader, "Jet_svIdx2"};
   TTreeReaderArray<Float_t> Jet_area = {fReader, "Jet_area"};
   TTreeReaderArray<Float_t> Jet_btagDeepFlavB = {fReader, "Jet_btagDeepFlavB"};
   TTreeReaderArray<Float_t> Jet_btagDeepFlavCvB = {fReader, "Jet_btagDeepFlavCvB"};
@@ -155,7 +153,7 @@ public :
   TTreeReaderArray<Float_t> Muon_mass = {fReader, "Muon_mass"};
   TTreeReaderArray<Float_t> Muon_miniPFRelIso_all = {fReader, "Muon_miniPFRelIso_all"};
   TTreeReaderArray<Float_t> Muon_miniPFRelIso_chg = {fReader, "Muon_miniPFRelIso_chg"};
-  TTreeReaderArray<Float_t> Muon_mvaMuID = {fReader, "Muon_mvaMuID"};
+  //TTreeReaderArray<Float_t> Muon_mvaMuID = {fReader, "Muon_mvaMuID"};
   TTreeReaderArray<Float_t> Muon_pfRelIso03_all = {fReader, "Muon_pfRelIso03_all"};
   TTreeReaderArray<Float_t> Muon_pfRelIso03_chg = {fReader, "Muon_pfRelIso03_chg"};
   TTreeReaderArray<Float_t> Muon_pfRelIso04_all = {fReader, "Muon_pfRelIso04_all"};
@@ -210,7 +208,8 @@ public :
   TTreeReaderValue<Bool_t> Flag_trkPOG_toomanystripclus53X = {fReader, "Flag_trkPOG_toomanystripclus53X"};
   TTreeReaderValue<Bool_t> Flag_trkPOG_logErrorTooManyClusters = {fReader, "Flag_trkPOG_logErrorTooManyClusters"};
   TTreeReaderValue<Bool_t> Flag_METFilters = {fReader, "Flag_METFilters"};
-  
+
+  /*
   //HLT paths
   TTreeReaderValue<Bool_t> HLT_Ele27_WPTight_Gsf = {fReader, "HLT_Ele27_WPTight_Gsf"};
   TTreeReaderValue<Bool_t> HLT_Ele28_WPTight_Gsf = {fReader, "HLT_Ele28_WPTight_Gsf"};
@@ -227,7 +226,7 @@ public :
   TTreeReaderValue<Bool_t> HLT_Mu20 = {fReader, "HLT_Mu20"};
   TTreeReaderValue<Bool_t> HLT_Mu27 = {fReader, "HLT_Mu27"};
   TTreeReaderValue<Bool_t> HLT_Mu50 = {fReader, "HLT_Mu50"};
-  TTreeReaderValue<Bool_t> HLT_Mu55 = {fReader, "HLT_Mu55"};
+  TTreeReaderValue<Bool_t> HLT_Mu55 = {fReader, "HLT_Mu55"};*/
 
   //--------------------
   // Gen-level branches:
@@ -243,7 +242,7 @@ public :
   //GenPart:
   TTreeReaderValue<iterator> nGenPart = {fReader_MC, "nGenPart"};
   TTreeReaderArray<int_or_short> GenPart_genPartIdxMother = {fReader_MC, "GenPart_genPartIdxMother"};
-  TTreeReaderArray<UShort_t> GenPart_statusFlags = {fReader_MC, "GenPart_statusFlags"};
+  TTreeReaderArray<int_or_ushort> GenPart_statusFlags = {fReader_MC, "GenPart_statusFlags"};
   TTreeReaderArray<Int_t> GenPart_pdgId = {fReader_MC, "GenPart_pdgId"};
   TTreeReaderArray<Int_t> GenPart_status = {fReader_MC, "GenPart_status"};
   TTreeReaderArray<Float_t> GenPart_eta = {fReader_MC, "GenPart_eta"};
@@ -252,8 +251,8 @@ public :
   TTreeReaderArray<Float_t> GenPart_pt = {fReader_MC, "GenPart_pt"};
 
   //GenWeights:
-  TTreeReaderValue<Float_t> Generator_weight = {fReader_MC, "Generator_weight"};
-  TTreeReaderValue<Float_t> genWeight = {fReader_MC, "genWeight"};
+  //TTreeReaderValue<Float_t> Generator_weight = {fReader_MC, "Generator_weight"};
+  //TTreeReaderValue<Float_t> genWeight = {fReader_MC, "genWeight"};
 
   //GenMET
   TTreeReaderValue<Float_t> GenMET_phi = {fReader_MC, "GenMET_phi"};
@@ -274,7 +273,7 @@ public :
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
 
-  //Rho: NanoAODv12+
+  //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentral = {fReader, "Rho_fixedGridRhoFastjetCentral"};
@@ -282,19 +281,18 @@ public :
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralChargedPileUp = {fReader, "Rho_fixedGridRhoFastjetCentralChargedPileUp"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralNeutral = {fReader, "Rho_fixedGridRhoFastjetCentralNeutral"};
   TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;
-
   /*
-  //Rho: NanoAODv11-
-  TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader, "fixedGridRhoFastjetAll"};
-  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader, "fixedGridRhoFastjetCentral"};
-  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralCalo =    {fReader, "fixedGridRhoFastjetCentralCalo"};
-  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralChargedPileUp = {fReader, "fixedGridRhoFastjetCentralChargedPileUp"};
-  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader, "fixedGridRhoFastjetCentralNeutral"};
+  //Rho: Run2
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader_MC, "fixedGridRhoFastjetAll"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader_MC, "fixedGridRhoFastjetCentral"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralCalo =    {fReader_MC, "fixedGridRhoFastjetCentralCalo"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralChargedPileUp = {fReader_MC, "fixedGridRhoFastjetCentralChargedPileUp"};
+  TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader_MC, "fixedGridRhoFastjetCentralNeutral"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_all = {fReader, "Photon_pfRelIso03_all"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_chg = {fReader, "Photon_pfRelIso03_chg"};
-  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;
-*/
+  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;*/
 
+  /*
   //Comment out the following for QCD samples:
   TTreeReaderValue<Float_t> LHEWeight_originalXWGTUP = {fReader_MC, "LHEWeight_originalXWGTUP"};
   TTreeReaderValue<uint_or_int> nLHEPdfWeight        = {fReader_MC, "nLHEPdfWeight"};
@@ -302,7 +300,7 @@ public :
   TTreeReaderValue<uint_or_int>nLHEReweightingWeight = {fReader_MC, "nLHEReweightingWeight"};
   TTreeReaderArray<Float_t> LHEReweightingWeight     = {fReader_MC, "LHEReweightingWeight"};
   TTreeReaderValue<uint_or_int> nLHEScaleWeight      = {fReader_MC, "nLHEScaleWeight"};
-  TTreeReaderArray<Float_t> LHEScaleWeight           = {fReader_MC, "LHEScaleWeight"};
+  TTreeReaderArray<Float_t> LHEScaleWeight           = {fReader_MC, "LHEScaleWeight"};*/
 
   //-------------------------------------------------------------------------------------------------------------
   // HLT paths that I am interested in:

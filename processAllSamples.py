@@ -30,13 +30,13 @@ campaign = "Run3Summer22"
 ### Options for Run3: Run3Summer22, Run3Summer22EE, Run3Summer23, Run3Summer23BPix
 
 mode = "TreeMaker"
-nanoAODv = 12 
+nanoAODv = 12
 
 samples_to_run = ["DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
-if nanoAODv==11: samples_to_run=["RareTop", "Muon", "EGamma", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLS_tau", "VLLD_mu"]
+if nanoAODv==11: samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
 
 ### Absolute paths:
-dumpdir = "/mnt/d/work/treeDump"
+dumpdir = "ROOT_FILES/trees/"
 nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
@@ -61,11 +61,14 @@ nfiles=0
 list_processed=[]
 list_failed=[]
 
-for sample, subs in samplelist.items():
-    for item in samples_to_run:
+for item in samples_to_run:
+    for sample, subs in samplelist.items():
+        
         if sample != item: continue
+        #if sample not in ['QCDEM', 'QCDMu', 'VVSS', 'WGtoLNuG', 'WtoLNu', 'ZGamma']: continue
+        #if 'VLL' not in sample: continue
+        #if 'RareTop' not in sample: continue
 
-        list_processed.append(sample)
         print('\n----------------------------------------------')
         warning(f'Submitting jobs for {sample}', 93)
         print('----------------------------------------------')
@@ -121,9 +124,9 @@ for sample, subs in samplelist.items():
             if mode == 'TreeMaker': prefix = 'tree'
             if mode == 'Skimmer':   prefix = 'skim'
             if mode == 'HistMaker': prefix = 'hist'
-            outfile = f'{prefix}_{sample}_{subsample}.root'
+            outfile = f'{prefix}_{samplename}.root'
 
-            outdir = os.path.join(dumpdir, jobname, sample)
+            outdir = os.path.join(dumpdir, jobname)
             if not dryrun: os.makedirs(outdir, exist_ok=True)
             outfile = os.path.join(outdir, outfile)
             
@@ -136,7 +139,7 @@ for sample, subs in samplelist.items():
                 print("flag = "+flag)
 
             rootmacro = f'{codedir}/compile_and_run.C'
-            arguments = f'"{mode}", "{infiles}", "{outfile}", "{campaign}", "{flag}"'
+            arguments = f'"{mode}", "{infiles}", "{outfile}", "{campaign}", "{samplename}", "{flag}"'
             command = f"root -q -b -l '{rootmacro}({arguments})'"
             if debug: warning(command, 33)
 
