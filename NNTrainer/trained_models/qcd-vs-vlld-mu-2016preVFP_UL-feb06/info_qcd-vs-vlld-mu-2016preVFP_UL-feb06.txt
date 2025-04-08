@@ -1,0 +1,30 @@
+Model Name: qcd-vs-vlld-mu-2016preVFP_UL-feb06
+Signal and Background before filtering: 9693, 10000
+Signal in training: 6785
+Signal in testing: 2908
+Background in training: 7000
+Background in testing: 3000
+Training Variables: ['njet', 'dilep_dR', 'dilep_ptratio', 'HT', 'LT', 'STfrac', 'metpt', 'dphi_metlep0', 'dphi_metdilep']
+Number of Epochs: 30
+Batch Size: 100
+
+Model Summary:
+
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense (Dense)                   │ (None, 64)             │           640 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 32)             │         2,080 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 16)             │           528 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_3 (Dense)                 │ (None, 1)              │            17 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 9,797 (38.27 KB)
+ Trainable params: 3,265 (12.75 KB)
+ Non-trainable params: 0 (0.00 B)
+ Optimizer params: 6,532 (25.52 KB)
+
+

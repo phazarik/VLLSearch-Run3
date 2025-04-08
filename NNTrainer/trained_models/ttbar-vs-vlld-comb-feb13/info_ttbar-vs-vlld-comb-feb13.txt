@@ -1,0 +1,30 @@
+Model Name: ttbar-vs-vlld-comb-feb13
+Signal and Background before filtering: 27550, 30000
+Signal in training: 19285
+Signal in testing: 8265
+Background in training: 21000
+Background in testing: 9000
+Training Variables: ['dilep_pt', 'dilep_mt', 'dilep_dphi', 'dilep_ptratio', 'LT', 'ST', 'STfrac', 'dphi_metlep0', 'dphi_metlep1', 'dphi_metlep_min']
+Number of Epochs: 30
+Batch Size: 100
+
+Model Summary:
+
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense (Dense)                   │ (None, 64)             │           704 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 32)             │         2,080 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 16)             │           528 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_3 (Dense)                 │ (None, 1)              │            17 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 9,989 (39.02 KB)
+ Trainable params: 3,329 (13.00 KB)
+ Non-trainable params: 0 (0.00 B)
+ Optimizer params: 6,660 (26.02 KB)
+
+
