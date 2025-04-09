@@ -10,7 +10,8 @@ junk = [
     "*~",
     "*.pcm",
     "*#",
-    "*d"
+    "*d",
+    "*dict*"
 ]
 
 if args.all : junk.append("test_outputs/*")

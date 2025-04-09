@@ -5,7 +5,7 @@
 *.root
 *.d
 *backup.h
-*dict*.h
+*dict*
 *pyc
 *.ipynb_checkpoints
 *png

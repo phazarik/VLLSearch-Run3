@@ -220,6 +220,20 @@ Bool_t AnaScript::Process(Long64_t entry)
       createJets();
       SortRecoObjects();
 
+      //-------------------------------------------------
+      //Corrections to Jets: (needs to be done only once)
+      //-------------------------------------------------
+      jec = 1.0;
+      jer = 1.0;
+      if(_data == 0){
+	for(int i=0; i<(int)Jet.size(); i++){
+	  jec =  returnJetJECSF(Jet.at(i), "nom");
+	  jer =  returnJetResolutionCorrection(Jet.at(i), "nom");
+	  Jet.at(i).v = Jet.at(i).v * jec;
+	  Jet.at(i).v = Jet.at(i).v * jer;
+	}
+      }
+
       //----------------------------------------------------------------------------------------------------------
       // Writing to tree
       //----------------------------------------------------------------------------------------------------------

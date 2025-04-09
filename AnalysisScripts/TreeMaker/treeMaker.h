@@ -68,25 +68,6 @@ void AnaScript::InitializeBranches(TTree *tree){
 void AnaScript::FillTree(TTree *tree){
   
   // This function sets values to the variables that goes into the tree.
-  // Event selection and jet-corrections  must be done here.
-
-  //---------------------
-  //Corrections to Jets:
-  //---------------------
-  jec = 1.0;
-  jer = 1.0;
-  if(_data == 0){
-    for(int i=0; i<(int)Jet.size(); i++){
-      jec =  returnJetJECSF(Jet.at(i), "nom");
-      jer =  returnJetResolutionCorrection(Jet.at(i), "nom");
-      Jet.at(i).v = Jet.at(i).v * jec;
-      Jet.at(i).v = Jet.at(i).v * jer;
-    }
-  }
-
-  //--------------------------------
-  //Selecting 2LSS events to fill:
-  //--------------------------------
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
