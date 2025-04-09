@@ -36,7 +36,7 @@ public :
   TTreeReader     fReader;
   TTreeReader     fReader_MC;
   TTree          *fChain = 0;
-
+  
   //For NanoAODv12+ (example: Run3Summer22 MC)
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
@@ -272,7 +272,7 @@ public :
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-
+  
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -430,6 +430,7 @@ public :
   double btagMCeff_2016postVFP_UL(Particle jet);
   double btagMCeff_2017_UL(Particle jet);
   double btagMCeff_2018_UL(Particle jet);
+  double btagMCeff_Run3Summer22(Particle jet);
   double returnbJetCorrection(vector<Particle> Jet, TString mode);
 
   //Trigger corrections:

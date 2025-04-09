@@ -37,6 +37,9 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   cout<<"btagWP = "  << _btagWP <<endl;
   cout<<"Data   = "  << _data <<"\n"<<endl;
 
+  jsondata = loadJson();
+  LoadCorrectionsFromPOG();
+
   //Initializing counters:
   nEvtTotal=0; nEvtRan=0;  nEvtTrigger=0;
   nEvtPass=0;  nEvtBad=0;  nThrown=0;

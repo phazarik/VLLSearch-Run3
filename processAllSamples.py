@@ -33,10 +33,14 @@ mode = "TreeMaker"
 nanoAODv = 12
 
 samples_to_run = ["DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
-if nanoAODv==11: samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
+if nanoAODv==11:
+    #samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
+    samples_to_run=["Muon", "EGamma", "RareTop"]
+    #samples_to_run=["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
 
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
+if mode == "HistMaker": dumpdir = "ROOT_FILES/hists/"
 nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
@@ -123,7 +127,7 @@ for item in samples_to_run:
             prefix = ''
             if mode == 'TreeMaker': prefix = 'tree'
             if mode == 'Skimmer':   prefix = 'skim'
-            if mode == 'HistMaker': prefix = 'hist'
+            if mode == 'HistMaker': prefix = 'hst'
             outfile = f'{prefix}_{samplename}.root'
 
             outdir = os.path.join(dumpdir, jobname)
