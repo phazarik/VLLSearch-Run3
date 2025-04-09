@@ -9,6 +9,7 @@ import os, sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+count = 0
 
 def load_df(infile):
     colnames = ['campaign', 'etalow', 'etahigh', 'ptlow', 'pthigh', 'sfdown', 'sf', 'sfup']
@@ -17,6 +18,7 @@ def load_df(infile):
     return df
 
 def make_muonSF_plot(df, correction_name, campaign_dict, run, yrange=(0.99, 1.01)):
+    
     selected_campaigns = list(campaign_dict.keys())
     df = df[df['campaign'].isin(selected_campaigns)]
     if df.empty:
@@ -28,8 +30,11 @@ def make_muonSF_plot(df, correction_name, campaign_dict, run, yrange=(0.99, 1.01
 
     eta_bins = df[['etalow', 'etahigh']].drop_duplicates().values
 
-    for etalow, etahigh in eta_bins:
-        ymin, ymax = yrange ### default
+    count = 0
+    for bin_index, (etalow, etahigh) in enumerate(eta_bins):
+
+        prefix = f"{bin_index:03d}"
+        ymin, ymax = yrange
         ymax_dev = 0
         
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -67,22 +72,24 @@ def make_muonSF_plot(df, correction_name, campaign_dict, run, yrange=(0.99, 1.01
         ### y-axis
         ax.set_ylim(1 - ymax_dev * 1.7, 1 + ymax_dev * 1.7)
         ax.set_ylabel(correction_name.replace('_', ' '), fontsize=12)
-        
+        ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.3f'))
         ax.legend(fontsize=10, frameon=False, ncol=2)
         ax.tick_params(axis='both', which='both', top=True, right=True)
-
         ax.text(0.03, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
         ax.text(0.03, 0.83, fr"${etalow:.1f} < \left| \eta \right| < {etahigh:.1f}$", transform=ax.transAxes, fontsize=10, family='sans-serif')
 
-        fname    = f"{run}_{correction_name}_eta{etalow:.1f}-{etahigh:.1f}.png"
+        fname    = f"{prefix}_{run}_{correction_name}_eta{etalow:.1f}-{etahigh:.1f}.png"
         fullname = os.path.join(outdir, fname)
         plt.tight_layout()
         plt.savefig(fullname, dpi=150)
         print(f'Created: {fullname}')
         plt.close(fig)
+        count += 1
+
+    print(f'Created {count} images.\n')
 
 def main():
-
+    
     campaign_dict_run2 = {
         "2016preVFP_UL":  {"name": "2016-preVFP",  "color": "xkcd:royal blue"},
         "2016postVFP_UL": {"name": "2016-postVFP", "color": "xkcd:deep sky blue"},
@@ -95,16 +102,16 @@ def main():
         "Run3Summer22EE":   {"name": "2022EE",   "color": "xkcd:magenta"},
         "Run3Summer23":     {"name": "2023",     "color": "xkcd:burnt orange"},
         "Run3Summer23BPix": {"name": "2023BPix", "color": "xkcd:teal"},
-    }
+    } 
 
     infile_id = '../../AnalysisScripts/Corrections/SFfromPOG/muon_id_sf.txt'
     df_id = load_df(infile_id)
     make_muonSF_plot(df_id, "Muon_ID_SF", campaign_dict_run2, "Run2")
     make_muonSF_plot(df_id, "Muon_ID_SF", campaign_dict_run3, "Run3")
-
+    
     infile_iso = '../../AnalysisScripts/Corrections/SFfromPOG/muon_iso_sf.txt'
     df_iso = load_df(infile_iso)
     make_muonSF_plot(df_iso, "Muon_ISO_SF", campaign_dict_run2, "Run2")
     make_muonSF_plot(df_iso, "Muon_ISO_SF", campaign_dict_run3, "Run3")
-
+    
 if __name__ == "__main__": main()

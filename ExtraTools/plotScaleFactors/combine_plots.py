@@ -12,14 +12,18 @@ images = []
 widths = []
 heights = []
 
+count = 0
 for fname in sorted(os.listdir(args.indir)):
+    if fname.startswith("combined"): continue
     if args.lookfor in fname and fname.lower().endswith(('.png', '.jpg', '.jpeg')):
+        print(f'Stitching: {fname}')
         path = os.path.join(args.indir, fname)
         img = Image.open(path)
         images.append(img)
         widths.append(img.width)
         heights.append(img.height)
-
+        count +=1
+        
 if not images:
     print('\033[31mNo matching images found.\033[0m')
     sys.exit(1)
@@ -35,7 +39,12 @@ for idx, img in enumerate(images):
     y_offset = (idx // cols) * max(heights)
     grid_image.paste(img, (x_offset, y_offset))
 
-outfile = os.path.join(args.indir, args.out)
-if not outfile.endswith('.png'): outfile += '.png'
+
+outfile = args.out
+if not outfile.endswith('.png'):       outfile = f'{outfile}.png'
+if not outfile.startswith('combined'): outfile = f'combined_{outfile}'
+outfile = os.path.join(args.indir, outfile)
+
 grid_image.save(outfile)
-print(f'Saved: {outfile}')
+print(f'\nSaved: {outfile}')
+print(f'Combined {count} images.\n')

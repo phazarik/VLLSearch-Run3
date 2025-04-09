@@ -26,8 +26,11 @@ def make_electronSF_plot(df, correction_name, campaign_dict, run, yrange=(0.99, 
 
     eta_phi_bins = df[['etalow', 'etahigh', 'philow', 'phihigh']].drop_duplicates().values
 
-    for etalow, etahigh, philow, phihigh in eta_phi_bins:
-        ymin, ymax = yrange ### default
+    count = 0
+    for bin_index, (etalow, etahigh, philow, phihigh) in enumerate(eta_phi_bins):
+
+        prefix = f"{bin_index:03d}"
+        ymin, ymax = yrange
         ymax_dev = 0
         
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -67,6 +70,7 @@ def make_electronSF_plot(df, correction_name, campaign_dict, run, yrange=(0.99, 
         ### y-axis
         ax.set_ylim(1 - ymax_dev * 1.7, 1 + ymax_dev * 1.7)
         ax.set_ylabel(correction_name.replace('_', ' '), fontsize=12)
+        ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.3f'))
         ax.legend(fontsize=10, frameon=False, ncol=2)
         ax.tick_params(axis='both', which='both', top=True, right=True)
 
@@ -76,12 +80,15 @@ def make_electronSF_plot(df, correction_name, campaign_dict, run, yrange=(0.99, 
         ax.text(0.97, 0.03, fr"${philow: >6.2f} < \phi < {phihigh: >6.2f}$", transform=ax.transAxes,
                 fontsize=10, family='sans-serif', ha='right')
         
-        fname = f"{run}_{correction_name}_phi{philow:.1f}-{phihigh:.1f}_eta{etalow:.1f}-{etahigh:.1f}.png"
+        fname = f"{prefix}_{run}_{correction_name}_phi{philow:.1f}-{phihigh:.1f}_eta{etalow:.1f}-{etahigh:.1f}.png"
         fullname = os.path.join(outdir, fname)
         plt.tight_layout()
         plt.savefig(fullname, dpi=150)
         print(f'Created: {fullname}')
         plt.close(fig)
+        count += 1
+
+    print(f'Created {count} images.\n')
 
 def main():
 
