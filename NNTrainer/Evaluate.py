@@ -13,8 +13,8 @@ from tqdm  import tqdm
 
 #Global parameters:
 indir = '../ROOT_FILES/trees/'
-jobname = 'tree_Run3Summer22_baseline'
-outdir = f'../ROOT_FILES/treesWithNN/{jobname}'
+jobname = 'tree_2016postVFPUL_baseline_Jan02'
+outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_2016postVFP_UL_baseline'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
