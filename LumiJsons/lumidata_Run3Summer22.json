@@ -6,12 +6,12 @@
     "Higgs": {
         "GGHHto2B": 123112.583,
         "GGHHto2C": 144737.152,
-        "GGHHto2W": 64661.808,
-        "GGHHtoZZ": 18644.603,
+        "GGHHto2W": 1266933.051,
+        "GGHHtoZZ": 30843500.0,
         "VBFHto2B": 796818.182,
         "VBFHto2C": 1040213.397,
-        "VBFHto2W": 356543.68,
-        "VBFHto2Z": 212182.765,
+        "VBFHto2W": 16105806.452,
+        "VBFHto2Z": 814781818.182,
         "WminusHHto2B": 3125233.051,
         "WminusHHto2C": 3881293.058,
         "WminusHHto2Z": 847783.905,
@@ -59,14 +59,14 @@
         "TZQB": 11166917.671
     },
     "ST": {
-        "TBbarQ": 24019.992,
+        "TBbarQ": 20508.103,
         "TBbartoLplusNuBbar": 4185294.118,
-        "TQbarto2Q": 73339.231,
-        "TQbartoLNu": 69864.808,
-        "TbarBQ": 18990.526,
+        "TQbarto2Q": 109461.538,
+        "TQbartoLNu": 211711.538,
+        "TbarBQ": 16435.952,
         "TbarBtoLminusNuB": 549314.685,
-        "TbarQto2Q": 706721.996,
-        "TbarQtoLNu": 728044.807
+        "TbarQto2Q": 106075.812,
+        "TbarQtoLNu": 221858.805
     },
     "TT": {
         "TTto2L2Nu": 517789.625,
@@ -77,23 +77,23 @@
         "TTZ": 552407.978
     },
     "TW": {
-        "TWminusto2L2Nu": 65842.734,
-        "TWminustoLNu2Q": 129024.729,
-        "TbarWplusto2L2Nu": 64568.322,
-        "TbarWplustoLNu2Q": 118958.835
+        "TWminusto2L2Nu": 509488.078,
+        "TWminustoLNu2Q": 491906.78,
+        "TbarWplusto2L2Nu": 500459.676,
+        "TbarWplustoLNu2Q": 454286.653
     },
     "VV": {
         "WWto2L2NuOS": 297600.972,
         "WWto2L2NuSS": 3363978.312,
         "WWto4Q": 560021.658,
-        "WWtoLNu2Q": 513134.941,
-        "WZto2L2Q": 550712.341,
-        "WZto3LNu": 563838.14,
-        "WZtoLNu2Q": 560979.962,
-        "ZZto2L2Nu": 14118139.67,
-        "ZZto2L2Q": 2160398.939,
-        "ZZto2Nu2Q": 602975.135,
-        "ZZto4L": 10524533.094
+        "WWtoLNu2Q": 489528.733,
+        "WZto2L2Q": 1126430.0,
+        "WZto3LNu": 1542410.556,
+        "WZtoLNu2Q": 717963.871,
+        "ZZto2L2Nu": 20794002.857,
+        "ZZto2L2Q": 6110328.333,
+        "ZZto2Nu2Q": 619140.0,
+        "ZZto4L": 73145505.0
     },
     "VVSS": {
         "WmWm": 1223598360.656,
@@ -113,7 +113,7 @@
         "600toInf": 99545379.877
     },
     "WtoLNu": {
-        "Inclusive": 1243.967
+        "Inclusive": 1314.158
     },
     "ZGamma": {
         "ZGto2LG": 867848.148

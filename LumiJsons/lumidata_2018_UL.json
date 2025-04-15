@@ -39,7 +39,7 @@
 	"s-channel_LeptonDecays"           :5178074.5989,
 	"t-channel_AntiTop_InclusiveDecays":1407728.544,
 	"t-channel_Top_InclusiveDecays"    :1558659.612,
-	"tW_AntiTop_InclusiceDecays"       : 238357.428,
+	"tW_AntiTop_InclusiveDecays"       : 238357.428,
 	"tW_Top_InclusiveDecays"           : 245177.196
     },
     "TTBar":{
@@ -59,7 +59,7 @@
     },
     "WZ":{
 	"WZTo1L1Nu2Q": 805257.731,
-	"WZTo2Q2L"   :4499605.731,
+	"WZTo2L2Q"   :4499605.731,
 	"WZTo3LNu"   :1889798.538
     },
     "ZZ":{
@@ -80,9 +80,6 @@
     },
     "ZZZ":{
 	"Inclusive":16937669.376694
-    },
-    "WJetsNLO":{
-	"Inclusive":1516.394181
     },
     "Rare":{
 	"THQ":    93446130.4484,

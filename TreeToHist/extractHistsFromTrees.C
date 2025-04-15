@@ -3,26 +3,31 @@
 #include <TH1F.h>
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <string>
+#include <map>
+#include <filesystem>
+#include <chrono>
+#include <cstdlib>
+#include <iomanip>
+#include <nlohmann/json.hpp>
 #include "setBranchesAndHistograms.h"
 #include "eventProcessor.h"
 using namespace std;
-/*
-Long64_t channel, trigger, nlep, njet, nbjet;
-Double_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
-Double_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
-Double_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
-Double_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
-Double_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-Double_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5;
-Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;*/
+namespace fs = std::filesystem;
+using json = nlohmann::json;
+
 Int_t channel, trigger, nlep, njet, nbjet;
 Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
 Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5;
+Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6;
 Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
+
+map<string, map<string, float>> loadJson(const string &filename);
+string todays_date();
 
 //External functions:
 void setBranches(TTree *tree);
@@ -39,36 +44,18 @@ void processTree(
 // Process all files for a  given jobname:
 //________________________________________________________________________________________________________________
 
-#include <fstream>
-#include <string>
-#include <map>
-#include <filesystem>
-#include <chrono>
-#include <cstdlib>
-#include <iomanip>
-#include <nlohmann/json.hpp>
-namespace fs = std::filesystem;
-using json = nlohmann::json;
-
-// Function to load JSON
-map<string, map<string, float>> loadJson(const string &filename) {
-    ifstream file(filename);
-    json j;
-    file >> j;
-    return j.get<map<string, map<string, float>>>();
-}
-
 void extractHistsFromTrees(
-			   const std::string& jobname  = "tree_Run3Summer22_baseline",
-			   const std::string& dump     = "hist_Run3Summer22_baseline",
+			   const std::string& jobname  = "baseline/tree_Run3Summer22_baseline",
+			   const std::string& dump     = "hist_Run3Summer22_baseline_ee",
 			   const std::string& campaign = "Run3Summer22",
-			   const std::string& channel  = "mm",
+			   const std::string& channel  = "ee",
 			   bool test   = false,
 			   bool dryrun = false)
 {
   // Input and output directories
-  string indir = "../ROOT_FILES/trees/" + jobname;
-  string outdir = "../ROOT_FILES/hists/" + dump;
+  string date_stamp  = todays_date();
+  string indir = "../ROOT_FILES/treesWithNN/" + jobname;
+  string outdir = "../ROOT_FILES/hists/"+date_stamp+"/"+dump;
   fs::create_directories(outdir);
   auto start_time = chrono::high_resolution_clock::now();
   
@@ -121,6 +108,10 @@ void extractHistsFromTrees(
 
     string treefile = entry.path().filename().string();
     if (treefile.find(".root") == string::npos) continue;
+
+    //if (treefile.find("tW_AntiTop_InclusiveDecays") == string::npos &&
+    //    treefile.find("WZTo2L2Q") == string::npos) continue;
+    
     cout << "\n\033[033mProcessing " << treefile << "\033[0m" <<endl;
 
     string histfile = treefile;
@@ -179,4 +170,24 @@ void extractHistsFromTrees(
     for (const auto &file : list_failed) cerr << file << ", ";
     cerr << endl;
   }
+}
+
+//--------------------------------------------------------------------------------------------
+// Additional functions:
+map<string, map<string, float>> loadJson(const string &filename) {
+    ifstream file(filename);
+    json j;
+    file >> j;
+    return j.get<map<string, map<string, float>>>();
+}
+
+string todays_date(){
+  string processline = "date +%Y-%m-%d";
+  array<char, 128> buffer;
+  string result;
+  unique_ptr<FILE, decltype(&pclose)> pipe(popen(processline.c_str(), "r"), pclose);
+  if(!pipe) throw runtime_error("Failed to run Bash script.");
+  while(fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) result += buffer.data();
+  while(!result.empty() && (result.back() == '\n' || result.back() == '\r')) result.pop_back();
+  return result;
 }

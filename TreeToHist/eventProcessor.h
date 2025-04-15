@@ -11,22 +11,14 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 using namespace std;
-/*
-extern Long64_t channel, trigger, nlep, njet, nbjet;
-extern Double_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
-extern Double_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
-extern Double_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
-extern Double_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
-extern Double_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
-extern Double_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5;*/
+
 extern Int_t channel, trigger, nlep, njet, nbjet;
 extern Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
 extern Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 extern Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5;
+extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6;
 extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
 
 struct hists{
@@ -151,6 +143,7 @@ void processTree(
     {"nnscore_qcd_vlld_2016postVFP", "nnscore_qcd_vlld_2016postVFP",  200, 0, 1, {}},
     {"nnscore_qcd_vlld_2017",        "nnscore_qcd_vlld_2017",         200, 0, 1, {}},
     {"nnscore_qcd_vlld_2018",        "nnscore_qcd_vlld_2018",         200, 0, 1, {}},
+    {"nnscore_qcd_vlld_2022",        "nnscore_qcd_vlld_2022",         200, 0, 1, {}},
     {"nnscore_ttbar_vlld",           "nnscore_ttbar_vlld",            200, 0, 1, {}},
   };
     
@@ -289,6 +282,13 @@ void processTree(
       hst_collection[41]->Fill(wt_pileup, 1.0);
       hst_collection[42]->Fill(wt_bjet, 1.0);
       hst_collection[43]->Fill(wt, 1.0);
+      //NNScores:
+      hst_collection[44]->Fill(nnscore1, fnwt);
+      hst_collection[45]->Fill(nnscore2, fnwt);
+      hst_collection[46]->Fill(nnscore3, fnwt);
+      hst_collection[47]->Fill(nnscore4, fnwt);
+      hst_collection[48]->Fill(nnscore5, fnwt);
+      hst_collection[49]->Fill(nnscore6, fnwt);
     }//Event selection
     //if(i>=100000) break;
   }//Event loop
