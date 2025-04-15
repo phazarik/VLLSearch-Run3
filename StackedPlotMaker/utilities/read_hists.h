@@ -51,7 +51,17 @@ TH1D *get_hist(
     return nullptr;
   }
   SetLastBinAsOverflow(hst);
+  //cout<<"Yield: "<<sample<<"_"<<subsample<<" = "<<(int)hst->Integral()<<endl;
+
+  //--------------------------------------
+  //Rebinning:
+  vector<TString> rebin_keys = {"nnscore", "STfrac", "sip3d", "iso", "eta", "phi", "dR", "ptratio"};
+  for (auto& key : rebin_keys){
+    if (var.Contains(key)){rebin = 5; break;}
+  }
   hst->Rebin(rebin);
+  //--------------------------------------
+  
   return hst;
 }
 
@@ -104,9 +114,7 @@ void SetFillColorFromLineColor(THStack *stack) {
   }
 }
 
-//-------------------------------------------------------------------------
-//For Run3 samples:
-//-------------------------------------------------------------------------
+//Names and colors:
 struct SampleConfig {
   TString sample;
   TString latex_name;
@@ -117,31 +125,49 @@ SampleConfig default_config = {"", "Other", kGray+2};
 vector<TH1D *> return_hist_collection(
 				      TString var,
 				      TString input_path,
+				      TString campaign,
 				      int rebin = 1
 				      ){
 
-  TString json_path = "../LumiJsons/lumidata_Run3Summer22.json";
+  TString json_path = "../LumiJsons/lumidata_"+campaign+".json";
   std::ifstream infile(json_path.Data());
   json sample_info; infile >> sample_info;
 
   vector<SampleConfig> config = {
-    {"DYto2L", "DY",            kRed-7},
-    {"Higgs",  "Higgs",         kMagenta},
-    {"QCDMu",  "QCD",           kYellow},
-    {"QCDEM",  "QCD (EM)",      kYellow+1},
-    {"RareTop","RareTop",       kCyan-2},
-    {"ST",     "tX",            kCyan-7},
-    {"TT",     "t#bar{t}",      kAzure+1},
-    {"TTV",    "t#bar{t}V",     kAzure+2},
-    {"TW",      "tW",           kBlue-3},
-    {"VV",      "VV",           kGreen+1},
-    {"VVSS",    "WWss",         kGreen-5},
-    {"VVV",     "VVV",          kGreen+3},
-    {"WGtoLNuG","W#gamma",      kGray+2},
-    {"WtoLNu",  "W+jets",       kGray+1},
-    {"ZGamma",  "Z#gamma",      kRed-9},
-    //{"Muon",    "Data (Muon)",  kBlack},
-    //{"EGamma",  "Data (EGM)",   kBlack},
+    //Run3:
+    {"DYto2L",     "DY",        kRed-7},
+    {"DYJetsToLL", "DY",        kRed-7},
+    {"Higgs",      "Higgs",       kMagenta},
+    {"QCDMu",          "QCD (#mu)", kYellow},
+    {"QCD_MuEnriched", "QCD (#mu)", kYellow},
+    {"QCDEM",          "QCD (e#gamma)", kYellow+1},
+    {"QCD_EMEnriched", "QCD (e#gamma)", kYellow+1},
+    {"RareTop",   "RareTop", kCyan-2},
+    {"Rare",      "Rare",    kCyan-2},
+    {"ST",        "tX",      kCyan-7},
+    {"SingleTop", "tX",      kCyan-7},
+    {"TT",    "t#bar{t}",      kAzure+1},
+    {"TTBar", "t#bar{t}",      kAzure+1},
+    {"TTV",   "t#bar{t}V",     kAzure+2},
+    {"TTW",   "t#bar{t}W",     kAzure+2},
+    {"TTZ",   "t#bar{t}Z",     kAzure+2},
+    {"TW",     "tW",           kBlue-3},
+    {"VV", "VV", kGreen+1},
+    {"WW", "WW", kGreen+1},
+    {"WZ", "WZ", kGreen+1},
+    {"ZZ", "ZZ", kGreen+1},
+    {"VVSS", "WWss", kGreen-5},
+    {"WpWp", "WWss", kGreen-5},
+    {"VVV", "VVV", kGreen+3},
+    {"WWW", "WWW", kGreen+3},
+    {"WWZ", "WWZ", kGreen+3},
+    {"WZZ", "WZZ", kGreen+3},
+    {"ZZZ", "ZZZ", kGreen+3},
+    {"WGtoLNuG", "W#gamma", kGray+2},
+    {"WGamma",   "W#gamma", kGray+2},
+    {"WtoLNu",        "W+jets", kGray+1},
+    {"HTbinnedWJets", "W+jets", kGray+1},
+    {"ZGamma",   "Z#gamma", kRed-9},
   };
   
   vector<TH1D *> hist_collection;
@@ -150,6 +176,8 @@ vector<TH1D *> return_hist_collection(
   for (auto& [sample_str, subsamples] : sample_info.items()) {
     TString sample = sample_str.c_str();
 
+    if (sample == "WJetsNLO") continue;
+    
     if (sample.Contains("VLLS") || sample.Contains("VLLD")) {
       //DisplayText("Skipping signal sample: " + sample, 33);
       continue;
@@ -181,11 +209,13 @@ vector<TH1D *> return_hist_collection(
       if (hst) {
         SetLastBinAsOverflow(hst);
         hst->Rebin(rebin);
-        hst->SetName(scfg->latex_name + "_" + subsample);
+        //hst->SetName(scfg->latex_name + "_" + subsample);
+	hst->SetName(scfg->latex_name);
+	hst->SetTitle(sample+"_"+subsample);
         hists.push_back(hst);
       }
       else{ 
-        DisplayText("Could not read hst for: " + sample + "_" + subsample, 31);
+        //DisplayText("Could not read hst for: " + sample + "_" + subsample, 31);
 	continue;
       }
     }
@@ -202,4 +232,48 @@ vector<TH1D *> return_hist_collection(
   return cleaned;
 }
 
+void combine_hists(vector<TH1D *> &hst_collection, vector<TString> innames, TString outname, int color) {
+  vector<TH1D *> to_combine;
+  vector<TString> match;
+
+  //Searching for matching backgrounds:
+  for (auto *hist : hst_collection) {
+    TString name = hist->GetName();
+    for (const auto &target : innames) {
+      if (name == target) {
+	to_combine.push_back(hist);
+	match.push_back(name);
+      }
+    }
+  }
+  cout << "Combining : " << outname << " = ";
+  for (size_t i = 0; i < match.size(); ++i) {
+    cout << match[i]; if (i != match.size() - 1) cout << " + ";
+  }
+  cout << endl;
+
+  if (to_combine.empty()) return;
+
+  TH1D *combined = (TH1D *)to_combine[0]->Clone(outname);
+  combined->SetDirectory(0);
+  combined->SetName(outname);
+
+  for (size_t i = 1; i < to_combine.size(); ++i) combined->Add(to_combine[i]);
+  SetHistoStyle(combined, color);
+  
+  //cout << "Replacing the following hists: ";
+  //for (const auto &h : to_combine) cout << h->GetName() << " ";
+  //cout << "\nWith: " << outname << endl;
+
+   hst_collection.erase(remove_if(hst_collection.begin(), hst_collection.end(),
+                                 [&](TH1D *h) {
+                                   for (const auto &target : innames)
+                                     if (TString(h->GetName()) == target) return true;
+                                   return false;
+                                 }),
+                       hst_collection.end());
+  
+  hst_collection.push_back(combined);
+}
+  
 #endif // READ_HISTS_H

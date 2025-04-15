@@ -169,6 +169,8 @@ TH1D *GetSbyRootB(TH1D *sig, vector<TH1D*> bkg){
   float nbkg = 0; for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
   float sqrtB = sqrt(nbkg);
   globalSbyB = nsig/sqrtB;
+
+  SetHistoStyle(srb, kBlack);
   return srb;
 }
 
@@ -198,6 +200,8 @@ TH1D *GetRatio(TH1D *data, vector<TH1D*> bkg){
       ratio->SetBinError(bin, 0);
     }
   }
+
+  SetHistoStyle(ratio, kBlack);
   return ratio;
 }
 
@@ -250,7 +254,8 @@ void DisplayYieldsInBins(TH1D *hst){
   float total = 0;
   for(int bin=0; bin<=nbins; bin++){
     float nhst   = hst->GetBinContent(bin);
-    cout<<nhst<<endl;
+    float err    = hst->GetBinError(bin);
+    cout<<bin<<"\t"<<nhst<<" ± "<<err<<endl;
     total = total + nhst;
   }
   cout<<"Total = "<<total<<endl;
@@ -306,5 +311,17 @@ void GetBinwiseSF(TString var, TH1D *hst_data, vector<TH1D*>bkg, TString targetn
   cout<<(int)nothers_total<<"\t";
   cout<<fixed<<setprecision(7)<<globalsf<<defaultfloat<<"\t";
   cout<<"all\n"<<endl;
+}
+
+void refine_hist(TH1D* hst) {
+  //Getting rif of nan bins in a histogram.
+  for (int i = 1; i <= hst->GetNbinsX(); ++i) {
+    double content = hst->GetBinContent(i);
+    double error = hst->GetBinError(i);
+    if (std::isnan(content) || std::isnan(error)) {
+      hst->SetBinContent(i, 0);
+      hst->SetBinError(i, 0);
+    }
+  }
 }
 #endif // FUNCTIONS_H

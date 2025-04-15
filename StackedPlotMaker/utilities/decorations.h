@@ -61,7 +61,7 @@ TLegend *create_legend(double x1, double y1, double x2, double y2){
 
 void SetLegendEntry(TLegend *lg, TH1D *hist){
   TString yield = Form("%d", (int)hist->Integral());
-  TString name  = hist->GetTitle();
+  TString name  = hist->GetName();
   TString text  = name + " [" + yield + "]";
   lg->AddEntry(hist, text, "f");
 }
@@ -116,7 +116,7 @@ void SetRatioStyle(TH1D *srb, TString name){
   srb->GetYaxis()->SetNdivisions(3, kTRUE);
   srb->GetYaxis()->SetLabelSize(0.13);
   srb->GetYaxis()->SetLabelOffset(0.008);
-  //srb->GetYaxis()->SetRangeUser(0, 1);
+  //srb->GetYaxis()->SetRangeUser(0, 0.1);
   //X-axis
   srb->GetXaxis()->SetTitle(name);
   srb->GetXaxis()->SetTitleSize(0.15);
