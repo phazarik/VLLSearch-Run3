@@ -17,7 +17,7 @@ void writeYields(
   TString date_stamp  = todays_date();
   bool toOverlayData=false; //Careful!
 
-  TString dump_folder = "signalyields/"+date_stamp+"/yields"+_campaign+"_"+_channel;
+  TString dump_folder = "signalyields/"+date_stamp+"/yields_"+_campaign+"_"+_channel;
   TString input_path = "../ROOT_FILES/hists/"+_jobname;
   
   //--------------------------------------------------------------------------
