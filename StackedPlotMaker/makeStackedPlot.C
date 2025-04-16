@@ -7,33 +7,54 @@
 float globalSbyB, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     TString _var = "HT",
-		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-04-15/hist_Run3Summer22_baseline_mm",
-		     TString _campaign = "Run3Summer22",
+		     TString _var = "dilep_mass",
+		     TString _name = "M_{LL} (GeV)",
+		     TString _jobname = "2025-01-07_mm/hist_2017UL_sr_Jan07_mm",
+		     TString _campaign = "2017_UL",
 		     TString _channel = "mm"
 		     )
 {
   TString date_stamp  = todays_date();
+  TString channelname = "";
+  if (_channel == "mm") channelname = "#mu#mu";
+  if (_channel == "me") channelname = "#mue";
+  if (_channel == "em") channelname = "e#mu";
+  if (_channel == "ee") channelname = "ee";
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=true;
-  bool toSave=false;
-  Double_t ymin = 0.1; Double_t ymax = 10E8;
-  TString output_tag = "baseline";
-  TString info1 = "baseline"; //event-selection
-  TString info2 = "#mu#mu channel";
+  bool toOverlayData=false;
+  bool toSave=true;
+  Double_t ymin = 0.1; Double_t ymax = 10E5;
+  TString output_tag = "sr";
+  TString info1 = "Signal Region"; //event-selection
+  TString info2 = channelname + "-channel";
+  //TString info2 = "corrected";
   
   //--------------------------------------------------------------------------
-  TString dump_folder = "plots/"+date_stamp+"/"+_campaign+"_"+output_tag+"_"+_channel;  
+  TString dump_folder = "plots/"+date_stamp+"/"+output_tag+"_"+_campaign+"_"+_channel;  
   TString filename = dump_folder+"/"+_var;
   TString input_path = "../ROOT_FILES/hists/"+_jobname;
   vector<TH1D *> hist_collection = return_hist_collection(_var, input_path, _campaign);
-
   /*
-  cout<<"\nBefore combining:"<<endl;
   double total;
+  cout<<"\nBefore combining:"<<endl;
+  total = 0;
+  for (int i = 0; i < (int)hist_collection.size(); i++){ 
+    cout << left << setw(3) << i+1 << "  " 
+         << left << setw(15) << hist_collection[i]->GetName() << "  "
+         << right << setw(8) << fixed << (int)hist_collection[i]->Integral() << endl;
+    total += hist_collection[i]->Integral();
+  }
+  cout<<"Sum = "<<total<<"\n"<<endl;
+  */
+  //Use LaTeX names:
+  combine_hists(hist_collection, {"WWW", "WWZ", "WZZ", "ZZZ"},   "VVV", kGreen+3);
+  combine_hists(hist_collection, {"WW", "WZ", "ZZ"},             "VV", kGreen+1);
+  combine_hists(hist_collection, {"QCD (#mu)", "QCD (e#gamma)"}, "QCD", kYellow);
+  combine_hists(hist_collection, {"t#bar{t}W", "t#bar{t}Z"},     "t#bar{t}V", kAzure+2);
+  /*
+  cout<<"\nAfter combining:"<<endl;
   total = 0;
   for (int i = 0; i < (int)hist_collection.size(); i++){ 
     cout << left << setw(3) << i+1 << "  " 
@@ -43,12 +64,6 @@ void makeStackedPlot(
   }
   cout<<"Sum = "<<total<<"\n"<<endl;*/
 
-  //Use LaTeX names:
-  combine_hists(hist_collection, {"WWW", "WWZ", "WZZ", "ZZZ"},   "VVV", kGreen+3);
-  combine_hists(hist_collection, {"WW", "WZ", "ZZ"},             "VV", kGreen+1);
-  combine_hists(hist_collection, {"QCD (#mu)", "QCD (e#gamma)"}, "QCD", kYellow);
-  combine_hists(hist_collection, {"t#bar{t}W", "t#bar{t}Z"},     "t#bar{t}V", kAzure+2);
-
   cout<<"Histogram collection read."<<endl;
 
   //______________________________________________________________
@@ -56,21 +71,30 @@ void makeStackedPlot(
   //                           DATA
   //______________________________________________________________
   vector<TH1D*> data_collection; data_collection.clear();
+  if(_campaign == "2016preVFP_UL"){
+    vector<string> eras = {"B", "C", "D", "E", "F"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+  }
+  if(_campaign == "2016postVFP_UL"){
+    vector<string> eras = {"F", "G", "H"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+  }
+  if(_campaign == "2017_UL"){
+    vector<string> eras = {"B", "C", "D", "E", "F"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+  }
   if(_campaign == "2018_UL"){
-    data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_A"));
-    data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_B"));
-    data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_C"));
-    data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_D"));
-    data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_A"));
-    data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_B"));
-    data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_C"));
-    data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_D"));
+    vector<string> eras = {"A", "B", "C", "D"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
   }
   if(_campaign == "Run3Summer22"){
-    data_collection.push_back(get_hist(_var, input_path, "EGamma", "C"));
-    data_collection.push_back(get_hist(_var, input_path, "EGamma", "D"));
-    data_collection.push_back(get_hist(_var, input_path, "Muon",   "C"));
-    data_collection.push_back(get_hist(_var, input_path, "Muon",   "D"));
+    vector<string> eras = {"C", "D"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }
   
   TH1D* hst_data  = nullptr;
@@ -131,27 +155,27 @@ void makeStackedPlot(
   TH1D *sig1, *sig2, *sig3;
   if(_channel == "ee"){
     sig1 = get_hist(_var, input_path, "VLLD_ele", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD e_{400}");}
+    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_ele", "M200");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD e_{200}");}
+    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
   }
   else if (_channel == "em"){
     sig1 = get_hist(_var, input_path, "VLLD_ele", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD e_{400}");}
+    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_mu", "M400");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD #mu_{400}");}
+    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
   }
   else if (_channel == "me"){
     sig1 = get_hist(_var, input_path, "VLLD_mu", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD #mu_{400}");}
+    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_ele", "M400");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD e_{400}");}
+    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
   }
   else if (_channel == "mm"){
     sig1 = get_hist(_var, input_path, "VLLD_mu", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD #mu_{400}");}
+    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_mu", "M200");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD #mu_{200}");}
+    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
   }
   sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
@@ -291,7 +315,7 @@ void makeStackedPlot(
   }
 
   // 3) Drawing veto region for Drell-Yan:
-  if(_channel=="ee" && _var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
+  //if(_channel=="ee" && _var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
 
   //-------------------------------------------------------------
   //                    Texts and legend
@@ -309,7 +333,10 @@ void makeStackedPlot(
   put_latex_text(info1, 0.17, 0.78, 42, 0.04);     //Additional information
   put_latex_text(info2, 0.17, 0.73, 42, 0.04);     //Additional information
 
-  TLegend *lg = create_legend(0.48, 0.52, 0.94, 0.89); lg->SetNColumns(2);
+  TLegend *lg = create_legend(0.48, 0.52, 0.94, 0.89);
+  //TLegend *lg = create_legend(0.52, 0.52, 0.96, 0.89);
+  lg->SetNColumns(2);
+  
   if(toOverlayData){
     TString data_yield = Form("%d", (int)hst_data->Integral());
     TString text = "Observed ["+data_yield+"]";
@@ -317,8 +344,11 @@ void makeStackedPlot(
     if(hst_smuon)  SetLegendEntry(lg, hst_smuon);
     if(hst_egamma) SetLegendEntry(lg, hst_egamma);
   }
-
-  for(int i=(int)bkg.size()-1; i>=0; i--) SetLegendEntry(lg, bkg[i]);
+  for(int i=(int)bkg.size()-1; i>=0; i--){
+    bkg[i]->SetLineColor(kBlack);
+    bkg[i]->SetLineWidth(1);
+    SetLegendEntry(lg, bkg[i]);
+  }
   if(sig1) SetLegendEntry(lg, sig1);
   if(sig2) SetLegendEntry(lg, sig2);
   if(sig3) SetLegendEntry(lg, sig3);

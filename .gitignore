@@ -11,6 +11,7 @@
 *png
 *zip
 *gz
+StackedPlotMaker/signalyields/
 !NNTrainer/
 !LocalScripts/NNTrainer/trained_models/*/*.png
 !LocalScripts/NNTrainer/trained_models/*/before_training/*.png

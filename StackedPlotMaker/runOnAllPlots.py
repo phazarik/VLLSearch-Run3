@@ -1,17 +1,18 @@
 import os, sys
 import time
 
+### default parameters:
 jobname  = "2025-04-15/hist_Run3Summer22_baseline_mm"
 campaign = "Run3Summer22"
 channel  = "mm"
-test = True
+test = False
 
 variables = [
-    ("nnscore_qcd_vlld_2016preVFP",  "NNScore: QCD vs VLLD (2016-preVFP)"),
-    ("nnscore_qcd_vlld_2016postVFP", "NNScore: QCD vs VLLD (2016-postVFP)"),
-    ("nnscore_qcd_vlld_2017",        "NNScore: QCD vs VLLD (2017)"),
-    ("nnscore_qcd_vlld_2018",        "NNScore: QCD vs VLLD (2018)"),
-    ("nnscore_qcd_vlld_2022",        "NNScore: QCD vs VLLD (2022)"),
+    #("nnscore_qcd_vlld_2016preVFP",  "NNScore: QCD vs VLLD (2016-preVFP)"),
+    #("nnscore_qcd_vlld_2016postVFP", "NNScore: QCD vs VLLD (2016-postVFP)"),
+    #("nnscore_qcd_vlld_2017",        "NNScore: QCD vs VLLD (2017)"),
+    #("nnscore_qcd_vlld_2018",        "NNScore: QCD vs VLLD (2018)"),
+    #("nnscore_qcd_vlld_2022",        "NNScore: QCD vs VLLD (2022)"),
     
     ("nlep",  "N_{L}"),
     ("njet",  "N_{J}"),
@@ -56,11 +57,11 @@ variables = [
     ("dphi_metlep_max", "max(#Delta#phi(L, p_{T}^{miss}))"),
     ("dphi_metlep_min", "min(#Delta#phi(L, p_{T}^{miss}))"),
 
-    ("2LSS_wt_leptonSF", "Lepton IdIso SF"),
-    ("2LSS_wt_trig", "Trigger efficiency SF"),
-    ("2LSS_wt_pileup", "PileUp weight"),
-    ("2LSS_wt_bjet", "bJet weight"),
-    ("2LSS_wt_evt", "Event weight"),
+    #("2LSS_wt_leptonSF", "Lepton IdIso SF"),
+    #("2LSS_wt_trig", "Trigger efficiency SF"),
+    #("2LSS_wt_pileup", "PileUp weight"),
+    #("2LSS_wt_bjet", "bJet weight"),
+    #("2LSS_wt_evt", "Event weight"),
 ]
 
 def color_print(text, color='red', style='normal'):
@@ -82,7 +83,8 @@ for var, varname in variables:
     count += 1
     color_print(f"\nPlot no: {count}", 'yellow', 'underline')
 
-    arguments = f'"{var}", "{varname}", "{jobname}", "{campaign}", "{channel}"'
+    #arguments = f'"{var}", "{varname}", "{jobname}", "{campaign}", "{channel}"'
+    arguments = f'"{var}", "{varname}"'
     command   = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
 
     os.system(command)

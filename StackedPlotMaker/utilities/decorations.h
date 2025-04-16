@@ -50,7 +50,6 @@ TPad *create_ratioPad(double x1, double y1, double x2, double y2){
 }
 
 TLegend *create_legend(double x1, double y1, double x2, double y2){
-  //TLegend *lg1 = new TLegend(0.87, 0.45, 0.95, 0.90);
   TLegend *lg1 = new TLegend(x1, y1, x2, y2);
   lg1->SetTextFont(62);		
   lg1->SetFillStyle(0);
@@ -146,7 +145,6 @@ void draw_veto_region(TPad *pad, double xmin, double xmax){
   double ymin = pad->GetUymin();
   double ymax = pad->GetUymax();
   TBox* veto = new TBox(xmin, ymin, xmax, ymax);
-  //veto->SetFillColor(kGray+2);
   veto->SetFillColor(kRed);
   veto->SetFillStyle(3001);
   veto->Draw();

@@ -60,6 +60,7 @@ TH1D *get_hist(
     if (var.Contains(key)){rebin = 5; break;}
   }
   hst->Rebin(rebin);
+  //Force rebin here.
   //--------------------------------------
   
   return hst;
@@ -177,6 +178,7 @@ vector<TH1D *> return_hist_collection(
     TString sample = sample_str.c_str();
 
     if (sample == "WJetsNLO") continue;
+    //if (sample == "TTZ") continue; //For DY CR
     
     if (sample.Contains("VLLS") || sample.Contains("VLLD")) {
       //DisplayText("Skipping signal sample: " + sample, 33);
@@ -208,7 +210,7 @@ vector<TH1D *> return_hist_collection(
       TH1D* hst = get_hist(var, input_path, sample, subsample);
       if (hst) {
         SetLastBinAsOverflow(hst);
-        hst->Rebin(rebin);
+        //hst->Rebin(rebin);
         //hst->SetName(scfg->latex_name + "_" + subsample);
 	hst->SetName(scfg->latex_name);
 	hst->SetTitle(sample+"_"+subsample);
@@ -246,13 +248,13 @@ void combine_hists(vector<TH1D *> &hst_collection, vector<TString> innames, TStr
       }
     }
   }
+  if (to_combine.empty()) return;
+
   cout << "Combining : " << outname << " = ";
   for (size_t i = 0; i < match.size(); ++i) {
     cout << match[i]; if (i != match.size() - 1) cout << " + ";
   }
   cout << endl;
-
-  if (to_combine.empty()) return;
 
   TH1D *combined = (TH1D *)to_combine[0]->Clone(outname);
   combined->SetDirectory(0);
