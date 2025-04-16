@@ -173,11 +173,11 @@
 	"SingleMuon_E":59800,
 	"SingleMuon_F":59800
     },
-    "SingleElectron":{
-	"SingleElectronBpreVFP_ver2":59800,
-	"SingleElectronCpreVFP":59800,
-	"SingleElectronDpreVFP":59800,
-	"SingleElectronEpreVFP":59800,
-	"SingleElectronFpreVFP":59800
+    "EGamma":{
+	"EGamma_B":59800,
+	"EGamma_C":59800,
+	"EGamma_D":59800,
+	"EGamma_E":59800,
+	"EGamma_F":59800
     }
 }

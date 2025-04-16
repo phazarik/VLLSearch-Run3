@@ -171,9 +171,9 @@
 	"SingleMuon_G":59800,
 	"SingleMuon_H":59800
     },
-    "SingleElectron":{
-	"SingleElectronFpostVFP":59800,
-	"SingleElectronGpostVFP":59800,
-	"SingleElectronHpostVFP":59800
+    "EGamma":{
+	"EGamma_F":59800,
+	"EGamma_G":59800,
+	"EGamma_H":59800
     }
 }

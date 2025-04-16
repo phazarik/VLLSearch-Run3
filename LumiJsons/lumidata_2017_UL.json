@@ -173,11 +173,11 @@
 	"SingleMuon_E":41480,
 	"SingleMuon_F":41480
     },
-    "SingleElectron":{
-	"SingleElectron_B":41480,
-	"SingleElectron_C":41480,
-	"SingleElectron_D":41480,
-	"SingleElectron_E":41480,
-	"SingleElectron_F":41480
+    "EGamma":{
+	"EGamma_B":41480,
+	"EGamma_C":41480,
+	"EGamma_D":41480,
+	"EGamma_E":41480,
+	"EGamma_F":41480
     }
 }
