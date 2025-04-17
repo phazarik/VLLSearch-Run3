@@ -9,9 +9,11 @@ float globalSbyB, globalObsbyExp, globalObsbyExpErr;
 void makeStackedPlot(
 		     TString _var = "dilep_mass",
 		     TString _name = "M_{LL} (GeV)",
-		     TString _jobname = "2025-01-07_mm/hist_2017UL_sr_Jan07_mm",
-		     TString _campaign = "2017_UL",
-		     TString _channel = "mm"
+		     TString _jobname = "2025-01-07_mm/hist_2018UL_qcdcr_Jan07_mm",
+		     TString _campaign = "2018_UL",
+		     TString _channel = "mm",
+		     TString _tag = "qcdcr",
+		     TString _displaytext = "QCD CR"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -23,11 +25,11 @@ void makeStackedPlot(
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=false;
+  bool toOverlayData=true;
   bool toSave=true;
-  Double_t ymin = 0.1; Double_t ymax = 10E5;
-  TString output_tag = "sr";
-  TString info1 = "Signal Region"; //event-selection
+  Double_t ymin = 0.1; Double_t ymax = 10E8;
+  TString output_tag = _tag;
+  TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
   //TString info2 = "corrected";
   

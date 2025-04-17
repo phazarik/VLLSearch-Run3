@@ -1,11 +1,74 @@
 import os, sys
+import argparse
 import time
+from tqdm import tqdm
+from rich.console import Console
+console = Console(highlight=False)
+print = console.print
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--test', action='store_true')
+parser.add_argument('--dryrun', action='store_true')
+args = parser.parse_args()
+test   = args.test
+dryrun = args.dryrun
+
+if test:   print('[WARNING]: test mode',   style="red")
+if dryrun: print('[WARNING]: dryrun mode', style="red")
+default = True
+
+#-----------------------------------------------------
 ### default parameters:
-jobname  = "2025-04-15/hist_Run3Summer22_baseline_mm"
-campaign = "Run3Summer22"
-channel  = "mm"
-test = False
+jobdict_default = {
+    "2025-01-07_mm/hist_2018UL_qcdvr_mm":{
+        "campaign":"2018_UL",
+        "channel":"mm",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    }
+}
+
+
+#-----------------------------------------------------
+
+jobdict = {
+    "2025-01-07_mm/hist_2018UL_qcdvr_Jan07_mm":{
+        "campaign":"2018_UL",
+        "channel":"mm",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    },
+    "2025-01-07_me/hist_2018UL_qcdvr_Jan07_me":{
+        "campaign":"2018_UL",
+        "channel":"me",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    },
+    "2025-01-07_em/hist_2018UL_qcdvr_Jan07_em":{
+        "campaign":"2018_UL",
+        "channel":"em",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    },
+    "2025-01-07_mm/hist_2017UL_qcdvr_Jan07_mm":{
+        "campaign":"2017_UL",
+        "channel":"mm",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    },
+    "2025-01-07_me/hist_2017UL_qcdvr_Jan07_me":{
+        "campaign":"2017_UL",
+        "channel":"me",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    },
+    "2025-01-07_em/hist_2017UL_qcdvr_Jan07_em":{
+        "campaign":"2017_UL",
+        "channel":"em",
+        "tag":"qcdvr",
+        "text":"QCD VR"
+    }
+}
 
 variables = [
     #("nnscore_qcd_vlld_2016preVFP",  "NNScore: QCD vs VLLD (2016-preVFP)"),
@@ -64,40 +127,60 @@ variables = [
     #("2LSS_wt_evt", "Event weight"),
 ]
 
-def color_print(text, color='red', style='normal'):
-    colors = {
-        'black': 30, 'red': 31, 'green': 32, 'yellow': 33,
-        'blue': 34, 'magenta': 35, 'cyan': 36, 'white': 37
-    }
-    styles = {'normal':0,'bold':1,'dim':2,'italic':3,'underline':4}
-    col = colors.get(color, 31)
-    sty = styles.get(style, 0)
-    color_text = f"\033[{sty};{col}m{text}\033[0m"
-    print(color_text)
+#______________________________________________________________________________________________________________
+#______________________________________________________________________________________________________________
 
 start_time = time.time()
-count = 0
 
-for var, varname in variables:
+jobcount = 0
+plotcount = 0
 
-    count += 1
-    color_print(f"\nPlot no: {count}", 'yellow', 'underline')
+iterator_job = jobdict.items()
+if default: iterator_job = jobdict_default.items()
 
-    #arguments = f'"{var}", "{varname}", "{jobname}", "{campaign}", "{channel}"'
-    arguments = f'"{var}", "{varname}"'
-    command   = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+for jobname, info in iterator_job:
+    jobcount += 1
+    campaign = info['campaign']
+    channel  = info['channel']
+    tag      = info['tag']
+    text     = info['text']
+    print(f'\n({jobcount}/{len(list(iterator_job))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
-    os.system(command)
+    count = 0
+    iterator_var = variables if not test else [variables[0]]
+    wrapper = (
+        tqdm(iterator_var,total=len(variables),unit="plot",desc="Plotting",colour="green",ncols=100,leave=True,
+             bar_format="{l_bar}{bar}| [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]")
+        if not test else iterator_var
+    )
 
+    for var, varname in wrapper:
+        count += 1
+        plotcount += 1
+        if test: print(f"\nPlot no: {count}", style='underline')
+        arguments = (
+            f'"{var}", '
+            f'"{varname}", '
+            f'"{jobname}", '
+            f'"{campaign}", '
+            f'"{channel}", '
+            f'"{tag}", '
+            f'"{text}"'
+        )
+        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        if test: print(command, style="italic dim")
+        if not test: command += " > /dev/null 2>&1" ## supress output
+        if not dryrun: os.system(command)
+
+    print(f'[yellow]{count}[/yellow] plots made for {jobname}')
     if test: break
 
 end_time = time.time()
 time_taken = end_time - start_time
 
-print('')
-color_print("Done!", 'yellow', 'bold')
-color_print(f"Time taken = {time_taken:.2f} seconds.", 'yellow')
-color_print(f"Total number of plots = {count}\n", 'yellow')
+print("\nDone!", style='yellow bold')
+print(f"Time taken = {time_taken:.2f} seconds.", style='yellow bold')
+print(f"Total number of plots = {plotcount}\n", style='yellow bold')
 
     
 
