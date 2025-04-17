@@ -29,7 +29,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   else cout<<"main: Provide correct campaign name!"<<endl;
   //Source: https://btv-wiki.docs.cern.ch/ScaleFactors/
   
-  cout<<"\nParemeters:"<<endl;
+  cout<<"\nParameters:"<<endl;
   cout<<"Campaign = "<< _campaign <<endl;
   cout<<"Year   = "  << _year <<endl;
   cout<<"Sample = "  << _samplename <<endl;

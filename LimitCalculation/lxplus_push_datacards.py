@@ -35,15 +35,15 @@ else:
     print("\n[yellow]Transfer complete.[/yellow]\n")
 
     instructions = """
-1. Login to lxplus
+1. Login to lxplus.
 2. Go to the work-area:
 ```
 /afs/cern.ch/user/p/phazarik/work/Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/CombinedLimit/data/tutorials/statistical_routines_tutorial
 ```
-3. Do `cmsenv`
+3. Do `cmsenv`.
 4. Run the limit calculator tool there: (this will take some time)
 ```
-bash run_mylimits_for_all.sh
+python3 find_limits_allJobs.py
 ```
 5. Come back to local area and bring back limit files.
 ```
