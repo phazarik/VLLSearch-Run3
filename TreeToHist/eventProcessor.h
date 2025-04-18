@@ -30,37 +30,9 @@ struct hists{
   std::vector<float> binning;  // For custom binning
 };
 
-double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors) {
-  std::string campaign(campaign_cstr);
-  std::string channel_key = std::to_string(channelval);
-  if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
-    const auto& ranges = scale_factors[campaign][channel_key];
-    for (const auto& range : ranges) {
-      double low = range["low"];
-      double high = 0.0;
-      if (range["high"].is_string() && range["high"] == "inf") high = std::numeric_limits<double>::infinity();
-      else high = range["high"];
-      double scale = range["scale"];
-      if (var >= low && var < high) return scale;
-    }
-  }
-  return 1.0;
-}
-
-double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors) {
-  std::string campaign(campaign_cstr);
-  std::string channel_key = std::to_string(channelval);
-  if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
-    return scale_factors[campaign][channel_key];
-  }
-  return 1.0;
-}
-
-void fillHistogram(TH1F* hist, float value, float weight = 1.0) {
-    if      (value < hist->GetXaxis()->GetXmin()) hist->Fill(hist->GetXaxis()->GetXmin(), weight);
-    else if (value > hist->GetXaxis()->GetXmax()) hist->Fill(hist->GetXaxis()->GetXmax(), weight);
-    else     hist->Fill(value, weight);
-}
+double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors);
+double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors);
+void fillHistogram(TH1F* hist, float value, float weight = 1.0);
 
 //________________________________________________________________________________________________________________
 //
@@ -78,10 +50,17 @@ void processTree(
   // Load corrections from JSON:
   std::ifstream json_ttbar("corrections/TTBar_HTbinned_corrections.json");
   std::ifstream json_qcd("corrections/QCD_global_corrections.json");
-  json sf_ttbar, sf_qcd;
+  std::ifstream json_dy("corrections/DY_Zptbinned_corrections.json");
+  std::ifstream json_chargemisID("corrections/DY_Zptbinned_chargemisID_corrections.json");
+  json sf_ttbar, sf_qcd, sf_dy, sf_chargemisID;
   json_ttbar >> sf_ttbar;
   json_qcd >> sf_qcd;
+  json_dy >> sf_dy;
+  json_chargemisID >> sf_chargemisID;
   cout << "Corrections loaded from JSON." << endl;
+
+  //Define sample-flags:
+  bool flag_dy = (channelval == 3) && baseFilename.find("DY") != string::npos; if(flag_dy) cout<<"Correcting DY sample ... "<<endl;
   
   //setBranches(tree);
   vector<TH1D*> hst_collection;
@@ -156,7 +135,7 @@ void processTree(
     hist->Sumw2();
     hst_collection.push_back(hist);
   }
-  cout<<"hst_collection size = "<<(int)hst_collection.size()<<"\033[0m"<<endl;
+  //cout<<"hst_collection size = "<<(int)hst_collection.size()<<"\033[0m"<<endl;
 
   //________________________________________________________________________________________________
   //
@@ -202,33 +181,26 @@ void processTree(
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-    std::string filename(inputFilename);
-    std::string baseFilename = filename.substr(filename.find_last_of("/\\") + 1);
+    string filename(inputFilename);
+    string baseFilename = filename.substr(filename.find_last_of("/\\") + 1);
 
-    /*
-    // 1) Global QCD scaling:
-    bool correct_QCD = (baseFilename.find("QCD") != std::string::npos) && (baseFilename.find("Enriched") != std::string::npos);
-    if(correct_QCD){
-      //cout<<"Correcting QCD MC"<<endl;
-      Double_t scale_qcd = 1.0;
-      scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd);
-      wt = wt * scale_qcd;
+    //1) DY correctionsfor the ee channel:
+    if(flag_dy){
+      Double_t scale_dy = 1.0;
+      Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID);
+      Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy);
+      scale_dy = scale_dy1*scale_dy2;
+      wt = wt * scale_dy;
     }
-    // 2) TTbar HT binned scaling:
-    bool correct_ttbar = baseFilename.find("TTBar") != std::string::npos;
-    if(correct_ttbar){
-      //cout<<"Correcting TTbar MC"<<endl;
-      Double_t scale_ttbar = 1.0;
-      //if(correct_ttbar)  scale_ttbar = (Double_t)getScaleFactorInBins(campaign, channelval, HT, sf_ttbar);
-      wt = wt * scale_ttbar;
-      }*/
     
     //--------------------------------
     // Filling up the histograms:
     // Caution: Careful with the order of the variables and size of hist_collection!
     //--------------------------------
     
-    event_selection = channel_selection && (lep0_iso<0.15 && lep1_iso<0.15) ;
+    event_selection = channel_selection && (lep0_iso<0.15 && lep1_iso<0.15);
+    if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106);
+    
     if(event_selection){
       Double_t fnwt = wt;
       // integers:
@@ -348,7 +320,42 @@ void processTree(
   outputFile->Close();
   file->Close();
 
-  cout << "Histograms have been saved to " << outputFilename << endl;
+  cout << "File created: " << outputFilename << endl;
+}
+
+//_______________________________________________________________________________________________________________
+//_______________________________________________________________________________________________________________
+
+double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors) {
+  std::string campaign(campaign_cstr);
+  std::string channel_key = std::to_string(channelval);
+  if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
+    const auto& ranges = scale_factors[campaign][channel_key];
+    for (const auto& range : ranges) {
+      double low = range["low"];
+      double high = 0.0;
+      if (range["high"].is_string() && range["high"] == "inf") high = std::numeric_limits<double>::infinity();
+      else high = range["high"];
+      double scale = range["scale"];
+      if (var >= low && var < high) return scale;
+    }
+  }
+  return 1.0;
+}
+
+double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors) {
+  std::string campaign(campaign_cstr);
+  std::string channel_key = std::to_string(channelval);
+  if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
+    return scale_factors[campaign][channel_key];
+  }
+  return 1.0;
+}
+
+void fillHistogram(TH1F* hist, float value, float weight = 1.0) {
+    if      (value < hist->GetXaxis()->GetXmin()) hist->Fill(hist->GetXaxis()->GetXmin(), weight);
+    else if (value > hist->GetXaxis()->GetXmax()) hist->Fill(hist->GetXaxis()->GetXmax(), weight);
+    else     hist->Fill(value, weight);
 }
 
 #endif //EVENTPROCESSOR_H

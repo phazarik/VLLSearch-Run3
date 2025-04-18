@@ -45,9 +45,9 @@ void processTree(
 //________________________________________________________________________________________________________________
 
 void extractHistsFromTrees(
-			   const std::string& jobname  = "baseline/tree_Run3Summer22_baseline",
-			   const std::string& dump     = "hist_Run3Summer22_baseline_ee",
-			   const std::string& campaign = "Run3Summer22",
+			   const std::string& jobname  = "baseline/tree_2018_UL_baseline",
+			   const std::string& dump     = "hist_2018_UL_baseline_ee",
+			   const std::string& campaign = "2018_UL",
 			   const std::string& channel  = "ee",
 			   bool test   = false,
 			   bool dryrun = false)
@@ -149,7 +149,7 @@ void extractHistsFromTrees(
     //------------------------------------------------------------------------------------------
     
     auto current_time = chrono::high_resolution_clock::now();
-    cout<<"Done! time taken = \033[033m"<<chrono::duration_cast<chrono::seconds>(current_time - prev_time).count()<<" second(s)\033[0m"<<endl;
+    cout<<"Time taken for this sample = "<<chrono::duration_cast<chrono::seconds>(current_time - prev_time).count()<<" second(s)"<<endl;
     prev_time = current_time;
 
     if(test) break;
@@ -159,11 +159,7 @@ void extractHistsFromTrees(
   auto end_time = chrono::high_resolution_clock::now();
   auto time_taken = chrono::duration_cast<chrono::seconds>(end_time - start_time).count();
 
-  cout << "\033[093m\nSummary:\033[0m" <<endl;
-  cout << "Files processed = "<<endl;
-  for (const auto &file : list_processed) cout << file << ", ";
-  cout << "\033[093m\nOutput directory: " << outdir << endl;
-  cout << "Total time taken: " << time_taken << " seconds.\n\033[0m"<<endl;
+  cout << "\n\033[033Time taken for the job: " << time_taken << " seconds.\n\033[0m"<<endl;
 
   if (!list_failed.empty()) {
     cerr << "\033[031m\nWarning: The following files were skipped :\n\033[0m"<<endl;
