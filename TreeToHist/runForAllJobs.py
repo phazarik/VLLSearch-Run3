@@ -21,18 +21,26 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "qcdcr/tree_2018_UL_qcdcr":{
-        "dump":"hist_2018_UL_qcdcr",
-        "campaign":"2018_UL"
+    "ttbarcr/tree_2016preVFP_UL_topcr":{
+        "dump":"hist_2016preVFP_UL_topcr",
+        "campaign":"2016preVFP_UL"
     },
-    "qcdvr/tree_2018_UL_qcdvr":{
-        "dump":"hist_2018_UL_qcdvr",
+    "ttbarcr/tree_2016postVFP_UL_topcr":{
+        "dump":"hist_2016postVFP_UL_topcr",
+        "campaign":"2016postVFP_UL"
+    },
+    "ttbarcr/tree_2017_UL_topcr":{
+        "dump":"hist_2017_UL_topcr",
+        "campaign":"2017_UL"
+    },
+    "ttbarcr/tree_2018_UL_topcr":{
+        "dump":"hist_2018_UL_topcr",
         "campaign":"2018_UL"
-    } 
+    }
 }
 
-#______________________________________________________________________________________________________________
-#______________________________________________________________________________________________________________
+#____________________________________________________________________________________________________
+#____________________________________________________________________________________________________
 
 today = date.today().strftime('%Y-%m-%d')
 start_time = time.time()
@@ -40,6 +48,7 @@ jobcount = 0
 processed = []
 
 for jobname, info in jobdict.items():
+    #if 'post' not in jobname: continue
     for channel in channels:
         jobcount += 1
         campaign = info["campaign"]
@@ -67,10 +76,12 @@ for jobname, info in jobdict.items():
 
 end_time = time.time()
 time_taken = end_time - start_time
+hours, rem = divmod(time_taken, 3600)
+minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
 if processed:
     print("Histograms are created in the following directories:")
     for name in processed: print(f"../ROOT_FILES/hists/{today}/{name}")
-print(f"Total time taken = {time_taken:.2f} seconds.\n", style='yellow bold')
+print(f"Total time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
     

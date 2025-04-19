@@ -33,6 +33,7 @@ struct hists{
 double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors);
 double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors);
 void fillHistogram(TH1F* hist, float value, float weight = 1.0);
+bool find_key(const string& inputFilename, const string& key);
 
 //________________________________________________________________________________________________________________
 //
@@ -58,9 +59,6 @@ void processTree(
   json_dy >> sf_dy;
   json_chargemisID >> sf_chargemisID;
   cout << "Corrections loaded from JSON." << endl;
-
-  //Define sample-flags:
-  bool flag_dy = (channelval == 3) && baseFilename.find("DY") != string::npos; if(flag_dy) cout<<"Correcting DY sample ... "<<endl;
   
   //setBranches(tree);
   vector<TH1D*> hst_collection;
@@ -176,21 +174,30 @@ void processTree(
     
     //if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    //wt = wt*wt_bjet;             //Adding b-tagging corrections
+    wt = wt*wt_bjet;             //Adding b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-    string filename(inputFilename);
-    string baseFilename = filename.substr(filename.find_last_of("/\\") + 1);
 
-    //1) DY correctionsfor the ee channel:
+    //1) DY correction for the ee channel:
+    bool flag_dy = (channelval == 3) && find_key(inputFilename, "DY");
     if(flag_dy){
       Double_t scale_dy = 1.0;
       Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID);
       Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy);
       scale_dy = scale_dy1*scale_dy2;
       wt = wt * scale_dy;
+      //cout<<"Correcting DY by : "<<scale_dy<<endl;
+    }
+
+    //2) QCD global correction:
+    bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
+    if(flag_qcd){
+      Double_t scale_qcd = 1.0;
+      scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd);
+      wt = wt * scale_qcd;
+      //cout<<"Correcting QCD by : "<<scale_qcd<<endl;
     }
     
     //--------------------------------
@@ -356,6 +363,11 @@ void fillHistogram(TH1F* hist, float value, float weight = 1.0) {
     if      (value < hist->GetXaxis()->GetXmin()) hist->Fill(hist->GetXaxis()->GetXmin(), weight);
     else if (value > hist->GetXaxis()->GetXmax()) hist->Fill(hist->GetXaxis()->GetXmax(), weight);
     else     hist->Fill(value, weight);
+}
+
+bool find_key(const string& inputFilename, const string& key) {
+    string baseFilename = inputFilename.substr(inputFilename.find_last_of("/\\") + 1);
+    return baseFilename.find(key) != string::npos;
 }
 
 #endif //EVENTPROCESSOR_H

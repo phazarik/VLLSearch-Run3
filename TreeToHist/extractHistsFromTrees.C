@@ -159,7 +159,7 @@ void extractHistsFromTrees(
   auto end_time = chrono::high_resolution_clock::now();
   auto time_taken = chrono::duration_cast<chrono::seconds>(end_time - start_time).count();
 
-  cout << "\n\033[033Time taken for the job: " << time_taken << " seconds.\n\033[0m"<<endl;
+  cout << "\n\033[93mTime taken for the job: " << time_taken << " seconds.\n\033[0m"<<endl;
 
   if (!list_failed.empty()) {
     cerr << "\033[031m\nWarning: The following files were skipped :\n\033[0m"<<endl;
