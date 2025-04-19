@@ -39,7 +39,7 @@
 	"s-channel_LeptonDecays"           :1462834.2246,
 	"t-channel_AntiTop_InclusiveDecays": 432710.1428,
 	"t-channel_Top_InclusiveDecays"    : 556199.2945,
-	"tW_AntiTop_InclusiceDecays"       :  78560.4429,
+	"tW_AntiTop_InclusiveDecays"       :  78560.4429,
 	"tW_Top_InclusiveDecays"           :  76764.2527
     },
     "TTBar":{

@@ -39,7 +39,7 @@
 	"s-channel_LeptonDecays"           :1475401.0695,
 	"t-channel_AntiTop_InclusiveDecays": 363329.8984,
 	"t-channel_Top_InclusiveDecays"    : 493483.2451,
-	"tW_AntiTop_InclusiceDecays"       :  70747.4623,
+	"tW_AntiTop_InclusiveDecays"       :  70747.4623,
 	"tW_Top_InclusiveDecays"           :  70878.2743
     },
     "TTBar":{
@@ -47,7 +47,7 @@
 	"TTToSemiLeptonic":358071.9330
     },
     "TTW":{
-	"TTWToLnu": 13231959.1458
+	"TTWToLNu": 13231959.1458
     },
     "TTZ":{
 	"TTZToLL": 216193519.0145
