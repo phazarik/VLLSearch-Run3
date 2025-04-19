@@ -47,6 +47,7 @@ TH1D *get_hist(
   TH1D *hst = (TH1D *)file->Get(var);
   if(!hst){
     DisplayText("Hist not found for "+filename, 31);
+    file->Close();
     delete file;
     return nullptr;
   }
@@ -62,7 +63,7 @@ TH1D *get_hist(
   hst->Rebin(rebin);
   //Force rebin here.
   //--------------------------------------
-  
+
   return hst;
 }
 
@@ -132,7 +133,18 @@ vector<TH1D *> return_hist_collection(
 
   TString json_path = "../LumiJsons/lumidata_"+campaign+".json";
   std::ifstream infile(json_path.Data());
-  json sample_info; infile >> sample_info;
+  if (!infile.is_open())  cerr << "Error: Could not open JSON file: " << json_path << endl;
+  infile.seekg(0, std::ios::end);
+  if (infile.tellg() == 0) cerr << "Error: JSON file is empty: " << json_path << endl;
+  infile.seekg(0, std::ios::beg);
+  json sample_info;
+  try {
+    infile >> sample_info;
+  } catch (const std::exception& e) {
+    cerr << "Error parsing JSON file: " << json_path << endl;
+    cerr << e.what() << endl;
+    exit(1);
+  }
 
   vector<SampleConfig> config = {
     //Run3:
@@ -222,7 +234,7 @@ vector<TH1D *> return_hist_collection(
       }
     }
     if (!hists.empty()) hist_collection.push_back(merge_and_decorate(hists, scfg->latex_name, scfg->color));
-    else DisplayText("Warning: Hist collection empty!", 31);
+    else DisplayText("Warning: Hist collection empty: "+sample, 31);
   }
   
   // Remove nulls if any:

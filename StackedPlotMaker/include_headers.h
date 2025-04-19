@@ -15,4 +15,7 @@
 #include "TCanvas.h"
 #include "TMathText.h"
 #include "TLine.h"
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TGraphErrors.h"
 using namespace std;

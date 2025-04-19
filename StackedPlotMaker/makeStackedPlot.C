@@ -7,13 +7,13 @@
 float globalSbyB, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     TString _var = "dilep_mass",
+		     TString _var = "HT",
 		     TString _name = "M_{LL} (GeV)",
-		     TString _jobname = "2025-01-07_mm/hist_2018UL_qcdcr_Jan07_mm",
+		     TString _jobname = "2025-04-19/hist_2018_UL_topcr_mm",
 		     TString _campaign = "2018_UL",
 		     TString _channel = "mm",
-		     TString _tag = "qcdcr",
-		     TString _displaytext = "QCD CR"
+		     TString _tag = "topcr_unscaled",
+		     TString _displaytext = "t#bar{t} CR"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -27,7 +27,7 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=true;
   bool toSave=true;
-  Double_t ymin = 0.1; Double_t ymax = 10E8;
+  Double_t ymin = 0.1; Double_t ymax = 10E6;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
@@ -36,7 +36,7 @@ void makeStackedPlot(
   //--------------------------------------------------------------------------
   TString dump_folder = "plots/"+date_stamp+"/"+output_tag+"_"+_campaign+"_"+_channel;  
   TString filename = dump_folder+"/"+_var;
-  TString input_path = "../ROOT_FILES/hists/"+_jobname;
+  TString input_path = "../ROOT_FILES/hists/"+_jobname;;
   vector<TH1D *> hist_collection = return_hist_collection(_var, input_path, _campaign);
   /*
   double total;
@@ -64,8 +64,8 @@ void makeStackedPlot(
          << right << setw(8) << fixed << (int)hist_collection[i]->Integral() << endl;
     total += hist_collection[i]->Integral();
   }
-  cout<<"Sum = "<<total<<"\n"<<endl;*/
-
+  cout<<"Sum = "<<total<<"\n"<<endl;
+  */
   cout<<"Histogram collection read."<<endl;
 
   //______________________________________________________________
@@ -182,6 +182,13 @@ void makeStackedPlot(
   sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
   cout<<"Signal ready!"<<endl;
+
+  //______________________________________________________________
+  
+  //                     ON-SCREEN DISPLAYS
+  //______________________________________________________________
+
+  GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
   
   //______________________________________________________________
   
@@ -374,6 +381,7 @@ void makeStackedPlot(
   if(toSave){
     createFolder(dump_folder);
     canvas->SaveAs(filename+".png");
+    cout<<"File created: "<<filename<<".png"<<endl;
   }
   
   cout<<"Done!"<<endl;

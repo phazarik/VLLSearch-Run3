@@ -1,20 +1,13 @@
 #ifndef DECORATIONS_H
 #define DECORATIONS_H
 
-void DisplayText(TString text, int color=31){
-  //ANSI COLOR CODE:
-  //Black   = 30
-  //Red     = 31
-  //Green   = 32
-  //Yellow  = 33
-  //Blue    = 34
-  //Magenta = 35
-  //Cyan    = 36
-  //White   = 37
-  TString set_color = "\033["+to_string(color)+"m";
-  cout<<set_color;
-  cout<<text<<endl;
-  cout<<"\033[0m";
+void DisplayText(TString text, int color=31, int style=0, TString end="\n"){
+  //Styles: 0=Reset, 1=Bold, 2=Dim, 3=Italic, 4=Underline, 5=Blink, 7=Reverse, 8=Hidden
+  //Colors: 30=Black, 31=Red, 32=Green, 33=Yellow, 34=Blue, 35=Magenta, 36=Cyan, 37=White
+  TString set_format = "\033["+to_string(style)+";"+to_string(color)+"m";
+  cout << set_format;
+  cout << text;
+  cout << "\033[0m" << end;
 }
 
 TCanvas *create_canvas(TString plotname, TString filename, float width, float height){

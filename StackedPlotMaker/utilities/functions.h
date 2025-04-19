@@ -76,51 +76,20 @@ TGraphErrors *GetUncertainty(TH1D* hist){
 }
 
 //--------------------------------------------------
-// Extracting scale factors:
-//--------------------------------------------------
-
-void GetBinwiseSF(TString var, TH1D *hst_data, TH1D *hst_qcd, vector<TH1D*>bkg){
-  if(var == "HT"){
-    DisplayText("\nScaleFactors in each HT bin:", 33);
-    cout<<"bin\tnData\tnQCD\tnOthers\tScaleFactor\tbin-range"<<endl;
-    
-    //For each bin:
-    for(int bin=0; bin<(int)hst_qcd->GetNbinsX(); bin++){
-      float ndata = hst_data->GetBinContent(bin+1);
-      float nqcd  = hst_qcd ->GetBinContent(bin+1);
-      float nothers = 0;
-      float binxlow = hst_data->GetXaxis()->GetBinLowEdge(bin+1);
-      float binxup  = hst_data->GetXaxis()->GetBinUpEdge(bin+1);
-      for(int i=0; i<(int)bkg.size(); i++){
-	if(bkg[i]->GetTitle() == (TString)"QCD") continue;
-	else nothers = nothers + bkg[i]->GetBinContent(bin+1);
-      }
-      float sf_bin = 0; if(nqcd !=0) sf_bin = (ndata-nothers)/nqcd;
-      cout<<bin+1<<"\t"<<(int)ndata<<"\t"<<(int)nqcd<<"\t"<<(int)nothers<<"\t";
-      cout<<fixed<<setprecision(7)<<sf_bin<<defaultfloat<<"\t";
-      cout<<binxlow<<"-"<<binxup<<endl;
-      
-    }
-    float nothers_total = 0;
-    for(int i=0; i<(int)bkg.size(); i++){
-      if(bkg[i]->GetTitle() == (TString)"QCD") continue;
-      else nothers_total = nothers_total + bkg[i]->Integral();
-    }
-    //Global:
-    float globalsf = 0;
-    if(hst_qcd->Integral()!=0) globalsf = (hst_data->Integral()-nothers_total)/hst_qcd->Integral(); 
-    cout<<"Global\t";
-    cout<<(int)hst_data->Integral()<<"\t";
-    cout<<(int)hst_qcd ->Integral()<<"\t";
-    cout<<(int)nothers_total<<"\t";
-    cout<<fixed<<setprecision(7)<<globalsf<<defaultfloat<<"\t";
-    cout<<"all\n"<<endl;
-  }  
-}
-
-//--------------------------------------------------
 // Operations on histograms:
 //--------------------------------------------------
+
+void refine_hist(TH1D* hst) {
+  //Getting rif of nan bins in a histogram.
+  for (int i = 1; i <= hst->GetNbinsX(); ++i) {
+    double content = hst->GetBinContent(i);
+    double error = hst->GetBinError(i);
+    if (std::isnan(content) || std::isnan(error)) {
+      hst->SetBinContent(i, 0);
+      hst->SetBinError(i, 0);
+    }
+  }
+}
 
 TH1D *DivideHists(TH1D *hst_num, TH1D*hst_den){
   int nbins = hst_num->GetNbinsX();
@@ -244,84 +213,82 @@ void DisplaySignalYieldsInBins(TH1D *sig){
   cout << defaultfloat << endl;
 }
 
-void DisplayYieldsInBins(TH1D *hst){
-  if(hst ==nullptr) cout<<"Hist is empty!" <<endl;
-  int nbins = hst->GetNbinsX();
-  cout << fixed << setprecision(2);
-  cout<<"------------------"<<endl;
-  cout<<hst->GetName()<<endl;
-  cout<<"------------------"<<endl;
-  float total = 0;
-  for(int bin=0; bin<=nbins; bin++){
-    float nhst   = hst->GetBinContent(bin);
-    float err    = hst->GetBinError(bin);
-    cout<<bin<<"\t"<<nhst<<" ± "<<err<<endl;
-    total = total + nhst;
-  }
-  cout<<"Total = "<<total<<endl;
-  cout << defaultfloat << endl;
-}
+void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> bkg, TString targetname) {
+  if (var != targetvar) return;
 
-void GetBinwiseSF(TString var, TH1D *hst_data, vector<TH1D*>bkg, TString targetname){
+  vector<int> w = {6, 9, 9, 9, 15, 11}; // widths: bin, nData, nTarget, nOthers, SF, bin-range
 
-  //Find the target histogram:
-  TH1D *hst_target;
-  for(int i=0; i<(int)bkg.size(); i++){
-    if(bkg[i]->GetName() == (TString)targetname){
+  TH1D *hst_target = nullptr;
+  for (int i = 0; i < (int)bkg.size(); i++) {
+    if (bkg[i]->GetName() == targetname) {
       hst_target = bkg[i];
-      DisplayText("Calculating scale-factors for "+string(bkg[i]->GetName()), 33);
-      //cout<<"Calculating scale-factors for "<<bkg[i]->GetName()<<endl;
+      cout<<"\nScale Factors for "<<bkg[i]->GetName()<<":"<<endl;
       break;
     }
   }
-  
-  //DisplayText("\nScaleFactors in each "+var+"  bin:", 33);
-  cout<<"bin\tnData\tnTarget\tnOthers\tScaleFactor\tbin-range"<<endl;
+  if (!hst_target) {
+    DisplayText("SF: target not found: " + targetvar);
+    return;
+  }
 
-  //For each bin:
-  for(int bin=0; bin<(int)hst_target->GetNbinsX(); bin++){
-    float ndata   = hst_data->GetBinContent(bin+1);
-    float ntarget = hst_target ->GetBinContent(bin+1);
+  auto print_line = [&]() {
+    printf("+");
+    for (int i = 0; i < (int)w.size(); i++) {
+      for (int j = 0; j < w[i]; j++) printf("-");
+      printf("+");
+    }
+    printf("\n");
+  };
+
+  print_line();
+  printf("|%*s|%*s|%*s|%*s|%*s|%*s|\n",
+         w[0], "bin", w[1], "nData", w[2], "nOthers",
+         w[3], "nTarget", w[4], "ScaleFactor", w[5], "bin-range");
+  print_line();
+
+  int total_ndata = 0, total_ntarget = 0, total_nothers = 0;
+
+  for (int bin = 0; bin < hst_data->GetNbinsX(); bin++) {
+    float ndata   = hst_data->GetBinContent(bin + 1);
+    float ntarget = hst_target->GetBinContent(bin + 1);
+    float binxlow = hst_data->GetXaxis()->GetBinLowEdge(bin + 1);
+    float binxup  = hst_data->GetXaxis()->GetBinUpEdge(bin + 1);
     float nothers = 0;
-    float binxlow = hst_data->GetXaxis()->GetBinLowEdge(bin+1);
-    float binxup  = hst_data->GetXaxis()->GetBinUpEdge(bin+1);
-    for(int i=0; i<(int)bkg.size(); i++){
-      if(bkg[i]->GetTitle() == (TString)targetname) continue;
-      else nothers = nothers + bkg[i]->GetBinContent(bin+1);
+    for (int i = 0; i < (int)bkg.size(); i++) {
+      if (bkg[i]->GetName() == targetname) continue;
+      nothers += bkg[i]->GetBinContent(bin + 1);
     }
-    float sf_bin = 0; if(ntarget !=0) sf_bin = (ndata-nothers)/ntarget;
-      
-    cout<<bin+1<<"\t"<<(int)ndata<<"\t"<<(int)ntarget<<"\t"<<(int)nothers<<"\t";
-    cout<<fixed<<setprecision(7)<<sf_bin<<defaultfloat<<"\t";
-    cout<<binxlow<<"-"<<binxup<<endl;
+
+    float sf_bin = 0;
+    if (ntarget != 0) sf_bin = (ndata - nothers) / ntarget;
+
+    total_ndata   += ndata;
+    total_ntarget += ntarget;
+    total_nothers += nothers;
+
+    TString range = TString::Format("%d–%d", (int)binxlow, (int)binxup);
+    printf("|%*d|%*d|%*d|%*d|%*.6f|%*s  |\n",
+           w[0], bin + 1,
+           w[1], (int)ndata,
+           w[2], (int)nothers,
+           w[3], (int)ntarget,
+           w[4], sf_bin,
+           w[5], range.Data());
   }
-  
-  float nothers_total = 0;
-  for(int i=0; i<(int)bkg.size(); i++){
-    if(bkg[i]->GetTitle() == (TString)targetname) continue;
-    else nothers_total = nothers_total + bkg[i]->Integral();
-  }
-  
-  //Global:
-  float globalsf = 0;
-  if(hst_target->Integral()!=0) globalsf = (hst_data->Integral()-nothers_total)/hst_target->Integral();
-  cout<<"Global\t";
-  cout<<(int)hst_data   ->Integral()<<"\t";
-  cout<<(int)hst_target ->Integral()<<"\t";
-  cout<<(int)nothers_total<<"\t";
-  cout<<fixed<<setprecision(7)<<globalsf<<defaultfloat<<"\t";
-  cout<<"all\n"<<endl;
+
+  print_line();
+
+  float global_sf = (float)(total_ndata - total_nothers) / total_ntarget;
+  printf("|%*s|%*d|%*d|%*d|%*.6f|%*s|\n",
+         w[0], "all",
+         w[1], total_ndata,
+         w[2], total_nothers,
+         w[3], total_ntarget,
+         w[4], global_sf,
+         w[5], " ");
+
+  print_line();
+  cout<<endl;
 }
 
-void refine_hist(TH1D* hst) {
-  //Getting rif of nan bins in a histogram.
-  for (int i = 1; i <= hst->GetNbinsX(); ++i) {
-    double content = hst->GetBinContent(i);
-    double error = hst->GetBinError(i);
-    if (std::isnan(content) || std::isnan(error)) {
-      hst->SetBinContent(i, 0);
-      hst->SetBinError(i, 0);
-    }
-  }
-}
 #endif // FUNCTIONS_H

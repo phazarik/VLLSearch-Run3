@@ -1,5 +1,6 @@
 import os, sys
 import argparse
+import subprocess
 import time
 from tqdm import tqdm
 from rich.console import Console
@@ -17,65 +18,111 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
-#-----------------------------------------------------
-### default parameters:
-jobdict_default = {
-    "2025-01-07_mm/hist_2018UL_qcdvr_mm":{
-        "campaign":"2018_UL",
-        "channel":"mm",
-        "tag":"qcdvr",
-        "text":"QCD VR"
-    }
-}
-
-
-#-----------------------------------------------------
-
 jobdict = {
-    "2025-01-07_mm/hist_2018UL_qcdvr_Jan07_mm":{
+    "2025-04-19/hist_2018_UL_topcr_mm":{
         "campaign":"2018_UL",
         "channel":"mm",
-        "tag":"qcdvr",
-        "text":"QCD VR"
+        "tag":"qcdCR",
+        "text":"QCD CR"
     },
-    "2025-01-07_me/hist_2018UL_qcdvr_Jan07_me":{
+    "2025-04-19/hist_2018_UL_topcr_me":{
         "campaign":"2018_UL",
         "channel":"me",
-        "tag":"qcdvr",
-        "text":"QCD VR"
+        "tag":"qcdCR",
+        "text":"QCD CR"
     },
-    "2025-01-07_em/hist_2018UL_qcdvr_Jan07_em":{
+    "2025-04-19/hist_2018_UL_topcr_em":{
         "campaign":"2018_UL",
         "channel":"em",
-        "tag":"qcdvr",
-        "text":"QCD VR"
+        "tag":"qcdCR",
+        "text":"QCD CR"
     },
-    "2025-01-07_mm/hist_2017UL_qcdvr_Jan07_mm":{
+    "2025-04-19/hist_2018_UL_topcr_ee":{
+        "campaign":"2018_UL",
+        "channel":"ee",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2017_UL_topcr_mm":{
         "campaign":"2017_UL",
         "channel":"mm",
-        "tag":"qcdvr",
-        "text":"QCD VR"
+        "tag":"qcdCR",
+        "text":"QCD CR"
     },
-    "2025-01-07_me/hist_2017UL_qcdvr_Jan07_me":{
+    "2025-04-19/hist_2017_UL_topcr_me":{
         "campaign":"2017_UL",
         "channel":"me",
-        "tag":"qcdvr",
-        "text":"QCD VR"
+        "tag":"qcdCR",
+        "text":"QCD CR"
     },
-    "2025-01-07_em/hist_2017UL_qcdvr_Jan07_em":{
+    "2025-04-19/hist_2017_UL_topcr_em":{
         "campaign":"2017_UL",
         "channel":"em",
-        "tag":"qcdvr",
-        "text":"QCD VR"
-    }
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2017_UL_topcr_ee":{
+        "campaign":"2017_UL",
+        "channel":"ee",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016preVFP_UL_topcr_mm":{
+        "campaign":"2016preVFP_UL",
+        "channel":"mm",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016preVFP_UL_topcr_me":{
+        "campaign":"2016preVFP_UL",
+        "channel":"me",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016preVFP_UL_topcr_em":{
+        "campaign":"2016preVFP_UL",
+        "channel":"em",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016preVFP_UL_topcr_ee":{
+        "campaign":"2016preVFP_UL",
+        "channel":"ee",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016postVFP_UL_topcr_mm":{
+        "campaign":"2016postVFP_UL",
+        "channel":"mm",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016postVFP_UL_topcr_me":{
+        "campaign":"2016postVFP_UL",
+        "channel":"me",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016postVFP_UL_topcr_em":{
+        "campaign":"2016postVFP_UL",
+        "channel":"em",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
+    "2025-04-19/hist_2016postVFP_UL_topcr_ee":{
+        "campaign":"2016postVFP_UL",
+        "channel":"ee",
+        "tag":"qcdCR",
+        "text":"QCD CR"
+    },
 }
 
 variables = [
-    #("nnscore_qcd_vlld_2016preVFP",  "NNScore: QCD vs VLLD (2016-preVFP)"),
-    #("nnscore_qcd_vlld_2016postVFP", "NNScore: QCD vs VLLD (2016-postVFP)"),
-    #("nnscore_qcd_vlld_2017",        "NNScore: QCD vs VLLD (2017)"),
-    #("nnscore_qcd_vlld_2018",        "NNScore: QCD vs VLLD (2018)"),
-    #("nnscore_qcd_vlld_2022",        "NNScore: QCD vs VLLD (2022)"),
+    ("nnscore_qcd_vlld_2016preVFP",  "NNScore: QCD vs VLLD (2016-preVFP)"),
+    ("nnscore_qcd_vlld_2016postVFP", "NNScore: QCD vs VLLD (2016-postVFP)"),
+    ("nnscore_qcd_vlld_2017",        "NNScore: QCD vs VLLD (2017)"),
+    ("nnscore_qcd_vlld_2018",        "NNScore: QCD vs VLLD (2018)"),
+    ("nnscore_qcd_vlld_2022",        "NNScore: QCD vs VLLD (2022)"),
     
     ("nlep",  "N_{L}"),
     ("njet",  "N_{J}"),
@@ -120,11 +167,11 @@ variables = [
     ("dphi_metlep_max", "max(#Delta#phi(L, p_{T}^{miss}))"),
     ("dphi_metlep_min", "min(#Delta#phi(L, p_{T}^{miss}))"),
 
-    #("2LSS_wt_leptonSF", "Lepton IdIso SF"),
-    #("2LSS_wt_trig", "Trigger efficiency SF"),
-    #("2LSS_wt_pileup", "PileUp weight"),
-    #("2LSS_wt_bjet", "bJet weight"),
-    #("2LSS_wt_evt", "Event weight"),
+    ("2LSS_wt_leptonSF", "Lepton IdIso SF"),
+    ("2LSS_wt_trig", "Trigger efficiency SF"),
+    ("2LSS_wt_pileup", "PileUp weight"),
+    ("2LSS_wt_bjet", "bJet weight"),
+    ("2LSS_wt_evt", "Event weight"),
 ]
 
 #______________________________________________________________________________________________________________
@@ -135,16 +182,13 @@ start_time = time.time()
 jobcount = 0
 plotcount = 0
 
-iterator_job = jobdict.items()
-if default: iterator_job = jobdict_default.items()
-
-for jobname, info in iterator_job:
+for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = info['tag']
-    text     = info['text']
-    print(f'\n({jobcount}/{len(list(iterator_job))}) Making plot for {jobname} ({channel}, {tag}, {text})')
+    tag      = "topcr_unscaled" #info['tag']
+    text     = "t#bar{t} CR" #info['text']
+    print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
     count = 0
     iterator_var = variables if not test else [variables[0]]
@@ -170,9 +214,9 @@ for jobname, info in iterator_job:
         command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output
-        if not dryrun: os.system(command)
+        if not dryrun: subprocess.run(command, shell=True)
 
-    print(f'[yellow]{count}[/yellow] plots made for {jobname}')
+    print(f'[yellow]{count}[/yellow] plot(s) made for {jobname}')
     if test: break
 
 end_time = time.time()
