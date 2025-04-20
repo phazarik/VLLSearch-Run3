@@ -174,7 +174,7 @@ void processTree(
     
     //if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    wt = wt*wt_bjet;             //Adding b-tagging corrections
+    //wt = wt*wt_bjet;             //Adding b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
@@ -198,6 +198,15 @@ void processTree(
       scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd);
       wt = wt * scale_qcd;
       //cout<<"Correcting QCD by : "<<scale_qcd<<endl;
+    }
+
+    //3) TTBar HT binned correction
+    bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_");
+    if(flag_ttbar){
+      Double_t scale_ttbar = 1.0;
+      scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar);;
+      wt = wt * scale_ttbar;
+      //cout<<"Correcting TTBar by : "<<scale_ttbar<<endl;
     }
     
     //--------------------------------

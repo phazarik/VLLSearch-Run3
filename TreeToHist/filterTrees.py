@@ -24,22 +24,22 @@ basedir = '../ROOT_FILES/treesWithNN/'
 
 jobdict = {
     "baseline/tree_2016preVFP_UL_baseline":{
-        "outjob":"ttbarcr/tree_2016preVFP_UL_topcr",
+        "outjob":"sigregion/tree_2016preVFP_UL_sigregion",
         "campaign":"2016preVFP_UL",
         "nnscore":"nnscore_qcd_vlld_2016preVFP"
     },
     "baseline/tree_2016postVFP_UL_baseline":{
-        "outjob":"ttbarcr/tree_2016postVFP_UL_topcr",
+        "outjob":"sigregion/tree_2016postVFP_UL_sigregion",
         "campaign":"2016postVFP_UL",
         "nnscore":"nnscore_qcd_vlld_2016postVFP"
     },
     "baseline/tree_2017_UL_baseline":{
-        "outjob":"ttbarcr/tree_2017_UL_topcr",
+        "outjob":"sigregion/tree_2017_UL_sigregion",
         "campaign":"2017_UL",
         "nnscore":"nnscore_qcd_vlld_2017"
     },
     "baseline/tree_2018_UL_baseline":{
-        "outjob":"ttbarcr/tree_2018_UL_topcr",
+        "outjob":"sigregion/tree_2018_UL_sigregion",
         "campaign":"2018_UL",
         "nnscore":"nnscore_qcd_vlld_2018"
     },
@@ -89,7 +89,7 @@ for injob, info in jobdict.items():
     
     indir = os.path.join(basedir, injob)
     outdir = os.path.join(basedir, outjob)
-    os.makedirs(outdir, exist_ok=True)
+    if not dryrun: os.makedirs(outdir, exist_ok=True)
 
     list_of_files = os.listdir(indir)
     list_empty_input = []
@@ -137,7 +137,7 @@ for injob, info in jobdict.items():
         
         #------------------------------
         # Final event selection:
-        event_selection = top_cr
+        event_selection = sr
         #------------------------------
 
         filecount += 1
@@ -166,8 +166,11 @@ for injob, info in jobdict.items():
     
 end_time = time.time()
 time_taken = end_time - start_time
+hours, rem = divmod(time_taken, 3600)
+minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
+print(f"Time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
 print(f"Time taken = {time_taken:.2f} seconds.", style='yellow bold')
 print(f"Total number of jobs  = {jobcount}",     style='yellow bold')
 print(f"Total number of files = {filecount}\n",  style='yellow bold')

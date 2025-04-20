@@ -21,21 +21,25 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "ttbarcr/tree_2016preVFP_UL_topcr":{
-        "dump":"hist_2016preVFP_UL_topcr",
+    "baseline/tree_2016preVFP_UL_baseline":{
+        "dump":"hist_2016preVFP_UL_baseline",
         "campaign":"2016preVFP_UL"
     },
-    "ttbarcr/tree_2016postVFP_UL_topcr":{
-        "dump":"hist_2016postVFP_UL_topcr",
+    "baseline/tree_2016postVFP_UL_baseline":{
+        "dump":"hist_2016postVFP_UL_baseline",
         "campaign":"2016postVFP_UL"
     },
-    "ttbarcr/tree_2017_UL_topcr":{
-        "dump":"hist_2017_UL_topcr",
+    "baseline/tree_2017_UL_baseline":{
+        "dump":"hist_2017_UL_baseline",
         "campaign":"2017_UL"
     },
-    "ttbarcr/tree_2018_UL_topcr":{
-        "dump":"hist_2018_UL_topcr",
+    "baseline/tree_2018_UL_baseline":{
+        "dump":"hist_2018_UL_baseline",
         "campaign":"2018_UL"
+    },
+    "baseline/tree_Run3Summer22_baseline":{
+        "dump":"hist_Run3Summer22_baseline",
+        "campaign":"Run3Summer22"
     }
 }
 
@@ -65,7 +69,7 @@ for jobname, info in jobdict.items():
         arguments = ', '.join(arguments)
 
         command = f"root -q -b -l 'extractHistsFromTrees.C({arguments})'"
-        print("\n"+command, style="yellow bold")
+        print(f"\nJob #{jobcount}: {command}", style="yellow bold")
 
         if not dryrun:
             os.system(command)
