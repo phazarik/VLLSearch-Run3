@@ -8,12 +8,12 @@ float globalSbyB, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
 		     TString _var = "HT",
-		     TString _name = "M_{LL} (GeV)",
-		     TString _jobname = "2025-04-19/hist_2018_UL_topcr_mm",
+		     TString _name = "HT (GeV)",
+		     TString _jobname = "2025-04-20_Top_HTscaled/hist_2018_UL_val_HTscaled_mm",
 		     TString _campaign = "2018_UL",
 		     TString _channel = "mm",
-		     TString _tag = "topcr_unscaled",
-		     TString _displaytext = "t#bar{t} CR"
+		     TString _tag = "val",
+		     TString _displaytext = "Validation"
 		     )
 {
   TString date_stamp  = todays_date();

@@ -19,102 +19,70 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-04-19/hist_2018_UL_topcr_mm":{
+    "2025-04-20_Top_HTscaled/hist_2018_UL_val_mm":{
         "campaign":"2018_UL",
-        "channel":"mm",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"mm"
     },
-    "2025-04-19/hist_2018_UL_topcr_me":{
+    "2025-04-20_Top_HTscaled/hist_2018_UL_val_me":{
         "campaign":"2018_UL",
-        "channel":"me",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"me"
     },
-    "2025-04-19/hist_2018_UL_topcr_em":{
+    "2025-04-20_Top_HTscaled/hist_2018_UL_val_em":{
         "campaign":"2018_UL",
-        "channel":"em",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"em"
     },
-    "2025-04-19/hist_2018_UL_topcr_ee":{
+    "2025-04-20_Top_HTscaled/hist_2018_UL_val_ee":{
         "campaign":"2018_UL",
-        "channel":"ee",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"ee"
     },
-    "2025-04-19/hist_2017_UL_topcr_mm":{
+    "2025-04-20_Top_HTscaled/hist_2017_UL_val_mm":{
         "campaign":"2017_UL",
-        "channel":"mm",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"mm"
     },
-    "2025-04-19/hist_2017_UL_topcr_me":{
+    "2025-04-20_Top_HTscaled/hist_2017_UL_val_me":{
         "campaign":"2017_UL",
-        "channel":"me",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"me"
     },
-    "2025-04-19/hist_2017_UL_topcr_em":{
+    "2025-04-20_Top_HTscaled/hist_2017_UL_val_em":{
         "campaign":"2017_UL",
-        "channel":"em",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"em"
     },
-    "2025-04-19/hist_2017_UL_topcr_ee":{
+    "2025-04-20_Top_HTscaled/hist_2017_UL_val_ee":{
         "campaign":"2017_UL",
-        "channel":"ee",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"ee"
     },
-    "2025-04-19/hist_2016preVFP_UL_topcr_mm":{
+    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_mm":{
         "campaign":"2016preVFP_UL",
-        "channel":"mm",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"mm"
     },
-    "2025-04-19/hist_2016preVFP_UL_topcr_me":{
+    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_me":{
         "campaign":"2016preVFP_UL",
-        "channel":"me",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"me"
     },
-    "2025-04-19/hist_2016preVFP_UL_topcr_em":{
+    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_em":{
         "campaign":"2016preVFP_UL",
-        "channel":"em",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"em"
     },
-    "2025-04-19/hist_2016preVFP_UL_topcr_ee":{
+    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_ee":{
         "campaign":"2016preVFP_UL",
-        "channel":"ee",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"ee"
     },
-    "2025-04-19/hist_2016postVFP_UL_topcr_mm":{
+    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_mm":{
         "campaign":"2016postVFP_UL",
-        "channel":"mm",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"mm"
     },
-    "2025-04-19/hist_2016postVFP_UL_topcr_me":{
+    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_me":{
         "campaign":"2016postVFP_UL",
-        "channel":"me",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"me"
     },
-    "2025-04-19/hist_2016postVFP_UL_topcr_em":{
+    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_em":{
         "campaign":"2016postVFP_UL",
-        "channel":"em",
-        "tag":"qcdCR",
-        "text":"QCD CR"
+        "channel":"em"
     },
-    "2025-04-19/hist_2016postVFP_UL_topcr_ee":{
+    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_ee":{
         "campaign":"2016postVFP_UL",
-        "channel":"ee",
-        "tag":"qcdCR",
-        "text":"QCD CR"
-    },
+        "channel":"ee"
+    }
 }
 
 variables = [
@@ -186,8 +154,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "topcr_unscaled" #info['tag']
-    text     = "t#bar{t} CR" #info['text']
+    tag      = "val"
+    text     = "Validation"
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
     count = 0
@@ -221,10 +189,9 @@ for jobname, info in jobdict.items():
 
 end_time = time.time()
 time_taken = end_time - start_time
+hours, rem = divmod(time_taken, 3600)
+minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
-print(f"Time taken = {time_taken:.2f} seconds.", style='yellow bold')
+print(f"Time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
 print(f"Total number of plots = {plotcount}\n", style='yellow bold')
-
-    
-
