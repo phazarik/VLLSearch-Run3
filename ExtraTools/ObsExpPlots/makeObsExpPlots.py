@@ -8,6 +8,7 @@ from tqdm import tqdm
 from rich.console import Console
 import json
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
 console = Console(highlight=False)
 print = console.print
@@ -40,6 +41,11 @@ def main():
         outfile  = "ttbar_uncorrected.png"
     )
 
+    plotObsExp(
+        jsonfile = "jsons/qcd_validation.json",
+        outfile  = "qcd_validation.png"
+    )
+
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
@@ -52,40 +58,57 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp"):
     outdir = f'plots/'
     os.makedirs(outdir, exist_ok=True)
 
-    fig, ax = plt.subplots(figsize=(6, 3))
-    ax.axhspan(0.95, 1.05, color='green', alpha=0.2)
+    fig_size = (6, 3)
+    fig, ax = plt.subplots(figsize=fig_size)    
+    ax.axhspan(0.95, 1.05, color='green', alpha=0.2, label='5% agreement')
 
     all_vals = []
-    for key, props in campaign_dict.items():
+    x_offset = 0.15
+    for index, (key, props) in enumerate(campaign_dict.items()):
         if 'Run3' in key: continue
         if key not in data: continue
         values = data[key]
-        y = [values.get(str(i), None) for i in range(4)]
-        ax.plot(x, y, marker='o', label=props["name"], color=props["color"])
-        all_vals.extend(y)
+
+        y, yerr = [], []
+        for i in range(4):
+            val = values.get(str(i), None)
+            if val is not None:
+                y.append(val[0])
+                yerr.append(val[1])
+                all_vals.append(val[0])
+            else:
+                y.append(None)
+                yerr.append(0)
+
+        x_offset_values = []
+        for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
+        ax.errorbar(x_offset_values, y, yerr=yerr, fmt='o', label=props["name"], color=props["color"], capsize=3)
 
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)
     ax.set_ylabel(name, fontsize=12)
     ax.set_xlabel("Channel", fontsize=12)
+    ax.tick_params(axis='both', which='both', top=True, right=True)
+    ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
+    ax.set_xlim(-1.5, len(channels) - 0.5 + x_offset)
 
     ymin, ymax = 0, 2
     max_dev = max(abs(v - 1.0) for v in all_vals if v is not None)
     delta = max(max_dev * 1.2, 0.05)
-    ymin, ymax = 1-delta, 1+delta
+    ymin, ymax = 1 - delta, 1 + delta
     ax.set_ylim(ymin, ymax)
 
     handles, labels = ax.get_legend_handles_labels()
-    ncol = 1 if len(labels) <= 4 else 2
-    ax.legend(handles, labels, fontsize=9, frameon=False, ncol=ncol)
-    ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
-    ax.text(0, 1.055, '5% agreement', ha='left', va='bottom', fontsize=9, color='green')
-    ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
+    ncol = 1 if len(labels) <= 5 else 2
+    ax.legend(handles, labels, fontsize=8, frameon=False, ncol=ncol, loc='lower left')
+    handles, labels = ax.get_legend_handles_labels()
 
-    if not outfile.endswith('png'): outfile=f"{outfile}.png"
+    if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
-    plt.tight_layout()
+    fig.set_size_inches(fig_size, forward=True)
+    fig.subplots_adjust(left=0.12, right=0.98, top=0.95, bottom=0.2)
+    #plt.tight_layout()
     plt.savefig(fullname, dpi=150)
     print(f'Created: {fullname}')
     plt.close(fig)
