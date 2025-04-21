@@ -35,21 +35,25 @@ campaign_dict = {
 }
 
 def main():
-
     plotObsExp(
         jsonfile = "jsons/ttbar_uncorrected.json",
         outfile  = "ttbar_uncorrected.png"
     )
-
     plotObsExp(
         jsonfile = "jsons/qcd_validation.json",
         outfile  = "qcd_validation.png"
+    )
+    plotObsExp(
+        jsonfile = "jsons/signal_significance.json",
+        outfile  = "signal_significance.png",
+        name     = "S/sqrt{B}",
+        signal   = True
     )
 
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotObsExp(jsonfile, outfile, name="Obs/Exp"):
+def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
 
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
@@ -60,7 +64,7 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp"):
 
     fig_size = (6, 3)
     fig, ax = plt.subplots(figsize=fig_size)    
-    ax.axhspan(0.95, 1.05, color='green', alpha=0.2, label='5% agreement')
+    if not signal: ax.axhspan(0.95, 1.05, color='green', alpha=0.2, label='5% agreement')
 
     all_vals = []
     x_offset = 0.15
@@ -90,13 +94,14 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp"):
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
-    ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
+    if not signal: ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
     ax.set_xlim(-1.5, len(channels) - 0.5 + x_offset)
 
-    ymin, ymax = 0, 2
-    max_dev = max(abs(v - 1.0) for v in all_vals if v is not None)
-    delta = max(max_dev * 1.2, 0.05)
-    ymin, ymax = 1 - delta, 1 + delta
+    ymin, ymax = 0, 1.5
+    if not signal:
+        max_dev = max(abs(v - 1.0) for v in all_vals if v is not None)
+        delta = max(max_dev * 1.2, 0.05)
+        ymin, ymax = 1 - delta, 1 + delta
     ax.set_ylim(ymin, ymax)
 
     handles, labels = ax.get_legend_handles_labels()
