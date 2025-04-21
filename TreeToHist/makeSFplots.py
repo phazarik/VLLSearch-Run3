@@ -35,68 +35,72 @@ campaign_dict = {
 
 def main():
 
-    plotGlobalCorrections(
-        jsonfile = "corrections/QCD_global_corrections.json",
-        name     = "QCD SF",
-        outfile  = "QCD_global_corrections.png"
-    )
-
     plotCorrectionsBinned(
         jsonfile = "corrections/TTBar_HTbinned_corrections.json",
         name     = "TTBar SF (HT-binned)",
         outfile  = "TTBar_HTbinned_corrections.png"
     )
-
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_chargemisID_corrections.json",
         name     = "DY charge-misID SF (Zpt binned)",
         outfile  = "DY_Zptbinned_chargemisID_corrections.png"
     )
-
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_corrections.json",
         name     = "DY SF (Zpt binned)",
         outfile  = "DY_Zptbinned_corrections.png"
     )
-
+    plotGlobalCorrections(
+        jsonfile = "corrections/QCD_global_corrections.json",
+        name     = "QCD SF",
+        outfile  = "QCD_global_corrections.png"
+    )
+    
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
 def plotGlobalCorrections(jsonfile, name, outfile):
-
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
     x = list(range(len(channels)))
-
     outdir = f'corrections/plots/'
     os.makedirs(outdir, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(6, 3))
-
-    for key, props in campaign_dict.items():
+    all_vals = []
+    x_offset = 0.15
+    for index, (key, props) in enumerate(campaign_dict.items()):
         if 'Run3' in key: continue
         if key not in data: continue
         values = data[key]
-        y = [values.get(str(i), None) for i in range(4)]
-        ax.plot(x, y, marker='o', label=props["name"], color=props["color"])
+        y, yerr = [], []
+        for i in range(4):
+            val = values.get(str(i), None)
+            if val is not None:
+                y.append(val[0])
+                yerr.append(val[1])
+                all_vals.append(val[0])
+            else:
+                y.append(None)
+                yerr.append(0)
+
+        x_offset_values = []
+        for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
+        ax.errorbar(x_offset_values, y, yerr=yerr, fmt='o', label=props["name"], color=props["color"], capsize=3)
 
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)
     ax.set_ylabel(name, fontsize=12)
     ax.set_xlabel("Channel", fontsize=12)
-
-    ymin = 0.0 #min(min(data[k].values()) for k in data)
-    ymax = 0.8 #max(max(data[k].values()) for k in data)
-    margin = (ymax - ymin) * 0.25
-    ax.set_ylim(ymin - margin, ymax + margin)
-
-    handles, labels = ax.get_legend_handles_labels()
-    ncol = 1 if len(labels) <= 4 else 2
-    ax.legend(handles, labels, fontsize=9, frameon=False, ncol=ncol)
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.set_xlim(-1.5, len(channels) - 0.5 + x_offset)
+    
+    handles, labels = ax.get_legend_handles_labels()
+    ncol = 1 if len(labels) <= 4 else 2
+    ax.legend(handles, labels, fontsize=8, frameon=False, ncol=ncol, loc='lower left')
 
-    if not outfile.endswith('png'): outfile=f"{outfile}.png"
+    if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
     plt.tight_layout()
     plt.savefig(fullname, dpi=150)
@@ -107,7 +111,6 @@ def plotGlobalCorrections(jsonfile, name, outfile):
 #____________________________________________________________________________________________________
 
 def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
-
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
     nch = len(channels)
@@ -126,7 +129,7 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
         if 'Run3' in key: continue
         if key not in data: continue
 
-        added_label = False  # Track if label has been used
+        added_label = False
 
         for i in range(nch):
             bins = data[key].get(str(i), [])
@@ -137,6 +140,7 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
 
             xvals = []
             yvals = []
+            yerrs = []
             xerrs = []
 
             for b in bins:
@@ -144,18 +148,19 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
                 high = maxval if b["high"] == "inf" else float(b["high"])
                 center = (low + high) / 2
                 xerr = (high - low) / 2
-                scale = float(b["scale"])
+                scale, err = b["scale"]
 
                 x = offset + center
                 xvals.append(x)
                 yvals.append(scale)
+                yerrs.append(err)
                 xerrs.append(xerr)
 
                 xticks.append(offset + low)
                 xticks.append(offset + high)
 
             label = props["name"] if not added_label else ""
-            ax.errorbar(xvals, yvals, xerr=xerrs, fmt='o', capsize=3,
+            ax.errorbar(xvals, yvals, xerr=xerrs, yerr=yerrs, fmt='o', capsize=3,
                         color=props["color"], label=label)
             added_label = True
 
@@ -166,8 +171,8 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     xticks = sorted(set(xticks))
     xticklabels = [str(int(x % spacing)) if x % spacing != maxval else '∞' for x in xticks]
 
-    ymin = min(b["scale"] for v in data.values() for ch in v.values() for b in ch)
-    ymax = max(b["scale"] for v in data.values() for ch in v.values() for b in ch)
+    ymin = min(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
+    ymax = max(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
     center = 1.0
     max_deviation = max(abs(center - ymin), abs(ymax - center))
     pad = max_deviation * 0.1

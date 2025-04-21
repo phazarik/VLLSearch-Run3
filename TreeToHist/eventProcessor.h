@@ -30,8 +30,8 @@ struct hists{
   std::vector<float> binning;  // For custom binning
 };
 
-double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors);
-double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors);
+double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors, TString mode="nom");
+double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors, TString mode="nom");
 void fillHistogram(TH1F* hist, float value, float weight = 1.0);
 bool find_key(const string& inputFilename, const string& key);
 
@@ -179,35 +179,33 @@ void processTree(
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-
+    /*
     //1) DY correction for the ee channel:
     bool flag_dy = (channelval == 3) && find_key(inputFilename, "DY");
     if(flag_dy){
       Double_t scale_dy = 1.0;
-      Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID);
-      Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy);
+      Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
+      Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
       scale_dy = scale_dy1*scale_dy2;
       wt = wt * scale_dy;
       //cout<<"Correcting DY by : "<<scale_dy<<endl;
     }
-
     //2) QCD global correction:
     bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
     if(flag_qcd){
       Double_t scale_qcd = 1.0;
-      scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd);
+      scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd, "nom");
       wt = wt * scale_qcd;
       //cout<<"Correcting QCD by : "<<scale_qcd<<endl;
     }
-
     //3) TTBar HT binned correction
     bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_");
     if(flag_ttbar){
       Double_t scale_ttbar = 1.0;
-      scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar);;
+      scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-      //cout<<"Correcting TTBar by : "<<scale_ttbar<<endl;
-    }
+      //cout<<"Correcting TTBar by : "<<scale_ttbar<<"\t"<<up<<"\t"<<down<<endl;
+      }*/
     
     //--------------------------------
     // Filling up the histograms:
@@ -342,7 +340,7 @@ void processTree(
 //_______________________________________________________________________________________________________________
 //_______________________________________________________________________________________________________________
 
-double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors) {
+double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors, TString mode="nom") {
   std::string campaign(campaign_cstr);
   std::string channel_key = std::to_string(channelval);
   if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
@@ -352,18 +350,28 @@ double getScaleFactorInBins(const char* campaign_cstr, int channelval, double va
       double high = 0.0;
       if (range["high"].is_string() && range["high"] == "inf") high = std::numeric_limits<double>::infinity();
       else high = range["high"];
-      double scale = range["scale"];
-      if (var >= low && var < high) return scale;
+      if (var >= low && var < high) {
+        double sf  = range["scale"][0];
+        double err = range["scale"][1];
+        if (mode == "nom")  return sf;
+        if (mode == "up")   return sf + err;
+        if (mode == "down") return sf - err;
+      }
     }
   }
   return 1.0;
 }
 
-double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors) {
+double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors, TString mode="nom") {
   std::string campaign(campaign_cstr);
   std::string channel_key = std::to_string(channelval);
   if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
-    return scale_factors[campaign][channel_key];
+    double sf = scale_factors[campaign][channel_key][0];
+    double err = scale_factors[campaign][channel_key][1];
+
+    if (mode == "nom")  return sf;
+    if (mode == "up")   return sf + err;
+    if (mode == "down") return sf - err;
   }
   return 1.0;
 }

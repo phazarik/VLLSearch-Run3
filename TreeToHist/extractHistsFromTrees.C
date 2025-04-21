@@ -26,7 +26,7 @@ Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_
 Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6;
 Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
 
-map<string, map<string, float>> loadJson(const string &filename);
+json loadJson(const string &filename);
 string todays_date();
 
 //External functions:
@@ -45,10 +45,10 @@ void processTree(
 //________________________________________________________________________________________________________________
 
 void extractHistsFromTrees(
-			   const std::string& jobname  = "baseline/tree_2018_UL_baseline",
-			   const std::string& dump     = "hist_2018_UL_baseline_ee",
+			   const std::string& jobname  = "ttbarcr/tree_2018_UL_topcr",
+			   const std::string& dump     = "hist_2018_UL_topcr_mm_test",
 			   const std::string& campaign = "2018_UL",
-			   const std::string& channel  = "ee",
+			   const std::string& channel  = "mm",
 			   bool test   = false,
 			   bool dryrun = false)
 {
@@ -122,10 +122,23 @@ void extractHistsFromTrees(
 
     // Extract luminosity
     float lumi = 0.0;
-    for (const auto &[sample, subs] : samplelist) {
+    /*for (const auto &[sample, subs] : samplelist) {
       if (treefile.find(sample) == string::npos) continue;
 
       for (const auto &[subsample, val] : subs) {
+	if (treefile.find(subsample) != string::npos) {
+	  lumi = val;
+	  break;
+	}
+      }
+      }*/
+    for (auto it = samplelist.begin(); it != samplelist.end(); ++it) {
+      const auto& sample = it.key();
+      const auto& subs = it.value();
+      if (treefile.find(sample) == string::npos) continue;
+      for (auto sub_it = subs.begin(); sub_it != subs.end(); ++sub_it) {
+	const auto& subsample = sub_it.key();
+	const auto& val = sub_it.value();
 	if (treefile.find(subsample) != string::npos) {
 	  lumi = val;
 	  break;
@@ -170,11 +183,11 @@ void extractHistsFromTrees(
 
 //--------------------------------------------------------------------------------------------
 // Additional functions:
-map<string, map<string, float>> loadJson(const string &filename) {
+json loadJson(const string &filename) {
     ifstream file(filename);
     json j;
     file >> j;
-    return j.get<map<string, map<string, float>>>();
+    return j;
 }
 
 string todays_date(){
