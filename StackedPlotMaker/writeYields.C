@@ -9,9 +9,11 @@ float globalSbyB, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "dilep_pt",
 		 TString _name = "p_{T}^{LL} (GeV)",
-		 TString _jobname = "2025-01-07_mm/hist_2018UL_sr_Jan07_mm/",
+		 TString _jobname = "2025-04-20_signal/hist_2018_UL_sigregion_mm/",
 		 TString _campaign = "2018_UL",
-		 TString _channel = "mm"
+		 TString _channel = "mm",
+		 TString _tag = "sigregion",
+		 TString _displaytext = "SR"
 		 )
 {
   TString date_stamp  = todays_date();

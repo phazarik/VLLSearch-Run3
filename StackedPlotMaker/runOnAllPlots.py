@@ -19,67 +19,67 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-04-20_Top_HTscaled/hist_2018_UL_val_mm":{
+    "2025-04-20_signal/hist_2018_UL_sigregion_mm":{
         "campaign":"2018_UL",
         "channel":"mm"
     },
-    "2025-04-20_Top_HTscaled/hist_2018_UL_val_me":{
+    "2025-04-20_signal/hist_2018_UL_sigregion_me":{
         "campaign":"2018_UL",
         "channel":"me"
     },
-    "2025-04-20_Top_HTscaled/hist_2018_UL_val_em":{
+    "2025-04-20_signal/hist_2018_UL_sigregion_em":{
         "campaign":"2018_UL",
         "channel":"em"
     },
-    "2025-04-20_Top_HTscaled/hist_2018_UL_val_ee":{
+    "2025-04-20_signal/hist_2018_UL_sigregion_ee":{
         "campaign":"2018_UL",
         "channel":"ee"
     },
-    "2025-04-20_Top_HTscaled/hist_2017_UL_val_mm":{
+    "2025-04-20_signal/hist_2017_UL_sigregion_mm":{
         "campaign":"2017_UL",
         "channel":"mm"
     },
-    "2025-04-20_Top_HTscaled/hist_2017_UL_val_me":{
+    "2025-04-20_signal/hist_2017_UL_sigregion_me":{
         "campaign":"2017_UL",
         "channel":"me"
     },
-    "2025-04-20_Top_HTscaled/hist_2017_UL_val_em":{
+    "2025-04-20_signal/hist_2017_UL_sigregion_em":{
         "campaign":"2017_UL",
         "channel":"em"
     },
-    "2025-04-20_Top_HTscaled/hist_2017_UL_val_ee":{
+    "2025-04-20_signal/hist_2017_UL_sigregion_ee":{
         "campaign":"2017_UL",
         "channel":"ee"
     },
-    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_mm":{
+    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_mm":{
         "campaign":"2016preVFP_UL",
         "channel":"mm"
     },
-    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_me":{
+    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_me":{
         "campaign":"2016preVFP_UL",
         "channel":"me"
     },
-    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_em":{
+    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_em":{
         "campaign":"2016preVFP_UL",
         "channel":"em"
     },
-    "2025-04-20_Top_HTscaled/hist_2016preVFP_UL_val_ee":{
+    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_ee":{
         "campaign":"2016preVFP_UL",
         "channel":"ee"
     },
-    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_mm":{
+    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_mm":{
         "campaign":"2016postVFP_UL",
         "channel":"mm"
     },
-    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_me":{
+    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_me":{
         "campaign":"2016postVFP_UL",
         "channel":"me"
     },
-    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_em":{
+    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_em":{
         "campaign":"2016postVFP_UL",
         "channel":"em"
     },
-    "2025-04-20_Top_HTscaled/hist_2016postVFP_UL_val_ee":{
+    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_ee":{
         "campaign":"2016postVFP_UL",
         "channel":"ee"
     }
@@ -154,8 +154,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "val"
-    text     = "Validation"
+    tag      = "sigregion"
+    text     = "SR"
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
     count = 0
@@ -179,7 +179,9 @@ for jobname, info in jobdict.items():
             f'"{tag}", '
             f'"{text}"'
         )
-        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        if var != "dilep_pt": continue
+        command = f"root -q -b -l 'writeYields.C({arguments})'"
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output
         if not dryrun: subprocess.run(command, shell=True)

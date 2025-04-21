@@ -12,8 +12,8 @@ args = parser.parse_args()
 search_key = args.find
 plotname   = args.plotname
 
-#campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
-campaigns = ["2018_UL", "2017_UL"]
+campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
+#campaigns = ["2018_UL", "2017_UL"]
 channels  = ["mm", "me", "em", "ee"]
 
 parent_dir = os.path.dirname(search_key.rstrip('/'))
@@ -53,17 +53,20 @@ for d in ordered_dirs:
         if args.test: break
 
 if not args.dryrun and images:
-    n = len(images)
-    cols = ceil(sqrt(n))
-    rows = ceil(n / cols)
-    
+    rows = len(campaigns)
+    cols = len(channels)
+
     w, h = images[0].size
     canvas = Image.new('RGB', (cols * w, rows * h), 'white')
 
-    for idx, img in enumerate(images):
-        x = (idx % cols) * w
-        y = (idx // cols) * h
-        canvas.paste(img, (x, y))
+    for row_idx, camp in enumerate(campaigns):
+        for col_idx, ch in enumerate(channels):
+            idx = row_idx * cols + col_idx
+            if idx >= len(images): continue
+            img = images[idx]
+            x = col_idx * w
+            y = row_idx * h
+            canvas.paste(img, (x, y))
 
     out_dir = os.path.join("plots", "combined")
     os.makedirs(out_dir, exist_ok=True)

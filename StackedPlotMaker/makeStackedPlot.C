@@ -7,13 +7,13 @@
 float globalSbyB, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     TString _var = "HT",
+		     TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-04-20_Top_HTscaled/hist_2018_UL_val_HTscaled_mm",
+		     TString _jobname = "2025-03-17_DYcorrections/hist_eeSS_DYpromptCR_scaled_2018UL_Mar17_ee",
 		     TString _campaign = "2018_UL",
-		     TString _channel = "mm",
-		     TString _tag = "val",
-		     TString _displaytext = "Validation"
+		     TString _channel = "ee",
+		     TString _tag = "dy",
+		     TString _displaytext = "DY CR"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -26,7 +26,7 @@ void makeStackedPlot(
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
   bool toOverlayData=true;
-  bool toSave=true;
+  bool toSave=false;
   Double_t ymin = 0.1; Double_t ymax = 10E6;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
@@ -188,7 +188,9 @@ void makeStackedPlot(
   //                     ON-SCREEN DISPLAYS
   //______________________________________________________________
 
-  GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+  //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+  //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
+  GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
   
   //______________________________________________________________
   

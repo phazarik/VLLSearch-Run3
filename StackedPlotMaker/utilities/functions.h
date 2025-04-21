@@ -215,9 +215,8 @@ void DisplaySignalYieldsInBins(TH1D *sig){
 
 void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> bkg, TString targetname) {
   if (var != targetvar) return;
-
-  vector<int> w = {6, 9, 9, 9, 15, 11}; // widths: bin, nData, nTarget, nOthers, SF, bin-range
-
+  vector<int> w = {6, 9, 9, 9, 28, 11};
+  
   TH1D *hst_target = nullptr;
   for (int i = 0; i < (int)bkg.size(); i++) {
     if (bkg[i]->GetName() == targetname) {
@@ -242,11 +241,12 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
 
   print_line();
   printf("|%*s|%*s|%*s|%*s|%*s|%*s|\n",
-         w[0], "bin", w[1], "nData", w[2], "nOthers",
-         w[3], "nTarget", w[4], "ScaleFactor", w[5], "bin-range");
+       w[0], "bin", w[1], "nData", w[2], "nOthers",
+       w[3], "nTarget", w[4], "ScaleFactor ± Error", w[5], "bin-range");
   print_line();
 
   int total_ndata = 0, total_ntarget = 0, total_nothers = 0;
+  float total_ndata_error = 0, total_ntarget_error = 0, total_nothers_error = 0;
 
   for (int bin = 0; bin < hst_data->GetNbinsX(); bin++) {
     float ndata   = hst_data->GetBinContent(bin + 1);
@@ -254,39 +254,58 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
     float binxlow = hst_data->GetXaxis()->GetBinLowEdge(bin + 1);
     float binxup  = hst_data->GetXaxis()->GetBinUpEdge(bin + 1);
     float nothers = 0;
+    float ndata_error = 0;
     for (int i = 0; i < (int)bkg.size(); i++) {
       if (bkg[i]->GetName() == targetname) continue;
       nothers += bkg[i]->GetBinContent(bin + 1);
     }
 
+    ndata_error = hst_data->GetBinError(bin + 1); // Get the error on data
+    float ntarget_error = hst_target->GetBinError(bin + 1); // Get the error on the target
+
+    // Calculate bin error for SF
     float sf_bin = 0;
-    if (ntarget != 0) sf_bin = (ndata - nothers) / ntarget;
+    float sf_error = 0;
+    if (ntarget != 0) {
+      sf_bin = (ndata - nothers) / ntarget;
+      sf_error = sf_bin * sqrt(pow(ndata_error / (ndata - nothers), 2) + pow(ntarget_error / ntarget, 2));
+    }
 
     total_ndata   += ndata;
     total_ntarget += ntarget;
     total_nothers += nothers;
+    total_ndata_error += pow(ndata_error, 2);
+    total_ntarget_error += pow(ntarget_error, 2);
 
+    TString sf_string = TString::Format("%.6f ± %.6f", sf_bin, sf_error);
     TString range = TString::Format("%d–%d", (int)binxlow, (int)binxup);
-    printf("|%*d|%*d|%*d|%*d|%*.6f|%*s  |\n",
-           w[0], bin + 1,
-           w[1], (int)ndata,
-           w[2], (int)nothers,
-           w[3], (int)ntarget,
-           w[4], sf_bin,
-           w[5], range.Data());
+    printf("|%*d|%*d|%*d|%*d|%*s|%*s  |\n",
+	   w[0], bin + 1,
+	   w[1], (int)ndata,
+	   w[2], (int)nothers,
+	   w[3], (int)ntarget,
+	   w[4], sf_string.Data(),
+	   w[5], range.Data());
   }
 
   print_line();
 
+  // Calculate global SF error
   float global_sf = (float)(total_ndata - total_nothers) / total_ntarget;
-  printf("|%*s|%*d|%*d|%*d|%*.6f|%*s|\n",
-         w[0], "all",
-         w[1], total_ndata,
-         w[2], total_nothers,
-         w[3], total_ntarget,
-         w[4], global_sf,
-         w[5], " ");
-
+  float global_sf_error = global_sf * sqrt(
+    pow(sqrt(total_ndata_error) / (total_ndata - total_nothers), 2) + 
+    pow(sqrt(total_ntarget_error) / total_ntarget, 2)
+  );
+  
+  TString global_sf_string = TString::Format("%.6f ± %.6f", global_sf, global_sf_error);
+  printf("|%*s|%*d|%*d|%*d|%*s|%*s|\n",
+	 w[0], "all",
+	 w[1], total_ndata,
+	 w[2], total_nothers,
+	 w[3], total_ntarget,
+	 w[4], global_sf_string.Data(),
+	 w[5], " ");
+  
   print_line();
   cout<<endl;
 }
