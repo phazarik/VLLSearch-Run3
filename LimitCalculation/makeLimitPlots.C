@@ -52,25 +52,57 @@ void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TStrin
 //##########################
 void makeLimitPlots(){
 
-  TString timetag = "2025-04-16";
+  TString timetag = "2025-04-21";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
   TString outdir  = gSystem->ConcatFileName("plots", timetag);
   gSystem->mkdir(outdir, true);
 
   ind=0;
   vector<plotinfo> limitdict = {
-    {"sigmaB_limits_VLLD_ele_2017_UL_em.txt",         "VLLD-e",   "2017_UL",   "e#mu",     "limit_VLLD_ele_2017_UL_em.png"},
-    {"sigmaB_limits_VLLD_ele_2017_UL_me.txt",         "VLLD-e",   "2017_UL",   "#mue",     "limit_VLLD_ele_2017_UL_me.png"},
-    {"sigmaB_limits_VLLD_ele_2018_UL_em.txt",         "VLLD-e",   "2018_UL",   "e#mu",     "limit_VLLD_ele_2018_UL_em.png"},
-    {"sigmaB_limits_VLLD_ele_2018_UL_me.txt",         "VLLD-e",   "2018_UL",   "#mue",     "limit_VLLD_ele_2018_UL_me.png"},
-    {"sigmaB_limits_VLLD_ele_combined_2017_2018.txt", "VLLD-e",   "2017+2018", "combined", "limit_VLLD_ele_combined.png"},
-    {"sigmaB_limits_VLLD_mu_2017_UL_em.txt",          "VLLD-#mu", "2017_UL",   "e#mu",     "limit_VLLD_mu_2017_UL_em.png"},
-    {"sigmaB_limits_VLLD_mu_2017_UL_me.txt",          "VLLD-#mu", "2017_UL",   "#mue",     "limit_VLLD_mu_2017_UL_me.png"},
-    {"sigmaB_limits_VLLD_mu_2017_UL_mm.txt",          "VLLD-#mu", "2017_UL",   "#mu#mu",   "limit_VLLD_mu_2017_UL_mm.png"},
-    {"sigmaB_limits_VLLD_mu_2018_UL_em.txt",          "VLLD-#mu", "2018_UL",   "e#mu",     "limit_VLLD_mu_2018_UL_em.png"},
-    {"sigmaB_limits_VLLD_mu_2018_UL_me.txt",          "VLLD-#mu", "2018_UL",   "#mue",     "limit_VLLD_mu_2018_UL_me.png"},
-    {"sigmaB_limits_VLLD_mu_2018_UL_mm.txt",          "VLLD-#mu", "2018_UL",   "#mu#mu",   "limit_VLLD_mu_2018_UL_mm.png"},
-    {"sigmaB_limits_VLLD_mu_combined_2017_2018.txt",  "VLLD-#mu", "2017+2018", "combined", "limit_VLLD_mu_combined.png"},
+    
+    {"sigmaB_VLLD_ele_2016preVFP_UL_ee.txt", "VLLD-e", "2016preVFP_UL", "ee",     "limit_VLLD_ele_2016preVFP_UL_ee.png"},
+    {"sigmaB_VLLD_ele_2016preVFP_UL_em.txt", "VLLD-e", "2016preVFP_UL", "e#mu",   "limit_VLLD_ele_2016preVFP_UL_em.png"},
+    {"sigmaB_VLLD_ele_2016preVFP_UL_me.txt", "VLLD-e", "2016preVFP_UL", "#mue",   "limit_VLLD_ele_2016preVFP_UL_me.png"},
+    {"sigmaB_VLLD_ele_2016preVFP_UL_mm.txt", "VLLD-e", "2016preVFP_UL", "#mu#mu", "limit_VLLD_ele_2016preVFP_UL_mm.png"},
+    
+    {"sigmaB_VLLD_ele_2016preVFP_UL_ee.txt", "VLLD-e", "2016preVFP_UL", "ee",     "limit_VLLD_ele_2016preVFP_UL_ee.png"},
+    {"sigmaB_VLLD_ele_2016preVFP_UL_em.txt", "VLLD-e", "2016preVFP_UL", "e#mu",   "limit_VLLD_ele_2016preVFP_UL_em.png"},
+    {"sigmaB_VLLD_ele_2016preVFP_UL_me.txt", "VLLD-e", "2016preVFP_UL", "#mue",   "limit_VLLD_ele_2016preVFP_UL_me.png"},
+    {"sigmaB_VLLD_ele_2016preVFP_UL_mm.txt", "VLLD-e", "2016preVFP_UL", "#mu#mu", "limit_VLLD_ele_2016preVFP_UL_mm.png"},
+
+    {"sigmaB_VLLD_ele_2017_UL_ee.txt", "VLLD-e", "2017_UL", "ee",     "limit_VLLD_ele_2017_UL_ee.png"},
+    {"sigmaB_VLLD_ele_2017_UL_em.txt", "VLLD-e", "2017_UL", "e#mu",   "limit_VLLD_ele_2017_UL_em.png"},
+    {"sigmaB_VLLD_ele_2017_UL_me.txt", "VLLD-e", "2017_UL", "#mue",   "limit_VLLD_ele_2017_UL_me.png"},
+    {"sigmaB_VLLD_ele_2017_UL_mm.txt", "VLLD-e", "2017_UL", "#mu#mu", "limit_VLLD_ele_2017_UL_mm.png"},
+
+    {"sigmaB_VLLD_ele_2018_UL_ee.txt", "VLLD-e", "2018_UL", "#ee",    "limit_VLLD_ele_2017_UL_ee.png"},
+    {"sigmaB_VLLD_ele_2018_UL_em.txt", "VLLD-e", "2018_UL", "e#mu",   "limit_VLLD_ele_2018_UL_em.png"},
+    {"sigmaB_VLLD_ele_2018_UL_me.txt", "VLLD-e", "2018_UL", "#mue",   "limit_VLLD_ele_2018_UL_me.png"},
+    {"sigmaB_VLLD_ele_2018_UL_mm.txt", "VLLD-e", "2018_UL", "#mu#mu", "limit_VLLD_ele_2018_UL_mm.png"},
+
+    {"sigmaB_VLLD_ele_combined_Run2.txt", "VLLD-e",   "Run2_UL", "combined", "limit_VLLD_ele_combined_Run2.png"},
+
+    {"sigmaB_VLLD_mu_2016preVFP_UL_ee.txt", "VLLD-#mu", "2016preVFP_UL", "ee",     "limit_VLLD_mu_2016preVFP_UL_ee.png"},
+    {"sigmaB_VLLD_mu_2016preVFP_UL_em.txt", "VLLD-#mu", "2016preVFP_UL", "e#mu",   "limit_VLLD_mu_2016preVFP_UL_em.png"},
+    {"sigmaB_VLLD_mu_2016preVFP_UL_me.txt", "VLLD-#mu", "2016preVFP_UL", "#mue",   "limit_VLLD_mu_2016preVFP_UL_me.png"},
+    {"sigmaB_VLLD_mu_2016preVFP_UL_mm.txt", "VLLD-#mu", "2016preVFP_UL", "#mu#mu", "limit_VLLD_mu_2016preVFP_UL_mm.png"},
+    
+    {"sigmaB_VLLD_mu_2016preVFP_UL_ee.txt", "VLLD-#mu", "2016preVFP_UL", "ee",     "limit_VLLD_mu_2016preVFP_UL_ee.png"},
+    {"sigmaB_VLLD_mu_2016preVFP_UL_em.txt", "VLLD-#mu", "2016preVFP_UL", "e#mu",   "limit_VLLD_mu_2016preVFP_UL_em.png"},
+    {"sigmaB_VLLD_mu_2016preVFP_UL_me.txt", "VLLD-#mu", "2016preVFP_UL", "#mue",   "limit_VLLD_mu_2016preVFP_UL_me.png"},
+    {"sigmaB_VLLD_mu_2016preVFP_UL_mm.txt", "VLLD-#mu", "2016preVFP_UL", "#mu#mu", "limit_VLLD_mu_2016preVFP_UL_mm.png"},
+
+    {"sigmaB_VLLD_mu_2017_UL_ee.txt",     "VLLD-#mu", "2017_UL", "ee",       "limit_VLLD_mu_2017_UL_ee.png"},
+    {"sigmaB_VLLD_mu_2017_UL_em.txt",     "VLLD-#mu", "2017_UL", "e#mu",     "limit_VLLD_mu_2017_UL_em.png"},
+    {"sigmaB_VLLD_mu_2017_UL_me.txt",     "VLLD-#mu", "2017_UL", "#mue",     "limit_VLLD_mu_2017_UL_me.png"},
+    {"sigmaB_VLLD_mu_2017_UL_mm.txt",     "VLLD-#mu", "2017_UL", "#mu#mu",   "limit_VLLD_mu_2017_UL_mm.png"},
+
+    {"sigmaB_VLLD_mu_2018_UL_ee.txt",     "VLLD-#mu", "2017_UL", "ee",       "limit_VLLD_mu_2018_UL_ee.png"},
+    {"sigmaB_VLLD_mu_2018_UL_em.txt",     "VLLD-#mu", "2018_UL", "e#mu",     "limit_VLLD_mu_2018_UL_em.png"},
+    {"sigmaB_VLLD_mu_2018_UL_me.txt",     "VLLD-#mu", "2018_UL", "#mue",     "limit_VLLD_mu_2018_UL_me.png"},
+    {"sigmaB_VLLD_mu_2018_UL_mm.txt",     "VLLD-#mu", "2018_UL", "#mu#mu",   "limit_VLLD_mu_2018_UL_mm.png"},
+
+    {"sigmaB_VLLD_mu_combined_Run2.txt", " VLLD-#mu", "Run2_UL", "combined", "limit_VLLD_mu_combined_Run2.png"},
   };
 
   for (size_t i = 0; i < limitdict.size(); i++) {
@@ -90,7 +122,7 @@ void makeLimitPlots(){
 }
 
 void makeOneLimitPlot(
-		   TString infile="sigmaBlimits/2025-04-16/sigmaB_limits_VLLD_mu_combined_2017_2018.txt",
+		   TString infile="sigmaBlimits/2025-04-16/sigmaB_VLLD_mu_combined_2017_2018.txt",
 		   TString outfile="test.png",
 		   TString modelname="VLLD-#mu",
 		   TString campaign="2017_2018",

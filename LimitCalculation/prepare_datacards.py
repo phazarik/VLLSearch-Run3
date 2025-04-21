@@ -15,17 +15,22 @@ from datetime import datetime
 import ROOT
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--test", action="store_true", help="Run in test mode (print the command but don't execute)")
+parser.add_argument("--test",    action="store_true", required=False, help="test mode")
+parser.add_argument("--combine", type=str,            required=False, help="combine tag, e.g.: Run2")
 args = parser.parse_args()
 test = args.test
+combine_str = args.combine
 
-def main(test=False):
+def main(combine_str, test=False):
 
-    basedir = '../StackedPlotMaker/signalyields/2025-04-16/'
-    jobs_to_combine = ['yields_2017_UL_em', 'yields_2017_UL_me', 'yields_2017_UL_mm', 'yields_2018_UL_em', 'yields_2018_UL_me', 'yields_2018_UL_mm']
-    #jobs_to_combine = ['yields_2017_UL_mm']
-    outtag = "_combined_2017_2018"
-    #outtag = "_"+jobs_to_combine[0].split('yields_')[1]
+    combine = bool(combine_str) 
+    outtag = f"_{combine_str}" if combine else ""
+    
+    basedir = '../StackedPlotMaker/signalyields/2025-04-21/'
+    jobs = [
+        "yields_2016postVFP_UL_ee", "yields_2016postVFP_UL_me", "yields_2016preVFP_UL_ee", "yields_2016preVFP_UL_me", "yields_2017_UL_ee", "yields_2017_UL_me", "yields_2018_UL_ee", "yields_2018_UL_me",
+        "yields_2016postVFP_UL_em", "yields_2016postVFP_UL_mm", "yields_2016preVFP_UL_em", "yields_2016preVFP_UL_mm", "yields_2017_UL_em", "yields_2017_UL_mm", "yields_2018_UL_em", "yields_2018_UL_mm"
+    ]
     
     ## signals:
     signal_ele = {
@@ -50,45 +55,51 @@ def main(test=False):
         }
     }
 
-    prepare_datacard(signal_mu,  jobs_to_combine, basedir, outtag, filtersig = 0.0001)
-    prepare_datacard(signal_ele, jobs_to_combine, basedir, outtag, filtersig = 0.0001)
+    prepare_datacard(signal_mu,  jobs, basedir, outtag, combine, filtersig = 0.0001)
+    prepare_datacard(signal_ele, jobs, basedir, outtag, combine, filtersig = 0.0001)
     print("\nDone!\n", style="yellow bold")
     
-def prepare_datacard(sigdict, joblist, baseinputdir, tag="", filtersig=0):
-
+def prepare_datacard(sigdict, joblist, baseinputdir, tag="", combine=False, filtersig=0):
     signame = list(sigdict.keys())[0]
     print(f'\n{"-"*35}\nPreparing datacards for {signame}\n{"-"*35}', style="bold yellow")
-    outputname = f'datacards_{signame}{tag}'
     today = datetime.now().strftime('%Y-%m-%d')
-    outdir = f'datacards/{today}/{outputname}'
+    parent_outdir = f'datacards/{today}'
 
-    ### Read text files into dataframes:
-    datadict = {}
+    if combine:
+        combined_dict = {}
+        print(f'Reading job(s):', end=' ')
+        for jobname in joblist:
+            print(jobname, end=' ')
+            dict_job = return_dict(jobname, baseinputdir, sigdict, signame)
 
-    print(f'Reading job(s):', end=' ')
-    for jobname in joblist:
-        print(jobname, end=' ')
-        dict_job = return_dict(jobname, baseinputdir, sigdict, signame)
+            for sample, subdict in dict_job.items():
+                if sample not in combined_dict: combined_dict[sample] = {}
+                for subsample, columns in subdict.items():
+                    if subsample not in combined_dict[sample]:
+                        combined_dict[sample][subsample] = {
+                            'bin': np.array([]),
+                            'sig': np.array([]),
+                            'obs': np.array([]),
+                            'exp': np.array([]),
+                            'experr': np.array([]),
+                            'S/sqrtB': np.array([]),
+                            'dbkg': np.array([]),
+                        }
+                    for col in columns:
+                        combined_dict[sample][subsample][col] = np.append(combined_dict[sample][subsample][col], columns[col])
+        print('\nData ready.')
 
-        for sample, subdict in dict_job.items():
-            if sample not in datadict: datadict[sample] = {}
-            for subsample, columns in subdict.items():
-                if subsample not in datadict[sample]:
-                    datadict[sample][subsample] = {
-                        'bin': np.array([]),
-                        'sig': np.array([]),
-                        'obs': np.array([]),
-                        'exp': np.array([]),
-                        'experr': np.array([]),
-                        'S/sqrtB': np.array([]),
-                        'dbkg': np.array([]),
-                    }
-                for col in columns:
-                    datadict[sample][subsample][col] = np.append(datadict[sample][subsample][col], columns[col])
-                    
-    print('\nData ready.')
+        outdir = os.path.join(parent_outdir, f'yields_combined{tag}')
+        process_datadict(sigdict, combined_dict, outdir, filtersig)
 
-    ### Use the dataframe from each mass point to create a text file.
+    else:
+        for jobname in joblist:
+            print(f'\nProcessing job: {jobname}', style="bold yellow")
+            dict_job = return_dict(jobname, baseinputdir, sigdict, signame)
+            outdir = os.path.join(parent_outdir, jobname)
+            process_datadict(sigdict, dict_job, outdir, filtersig)
+
+def process_datadict(sigdict, datadict, outdir, filtersig):
     count = 0
     processed = []
     for sample, subs in sigdict.items():
@@ -96,31 +107,29 @@ def prepare_datacard(sigdict, joblist, baseinputdir, tag="", filtersig=0):
         for subsample, val in subs.items():
             if subsample not in datadict[sample]: continue
 
-            count+= 1
+            count += 1
             sampleyield = datadict[sample][subsample]
             sample_df = pd.DataFrame(sampleyield)
             sample_df['bin'] = sample_df['bin'].astype(int)
             sample_df['obs'] = sample_df['obs'].astype(int)
             sample_df = sample_df.sort_values(by='S/sqrtB', ascending=False).reset_index(drop=True)
 
-            # Filtering the dataframe.
-            if filtersig > 0: sample_df = sample_df[sample_df['sig']>filtersig]
+            if filtersig > 0: sample_df = sample_df[sample_df['sig'] > filtersig]
             if "400" in subsample:
                 print(f'Table for {sample} {subsample}:', style="yellow")
                 print(tabulate(sample_df, headers='keys', tablefmt='psql'))
             if filtersig > 0:
                 print(f"Filter: nsig > {filtersig} for {sample} {subsample}")
             
+            os.makedirs(outdir, exist_ok=True)
             datacard_name = f'datacard_{sample}_{subsample}.txt'
             datacard_path = os.path.join(outdir, datacard_name)
+            newfile = write_datacard(sample_df, datacard_path)
+            processed.append(newfile)
 
-            if not test:
-                newfile = write_datacard(sample_df, datacard_path)
-                processed.append(newfile)
-
-    if len(processed) > 0:
-        print(f"\n{len(processed)} files created:")
-        for index, filename in enumerate(processed): print(f"{index+1}. {filename}", style="yellow")
+    if processed:
+        print(f"\n{len(processed)} files created in {outdir}:")
+        for index, filename in enumerate(processed): print(f"{index+1}. {filename}", style="yellow")         
 
 #______________________________________________________________________________________________________
 
@@ -140,7 +149,7 @@ def return_dict(jobname, baseinputdir, sigdict, signame):
             filepath = os.path.join(indir, filename)
 
             if not os.path.exists(filepath):
-                print(f'\033[33mWarning: File not found: {filepath}\033[0m')
+                print(f'Warning: File not found: {filepath}', style='red')
                 continue
 
             try:
@@ -246,4 +255,4 @@ def write_datacard(df, datacard):
             
     return datacard
     
-if __name__ == "__main__" : main()
+if __name__ == "__main__" : main(combine_str, test)

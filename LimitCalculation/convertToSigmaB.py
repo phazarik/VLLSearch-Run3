@@ -1,9 +1,9 @@
 import os
 import numpy as np
 from datetime import datetime
+
 today = datetime.now().strftime("%Y-%m-%d")
 
-# Define your cross-section limits and sample details
 sigdict = {
     'VLLD_ele': {
         'M100': {'mass': 100, 'xsec': 16.9, 'ngen': 110871, 'scale': 10},
@@ -12,7 +12,6 @@ sigdict = {
         'M400': {'mass': 400, 'xsec': 0.0907, 'ngen': 24491, 'scale': 1},
         'M600': {'mass': 600, 'xsec': 0.0149, 'ngen': 24611, 'scale': 1},
         'M800': {'mass': 800, 'xsec': 0.00347, 'ngen': 23680, 'scale': 1},
-        #'M1000': {'mass': 1000, 'xsec': 0.000971, 'ngen': 24286, 'scale': 1}
     },
     'VLLD_mu': {
         'M100': {'mass': 100, 'xsec': 16.9, 'ngen': 111926, 'scale': 10},
@@ -24,35 +23,52 @@ sigdict = {
     }
 }
 
-# Path for CMS-combine output files and the output directory for the sigma limits
-combine_output_path = 'fromCMScombine/2025-04-16'
+combine_output_path = 'fromCMScombine/2025-04-21'
 files = os.listdir(combine_output_path)
-outdir = 'sigmaBlimits/'+today
+outdir = 'sigmaBlimits/' + today
 os.makedirs(outdir, exist_ok=True)
 
-# Process each file in the directory
 for f in files:
-    if not f.endswith('.txt'): continue
-    
+    if not f.endswith('.txt'):
+        continue
+
     infile = os.path.join(combine_output_path, f)
-    outfile = os.path.join(outdir, 'sigmaB_' + f)
+    outfile = os.path.join(outdir, f.replace('limits_', 'sigmaB_'))
 
-    # Iterate over each sample in the dictionary
-    for sample, subdict in sigdict.items():
-        if sample not in f: continue  # Skip if the sample is not in the filename
+    model_name = None
+    if 'VLLD_ele' in f:  model_name = 'VLLD_ele'
+    elif 'VLLD_mu' in f: model_name = 'VLLD_mu'
+    else:
+        print(f"Model not found in file name: {f}. Skipping.")
+        continue
 
-        print(f'\nCalculating sigma*B for {sample} using {f}:')
+    subdict = sigdict.get(model_name)
+    if subdict is None:
+        print(f"Model {model_name} not in sigdict. Skipping {f}.")
+        continue
+
+    print(f'\nCalculating sigma*B for {model_name} using {f}:')
+    try:
         with open(infile, 'r') as inf, open(outfile, 'w') as outf:
-            # Write the header for the output file
             outf.write("Mass\tObserved\tExp_2down\tExp_1down\tExp\tExp_1up\tExp_2up\ttheory\n")
-
-            # Skip the header line in the input file
             header = inf.readline().strip().split()
 
-            # Read each line from the input file and calculate sigmaB limits
             for line in inf:
                 values = line.strip().split()
-                mass = int(values[0])  # Get mass from the first column
+                if len(values) < 7:
+                    print(f"Skipping malformed line in {f}: {line.strip()}")
+                    continue
+
+                try:
+                    mass = int(values[0])
+                except ValueError:
+                    print(f"Invalid mass value in {f}: {values[0]}. Skipping line.")
+                    continue
+
+                if f"M{mass}" not in subdict:
+                    print(f"Mass {mass} not found in sigdict for {model_name}. Skipping.")
+                    continue
+
                 r_values = {
                     'obs': float(values[1]),
                     'exp_2down': float(values[2]),
@@ -62,36 +78,31 @@ for f in files:
                     'exp_2up': float(values[6])
                 }
 
-                print(f"Mass: {mass}, R-values: {r_values}")
+                val = subdict[f"M{mass}"]
+                sigmaB_theory = val['xsec']
 
-                # Calculate sigma*B values for the given mass and sample
-                for subsample, val in subdict.items():
-                    if val['mass'] == mass:
-                        sigmaB_theory = val['xsec']  # Cross-section for the given mass
+                xsec_limit = {
+                    'obs': r_values['obs'] * sigmaB_theory,
+                    'exp_2down': r_values['exp_2down'] * sigmaB_theory,
+                    'exp_1down': r_values['exp_1down'] * sigmaB_theory,
+                    'exp': r_values['exp'] * sigmaB_theory,
+                    'exp_1up': r_values['exp_1up'] * sigmaB_theory,
+                    'exp_2up': r_values['exp_2up'] * sigmaB_theory
+                }
 
-                        # Calculate sigma*B for each limit
-                        xsec_limit = {
-                            'obs': r_values['obs'] * sigmaB_theory,
-                            'exp_2down': r_values['exp_2down'] * sigmaB_theory,
-                            'exp_1down': r_values['exp_1down'] * sigmaB_theory,
-                            'exp': r_values['exp'] * sigmaB_theory,
-                            'exp_1up': r_values['exp_1up'] * sigmaB_theory,
-                            'exp_2up': r_values['exp_2up'] * sigmaB_theory
-                        }
+                outf.write(f"{mass}\t"
+                           f"{xsec_limit['obs']:.4f}\t"
+                           f"{xsec_limit['exp_2down']:.4f}\t"
+                           f"{xsec_limit['exp_1down']:.4f}\t"
+                           f"{xsec_limit['exp']:.4f}\t"
+                           f"{xsec_limit['exp_1up']:.4f}\t"
+                           f"{xsec_limit['exp_2up']:.4f}\t"
+                           f"{sigmaB_theory:.4f}\n")
 
-                        # Write the values to the output file in the required format
-                        outf.write(f"{mass}\t"
-                                   f"{xsec_limit['obs']:.2f}\t"
-                                   f"{xsec_limit['exp_2down']:.2f}\t"
-                                   f"{xsec_limit['exp_1down']:.2f}\t"
-                                   f"{xsec_limit['exp']:.2f}\t"
-                                   f"{xsec_limit['exp_1up']:.2f}\t"
-                                   f"{xsec_limit['exp_2up']:.2f}\t"
-                                   f"{sigmaB_theory:.2f}\n")
-
-                        print(f"Mass: {mass}, Sigma*B Limits: {xsec_limit}")
+                print(f"Mass: {mass}, Sigma*B Limits: {xsec_limit}")
 
         print(f'File created: {outfile}')
+    except Exception as e: print(f"Error processing {f}: {e}")
     print('-' * 100)
 
 print('\nAll CMS-combine files have been converted to sigma*B limits!\n')
