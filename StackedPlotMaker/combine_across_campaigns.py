@@ -12,8 +12,7 @@ args = parser.parse_args()
 search_key = args.find
 plotname   = args.plotname
 
-campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
-#campaigns = ["2018_UL", "2017_UL"]
+campaigns = ["2018_UL", "2017_UL", "2016postVFP_UL", "2016preVFP_UL"]
 channels  = ["mm", "me", "em", "ee"]
 
 parent_dir = os.path.dirname(search_key.rstrip('/'))

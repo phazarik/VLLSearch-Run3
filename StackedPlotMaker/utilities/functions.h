@@ -1,7 +1,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 #include "../include_headers.h"
-extern float globalSbyB, globalObsbyExp, globalObsbyExpErr;
+extern float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 //--------------------------------------------------
 // File handling:
@@ -138,6 +138,14 @@ TH1D *GetSbyRootB(TH1D *sig, vector<TH1D*> bkg){
   float nbkg = 0; for(int i=0; i<(int)bkg.size(); i++) nbkg = nbkg + bkg[i]->Integral();
   float sqrtB = sqrt(nbkg);
   globalSbyB = nsig/sqrtB;
+
+  double serr2 = 0;
+  for(int bin=1; bin<=srb->GetNbinsX(); bin++){
+    double err = srb->GetBinError(bin);
+    if(std::isnan(err) || std::isinf(err)) continue;
+    serr2 += err * err;
+  }
+  globalSbyBErr = sqrt(serr2);
 
   SetHistoStyle(srb, kBlack);
   return srb;

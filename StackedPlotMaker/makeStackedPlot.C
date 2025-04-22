@@ -4,16 +4,16 @@
 #include "utilities/read_hists.h"
 
 //Global parameters:
-float globalSbyB, globalObsbyExp, globalObsbyExpErr;
+float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
 		     TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-03-17_DYcorrections/hist_eeSS_DYpromptCR_scaled_2018UL_Mar17_ee",
+		     TString _jobname = "2025-04-20_signal/hist_2018_UL_sigregion_mm",
 		     TString _campaign = "2018_UL",
-		     TString _channel = "ee",
-		     TString _tag = "dy",
-		     TString _displaytext = "DY CR"
+		     TString _channel = "mm",
+		     TString _tag = "sigregion",
+		     TString _displaytext = "SR"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -25,7 +25,7 @@ void makeStackedPlot(
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=true;
+  bool toOverlayData=false;
   bool toSave=false;
   Double_t ymin = 0.1; Double_t ymax = 10E6;
   TString output_tag = _tag;
@@ -363,16 +363,18 @@ void makeStackedPlot(
   if(sig1) SetLegendEntry(lg, sig1);
   if(sig2) SetLegendEntry(lg, sig2);
   if(sig3) SetLegendEntry(lg, sig3);
-  TString legendheader = Form("Global S/#sqrt{B} = %.3f", globalSbyB);
+  TString legendheader = Form("Global S/#sqrt{B} = %.3f #pm %.3f", globalSbyB, globalSbyBErr);
   if(toOverlayData){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);
     TString err = Form("%.3f", globalObsbyExpErr);
     legendheader = val+" #pm "+err;
     cout << fixed << setprecision(3);
-    cout << "Obs/Exp = " << globalObsbyExp << " ± " << globalObsbyExpErr << "\n";
+    cout << "Obs/Exp = " << globalObsbyExp << " ± " << globalObsbyExpErr << endl;
+    cout << "S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << "\n";
     cout << defaultfloat << endl;
   }
-  else cout<<legendheader<<"\n"<<endl; 
+  else cout<<legendheader<<"\n"<<endl;
+					 
   lg->SetHeader(legendheader);
   lg->Draw();
   canvas->Update();

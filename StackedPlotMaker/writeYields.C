@@ -4,13 +4,13 @@
 #include "utilities/read_hists.h"
 
 //Global parameters:
-float globalSbyB, globalObsbyExp, globalObsbyExpErr;
+float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void writeYields(
 		 TString _var = "dilep_pt",
 		 TString _name = "p_{T}^{LL} (GeV)",
-		 TString _jobname = "2025-04-20_signal/hist_2018_UL_sigregion_mm/",
-		 TString _campaign = "2018_UL",
+		 TString _jobname = "2025-04-20_signal/hist_2016preVFP_UL_sigregion_mm/",
+		 TString _campaign = "2016preVFP_UL",
 		 TString _channel = "mm",
 		 TString _tag = "sigregion",
 		 TString _displaytext = "SR"
