@@ -33,7 +33,6 @@ def extract_limits(datacard_path, method, test=False):
     )
 
     limits = {}
-    
     for key, pattern in patterns_to_look_for.items():
         match = pattern.search(result.stdout)
         if match: limits[key] = float(match.group(1))
@@ -43,10 +42,10 @@ def extract_limits(datacard_path, method, test=False):
 # Main function to process all files and store the results in a dictionary
 def process_datacards(jobname, method, test=False):
 
-    inputpath = os.path.join('datacards', jobname)
-    limits_dict = {}
+    inputpath = jobname
+    if not inputpath.startswith('datacards'): inputpath = os.path.join('datacards', jobname)
+    limits_by_model = {}
 
-    # If test is True, only process the first datacard and print the full output
     if test:
         for filename in os.listdir(inputpath):
             if filename.endswith(".txt"):
@@ -54,60 +53,58 @@ def process_datacards(jobname, method, test=False):
                 limits, output = extract_limits(datacard_path, method, test)
                 print(f"Full output for {filename}:\n\n")
                 print(output, style="white")
+                model = 'VLLD_ele' if 'ele' in filename else 'VLLD_mu'
+                mass = int(re.search(r'(\d+)', filename).group(1))
+                return {model: {mass: limits}}
 
-                return {int(re.search(r'(\d+)', filename).group(1)): limits}
+    with Progress("[progress.description]{task.description}", BarColumn(), TaskProgressColumn(), transient=True) as progress:
+        datacards = [f for f in os.listdir(inputpath) if f.endswith(".txt")]
+        total = len(datacards)
+        task_id = progress.add_task("Processing datacards", total=total)
 
-    with Progress(
-            "[progress.description]{task.description}",
-            BarColumn(),
-            TaskProgressColumn(),
-            transient=True) as progress:
+        for filename in datacards:
+            match = re.search(r'(\d+)', filename)
+            if not match: continue
+            mass = int(match.group(1))
+            model = 'VLLD_ele' if 'ele' in filename else 'VLLD_mu'
+            if model not in limits_by_model:
+                limits_by_model[model] = {}
 
-        mass_files = [f for f in os.listdir(inputpath) if f.endswith(".txt")]
-        total_files = len(mass_files)
-        task_id = progress.add_task("Processing mass points", total=total_files)
-        for filename in mass_files:
-            mass = re.search(r'(\d+)', filename)
-            if mass:
-                mass = int(mass.group(1))
-                datacard_path = os.path.join(inputpath, filename)
-                limits, _ = extract_limits(datacard_path, method)
-                limits_dict[mass] = limits
+            datacard_path = os.path.join(inputpath, filename)
+            limits, _ = extract_limits(datacard_path, method)
+            limits_by_model[model][mass] = limits
             progress.update(task_id, advance=1)
 
-    return limits_dict
+    return limits_by_model
 
-def write_limits(limits_dict, jobname, test=False):
+def write_limits(limits_by_model, jobname, test=False):
+    for model, limits_dict in limits_by_model.items():
+        table_data = []
+        for mass in sorted(limits_dict.keys()):
+            row = {'Mass': mass}
+            row.update(limits_dict[mass])
+            table_data.append(row)
 
-    table_data = []
-    for mass in sorted(limits_dict.keys()):
-        row = {'Mass': mass}
-        row.update(limits_dict[mass])
-        table_data.append(row)
-        
-    print(tabulate(table_data, headers='keys', tablefmt='psql'))
-    
-    if not test:
-        outdir = 'limits'
-        os.makedirs(outdir, exist_ok=True)
-        output_file = f"limits/{jobname}.txt"
-        output_file = output_file.replace('datacards', 'limits')
-        with open(output_file, 'w') as file:
-            file.write(f"{'Mass':<10}")
-            for key in patterns_to_look_for.keys():
-                file.write(f"{key:<15}")
-            file.write("\n")
+        print(f"\nResults for model: {model}")
+        print(tabulate(table_data, headers='keys', tablefmt='psql'))
 
-            # Write the limits for each mass point to the file
-            for mass, limits in sorted(limits_dict.items()):
-                file.write(f"{mass:<10}")
+        if not test:
+            os.makedirs('limits', exist_ok=True)
+            campaign = os.path.basename(jobname).replace("yields_", "")
+            output_file = f"limits/limits_{model}_{campaign}.txt"
+            with open(output_file, 'w') as file:
+                file.write(f"{'Mass':<10}")
                 for key in patterns_to_look_for.keys():
-                    value = limits.get(key, 'N/A')
-                    file.write(f"{value:<15}")
+                    file.write(f"{key:<15}")
                 file.write("\n")
+                for mass, limits in sorted(limits_dict.items()):
+                    file.write(f"{mass:<10}")
+                    for key in patterns_to_look_for.keys():
+                        value = limits.get(key)
+                        file.write(f"{value:<15}" if value is not None else f"{'N/A':<15}")
+                    file.write("\n")
+            print(f"Output written to {output_file}")
 
-        print(f"\nOutput written to {output_file}")
-        
 # Main execution
 if __name__ == "__main__":
     # Parse arguments

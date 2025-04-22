@@ -1,6 +1,6 @@
 import os, sys
 import argparse
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--indir', type=str, required=True, help='Plot directory.')
@@ -53,23 +53,38 @@ if not images:
     print("Error: No images found to combine.")
     sys.exit(1)
 
-rows = [c for c in campaigns if any((c, ch) in images for ch in channels)]
-cols = [ch for ch in channels if any((c, ch) in images for c in campaigns)]
-
+#rows = [c for c in campaigns if any((c, ch) in images for ch in channels)]
+#cols = [ch for ch in channels if any((c, ch) in images for c in campaigns)]
+# Use all campaigns and channels for the grid, even if some images are missing
+rows = campaigns
+cols = channels
 img_width, img_height = next(iter(images.values())).size
 padding = 10
+header_height = 50
+sidebar_width = 100
+
 stitched_img = Image.new('RGB', 
                          (img_width * len(cols) + padding * (len(cols) - 1), 
                           img_height * len(rows) + padding * (len(rows) - 1)), 
                          (255, 255, 255))
 
+draw = ImageDraw.Draw(stitched_img)
+try:    font = ImageFont.truetype("/mnt/c/Windows/Fonts/Calibri.ttf", 60)
+except: font = ImageFont.load_default()
+
 for i, row in enumerate(rows):
     for j, col in enumerate(cols):
         img = images.get((row, col))
+        x_offset = j * (img_width + padding)
+        y_offset = i * (img_height + padding)
         if img:
-            x_offset = j * (img_width + padding)
-            y_offset = i * (img_height + padding)
             stitched_img.paste(img, (x_offset, y_offset))
+        else:
+            draw.text((x_offset + img_width // 2, y_offset + img_height // 2), 
+                      "No yield", 
+                      fill=(255, 0, 0), 
+                      font=font, 
+                      anchor="mm")
 
 if not args.dryrun: stitched_img.save(outfile)
 print(f"Saved: {outfile} ({len(rows)} rows x {len(cols)} cols)")

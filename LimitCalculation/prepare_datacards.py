@@ -1,8 +1,7 @@
-#-----------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------
 # This reads from the yield .txt files from the StackPlotMaker directory and prepares datacards for cms-combine.
 # https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/latest/tutorial_stat_routines/stat_routines/
-#-----------------------------------------------------------------------------------------------------------------
-
+#----------------------------------------------------------------------------------------------------------------
 import os, sys, argparse
 import json
 import numpy as np
@@ -26,7 +25,7 @@ def main(combine_str, test=False):
     combine = bool(combine_str) 
     outtag = f"_{combine_str}" if combine else ""
     
-    basedir = '../StackedPlotMaker/signalyields/2025-04-21/'
+    basedir = '../StackedPlotMaker/signalyields/2025-04-22/'
     jobs = [
         "yields_2016postVFP_UL_ee", "yields_2016postVFP_UL_me", "yields_2016preVFP_UL_ee", "yields_2016preVFP_UL_me", "yields_2017_UL_ee", "yields_2017_UL_me", "yields_2018_UL_ee", "yields_2018_UL_me",
         "yields_2016postVFP_UL_em", "yields_2016postVFP_UL_mm", "yields_2016preVFP_UL_em", "yields_2016preVFP_UL_mm", "yields_2017_UL_em", "yields_2017_UL_mm", "yields_2018_UL_em", "yields_2018_UL_mm"
@@ -35,28 +34,27 @@ def main(combine_str, test=False):
     ## signals:
     signal_ele = {
         'VLLD_ele': {
-            'M100': {'mass': 100, 'xsec': 16.9,       'ngen': 110871, 'scale':10},
+            'M100': {'mass': 100, 'xsec': 16.9,       'ngen': 110871, 'scale':1},
             'M200': {'mass': 200, 'xsec': 1.36,       'ngen': 73730 , 'scale':1},
             'M300': {'mass': 300, 'xsec': 0.291,      'ngen': 24753 , 'scale':1},
-            'M400': {'mass': 400, 'xsec': 0.0907,     'ngen': 24491 , 'scale':1},
-            'M600': {'mass': 600, 'xsec': 0.0149,     'ngen': 24611 , 'scale':1},
-            'M800': {'mass': 800, 'xsec': 0.00347,    'ngen': 23680 , 'scale':1},
-            'M1000': {'mass': 1000, 'xsec': 0.000971, 'ngen': 24286 , 'scale':1}
+            'M400': {'mass': 400, 'xsec': 0.0907,     'ngen': 24491 , 'scale':10},
+            'M600': {'mass': 600, 'xsec': 0.0149,     'ngen': 24611 , 'scale':10},
+            'M800': {'mass': 800, 'xsec': 0.00347,    'ngen': 23680 , 'scale':50}
         }
     }
     signal_mu = {
         'VLLD_mu': {
-            'M100': {'mass': 100, 'xsec': 16.9,    'ngen': 111926, 'scale':10},
+            'M100': {'mass': 100, 'xsec': 16.9,    'ngen': 111926, 'scale':1},
             'M200': {'mass': 200, 'xsec': 1.36,    'ngen': 73908,  'scale':1},
             'M300': {'mass': 300, 'xsec': 0.291,   'ngen': 25022,  'scale':1},
-            'M400': {'mass': 400, 'xsec': 0.0907,  'ngen': 24299 , 'scale':1},
-            'M600': {'mass': 600, 'xsec': 0.0149,  'ngen': 24890,  'scale':1},
-            'M800': {'mass': 800, 'xsec': 0.00347, 'ngen': 24763,  'scale':1}
+            'M400': {'mass': 400, 'xsec': 0.0907,  'ngen': 24299 , 'scale':10},
+            'M600': {'mass': 600, 'xsec': 0.0149,  'ngen': 24890,  'scale':10},
+            'M800': {'mass': 800, 'xsec': 0.00347, 'ngen': 24763,  'scale':50}
         }
     }
 
-    prepare_datacard(signal_mu,  jobs, basedir, outtag, combine, filtersig = 0.0001)
-    prepare_datacard(signal_ele, jobs, basedir, outtag, combine, filtersig = 0.0001)
+    prepare_datacard(signal_mu,  jobs, basedir, outtag, combine, filtersig = 0)
+    prepare_datacard(signal_ele, jobs, basedir, outtag, combine, filtersig = 0)
     print("\nDone!\n", style="yellow bold")
     
 def prepare_datacard(sigdict, joblist, baseinputdir, tag="", combine=False, filtersig=0):
@@ -114,6 +112,11 @@ def process_datadict(sigdict, datadict, outdir, filtersig):
             sample_df['obs'] = sample_df['obs'].astype(int)
             sample_df = sample_df.sort_values(by='S/sqrtB', ascending=False).reset_index(drop=True)
 
+            # Ensure signal yields are not invalid. Zeros and negatives are not allowed
+            sample_df['sig']     = sample_df['sig'].apply(lambda x: 0.000001 if x <= 0 else x)
+            sample_df['S/sqrtB'] = sample_df['S/sqrtB'].apply(lambda x: 0.000001 if x <= 0 else x)
+
+            #Filtering:
             if filtersig > 0: sample_df = sample_df[sample_df['sig'] > filtersig]
             if "400" in subsample:
                 print(f'Table for {sample} {subsample}:', style="yellow")
@@ -170,7 +173,12 @@ def return_dict(jobname, baseinputdir, sigdict, signame):
                         'dbkg': np.array([]),
                     }
                 # Append data from temp_df to the numpy arrays
-                for col in temp_df.columns: df[sample][subsample][col] = np.append(df[sample][subsample][col], temp_df[col].values)
+                for col in temp_df.columns:
+                    values = temp_df[col].values
+                    if col in ("sig"): #("sig", "S/sqrtB"): #inflating signal and S/sqrtB
+                        scale_factor = sigdict[sample][subsample].get("scale", 1)
+                        values = values * scale_factor
+                    df[sample][subsample][col] = np.append(df[sample][subsample][col], values)
 
             except Exception as e: print(f'Could not read into df: {filepath}', style="red")
 

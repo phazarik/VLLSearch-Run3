@@ -27,4 +27,4 @@ if not test:
     os.makedirs(local_dir, exist_ok=True)
     subprocess.run(scp_command, shell=True)
 
-print("\n[yellow]Transfer complete.[/yellow]\n")
+print("\nTransfer complete.\n", style='yellow')

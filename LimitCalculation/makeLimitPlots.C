@@ -3,6 +3,10 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <array> 
+#include <memory>
+#include <cstdio>
+#include <stdexcept>
 #include <TString.h>
 #include <TCanvas.h>
 #include <TGraph.h>
@@ -14,7 +18,7 @@
 #include <TLatex.h>
 #include <TSystem.h>
 using namespace std;
-int ind;
+int ind, indplt;
 
 // Struct to hold limit data
 struct LimitData {
@@ -42,22 +46,23 @@ vector<LimitData> ReadDataFromFile(const TString& filename);
 void StyleGraph(TGraph* graph, int color, int lineStyle = 1, int lineWidth = 2);
 void StyleUncertaintyBand(TGraphAsymmErrors* graph, int fillColor);
 void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax);
-void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel);
-TLegend* CreateLegend();
 TCanvas* CreateCanvas(TString name);
-void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TString campaign, TString channel, float ymin, float ymax);
+TLegend* CreateLegend(bool bottomleft);
+void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, bool bottomleft);
+void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TString campaign, TString channel, float ymin, float ymax, bool bottomleft);
+string todays_date();
 
 //##########################
 //          Main
 //##########################
 void makeLimitPlots(){
 
-  TString timetag = "2025-04-21";
+  TString timetag = "2025-04-22";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
-  TString outdir  = gSystem->ConcatFileName("plots", timetag);
+  TString outdir = gSystem->ConcatFileName("plots", todays_date().c_str());
   gSystem->mkdir(outdir, true);
 
-  ind=0;
+  ind=0; indplt=0;
   vector<plotinfo> limitdict = {
     
     {"sigmaB_VLLD_ele_2016preVFP_UL_ee.txt", "VLLD-e", "2016preVFP_UL", "ee",     "limit_VLLD_ele_2016preVFP_UL_ee.png"},
@@ -65,10 +70,10 @@ void makeLimitPlots(){
     {"sigmaB_VLLD_ele_2016preVFP_UL_me.txt", "VLLD-e", "2016preVFP_UL", "#mue",   "limit_VLLD_ele_2016preVFP_UL_me.png"},
     {"sigmaB_VLLD_ele_2016preVFP_UL_mm.txt", "VLLD-e", "2016preVFP_UL", "#mu#mu", "limit_VLLD_ele_2016preVFP_UL_mm.png"},
     
-    {"sigmaB_VLLD_ele_2016preVFP_UL_ee.txt", "VLLD-e", "2016preVFP_UL", "ee",     "limit_VLLD_ele_2016preVFP_UL_ee.png"},
-    {"sigmaB_VLLD_ele_2016preVFP_UL_em.txt", "VLLD-e", "2016preVFP_UL", "e#mu",   "limit_VLLD_ele_2016preVFP_UL_em.png"},
-    {"sigmaB_VLLD_ele_2016preVFP_UL_me.txt", "VLLD-e", "2016preVFP_UL", "#mue",   "limit_VLLD_ele_2016preVFP_UL_me.png"},
-    {"sigmaB_VLLD_ele_2016preVFP_UL_mm.txt", "VLLD-e", "2016preVFP_UL", "#mu#mu", "limit_VLLD_ele_2016preVFP_UL_mm.png"},
+    {"sigmaB_VLLD_ele_2016postVFP_UL_ee.txt", "VLLD-e", "2016postVFP_UL", "ee",     "limit_VLLD_ele_2016postVFP_UL_ee.png"},
+    {"sigmaB_VLLD_ele_2016postVFP_UL_em.txt", "VLLD-e", "2016postVFP_UL", "e#mu",   "limit_VLLD_ele_2016postVFP_UL_em.png"},
+    {"sigmaB_VLLD_ele_2016postVFP_UL_me.txt", "VLLD-e", "2016postVFP_UL", "#mue",   "limit_VLLD_ele_2016postVFP_UL_me.png"},
+    {"sigmaB_VLLD_ele_2016postVFP_UL_mm.txt", "VLLD-e", "2016postVFP_UL", "#mu#mu", "limit_VLLD_ele_2016postVFP_UL_mm.png"},
 
     {"sigmaB_VLLD_ele_2017_UL_ee.txt", "VLLD-e", "2017_UL", "ee",     "limit_VLLD_ele_2017_UL_ee.png"},
     {"sigmaB_VLLD_ele_2017_UL_em.txt", "VLLD-e", "2017_UL", "e#mu",   "limit_VLLD_ele_2017_UL_em.png"},
@@ -87,10 +92,10 @@ void makeLimitPlots(){
     {"sigmaB_VLLD_mu_2016preVFP_UL_me.txt", "VLLD-#mu", "2016preVFP_UL", "#mue",   "limit_VLLD_mu_2016preVFP_UL_me.png"},
     {"sigmaB_VLLD_mu_2016preVFP_UL_mm.txt", "VLLD-#mu", "2016preVFP_UL", "#mu#mu", "limit_VLLD_mu_2016preVFP_UL_mm.png"},
     
-    {"sigmaB_VLLD_mu_2016preVFP_UL_ee.txt", "VLLD-#mu", "2016preVFP_UL", "ee",     "limit_VLLD_mu_2016preVFP_UL_ee.png"},
-    {"sigmaB_VLLD_mu_2016preVFP_UL_em.txt", "VLLD-#mu", "2016preVFP_UL", "e#mu",   "limit_VLLD_mu_2016preVFP_UL_em.png"},
-    {"sigmaB_VLLD_mu_2016preVFP_UL_me.txt", "VLLD-#mu", "2016preVFP_UL", "#mue",   "limit_VLLD_mu_2016preVFP_UL_me.png"},
-    {"sigmaB_VLLD_mu_2016preVFP_UL_mm.txt", "VLLD-#mu", "2016preVFP_UL", "#mu#mu", "limit_VLLD_mu_2016preVFP_UL_mm.png"},
+    {"sigmaB_VLLD_mu_2016postVFP_UL_ee.txt", "VLLD-#mu", "2016postVFP_UL", "ee",     "limit_VLLD_mu_2016postVFP_UL_ee.png"},
+    {"sigmaB_VLLD_mu_2016postVFP_UL_em.txt", "VLLD-#mu", "2016postVFP_UL", "e#mu",   "limit_VLLD_mu_2016postVFP_UL_em.png"},
+    {"sigmaB_VLLD_mu_2016postVFP_UL_me.txt", "VLLD-#mu", "2016postVFP_UL", "#mue",   "limit_VLLD_mu_2016postVFP_UL_me.png"},
+    {"sigmaB_VLLD_mu_2016postVFP_UL_mm.txt", "VLLD-#mu", "2016postVFP_UL", "#mu#mu", "limit_VLLD_mu_2016postVFP_UL_mm.png"},
 
     {"sigmaB_VLLD_mu_2017_UL_ee.txt",     "VLLD-#mu", "2017_UL", "ee",       "limit_VLLD_mu_2017_UL_ee.png"},
     {"sigmaB_VLLD_mu_2017_UL_em.txt",     "VLLD-#mu", "2017_UL", "e#mu",     "limit_VLLD_mu_2017_UL_em.png"},
@@ -112,12 +117,22 @@ void makeLimitPlots(){
     if (limitdict[i].channel != "combined") channel += " channel";
     TString modelname = limitdict[i].modelname;
     TString campaign  = limitdict[i].campaign;
-    float ymin = limitdict[i].ymin; float ymax = limitdict[i].ymax;
-    makeOneLimitPlot(infile, outfile, modelname, campaign, channel, ymin, ymax);
+    float ymin = 10e-4; float ymax = 10e3;
+    bool bottomleft = false;
+
+    //Exceptions:
+    /*
+    if (infile.Contains("VLLD_ele_2017_UL_mm") ||
+        infile.Contains("VLLD_mu_2017_UL_ee") ||
+        infile.Contains("VLLD_mu_2018_UL_ee")) {
+        bottomleft = true;
+	}*/
+    
+    makeOneLimitPlot(infile, outfile, modelname, campaign, channel, ymin, ymax, bottomleft);
     //break;
   }
 
-  cout<<"Done!"<<endl;
+  cout<<"Done! Total images created = "<<indplt<<"\n"<<endl;
   
 }
 
@@ -128,7 +143,8 @@ void makeOneLimitPlot(
 		   TString campaign="2017_2018",
 		   TString channel="#mu#mu",
 		   float ymin=10e-4,
-		   float ymax=10e2
+		   float ymax=10e2,
+		   bool bottomleft = false
 		   )
 {
   ind += 1;
@@ -137,8 +153,14 @@ void makeOneLimitPlot(
   bool tosave = true;
   
   vector<LimitData> limits = ReadDataFromFile(infile);
+  if(limits.empty()) return;
+  
   int nPoints = limits.size();
-  if (limits.empty()) return;
+  if (nPoints < 3) {
+    cout << "\033[31mInsufficient points (" << nPoints << ") in file: " << infile.Data();
+    cout << "; Skipping plot generation.\033[0m" << std::endl;
+    return;
+  }
   
   gStyle->Reset(); //important
   gStyle->SetOptStat(0);
@@ -205,7 +227,7 @@ void makeOneLimitPlot(
   c1->Update();
 
   // Create and draw legend
-  TLegend* legend = CreateLegend();
+  TLegend* legend = CreateLegend(bottomleft);
   if(showdata) legend->AddEntry(graph_obs, "Observed", "lp");
   legend->AddEntry(graph_exp, "Expected", "l");
   legend->AddEntry(graph_1sigma, "68% Expected", "f");
@@ -214,7 +236,7 @@ void makeOneLimitPlot(
   legend->Draw();
 
   // Add CMS label
-  AddCMSLabel(c1, campaign, channel);
+  AddCMSLabel(c1, campaign, channel, bottomleft);
 
   // Set logarithmic scale and update canvas
   c1->SetLogy();
@@ -222,6 +244,7 @@ void makeOneLimitPlot(
   if(tosave) c1->SaveAs(outfile);
   //delete c1;
 
+  indplt += 1;
 }
 
 //_____________________________________________________________________________________
@@ -232,7 +255,7 @@ void makeOneLimitPlot(
 vector<LimitData> ReadDataFromFile(const TString& infile) {
   std::ifstream txtfile(infile.Data());
   if (!txtfile.is_open()) {
-    std::cerr << "Error: Unable to open txtfile " << infile.Data() << std::endl;
+    std::cerr << "\033[31mError: Unable to open txtfile " << infile.Data() <<"\033[0m"<< std::endl;
     return {};
   }
 
@@ -281,15 +304,17 @@ void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax) {
   gStyle->SetCanvasPreferGL(true);  // Enabling anti-aliasing
 }
 
-void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel) {
+void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, bool bottomleft = false) {
   TLatex latex;
   latex.SetNDC();
   latex.SetTextSize(0.06);
-  latex.DrawLatex(0.17, 0.86, "CMS");
+  if(bottomleft) latex.DrawLatex(0.17, 0.26, "CMS");
+  else           latex.DrawLatex(0.17, 0.86, "CMS");
   latex.SetTextFont(52);
   
   latex.SetTextSize(0.05);
-  latex.DrawLatex(0.30, 0.86, "Preliminary");
+  if(bottomleft) latex.DrawLatex(0.30, 0.26, "Preliminary");
+  else           latex.DrawLatex(0.30, 0.86, "Preliminary");
   latex.SetTextFont(42);
   latex.SetTextSize(0.04);
 
@@ -302,16 +327,22 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel) {
   else if(string(campaign) == "Run3Summer22")   latex.DrawLatex(0.74, 0.96, "7.98 fb^{-1} (2022)");
   else cout<<"Put correct campaign name!"<<endl;
   
-  latex.DrawLatex(0.17, 0.81, "Asymptotic. Stat only");
-  latex.DrawLatex(0.17, 0.76, channel);
+  if(bottomleft) latex.DrawLatex(0.17, 0.21, "Asymptotic. Stat only");
+  else           latex.DrawLatex(0.17, 0.81, "Asymptotic. Stat only");
+  if(bottomleft) latex.DrawLatex(0.17, 0.16, channel);
+  else           latex.DrawLatex(0.17, 0.76, channel);
 }
 
-TLegend* CreateLegend() {
-  TLegend* legend = new TLegend(0.56, 0.65, 0.96, 0.90);
+TLegend* CreateLegend(bool bottomleft=false) {
+  TLegend* legend;
+  if(bottomleft) legend = new TLegend(0.56, 0.15, 0.96, 0.40);
+  else           legend = new TLegend(0.56, 0.65, 0.96, 0.90);
   legend->SetTextSize(0.035);
   legend->SetTextFont(42);
   legend->SetBorderSize(0);
-  legend->SetFillStyle(0);
+  //legend->SetFillStyle(0);
+  legend->SetFillColor(0);
+  legend->SetFillStyle(3013);
   return legend;
 }
 
@@ -325,4 +356,17 @@ TCanvas* CreateCanvas(TString name) {
   c1->SetFillColor(0);
   c1->SetFrameFillColor(0);
   return c1;
+}
+
+string todays_date(){
+  string processline = "date +%Y-%m-%d";
+  array<char, 128> buffer;
+  string result;
+  unique_ptr<FILE, decltype(&pclose)> pipe(popen(processline.c_str(), "r"), pclose);
+  if(!pipe) throw runtime_error("Failed to run Bash script.");
+  //Storing the buffer data in 'result'
+  while(fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) result += buffer.data();
+  // Remove trailing newline characters
+  while(!result.empty() && (result.back() == '\n' || result.back() == '\r')) result.pop_back();
+  return result;
 }
