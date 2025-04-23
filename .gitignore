@@ -9,6 +9,8 @@
 *pyc
 *.ipynb_checkpoints
 *png
+*pdf
+*svg
 *zip
 *gz
 StackedPlotMaker/signalyields/
