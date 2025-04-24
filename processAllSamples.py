@@ -1,11 +1,14 @@
-#--------------------------------------------------------------------------------------------------------
-# This takes all the Physics processes mentioned in the lumi json file and runs compile_and_run for them.
+#-----------------------------------------------------------------------------------------------------
+# This takes all the Physics processes mentioned in the lumi-json and runs compile_and_run for them.
 # example usage: python3 processAllSamples.py --jobname test --dryrun --debug
-#--------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
 
 import os, sys, argparse
 import json
 import time
+from rich.console import Console
+console = Console(highlight=False)
+print = console.print
 start_time = time.time()
 
 ### Picking the arguments and flags:
@@ -33,10 +36,11 @@ mode = "TreeMaker"
 nanoAODv = 12
 
 samples_to_run = ["DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
+samples_to_run.extend(["Muon", "EGamma"])
 if nanoAODv==11:
     #samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
-    samples_to_run=["Muon", "EGamma", "RareTop"]
-    #samples_to_run=["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
+    #samples_to_run=["RareTop"]
+    samples_to_run=["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
 
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
@@ -48,11 +52,9 @@ codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 # DON'T TOUCH BELOW
 #---------------------------------------------
 
-def warning(text, color=31, bold=0): print(f'\033[{bold};{color}m{text}\033[0m')
-
 jsonfilepath = 'LumiJsons'
 jsonfile = os.path.join(jsonfilepath, f'lumidata_{campaign}.json')
-if not os.path.exists(jsonfilepath): warning(f'Error: File not found: {jsonfile}')
+if not os.path.exists(jsonfilepath): print(f'Error: File not found: {jsonfile}', style='red')
 with open(jsonfile,'r') as jsondata: samplelist = json.load(jsondata)
 if debug: print(jsondata)
 
@@ -74,7 +76,7 @@ for item in samples_to_run:
         #if 'RareTop' not in sample: continue
 
         print('\n----------------------------------------------')
-        warning(f'Submitting jobs for {sample}', 93)
+        print(f'Submitting jobs for {sample}', style='yellow bold')
         print('----------------------------------------------')
 
         flag = 'flag'
@@ -90,16 +92,16 @@ for item in samples_to_run:
         for subsample, val in subs.items():
 
             samplename = f'{sample}_{subsample}'
-            warning(f'\nProcessing {samplename} ... ', 94)
+            print(f'\nProcessing {samplename} ... ', style='cyan')
             
             ### Exception for nanoAOD version:
             if nanoAODv==12:
                 if 'RareTop' in sample and 'TTWZ' in subsample:
-                    warning(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', 91)
+                    print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', color='red')
                     continue
             if nanoAODv==11:
                 if 'RareTop' in sample and 'TTWZ' not in subsample:
-                    warning(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', 91)
+                    print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', color='red')
                     continue
 
             #------------------------------------------
@@ -109,7 +111,7 @@ for item in samples_to_run:
 
             inpath = os.path.join(nanoAODpath, sample, subsample)
             if not os.path.exists(inpath):
-                warning(f'Error: Path does not exist: {inpath}')
+                print(f'Error: Path does not exist: {inpath}', style='red')
                 list_failed.append(samplename)
                 continue
 
@@ -117,7 +119,7 @@ for item in samples_to_run:
             filelist = [f for f in os.listdir(inpath) if f.endswith('.root')]
             print(f'Found {len(filelist)} files.')
             if len(filelist) == 0:
-                warning(f"Error: Files don't exist in: {inpath}")
+                print(f"Error: Files don't exist in: {inpath}", style='red')
                 list_failed.append(samplename)
                 continue
 
@@ -145,7 +147,7 @@ for item in samples_to_run:
             rootmacro = f'{codedir}/compile_and_run.C'
             arguments = f'"{mode}", "{infiles}", "{outfile}", "{campaign}", "{samplename}", "{flag}"'
             command = f"root -q -b -l '{rootmacro}({arguments})'"
-            if debug: warning(command, 33)
+            if debug: print(command, style='dim italic')
 
             if not dryrun: os.system(command)
 
@@ -164,14 +166,14 @@ for item in samples_to_run:
 
 end_time = time.time()
 time_taken = end_time-start_time
-warning('\n'+'-'*50, 93)
-warning('Summary', 93)
+print('\n'+'-'*50, style='yellow bold')
+print('Summary', style='yellow bold')
 print(f'Samples processed: {list_processed}')
-print(f'Output directory: \033[093m{os.path.join(dumpdir, jobname)}\033[0m')
-print(f'Total time taken : \033[093m{time_taken:.2f} seconds\033[0m.')
+print(f'Output directory: [yellow bold]{os.path.join(dumpdir, jobname)}[/yellow bold]')
+print(f'Total time taken : [yellow bold]{time_taken:.2f} seconds[/yellow bold]')
 print(f'Number of jobs : {njobs}')
 print(f'Number of files : {nfiles}')
 if len(list_failed) > 0:
-    warning('Warning: The following samples were skipped.')
+    print('Warning: The following samples were skipped.', style='red')
     print(list_failed)
-warning('-'*50+'\n\n', 93)
+print('-'*50+'\n\n', style='yellow bold')

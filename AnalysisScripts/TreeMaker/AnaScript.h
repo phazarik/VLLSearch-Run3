@@ -44,7 +44,7 @@ public :
   using int_or_ushort = UShort_t;
   using uint_or_int   = Int_t;
   /*
-  //For NanoAODv11- (example: Run3Summer22 Data)
+  //For NanoAODv11-
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;

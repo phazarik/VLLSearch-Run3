@@ -91,7 +91,7 @@ void makeBrazillianPlots(){
 	}*/
 
     makeOneLimitPlot(infile, outfile, modelname, campaign, channel, ymin, ymax, bottomleft);
-    //break;
+    break;
   }
   cout<<"Done! Total images created = "<<indplt<<"\n"<<endl;  
 }
@@ -110,7 +110,7 @@ void makeOneLimitPlot(
   ind += 1;
   TString cname = Form("c_%d", ind);
   bool showdata = false;
-  bool tosave = true;
+  bool tosave = false;
 
   //-----------------------------------------------------------------------
   // Loading data from input file in the following format:
@@ -185,8 +185,7 @@ void makeOneLimitPlot(
   legend->Draw();
 
   // Add CMS label
-  AddCMSLabel(c1, campaign, channel, bottomleft);
-  c1->SetLogy();
+  AddCMSLabel(c1, campaign, channel, bottomleft);;
   c1->Update();
   
   if(tosave){

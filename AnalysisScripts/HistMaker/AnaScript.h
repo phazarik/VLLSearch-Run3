@@ -36,20 +36,20 @@ public :
   TTreeReader     fReader;
   TTreeReader     fReader_MC;
   TTree          *fChain = 0;
-  /*
+  
   //For NanoAODv12+ (example: Run3Summer22 MC)
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;
-  using uint_or_int   = Int_t;*/
-  
-  //For NanoAODv11- (example: Run3Summer22 Data)
+  using uint_or_int   = Int_t;
+  /*
+  //For NanoAODv11-
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
-  using uint_or_int  = UInt_t;
+  using uint_or_int  = UInt_t;*/
 
   //Read only the important branches:
   TTreeReaderValue<UInt_t> run = {fReader, "run"};
@@ -272,7 +272,7 @@ public :
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-  /*
+
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -280,8 +280,8 @@ public :
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralCalo = {fReader, "Rho_fixedGridRhoFastjetCentralCalo"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralChargedPileUp = {fReader, "Rho_fixedGridRhoFastjetCentralChargedPileUp"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralNeutral = {fReader, "Rho_fixedGridRhoFastjetCentralNeutral"};
-  TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;*/
-  
+  TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;
+  /*
   //Rho: Run2
   TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader_MC, "fixedGridRhoFastjetAll"};
   TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader_MC, "fixedGridRhoFastjetCentral"};
@@ -290,7 +290,7 @@ public :
   TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader_MC, "fixedGridRhoFastjetCentralNeutral"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_all = {fReader, "Photon_pfRelIso03_all"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_chg = {fReader, "Photon_pfRelIso03_chg"};
-  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;
+  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;*/
 
   /*
   //Comment out the following for QCD samples:
@@ -433,7 +433,7 @@ public :
   double btagMCeff_2016postVFP_UL(Particle jet);
   double btagMCeff_2017_UL(Particle jet);
   double btagMCeff_2018_UL(Particle jet);
-  double btagMCeff_Run3Summer23(Particle jet);
+  double btagMCeff_Run3Summer22(Particle jet);
   double returnbJetCorrection(vector<Particle> Jet, TString mode);
 
   //Trigger corrections:
