@@ -431,6 +431,7 @@ public :
   double btagMCeff_2017_UL(Particle jet);
   double btagMCeff_2018_UL(Particle jet);
   double btagMCeff_Run3Summer22(Particle jet);
+  double btagMCeff_Run3Summer22EE(Particle jet);
   double returnbJetCorrection(vector<Particle> Jet, TString mode);
 
   //Trigger corrections:

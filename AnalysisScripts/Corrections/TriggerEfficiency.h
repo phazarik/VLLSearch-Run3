@@ -63,11 +63,11 @@ double AnaScript::TrigEFF_allCampaign_Isomu24_MC(Particle muon){
     else if(eta>1.479)  eff = 0.5*0.958908*(1.0+TMath::Erf((pt-23.9493)/(2.0*0.408312)));
     return eff;
   }
-  else if(_campaign == "Run3Summer22"){
+  else if(_campaign.Contains("Run3")){
     return 1.0;
   }
   else{
-    cout<<"Warning: Give proper campaign name."<<endl;
+    cout<<"Warning: TrigEFF_allCampaign_Isomu24_MC: Give proper campaign name."<<endl;
     return 1.0;
   }
 }
@@ -116,8 +116,11 @@ double AnaScript::TrigEFF_allCampaign_Isomu24_Data(Particle muon){
     else if(eta>1.479)  eff = 0.5*0.931413*(1.0+TMath::Erf((pt-23.4266)/(2.0*0.200128)));
     return eff;
   }
+  else if(_campaign == "Run3Summer22EE"){
+    return 1.0;
+  }
   else{
-    cout<<"Warning: Give proper campaign name."<<endl;
+    cout<<"Warning: TrigEFF_allCampaign_Isomu24_Data: Give proper campaign name."<<endl;
     return 1.0;
   }
 }
@@ -158,11 +161,11 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(Particle electron){
     else if(eta>1.479)  eff = 0.5*0.981582*(1.0+TMath::Erf((pt-33.9066)/(2.0*1.55882)));
     return eff;
   }
-  else if(_campaign == "Run3Summer22"){
+  else if(_campaign.Contains("Run3")){
     return 1.0;
   }
   else{
-    cout<<"Warning: Give proper campaign name."<<endl;
+    cout<<"Warning: TrigEFF_allCampaign_Ele27or32WPTightGSF_MC: Give proper campaign name."<<endl;
     return 1.0;
   }
 }
@@ -192,12 +195,6 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron
     else if(eta>1.479)  eff = 0.5*0.962208*(1.0+TMath::Erf((pt-33.9927)/(2.0*1.55814)));
     return eff;
   }
-  /*
-  else if(_campaign == "2018_UL"){ 
-    if(eta<=1.479)     eff = 0.5*0.950463*(1.0+TMath::Erf((pt-23.9593)/(2.0*0.375996)));
-    else if(eta>1.479) eff = 0.5*0.953162*(1.0+TMath::Erf((pt-23.9459)/(2.0*0.457351)));
-    return eff; //Taken from Yash on 05-06-2024 //HLT_Ele32_WPTight_Gsf
-    }*/
   else if(_campaign == "2018_UL"){ 
     if(eta<=1.479)     eff = 0.5*0.962897*(1.0+TMath::Erf((pt-33.1188)/(2.0*0.844886)));
     else if(eta>1.479) eff = 0.5*0.975043*(1.0+TMath::Erf((pt-32.9805)/(2.0*1.18094)));
@@ -208,8 +205,11 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron
     else if(eta>1.479) eff = 0.5*0.971387*(1.0+TMath::Erf((pt-29.2013)/(2.0*2.10407)));
     return eff;
   }
+  else if(_campaign == "Run3Summer22EE"){
+    return 1.0;
+  }
   else{
-    cout<<"Warning: Give proper campaign name."<<endl;
+    cout<<"Warning: TrigEFF_allCampaign_Ele27or32WPTightGSF_Data: Give proper campaign name."<<endl;
     return 1.0;
   }
 }

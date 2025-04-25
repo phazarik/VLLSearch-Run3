@@ -11,9 +11,9 @@
 using namespace std;
 
 void compile_and_run(
-		     TString infile  = "/mnt/d/work/skimmed_2LSS_Run3Summer22/DYto2L/50toInf/*.root",
+		     TString infile  = "/mnt/d/work/skimmed_2LSS_Run3Summer22EE/DYto2L/50toInf/*.root",
 		     TString outfile = "test_outputs/tree_testcompile.root",
-		     TString campaign = "Run3Summer22",
+		     TString campaign = "Run3Summer22EE",
 		     TString sample = "DYJetsToLL_M50",
 		     TString flag = "dy"
 		     )

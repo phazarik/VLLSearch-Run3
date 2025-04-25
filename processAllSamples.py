@@ -28,15 +28,15 @@ debug   = args.debug   ### For debug statements.
 #  SET GLOBAL PARAMETERS BEFORE RUNNING
 #---------------------------------------------
 
-campaign = "Run3Summer22"
+campaign = "Run3Summer22EE"
 ### Options for Run2: 2016preVFP_UL, 2016postVFP_UL, 2017_UL, 2018_UL
 ### Options for Run3: Run3Summer22, Run3Summer22EE, Run3Summer23, Run3Summer23BPix
 
-mode = "TreeMaker"
+mode = "HistMaker"
 nanoAODv = 12
 
 samples_to_run = ["DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
-samples_to_run.extend(["Muon", "EGamma"])
+#samples_to_run.extend(["Muon", "EGamma"])
 if nanoAODv==11:
     #samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
     #samples_to_run=["RareTop"]
@@ -45,7 +45,7 @@ if nanoAODv==11:
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
 if mode == "HistMaker": dumpdir = "ROOT_FILES/hists/"
-nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22"
+nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22EE"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
 #---------------------------------------------
@@ -94,15 +94,16 @@ for item in samples_to_run:
             samplename = f'{sample}_{subsample}'
             print(f'\nProcessing {samplename} ... ', style='cyan')
             
-            ### Exception for nanoAOD version:
-            if nanoAODv==12:
-                if 'RareTop' in sample and 'TTWZ' in subsample:
-                    print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', color='red')
-                    continue
-            if nanoAODv==11:
-                if 'RareTop' in sample and 'TTWZ' not in subsample:
-                    print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', color='red')
-                    continue
+            ### Exception for nanoAOD version in Run3Summer22:
+            if campaign == "Run3Summer22":
+                if nanoAODv==12:
+                    if 'RareTop' in sample and 'TTWZ' in subsample:
+                        print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', style='red')
+                        continue
+                if nanoAODv==11:
+                    if 'RareTop' in sample and 'TTWZ' not in subsample:
+                        print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', style='red')
+                        continue
 
             #------------------------------------------
             # Find directories and files in input_path.
