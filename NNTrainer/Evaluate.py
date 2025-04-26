@@ -13,17 +13,18 @@ from tqdm  import tqdm
 
 #Global parameters:
 indir = '../ROOT_FILES/trees/'
-jobname = 'tree_Run3Summer22_baseline_Apr24'
-outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer22_baseline'
+jobname = 'tree_Run3Summer22EE_baseline_Apr25'
+outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer22EE_baseline'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    'qcd-vs-vlld-comb-2016postVFP_UL-feb07': 'nnscore_qcd_vlld_2016postVFP',
-    'qcd-vs-vlld-comb-2016preVFP_UL-feb07' : 'nnscore_qcd_vlld_2016preVFP',
-    'qcd-vs-vlld-comb-2017_UL-feb07'       : 'nnscore_qcd_vlld_2017',
-    'qcd-vs-vlld-comb-2018_UL-feb07'       : 'nnscore_qcd_vlld_2018',
-    'qcd-vs-vlld-comb-Run3Summer22-apr08'  : 'nnscore_qcd_vlld_2022',
-    'ttbar-vs-vlld-comb-feb13'             : 'nnscore_ttbar_vlld',
+    'qcd-vs-vlld-comb-2016postVFP_UL-feb07' : 'nnscore_qcd_vlld_2016postVFP',
+    'qcd-vs-vlld-comb-2016preVFP_UL-feb07'  : 'nnscore_qcd_vlld_2016preVFP',
+    'qcd-vs-vlld-comb-2017_UL-feb07'        : 'nnscore_qcd_vlld_2017',
+    'qcd-vs-vlld-comb-2018_UL-feb07'        : 'nnscore_qcd_vlld_2018',
+    'qcd-vs-vlld-comb-Run3Summer22-apr08'   : 'nnscore_qcd_vlld_2022',
+    'qcd-vs-vlld-comb-Run3Summer22EE-apr26' : 'nnscore_qcd_vlld_2022EE',
+    'ttbar-vs-vlld-comb-feb13'              : 'nnscore_ttbar_vlld',
 }
 
 #-------------------------------------------
