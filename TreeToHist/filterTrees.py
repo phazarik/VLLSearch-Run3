@@ -45,6 +45,19 @@ jobdict = {
     },
 }
 
+jobdict = {
+    "baseline/tree_Run3Summer22_baseline":{
+        "outjob":"qcdcr/tree_Run3Summer22_qcdcr",
+        "campaign":"Run3Summer22",
+        "nnscore":"nnscore_qcd_vlld_2022"
+    },
+    "baseline/tree_Run3Summer22EE_baseline":{
+        "outjob":"qcdcr/tree_Run3Summer22EE_qcdcr",
+        "campaign":"Run3Summer22EE",
+        "nnscore":"nnscore_qcd_vlld_2022EE"
+    }
+}
+
 def read_file_into_df(filepath, step_size=100000, test=False):
     with uproot.open(filepath) as tfile:
         if "myEvents" not in tfile:
@@ -137,7 +150,7 @@ for injob, info in jobdict.items():
         
         #------------------------------
         # Final event selection:
-        event_selection = sr
+        event_selection = qcd_cr
         #------------------------------
 
         filecount += 1

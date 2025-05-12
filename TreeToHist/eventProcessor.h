@@ -18,7 +18,7 @@ extern Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 extern Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6;
+extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
 extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
 
 struct hists{
@@ -116,12 +116,13 @@ void processTree(
     {"2LSS_wt_bjet", "wt_bjet", 200, 0, 2, {}},
     {"2LSS_wt_evt", "weight", 200, 0, 2, {}},
     // nnscores:
-    {"nnscore_qcd_vlld_2016preVFP",  "nnscore_qcd_vlld_2016preVFP",   200, 0, 1, {}},
-    {"nnscore_qcd_vlld_2016postVFP", "nnscore_qcd_vlld_2016postVFP",  200, 0, 1, {}},
-    {"nnscore_qcd_vlld_2017",        "nnscore_qcd_vlld_2017",         200, 0, 1, {}},
-    {"nnscore_qcd_vlld_2018",        "nnscore_qcd_vlld_2018",         200, 0, 1, {}},
-    {"nnscore_qcd_vlld_2022",        "nnscore_qcd_vlld_2022",         200, 0, 1, {}},
-    {"nnscore_ttbar_vlld",           "nnscore_ttbar_vlld",            200, 0, 1, {}},
+    {"nnscore_Run2_vlld_qcd",   "nnscore_Run2_vlld_qcd",   200, 0, 1, {}},
+    {"nnscore_Run2_vlld_ttbar", "nnscore_Run2_vlld_ttbar", 200, 0, 1, {}},
+    {"nnscore_Run2_vlld_wjets", "nnscore_Run2_vlld_wjets", 200, 0, 1, {}},
+    {"nnscore_Run3_vlld_qcd",   "nnscore_Run3_vlld_qcd",   200, 0, 1, {}},
+    {"nnscore_Run3_vlld_ttbar", "nnscore_Run3_vlld_ttbar", 200, 0, 1, {}},
+    {"nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_wjets", 200, 0, 1, {}}
+
   };
     
   //Booking histograms:
@@ -172,7 +173,9 @@ void processTree(
 	
     Double_t wt = 1.0;
     
-    //if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
+    if((string)campaign == "Run3Summer22" || (string)campaign == "Run3Summer22EE") wt_pileup = 1.0;
+    if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
+
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
     //wt = wt*wt_bjet;             //Adding b-tagging corrections
 
@@ -275,6 +278,7 @@ void processTree(
       hst_collection[47]->Fill(nnscore4, fnwt);
       hst_collection[48]->Fill(nnscore5, fnwt);
       hst_collection[49]->Fill(nnscore6, fnwt);
+      //hst_collection[50]->Fill(nnscore7, fnwt);
     }//Event selection
     //if(i>=100000) break;
   }//Event loop
@@ -334,7 +338,8 @@ void processTree(
   outputFile->Close();
   file->Close();
 
-  cout << "File created: " << outputFilename << endl;
+  cout << "Input:  " << inputFilename << endl;
+  cout << "Output: " << outputFilename << endl;
 }
 
 //_______________________________________________________________________________________________________________

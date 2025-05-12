@@ -148,5 +148,35 @@
 	    { "low": 300, "high": 400,   "scale": [1.0, 0] },
 	    { "low": 400, "high": "inf", "scale": [1.0, 0] }
 	]
+    },
+    "Run3Summer22EE": {
+	"0": [
+	    { "low": 50,  "high": 100,   "scale": [1.0, 0] },
+	    { "low": 100, "high": 200,   "scale": [1.0, 0] },
+	    { "low": 200, "high": 300,   "scale": [1.0, 0] },
+	    { "low": 300, "high": 400,   "scale": [1.0, 0] },
+	    { "low": 400, "high": "inf", "scale": [1.0, 0] }
+	],
+	"1": [
+	    { "low": 50,  "high": 100,   "scale": [1.0, 0] },
+	    { "low": 100, "high": 200,   "scale": [1.0, 0] },
+	    { "low": 200, "high": 300,   "scale": [1.0, 0] },
+	    { "low": 300, "high": 400,   "scale": [1.0, 0] },
+	    { "low": 400, "high": "inf", "scale": [1.0, 0] }
+	],
+	"2": [
+	    { "low": 50,  "high": 100,   "scale": [1.0, 0] },
+	    { "low": 100, "high": 200,   "scale": [1.0, 0] },
+	    { "low": 200, "high": 300,   "scale": [1.0, 0] },
+	    { "low": 300, "high": 400,   "scale": [1.0, 0] },
+	    { "low": 400, "high": "inf", "scale": [1.0, 0] }
+	],
+	"3": [
+	    { "low": 50,  "high": 100,   "scale": [1.0, 0] },
+	    { "low": 100, "high": 200,   "scale": [1.0, 0] },
+	    { "low": 200, "high": 300,   "scale": [1.0, 0] },
+	    { "low": 300, "high": 400,   "scale": [1.0, 0] },
+	    { "low": 400, "high": "inf", "scale": [1.0, 0] }
+	]
     }
 }

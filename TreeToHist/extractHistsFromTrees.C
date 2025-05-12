@@ -23,7 +23,7 @@ Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6;
+Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
 Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
 
 json loadJson(const string &filename);
@@ -45,9 +45,9 @@ void processTree(
 //________________________________________________________________________________________________________________
 
 void extractHistsFromTrees(
-			   const std::string& jobname  = "ttbarcr/tree_2018_UL_topcr",
-			   const std::string& dump     = "hist_2018_UL_topcr_mm_test",
-			   const std::string& campaign = "2018_UL",
+			   const std::string& jobname  = "baseline/tree_Run3Summer22EE_baseline",
+			   const std::string& dump     = "hist_Run3Summer22EE_baseline_mm",
+			   const std::string& campaign = "Run3Summer22EE",
 			   const std::string& channel  = "mm",
 			   bool test   = false,
 			   bool dryrun = false)
@@ -81,6 +81,10 @@ void extractHistsFromTrees(
   else if (campaign == "Run3Summer22") {
     lumifile = "../LumiJsons/lumidata_Run3Summer22.json";
     datalumi = 7980.4;
+  }
+  else if (campaign == "Run3Summer22EE") {
+    lumifile = "../LumiJsons/lumidata_Run3Summer22EE.json";
+    datalumi = 26671.7;
   }
   else cout<<"Provide correct campaign name!"<<endl;
 
@@ -132,6 +136,7 @@ void extractHistsFromTrees(
 	}
       }
       }*/
+    /*
     for (auto it = samplelist.begin(); it != samplelist.end(); ++it) {
       const auto& sample = it.key();
       const auto& subs = it.value();
@@ -144,13 +149,30 @@ void extractHistsFromTrees(
 	  break;
 	}
       }
+      }*/
+
+    bool found_match = false;
+    for (auto it = samplelist.begin(); it != samplelist.end(); ++it) {
+      const auto& sample = it.key();
+      const auto& subs = it.value();
+      if (treefile.find(sample) == string::npos) continue;
+      for (auto sub_it = subs.begin(); sub_it != subs.end(); ++sub_it) {
+        const auto& subsample = sub_it.key();
+        const auto& val = sub_it.value();
+        if (treefile.find(sample + "_" + subsample) != string::npos || treefile.find(sample + subsample) != string::npos) {
+	  lumi = val;
+	  found_match = true;
+	  break;
+        }
+      }
+      if (found_match) break; // No need to check other samples if matched
+    }
+    if (!found_match) {
+      cerr << "\033[31m[Warning]\033[0m No matching sample+subsample found for file: " << treefile << endl;
     }
 
-    if (lumi > 0.0) list_processed.push_back(treefile);
-    else            list_failed.push_back(treefile);
-
     float lumisf = datalumi / lumi;
-    if (treefile.find("SingleMuon") != string::npos || treefile.find("EGamma") != string::npos) {
+    if (treefile.find("Muon") != string::npos || treefile.find("EGamma") != string::npos) {
       lumisf = 1.0;
     }
     //cout << "Luminosity = " << lumi << ", scalefactor = " << fixed << setprecision(6) << lumisf << endl;

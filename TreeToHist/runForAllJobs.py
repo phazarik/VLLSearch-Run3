@@ -40,6 +40,10 @@ jobdict = {
     "baseline/tree_Run3Summer22_baseline":{
         "dump":"hist_Run3Summer22_baseline",
         "campaign":"Run3Summer22"
+    },
+    "baseline/tree_Run3Summer22EE_baseline":{
+        "dump":"hist_Run3Summer22EE_baseline",
+        "campaign":"Run3Summer22EE"
     }
 }
 
@@ -52,7 +56,7 @@ jobcount = 0
 processed = []
 
 for jobname, info in jobdict.items():
-    #if 'post' not in jobname: continue
+    #if 'EE' not in jobname: continue
     for channel in channels:
         jobcount += 1
         campaign = info["campaign"]
