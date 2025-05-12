@@ -7,13 +7,13 @@
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     TString _var = "dilep_pt",
+		     TString _var = "HT",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-04-20_signal/hist_2018_UL_sigregion_mm",
-		     TString _campaign = "2018_UL",
+		     TString _jobname = "2025-05-12_baseline/hist_Run3Summer22EE_baseline_mm",
+		     TString _campaign = "Run3Summer22EE",
 		     TString _channel = "mm",
-		     TString _tag = "sigregion",
-		     TString _displaytext = "SR"
+		     TString _tag = "baseline",
+		     TString _displaytext = "baseline"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -26,8 +26,8 @@ void makeStackedPlot(
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
   bool toOverlayData=false;
-  bool toSave=false;
-  Double_t ymin = 0.1; Double_t ymax = 10E6;
+  bool toSave=true;
+  Double_t ymin = 0.1; Double_t ymax = 10E10;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
@@ -95,6 +95,11 @@ void makeStackedPlot(
   }
   if(_campaign == "Run3Summer22"){
     vector<string> eras = {"C", "D"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+  }
+  if(_campaign == "Run3Summer22EE"){
+    vector<string> eras = {"E", "F", "G"};
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }
@@ -341,6 +346,7 @@ void makeStackedPlot(
   if(_campaign == "2017_UL")        put_latex_text("41.5 fb^{-1} (2017)", 0.74, 0.94, 42, 0.05);
   if(_campaign == "2018_UL")        put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05);
   if(_campaign == "Run3Summer22")   put_latex_text("7.98 fb^{-1} (2022)", 0.74, 0.94, 42, 0.05);
+  if(_campaign == "Run3Summer22EE") put_latex_text("26.67 fb^{-1} (2022-postEE)", 0.61, 0.94, 42, 0.05);
   put_latex_text(info1, 0.17, 0.78, 42, 0.04);     //Additional information
   put_latex_text(info2, 0.17, 0.73, 42, 0.04);     //Additional information
 

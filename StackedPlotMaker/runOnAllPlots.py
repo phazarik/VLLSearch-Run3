@@ -19,78 +19,111 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-04-20_signal/hist_2018_UL_sigregion_mm":{
+    "2025-05-12_baseline/hist_2018_UL_baseline_mm":{
         "campaign":"2018_UL",
         "channel":"mm"
     },
-    "2025-04-20_signal/hist_2018_UL_sigregion_me":{
+    "2025-05-12_baseline/hist_2018_UL_baseline_me":{
         "campaign":"2018_UL",
         "channel":"me"
     },
-    "2025-04-20_signal/hist_2018_UL_sigregion_em":{
+    "2025-05-12_baseline/hist_2018_UL_baseline_em":{
         "campaign":"2018_UL",
         "channel":"em"
     },
-    "2025-04-20_signal/hist_2018_UL_sigregion_ee":{
+    "2025-05-12_baseline/hist_2018_UL_baseline_ee":{
         "campaign":"2018_UL",
         "channel":"ee"
     },
-    "2025-04-20_signal/hist_2017_UL_sigregion_mm":{
+    "2025-05-12_baseline/hist_2017_UL_baseline_mm":{
         "campaign":"2017_UL",
         "channel":"mm"
     },
-    "2025-04-20_signal/hist_2017_UL_sigregion_me":{
+    "2025-05-12_baseline/hist_2017_UL_baseline_me":{
         "campaign":"2017_UL",
         "channel":"me"
     },
-    "2025-04-20_signal/hist_2017_UL_sigregion_em":{
+    "2025-05-12_baseline/hist_2017_UL_baseline_em":{
         "campaign":"2017_UL",
         "channel":"em"
     },
-    "2025-04-20_signal/hist_2017_UL_sigregion_ee":{
+    "2025-05-12_baseline/hist_2017_UL_baseline_ee":{
         "campaign":"2017_UL",
         "channel":"ee"
     },
-    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_mm":{
+    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_mm":{
         "campaign":"2016preVFP_UL",
         "channel":"mm"
     },
-    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_me":{
+    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_me":{
         "campaign":"2016preVFP_UL",
         "channel":"me"
     },
-    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_em":{
+    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_em":{
         "campaign":"2016preVFP_UL",
         "channel":"em"
     },
-    "2025-04-20_signal/hist_2016preVFP_UL_sigregion_ee":{
+    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_ee":{
         "campaign":"2016preVFP_UL",
         "channel":"ee"
     },
-    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_mm":{
+    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_mm":{
         "campaign":"2016postVFP_UL",
         "channel":"mm"
     },
-    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_me":{
+    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_me":{
         "campaign":"2016postVFP_UL",
         "channel":"me"
     },
-    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_em":{
+    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_em":{
         "campaign":"2016postVFP_UL",
         "channel":"em"
     },
-    "2025-04-20_signal/hist_2016postVFP_UL_sigregion_ee":{
+    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_ee":{
         "campaign":"2016postVFP_UL",
+        "channel":"ee"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22_baseline_mm":{
+        "campaign":"Run3Summer22",
+        "channel":"mm"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22_baseline_me":{
+        "campaign":"Run3Summer22",
+        "channel":"me"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22_baseline_em":{
+        "campaign":"Run3Summer22",
+        "channel":"em"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22_baseline_ee":{
+        "campaign":"Run3Summer22",
+        "channel":"ee"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_mm":{
+        "campaign":"Run3Summer22EE",
+        "channel":"mm"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_me":{
+        "campaign":"Run3Summer22EE",
+        "channel":"me"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_em":{
+        "campaign":"Run3Summer22EE",
+        "channel":"em"
+    },
+    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_ee":{
+        "campaign":"Run3Summer22EE",
         "channel":"ee"
     }
 }
 
 variables = [
-    ("nnscore_qcd_vlld_2016preVFP",  "NNScore: QCD vs VLLD (2016-preVFP)"),
-    ("nnscore_qcd_vlld_2016postVFP", "NNScore: QCD vs VLLD (2016-postVFP)"),
-    ("nnscore_qcd_vlld_2017",        "NNScore: QCD vs VLLD (2017)"),
-    ("nnscore_qcd_vlld_2018",        "NNScore: QCD vs VLLD (2018)"),
-    ("nnscore_qcd_vlld_2022",        "NNScore: QCD vs VLLD (2022)"),
+    ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
+    ("nnscore_Run2_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-2)"),
+    ("nnscore_Run2_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-2)"),
+    ("nnscore_Run3_vlld_qcd",   "NNScore: QCD vs VLLD (Run-3)"),
+    ("nnscore_Run3_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-3)"),
+    ("nnscore_Run3_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-3)"),
     
     ("nlep",  "N_{L}"),
     ("njet",  "N_{J}"),
@@ -151,11 +184,14 @@ jobcount = 0
 plotcount = 0
 
 for jobname, info in jobdict.items():
+
+    #if 'Run3Summer22EE' not in jobname: continue
+    
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "sigregion"
-    text     = "SR"
+    tag      = "baseline"
+    text     = "baseline"
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
     count = 0
@@ -179,9 +215,9 @@ for jobname, info in jobdict.items():
             f'"{tag}", '
             f'"{text}"'
         )
-        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
-        if var != "dilep_pt": continue
-        command = f"root -q -b -l 'writeYields.C({arguments})'"
+        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        #if var != "dilep_pt": continue
+        #command = f"root -q -b -l 'writeYields.C({arguments})'"
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output
         if not dryrun: subprocess.run(command, shell=True)
