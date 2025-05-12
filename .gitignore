@@ -13,6 +13,7 @@
 *svg
 *zip
 *gz
+**/*backup*/**
 StackedPlotMaker/signalyields/
 LimitCalculation/datacards/*/*/*.txt
 LimitCalculation/fromCMScombine/*/*.txt
@@ -20,4 +21,4 @@ LimitCalculation/sigmaBlimits/*/*txt
 !NNTrainer/
 !LocalScripts/NNTrainer/trained_models/*/*.png
 !LocalScripts/NNTrainer/trained_models/*/before_training/*.png
-NNTrainer/backup_*
+NNTrainer/trained_models/backup_*/

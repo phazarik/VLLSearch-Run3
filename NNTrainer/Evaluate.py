@@ -13,18 +13,17 @@ from tqdm  import tqdm
 
 #Global parameters:
 indir = '../ROOT_FILES/trees/'
-jobname = 'tree_Run3Summer22EE_baseline_Apr25'
-outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer22EE_baseline'
+jobname = 'tree_2018UL_baseline_Dec30'
+outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_2018_UL_baseline'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    'qcd-vs-vlld-comb-2016postVFP_UL-feb07' : 'nnscore_qcd_vlld_2016postVFP',
-    'qcd-vs-vlld-comb-2016preVFP_UL-feb07'  : 'nnscore_qcd_vlld_2016preVFP',
-    'qcd-vs-vlld-comb-2017_UL-feb07'        : 'nnscore_qcd_vlld_2017',
-    'qcd-vs-vlld-comb-2018_UL-feb07'        : 'nnscore_qcd_vlld_2018',
-    'qcd-vs-vlld-comb-Run3Summer22-apr08'   : 'nnscore_qcd_vlld_2022',
-    'qcd-vs-vlld-comb-Run3Summer22EE-apr26' : 'nnscore_qcd_vlld_2022EE',
-    'ttbar-vs-vlld-comb-feb13'              : 'nnscore_ttbar_vlld',
+    'qcd-vs-vlld-comb-Run2-mar12'  : 'nnscore_Run2_vlld_qcd',
+    'ttbar-vs-vlld-comb-Run2-mar12': 'nnscore_Run2_vlld_ttbar',
+    'wjets-vs-vlld-comb-Run2-mar12': 'nnscore_Run2_vlld_wjets',
+    'qcd-vs-vlld-comb-Run3-mar12'  : 'nnscore_Run3_vlld_qcd',
+    'ttbar-vs-vlld-comb-Run3-mar12': 'nnscore_Run3_vlld_ttbar',
+    'wjets-vs-vlld-comb-Run3-mar12': 'nnscore_Run3_vlld_wjets',
 }
 
 #-------------------------------------------
@@ -33,27 +32,6 @@ modeldict = {
 #-------------------------------------------
 # Define functions:
 #Given a TFile, read its branches into a dataframe.
-'''
-def read_file_into_df(filepath, truth=None):
-
-    tfile = uproot.open(filepath)
-    
-    ttree = tfile['myEvents']
-    branches = ttree.keys()
-    awkarray = ttree.arrays(branches)
-    df = pd.DataFrame(awkarray.to_list())
-
-    return df
-
-def write_df_into_file(df, filepath):
-    if df.empty:
-        data_dict = {col: np.array([], dtype=df[col].dtype) for col in df.columns}
-        print(f"\033[0;31mWarning: Writing empty file: {filepath}\033[0m\n")
-    else:
-        data_dict = df.to_dict('list')
-        
-    with uproot.recreate(filepath) as file: file['myEvents'] = data_dict
-'''
 
 def read_file_into_df(filepath, step_size=100000):
     with uproot.open(filepath) as tfile:
@@ -149,8 +127,6 @@ for f in list_of_files:
 
         #Step 2.1: pick which variables to read, and turn those into a numpy array: 
         train_var = []
-
-        #if modelname in ['qcd-vs-vlld-mu-m200-800-oct21', 'qcd-vs-vlld-ele-m200-800-oct21', 'qcd-vs-vlld-mu-m100-oct21', 'qcd-vs-vlld-ele-m100-oct21']:
         if 'qcd' in modelname:
             train_var = [
                 'njet',
@@ -173,9 +149,20 @@ for f in list_of_files:
                 'ST',
                 'STfrac',
                 'dphi_metlep0',
-                'dphi_metlep1',
-                'dphi_metlep_min'
+                'dphi_metlep1'
             ]
+        elif 'wjets' in modelname:
+            train_var =[
+                'dilep_pt',
+                'dilep_dR',
+                'LT',
+                'STfrac',
+                'lep0_eta',
+                'lep1_eta',
+                'lep0_mt',
+                'lep1_mt',
+                'dphi_metlep_min'
+            ]            
         else: print('Error: Pick correct training variables!')
 
         model_filename = f'trained_models/{modelname}/model_{modelname}.keras'
