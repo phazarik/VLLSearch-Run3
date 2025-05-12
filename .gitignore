@@ -20,3 +20,4 @@ LimitCalculation/sigmaBlimits/*/*txt
 !NNTrainer/
 !LocalScripts/NNTrainer/trained_models/*/*.png
 !LocalScripts/NNTrainer/trained_models/*/before_training/*.png
+NNTrainer/backup_*

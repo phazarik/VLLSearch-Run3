@@ -27,7 +27,7 @@ json AnaScript::loadJson(){
 
   if (jsondata.empty()) cout << "\033[31mWarning: JSON data is empty!\033[0m" << endl;
 
-  cout<<"json file loaded."<<endl;
+  cout<<"json file loaded: "<<jsonfilename<<endl;
   return jsondata;
 }
 
@@ -37,11 +37,6 @@ bool AnaScript::checkJson(bool isData, int runno, int lumisection){
 
   int year=0;
   bool keep_this_event = false;
-  
-  //The years are  defined using the run numbers:
-  //if( runno==271036 || runno==284044 || (runno>271036 && runno<284044) ){ year=2016; }
-  //if( runno==294927 || runno==306462 || (runno>294927 && runno<306462) ){ year=2017; }
-  //if( runno==314472 || runno==325175 || (runno>314472 && runno<325175) ){ year=2018; }
   year = _year;
   
   std::string strrunno = std::to_string(runno);
