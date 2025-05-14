@@ -31,33 +31,27 @@ json AnaScript::loadJson(){
   return jsondata;
 }
 
-bool AnaScript::checkJson(bool isData, int runno, int lumisection){
+bool AnaScript::checkJson(bool isData, int runno, int lumisection) {
 
-  if(!isData) return 1;
+  if (!isData) return true;
 
-  int year=0;
-  bool keep_this_event = false;
-  year = _year;
-  
-  std::string strrunno = std::to_string(runno);
+  string strrunno = to_string(runno);
   auto checkrun = jsondata.find(strrunno);
   
-  if( checkrun != jsondata.end()){
-    auto runfilter  = *checkrun;
-    for( unsigned int i=0; i<runfilter.size(); i++ ){
+  if (checkrun != jsondata.end()) {
+    auto runfilter = *checkrun;
+    for (unsigned int i = 0; i < runfilter.size(); i++) {
       int runfilterbegin = runfilter.at(i).at(0);
-      int runfilterend   = runfilter.at(i).at(1);
-      if(
-	 lumisection==runfilterbegin ||
-	 lumisection==runfilterend ||
-	 (lumisection>runfilterbegin && lumisection<runfilterend)
-	 ){
-	keep_this_event = true;
-	break;
+      int runfilterend = runfilter.at(i).at(1);
+      
+      if (runfilterbegin <= lumisection && lumisection <= runfilterend) {
+        //cout << "Match found for run, lumi = " << runno << ", " << lumisection;
+        //cout << " in: [" << runfilterbegin << ", " << runfilterend << "]" << endl;
+        return true;
       }
     }
+    //cout << "Match not found for run, lumi = " << runno << ", " << lumisection << endl;
   }
-  
-  return keep_this_event;
-
+  else cout << "Run number not found in JSON: " << runno << endl;
+  return false;
 }
