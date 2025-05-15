@@ -55,6 +55,8 @@ def main():
 
 def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
 
+    #if 'qcd' not in jsonfile: return
+
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
     x = list(range(len(channels)))
@@ -64,12 +66,12 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
 
     fig_size = (6, 3)
     fig, ax = plt.subplots(figsize=fig_size)    
-    if not signal: ax.axhspan(0.95, 1.05, color='green', alpha=0.2, label='5% agreement')
+    if not signal: ax.axhspan(0.95, 1.05, color='green', alpha=0.2)
 
     all_vals = []
-    x_offset = 0.15
+    x_offset = 0.1
     for index, (key, props) in enumerate(campaign_dict.items()):
-        if 'Run3' in key: continue
+        #if 'Run3' in key: continue
         if key not in data: continue
         values = data[key]
 
@@ -95,7 +97,7 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
     if not signal: ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
-    ax.set_xlim(-1.5, len(channels) - 0.5 + x_offset)
+    ax.set_xlim(-0.5, len(channels) - 0.5 + x_offset)
 
     ymin, ymax = 0, 1.5
     if not signal:
@@ -103,11 +105,9 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
         delta = max(max_dev * 1.2, 0.05)
         ymin, ymax = 1 - delta, 1 + delta
     ax.set_ylim(ymin, ymax)
-
-    handles, labels = ax.get_legend_handles_labels()
-    ncol = 1 if len(labels) <= 5 else 2
-    ax.legend(handles, labels, fontsize=8, frameon=False, ncol=ncol, loc='lower left')
-    handles, labels = ax.get_legend_handles_labels()
+    
+    ncol = 1 if len([k for k in campaign_dict if k in data]) <= 5 else 2
+    ax.legend(fontsize=8, frameon=False, ncol=ncol, loc='best')
 
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
