@@ -180,7 +180,7 @@ void extractHistsFromTrees(
     //------------------------------------------------------------------------------------------
     // Main function
     if(dryrun) cout<<"Arguments: "<<infilepath <<"\t"<< outfilepath <<"\t"<< campaign <<"\t"<< chval <<"\t"<< lumisf <<endl;
-    else  processTree(infilepath.c_str(), outfilepath.c_str(), campaign.c_str(), chval, lumisf);
+    else  processTree(infilepath.c_str(), outfilepath.c_str(), campaign.c_str(), chval, lumisf, test);
     //------------------------------------------------------------------------------------------
     
     auto current_time = chrono::high_resolution_clock::now();

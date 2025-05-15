@@ -46,7 +46,9 @@ void processTree(
 		 const char* outputFilename,
 		 const char* campaign,
 		 int channelval,
-		 float lumisf)
+		 float lumisf,
+		 bool test
+		 )
 { 
   // Load corrections from JSON:
   std::ifstream json_ttbar("corrections/TTBar_HTbinned_corrections.json");
@@ -60,8 +62,8 @@ void processTree(
   json_chargemisID >> sf_chargemisID;
   cout << "Corrections loaded from JSON." << endl;
   
-  //setBranches(tree);
   vector<TH1D*> hst_collection;
+  //hst_collection->clear();
 
   vector<hists> hdef = {
     // integers:
@@ -132,6 +134,7 @@ void processTree(
     if ((int)hdef[i].binning.size()!=0) hist = new TH1D(hdef[i].name, hdef[i].title, hdef[i].binning.size() - 1, &hdef[i].binning[0]);
     else                                hist = new TH1D(hdef[i].name, hdef[i].title, hdef[i].nbins, hdef[i].xmin, hdef[i].xmax);
     hist->Sumw2();
+    hist->SetDirectory(0);
     hst_collection.push_back(hist);
   }
   //cout<<"hst_collection size = "<<(int)hst_collection.size()<<"\033[0m"<<endl;
@@ -154,6 +157,8 @@ void processTree(
   
   Long64_t nentries = tree->GetEntries();
   for (Long64_t i = 0; i < nentries; i++) {
+    
+    if(test) cout << "Looping over event " << i << endl;
 
     tree->GetEntry(i);
 
@@ -177,19 +182,19 @@ void processTree(
     if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
 
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    //wt = wt*wt_bjet;             //Adding b-tagging corrections
+    wt = wt*wt_bjet;             //Adding b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-    /*
+    
     //1) DY correction for the ee channel:
     bool flag_dy = (channelval == 3) && find_key(inputFilename, "DY");
     if(flag_dy){
       Double_t scale_dy = 1.0;
       Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
-      Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
-      scale_dy = scale_dy1*scale_dy2;
+      //Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
+      scale_dy = scale_dy1;//*scale_dy2;
       wt = wt * scale_dy;
       //cout<<"Correcting DY by : "<<scale_dy<<endl;
     }
@@ -208,7 +213,7 @@ void processTree(
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
       //cout<<"Correcting TTBar by : "<<scale_ttbar<<"\t"<<up<<"\t"<<down<<endl;
-      }*/
+    }
     
     //--------------------------------
     // Filling up the histograms:
@@ -216,10 +221,15 @@ void processTree(
     //--------------------------------
     
     event_selection = channel_selection && (lep0_iso<0.15 && lep1_iso<0.15);
-    if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106);
-    
+    //if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106);
+
+    int count = 0;
     if(event_selection){
       Double_t fnwt = wt;
+
+      count = count+1;
+      if(test) cout<<count<<" Filling events with weight = "<<fnwt<<endl;
+      
       // integers:
       hst_collection[0] ->Fill(channel, 1.0);
       hst_collection[1] ->Fill(trigger, 1.0);
@@ -324,10 +334,12 @@ void processTree(
   */
   
   //Luminosity scaling and overflow handling:
+  if(test) cout << "Before SetLastBinAsOverflow: channel entries = " << hst_collection[0]->GetEntries() << endl;
   for(int i=0; i<(int)hst_collection.size(); i++){
-    SetLastBinAsOverflow(hst_collection[i]);
+    if (hst_collection[i]->GetEntries() > 0) SetLastBinAsOverflow(hst_collection[i]);
     hst_collection[i]->Scale(lumisf);
   }
+  if(test) cout << "After SetLastBinAsOverflow: channel entries = " << hst_collection[0]->GetEntries() << endl;
   
   // Save histograms to a new ROOT file
   TFile *outputFile = new TFile(outputFilename, "RECREATE");

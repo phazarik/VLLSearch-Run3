@@ -47,6 +47,17 @@ jobdict = {
     }
 }
 
+jobdict = {
+    "wjetscr/tree_Run3Summer22_wjetscr":{
+        "dump":"hist_Run3Summer22_wjetscr_unscaled",
+        "campaign":"Run3Summer22"
+    },
+    "wjetscr/tree_Run3Summer22EE_wjetscr":{
+        "dump":"hist_Run3Summer22EE_wjetscr_unscaled",
+        "campaign":"Run3Summer22EE"
+    }
+}
+
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 

@@ -60,19 +60,22 @@ def main():
 #____________________________________________________________________________________________________
 
 def plotGlobalCorrections(jsonfile, name, outfile):
+    
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
     x = list(range(len(channels)))
+
     outdir = f'corrections/plots/'
     os.makedirs(outdir, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(6, 3))
     all_vals = []
-    x_offset = 0.15
+    x_offset = 0.1
     for index, (key, props) in enumerate(campaign_dict.items()):
-        if 'Run3' in key: continue
+        #if 'Run3' in key: continue
         if key not in data: continue
         values = data[key]
+        
         y, yerr = [], []
         for i in range(4):
             val = values.get(str(i), None)
@@ -94,7 +97,7 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
-    ax.set_xlim(-1.5, len(channels) - 0.5 + x_offset)
+    ax.set_xlim(-1.0, len(channels) - 0.5 + x_offset)
     
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2
@@ -111,6 +114,9 @@ def plotGlobalCorrections(jsonfile, name, outfile):
 #____________________________________________________________________________________________________
 
 def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
+
+    if 'TTBar' not in jsonfile: return
+    
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
     nch = len(channels)
@@ -118,15 +124,15 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     outdir = 'corrections/plots/'
     os.makedirs(outdir, exist_ok=True)
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(10, 4))
 
     xticks = []
     xticklabels = []
-    spacing = maxval + 50
+    spacing = maxval + 40
     active_offsets = []
 
     for key, props in campaign_dict.items():
-        if 'Run3' in key: continue
+        #if 'Run3' in key: continue
         if key not in data: continue
 
         added_label = False
@@ -196,7 +202,7 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     ncol = 1 if len(labels) <= 4 else 2
     ax.legend(handles, labels, fontsize=9, frameon=True, ncol=ncol)
     ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.03, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.text(0.015, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
 
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)

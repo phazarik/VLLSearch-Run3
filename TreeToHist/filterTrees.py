@@ -25,36 +25,30 @@ basedir = '../ROOT_FILES/treesWithNN/'
 jobdict = {
     "baseline/tree_2016preVFP_UL_baseline":{
         "outjob":"sigregion/tree_2016preVFP_UL_sigregion",
-        "campaign":"2016preVFP_UL",
-        "nnscore":"nnscore_qcd_vlld_2016preVFP"
+        "campaign":"2016preVFP_UL"
     },
     "baseline/tree_2016postVFP_UL_baseline":{
         "outjob":"sigregion/tree_2016postVFP_UL_sigregion",
-        "campaign":"2016postVFP_UL",
-        "nnscore":"nnscore_qcd_vlld_2016postVFP"
+        "campaign":"2016postVFP_UL"
     },
     "baseline/tree_2017_UL_baseline":{
         "outjob":"sigregion/tree_2017_UL_sigregion",
-        "campaign":"2017_UL",
-        "nnscore":"nnscore_qcd_vlld_2017"
+        "campaign":"2017_UL"
     },
     "baseline/tree_2018_UL_baseline":{
         "outjob":"sigregion/tree_2018_UL_sigregion",
-        "campaign":"2018_UL",
-        "nnscore":"nnscore_qcd_vlld_2018"
+        "campaign":"2018_UL"
     },
 }
 
 jobdict = {
     "baseline/tree_Run3Summer22_baseline":{
-        "outjob":"qcdcr/tree_Run3Summer22_qcdcr",
-        "campaign":"Run3Summer22",
-        "nnscore":"nnscore_qcd_vlld_2022"
+        "outjob":"wjetscr/tree_Run3Summer22_wjetscr",
+        "campaign":"Run3Summer22"
     },
     "baseline/tree_Run3Summer22EE_baseline":{
-        "outjob":"qcdcr/tree_Run3Summer22EE_qcdcr",
-        "campaign":"Run3Summer22EE",
-        "nnscore":"nnscore_qcd_vlld_2022EE"
+        "outjob":"wjetscr/tree_Run3Summer22EE_wjetscr",
+        "campaign":"Run3Summer22EE"
     }
 }
 
@@ -92,13 +86,23 @@ print('Functions loaded.')
 start_time = time.time()
 jobcount = 0
 filecount = 0
+
 for injob, info in jobdict.items():
+
     jobcount += 1
     outjob = info["outjob"]
     campaign = info["campaign"]
-    nnscore = info["nnscore"]
 
-    print(f"\n({jobcount}/{len(list(jobdict.items()))}) injob = {injob}, outjob = {outjob}, campaign = {campaign}, nnscore = {nnscore}", style="yellow")
+    ### Picking the right DNN score for event selection:
+    nnscore_qcd   = "nnscore_Run3_vlld_qcd"
+    nnscore_ttbar = "nnscore_Run3_vlld_ttbar"
+    nnscore_wjets = "nnscore_Run3_vlld_wjets"
+    if 'Run3' not in campaign:
+        nnscore_qcd   = "nnscore_Run2_vlld_qcd"
+        nnscore_ttbar = "nnscore_Run2_vlld_ttbar"
+        nnscore_wjets = "nnscore_Run2_vlld_wjets"
+
+    print(f"\n({jobcount}/{len(list(jobdict.items()))}) injob = {injob}, outjob = {outjob}, campaign = {campaign}", style="yellow")
     
     indir = os.path.join(basedir, injob)
     outdir = os.path.join(basedir, outjob)
@@ -127,30 +131,33 @@ for injob, info in jobdict.items():
         #         EVENT SELECTION          #
         ####################################
 
-        #Step1: Controlling QCD:
+        ## Step1: Controlling QCD:
         dy_veto = 'not (channel == 3 and 76 < dilep_mass < 106)'
-        qcd_cr = f'{dy_veto} and {nnscore}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d>5'
-        qcd_vr = f'{dy_veto} and {nnscore}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d<5'
+        qcd_cr = f'{dy_veto} and {nnscore_qcd}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d>5'
+        qcd_vr = f'{dy_veto} and {nnscore_qcd}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d<5'
         
-        #Step2: Controlling Drell-Yan:
-        dycr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
+        ## Step2: Controlling Drell-Yan:
+        dy_cr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
 
-        #Step3: Filter bad events:
+        ## Step3: Controlling WJets:
         tight_sip3d =  'lep0_sip3d<5 and lep1_sip3d<10'
-        good_events = f'{tight_sip3d} and {dy_veto} and {nnscore}>0.30 and HT>50' 
+        qcd_veto    = f'{tight_sip3d} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50' 
+        wjets_cr    = f'{qcd_veto} and {nnscore_wjets}<0.50'
+        wjets_veto  = f'{qcd_veto} and {nnscore_wjets}>0.50' 
         
-        #Step4: Controlling TTbar:
-        top_cr = f'{good_events} and {nnscore}>0.70 and nbjet>0'    
+        ## Step4: Controlling TTbar:
+        good_events = wjets_veto
+        top_cr = f'{good_events} and {nnscore_qcd}>0.70 and nbjet>0'
         
-        #Step5: Validation:
-        val_region = f'{good_events} and 0.50<{nnscore}<0.70'
+        ## Step5: Validation:
+        val_region = f'{good_events} and 0.50<{nnscore_qcd}<0.70'
         
-        #Step6: Signal regions:
-        sr = f'{good_events} and {nnscore}>0.70 and nbjet==0'
+        ## Step6: Signal regions:
+        sr = f'{good_events} and {nnscore_qcd}>0.70 and nbjet==0'
         
         #------------------------------
         # Final event selection:
-        event_selection = qcd_cr
+        event_selection = wjets_cr
         #------------------------------
 
         filecount += 1
