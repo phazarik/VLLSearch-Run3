@@ -25,10 +25,12 @@ def main(combine_str, test=False):
     combine = bool(combine_str) 
     outtag = f"_{combine_str}" if combine else ""
     
-    basedir = '../StackedPlotMaker/signalyields/2025-04-22/'
+    basedir = '../StackedPlotMaker/signalyields/2025-05-15/'
     jobs = [
         "yields_2016postVFP_UL_ee", "yields_2016postVFP_UL_me", "yields_2016preVFP_UL_ee", "yields_2016preVFP_UL_me", "yields_2017_UL_ee", "yields_2017_UL_me", "yields_2018_UL_ee", "yields_2018_UL_me",
-        "yields_2016postVFP_UL_em", "yields_2016postVFP_UL_mm", "yields_2016preVFP_UL_em", "yields_2016preVFP_UL_mm", "yields_2017_UL_em", "yields_2017_UL_mm", "yields_2018_UL_em", "yields_2018_UL_mm"
+        "yields_2016postVFP_UL_em", "yields_2016postVFP_UL_mm", "yields_2016preVFP_UL_em", "yields_2016preVFP_UL_mm", "yields_2017_UL_em", "yields_2017_UL_mm", "yields_2018_UL_em", "yields_2018_UL_mm",
+        "yields_Run3Summer22_ee",   "yields_Run3Summer22_em",   "yields_Run3Summer22_me",   "yields_Run3Summer22_mm",
+        "yields_Run3Summer22EE_ee", "yields_Run3Summer22EE_em", "yields_Run3Summer22EE_me", "yields_Run3Summer22EE_mm"
     ]
     
     ## signals:

@@ -318,4 +318,56 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
   cout<<endl;
 }
 
+void DisplayBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> bkg, TString targetname) {
+  if (var != targetvar) return;
+
+  TH1D *hst_target = nullptr;
+  for (int i = 0; i < (int)bkg.size(); i++) {
+    if (bkg[i]->GetName() == targetname) {
+      hst_target = bkg[i];
+      break;
+    }
+  }
+  if (!hst_target) {
+    DisplayText("SF: target not found: " + targetvar);
+    return;
+  }
+
+  printf("{\n");
+  printf("  \"bins\": [\n");
+
+  int nbins = hst_data->GetNbinsX();
+  for (int bin = 0; bin < nbins; bin++) {
+    float ndata   = hst_data->GetBinContent(bin + 1);
+    float ntarget = hst_target->GetBinContent(bin + 1);
+    float binxlow = hst_data->GetXaxis()->GetBinLowEdge(bin + 1);
+    float binxup  = hst_data->GetXaxis()->GetBinUpEdge(bin + 1);
+    float nothers = 0;
+    float ndata_error = hst_data->GetBinError(bin + 1);
+    float ntarget_error = hst_target->GetBinError(bin + 1);
+
+    for (int i = 0; i < (int)bkg.size(); i++) {
+      if (bkg[i]->GetName() == targetname) continue;
+      nothers += bkg[i]->GetBinContent(bin + 1);
+    }
+
+    float sf_bin = 0, sf_error = 0;
+    if (ntarget != 0) {
+      sf_bin = (ndata - nothers) / ntarget;
+      sf_error = sf_bin * sqrt(pow(ndata_error / (ndata - nothers), 2) + pow(ntarget_error / ntarget, 2));
+    }
+
+    TString high_str = (bin == nbins - 1) ? "\"inf\"" : TString::Format("%d", (int)binxup);
+    printf("    { \"low\": %d, \"high\": %s, \"scale\": [%.6f, %.6f] }%s\n",
+           (int)binxlow,
+           high_str.Data(),
+           sf_bin,
+           sf_error,
+           (bin == nbins - 1 ? "" : ","));
+  }
+
+  printf("  ]\n");
+  printf("}\n");
+}
+
 #endif // FUNCTIONS_H

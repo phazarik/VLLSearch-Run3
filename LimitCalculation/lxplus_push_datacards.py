@@ -14,7 +14,7 @@ test = args.test
 remote_user = "phazarik"
 remote_host = "lxplus.cern.ch"
 remote_path = "/afs/cern.ch/user/p/phazarik/work/Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/CombinedLimit/data/tutorials/statistical_routines_tutorial/datacards"
-local_dir = "datacards/2025-04-22"
+local_dir = "datacards/2025-05-15"
 
 dirs_to_copy = [
     os.path.join(local_dir, d)

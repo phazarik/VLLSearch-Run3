@@ -26,7 +26,7 @@ string todays_date();
 
 void makeBrazillianPlots(){
 
-  TString timetag = "2025-04-22";
+  TString timetag = "2025-05-15";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
   TString outdir = gSystem->ConcatFileName("plots", todays_date().c_str());
   gSystem->mkdir(outdir, true);
@@ -51,6 +51,17 @@ void makeBrazillianPlots(){
     {"sigmaB_VLLD_ele_2018_UL_me.txt", "VLLD-e", "2018_UL", "#mue"},
     {"sigmaB_VLLD_ele_2018_UL_mm.txt", "VLLD-e", "2018_UL", "#mu#mu"},
     {"sigmaB_VLLD_ele_combined_Run2.txt", "VLLD-e",   "Run2_UL", "combined"},
+
+    {"sigmaB_VLLD_ele_Run3Summer22_ee.txt", "VLLD-e", "Run3Summer22", "#ee"},
+    {"sigmaB_VLLD_ele_Run3Summer22_em.txt", "VLLD-e", "Run3Summer22", "e#mu"},
+    {"sigmaB_VLLD_ele_Run3Summer22_me.txt", "VLLD-e", "Run3Summer22", "#mue"},
+    {"sigmaB_VLLD_ele_Run3Summer22_mm.txt", "VLLD-e", "Run3Summer22", "#mu#mu"},
+    {"sigmaB_VLLD_ele_Run3Summer22EE_ee.txt", "VLLD-e", "Run3Summer22EE", "#ee"},
+    {"sigmaB_VLLD_ele_Run3Summer22EE_em.txt", "VLLD-e", "Run3Summer22EE", "e#mu"},
+    {"sigmaB_VLLD_ele_Run3Summer22EE_me.txt", "VLLD-e", "Run3Summer22EE", "#mue"},
+    {"sigmaB_VLLD_ele_Run3Summer22EE_mm.txt", "VLLD-e", "Run3Summer22EE", "#mu#mu"},
+    {"sigmaB_VLLD_ele_combined_2022.txt", "VLLD-e", "2022", "combined"},
+    
     //mu-type:
     {"sigmaB_VLLD_mu_2016preVFP_UL_ee.txt", "VLLD-#mu", "2016preVFP_UL", "ee"},
     {"sigmaB_VLLD_mu_2016preVFP_UL_em.txt", "VLLD-#mu", "2016preVFP_UL", "e#mu"},
@@ -68,11 +79,28 @@ void makeBrazillianPlots(){
     {"sigmaB_VLLD_mu_2018_UL_em.txt",     "VLLD-#mu", "2018_UL", "e#mu"},
     {"sigmaB_VLLD_mu_2018_UL_me.txt",     "VLLD-#mu", "2018_UL", "#mue"},
     {"sigmaB_VLLD_mu_2018_UL_mm.txt",     "VLLD-#mu", "2018_UL", "#mu#mu"},
-    {"sigmaB_VLLD_mu_combined_Run2.txt", " VLLD-#mu", "Run2_UL", "combined"}
+    {"sigmaB_VLLD_mu_combined_Run2.txt", " VLLD-#mu", "Run2_UL", "combined"},
+
+    {"sigmaB_VLLD_mu_Run3Summer22_ee.txt", "VLLD-#mu", "Run3Summer22", "#ee"},
+    {"sigmaB_VLLD_mu_Run3Summer22_em.txt", "VLLD-#mu", "Run3Summer22", "e#mu"},
+    {"sigmaB_VLLD_mu_Run3Summer22_me.txt", "VLLD-#mu", "Run3Summer22", "#mue"},
+    {"sigmaB_VLLD_mu_Run3Summer22_mm.txt", "VLLD-#mu", "Run3Summer22", "#mu#mu"},
+    {"sigmaB_VLLD_mu_Run3Summer22EE_ee.txt", "VLLD-#mu", "Run3Summer22EE", "#ee"},
+    {"sigmaB_VLLD_mu_Run3Summer22EE_em.txt", "VLLD-#mu", "Run3Summer22EE", "e#mu"},
+    {"sigmaB_VLLD_mu_Run3Summer22EE_me.txt", "VLLD-#mu", "Run3Summer22EE", "#mue"},
+    {"sigmaB_VLLD_mu_Run3Summer22EE_mm.txt", "VLLD-#mu", "Run3Summer22EE", "#mu#mu"},
+    {"sigmaB_VLLD_mu_combined_2022.txt", "VLLD-#mu", "2022", "combined"},
   };
+
+  
 
   for (size_t i = 0; i < limitdict.size(); i++) {
     TString infile   = gSystem->ConcatFileName(indir,  limitdict[i].filename);
+    if (gSystem->AccessPathName(infile, kFileExists)) {
+      cout << "Skipping absent file: " << infile << endl;
+      continue;
+    }
+
     TString out = limitdict[i].filename; out.ReplaceAll("sigmaB", "limit"); out.ReplaceAll(".txt", "");
     TString outfile   = gSystem->ConcatFileName(outdir, out);
     TString channel   = limitdict[i].channel;
@@ -91,7 +119,7 @@ void makeBrazillianPlots(){
 	}*/
 
     makeOneLimitPlot(infile, outfile, modelname, campaign, channel, ymin, ymax, bottomleft);
-    break;
+    //break;
   }
   cout<<"Done! Total images created = "<<indplt<<"\n"<<endl;  
 }
@@ -110,7 +138,7 @@ void makeOneLimitPlot(
   ind += 1;
   TString cname = Form("c_%d", ind);
   bool showdata = false;
-  bool tosave = false;
+  bool tosave = true;
 
   //-----------------------------------------------------------------------
   // Loading data from input file in the following format:

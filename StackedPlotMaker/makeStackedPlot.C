@@ -9,11 +9,11 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void makeStackedPlot(
 		     TString _var = "HT",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-05-12_baseline/hist_Run3Summer22EE_baseline_mm",
+		     TString _jobname = "2025-05-15_sr/hist_Run3Summer22EE_sr_mm",
 		     TString _campaign = "Run3Summer22EE",
 		     TString _channel = "mm",
-		     TString _tag = "baseline",
-		     TString _displaytext = "baseline"
+		     TString _tag = "sr",
+		     TString _displaytext = "Signal region"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -26,8 +26,8 @@ void makeStackedPlot(
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
   bool toOverlayData=false;
-  bool toSave=true;
-  Double_t ymin = 0.1; Double_t ymax = 10E10;
+  bool toSave=false;
+  Double_t ymin = 0.1; Double_t ymax = 10E6;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
@@ -193,9 +193,12 @@ void makeStackedPlot(
   //                     ON-SCREEN DISPLAYS
   //______________________________________________________________
 
-  //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+  GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
   //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-  GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
+  //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
+  //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets");
+  //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+  //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+#gamma");
   
   //______________________________________________________________
   
@@ -369,7 +372,7 @@ void makeStackedPlot(
   if(sig1) SetLegendEntry(lg, sig1);
   if(sig2) SetLegendEntry(lg, sig2);
   if(sig3) SetLegendEntry(lg, sig3);
-  TString legendheader = Form("Global S/#sqrt{B} = %.3f #pm %.3f", globalSbyB, globalSbyBErr);
+  TString legendheader = Form("Global S/#sqrt{B} = %.3f ± %.3f", globalSbyB, globalSbyBErr);
   if(toOverlayData){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);
     TString err = Form("%.3f", globalObsbyExpErr);

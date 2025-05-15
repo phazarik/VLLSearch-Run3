@@ -9,11 +9,11 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "dilep_pt",
 		 TString _name = "p_{T}^{LL} (GeV)",
-		 TString _jobname = "2025-04-20_signal/hist_2016preVFP_UL_sigregion_mm/",
+		 TString _jobname = "2025-05-15_sr/hist_Run3Summer22EE_sr_mm/",
 		 TString _campaign = "2016preVFP_UL",
 		 TString _channel = "mm",
-		 TString _tag = "sigregion",
-		 TString _displaytext = "SR"
+		 TString _tag = "sr",
+		 TString _displaytext = "Signal region"
 		 )
 {
   TString date_stamp  = todays_date();
@@ -58,6 +58,11 @@ void writeYields(
   }
   if(_campaign == "Run3Summer22"){
     vector<string> eras = {"C", "D"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+  }
+  if(_campaign == "Run3Summer22EE"){
+    vector<string> eras = {"E", "F", "G"};
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }

@@ -19,99 +19,35 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-05-12_baseline/hist_2018_UL_baseline_mm":{
-        "campaign":"2018_UL",
-        "channel":"mm"
-    },
-    "2025-05-12_baseline/hist_2018_UL_baseline_me":{
-        "campaign":"2018_UL",
-        "channel":"me"
-    },
-    "2025-05-12_baseline/hist_2018_UL_baseline_em":{
-        "campaign":"2018_UL",
-        "channel":"em"
-    },
-    "2025-05-12_baseline/hist_2018_UL_baseline_ee":{
-        "campaign":"2018_UL",
-        "channel":"ee"
-    },
-    "2025-05-12_baseline/hist_2017_UL_baseline_mm":{
-        "campaign":"2017_UL",
-        "channel":"mm"
-    },
-    "2025-05-12_baseline/hist_2017_UL_baseline_me":{
-        "campaign":"2017_UL",
-        "channel":"me"
-    },
-    "2025-05-12_baseline/hist_2017_UL_baseline_em":{
-        "campaign":"2017_UL",
-        "channel":"em"
-    },
-    "2025-05-12_baseline/hist_2017_UL_baseline_ee":{
-        "campaign":"2017_UL",
-        "channel":"ee"
-    },
-    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_mm":{
-        "campaign":"2016preVFP_UL",
-        "channel":"mm"
-    },
-    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_me":{
-        "campaign":"2016preVFP_UL",
-        "channel":"me"
-    },
-    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_em":{
-        "campaign":"2016preVFP_UL",
-        "channel":"em"
-    },
-    "2025-05-12_baseline/hist_2016preVFP_UL_baseline_ee":{
-        "campaign":"2016preVFP_UL",
-        "channel":"ee"
-    },
-    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_mm":{
-        "campaign":"2016postVFP_UL",
-        "channel":"mm"
-    },
-    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_me":{
-        "campaign":"2016postVFP_UL",
-        "channel":"me"
-    },
-    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_em":{
-        "campaign":"2016postVFP_UL",
-        "channel":"em"
-    },
-    "2025-05-12_baseline/hist_2016postVFP_UL_baseline_ee":{
-        "campaign":"2016postVFP_UL",
-        "channel":"ee"
-    },
-    "2025-05-12_baseline/hist_Run3Summer22_baseline_mm":{
+    "2025-05-15_sr/hist_Run3Summer22_sr_mm":{
         "campaign":"Run3Summer22",
         "channel":"mm"
     },
-    "2025-05-12_baseline/hist_Run3Summer22_baseline_me":{
+    "2025-05-15_sr/hist_Run3Summer22_sr_me":{
         "campaign":"Run3Summer22",
         "channel":"me"
     },
-    "2025-05-12_baseline/hist_Run3Summer22_baseline_em":{
+    "2025-05-15_sr/hist_Run3Summer22_sr_em":{
         "campaign":"Run3Summer22",
         "channel":"em"
     },
-    "2025-05-12_baseline/hist_Run3Summer22_baseline_ee":{
+    "2025-05-15_sr/hist_Run3Summer22_sr_ee":{
         "campaign":"Run3Summer22",
         "channel":"ee"
     },
-    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_mm":{
+    "2025-05-15_sr/hist_Run3Summer22EE_sr_mm":{
         "campaign":"Run3Summer22EE",
         "channel":"mm"
     },
-    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_me":{
+    "2025-05-15_sr/hist_Run3Summer22EE_sr_me":{
         "campaign":"Run3Summer22EE",
         "channel":"me"
     },
-    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_em":{
+    "2025-05-15_sr/hist_Run3Summer22EE_sr_em":{
         "campaign":"Run3Summer22EE",
         "channel":"em"
     },
-    "2025-05-12_baseline/hist_Run3Summer22EE_baseline_ee":{
+    "2025-05-15_sr/hist_Run3Summer22EE_sr_ee":{
         "campaign":"Run3Summer22EE",
         "channel":"ee"
     }
@@ -184,14 +120,13 @@ jobcount = 0
 plotcount = 0
 
 for jobname, info in jobdict.items():
-
-    #if 'Run3Summer22EE' not in jobname: continue
     
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "baseline"
-    text     = "baseline"
+    tag      = "sr"
+    text     = "Signal region"
+    
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
     count = 0
@@ -215,9 +150,13 @@ for jobname, info in jobdict.items():
             f'"{tag}", '
             f'"{text}"'
         )
-        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
-        #if var != "dilep_pt": continue
-        #command = f"root -q -b -l 'writeYields.C({arguments})'"
+        ## For plotmaker:
+        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+
+        ## For writing yields"
+        if var != "dilep_pt": continue
+        command = f"root -q -b -l 'writeYields.C({arguments})'"
+
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output
         if not dryrun: subprocess.run(command, shell=True)
