@@ -2,7 +2,7 @@
 ### Object selections
 | Selection type | Muon | Electron | Jet | 
 |--|--|--|--|
-|$p_{T}$, $|\eta|$     | >10, <2.4 | >10, <2.4 | >50, <2.4 |
+|$p_{T}$, $\lvert \eta \rvert$ | >10, <2.4 | >10, <2.4 | >50, <2.4 |
 | prompt (dxy, dz)| 0.05, 0.1 | 0.05 (0.1), 0.1 (0.2) in barrel (endcap) | -- |
 | ID              | `Muon_mediumId` | `Electron_cutBased`>2 (medium) | `Jet_jetId` >= 1 (2 in 2016) |
 | Isolation       | `Muon_pfRelIso03_all`<0.15 | `Electron_pfRelIso03_all`<0.15 | -- |
