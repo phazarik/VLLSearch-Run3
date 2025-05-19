@@ -26,7 +26,7 @@ Datacards are prepared for each signal mass point. Each datacard includes multip
 
 These numbers are produced as text files by [`writeYields.C`](../StackedPlotMaker/writeYields.C) in the following format.
 ```
-bin-index >> nsig >> nobs >> nexp >> nexperr >> s-over-rootB >> 1+experr/nexp
+bin-index >> nsig >> nobs >> nexp >> experr >> s-over-rootB >> 1+experr/nexp
 ```
 More information on datacard preparation is available [here](https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/latest/part2/settinguptheanalysis/).
 
@@ -42,9 +42,9 @@ cmsenv
 git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
 cd HiggsAnalysis/CombinedLimit
 ```
-The datacards are transferred into lxplus working are, into a directory named `datacards` using `lxplus_push_datacards.py`.  By design, `find_limits_allJobs.py` automatically picks up the datacards from here, calculates r-values using the asymptotic method, and writes them down in text files. These are brought back locally using `lxplus_pull_limits.py` for making Brazilian limit plots.
+The datacards are transferred into lxplus working area, into a directory named `datacards` using `lxplus_push_datacards.py`.  By design, `find_limits_allJobs.py` automatically picks up the datacards from here, calculates r-values using the asymptotic method, and writes them down in text files. These are brought back locally using `lxplus_pull_limits.py` for making Brazilian limit plots.
 
 ### Key Points
--  The CMS Combine tool performs best when the expected r-value is close to 1, due to the approximations underlying the asymptotic method.
+- The CMS Combine tool performs best when the expected r-value is close to 1, due to the approximations underlying the asymptotic method.
 - To achieve this, signal strengths ($\sigma B$) for some mass points are **artificially scaled** when preparing the datacards, ensuring reasonable r-values from Combine.
 - When converting the resulting r-values into $\sigma B$ limits, the **same scaling factor is applied** to maintain consistency.
