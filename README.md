@@ -3,11 +3,9 @@ This repository contains tools for searching for vector-like leptons (VLLs) usin
 
 ## 🛠️ Prerequisites
 
-Here is my current setup.
-
-![24.9.1](https://img.shields.io/badge/Conda-24.9.1-green)
-![3.10.9](https://img.shields.io/badge/Python-3.10.9-blue)
-![6.26/10](https://img.shields.io/badge/ROOT-6.26%2F10-yellow) (Built on: Apr 07, 2023)
+![24.9.1](https://img.shields.io/badge/Conda-24.9.1-green)<br>
+![3.10.9](https://img.shields.io/badge/Python-3.10.9-blue)<br>
+![6.26/10](https://img.shields.io/badge/ROOT-6.26%2F10-yellow) (Built on: Apr 07, 2023)<br>
 **[nlohmann/json](https://github.com/nlohmann/json)** (Accessed: Oct 15, 2024)
 
 The following are some additional Python packages installed using conda-forge.
@@ -109,7 +107,7 @@ Once histograms with corrections and scaling applied are produced, the following
 ```
 
 ### Limits
-![Update in progress](https://img.shields.io/badge/Update%20in%20progress-red)
+The procedure for computing limits is described in detail in the [LimitCalculation](LimitCalculation/) section. Limits are computed at 95% using the Asymptotic approximation from CMS Combine.
 
 ## 🔗 Relevant Links & Tools
 - Sample database:  

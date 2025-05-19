@@ -2,34 +2,37 @@
 ### Object selections
 | Selection type | Muon | Electron | Jet | 
 |--|--|--|--|
-|pT, abs(eta)     | >10, <2.4 | >10, <2.4 | >30, <2.4 |
+|$p_{T}$, $|\eta|$     | >10, <2.4 | >10, <2.4 | >50, <2.4 |
 | prompt (dxy, dz)| 0.05, 0.1 | 0.05 (0.1), 0.1 (0.2) in barrel (endcap) | -- |
 | ID              | `Muon_mediumId` | `Electron_cutBased`>2 (medium) | `Jet_jetId` >= 1 (2 in 2016) |
 | Isolation       | `Muon_pfRelIso03_all`<0.15 | `Electron_pfRelIso03_all`<0.15 | -- |
-|Cleaning         |--- |Cleaned from loose-mu (0.4)| Cleaned from loose-L (0.4)
+|Cleaning         |--- |Cleaned from loose-$\mu$ (0.4)| Cleaned from loose-$\mu$/e (0.4)
 
 ### b-tagging thresholds
 |Campaign|b-tagger| Threshold|
 |--|--|--|
-|2016preVFP_UL |`Jet_btagDeepFlavB`|0.2783|
-|2016postVFP_UL|`Jet_btagDeepFlavB`|0.3040|
-|2017_UL       |`Jet_btagDeepFlavB`|0.2598|
-|2018_UL       |`Jet_btagDeepFlavB`|0.2489|
+|2016preVFP_UL    |`Jet_btagDeepFlavB`|0.2598|
+|2016postVFP_UL   |`Jet_btagDeepFlavB`|0.2489|
+|2017_UL          |`Jet_btagDeepFlavB`|0.3040|
+|2018_UL          |`Jet_btagDeepFlavB`|0.2783|
+|Run3Summer22     |`Jet_btagDeepFlavB`|0.3086|
+|Run3Summer22EE   |`Jet_btagDeepFlavB`|0.3196|
+|Run3Summer23     |`Jet_btagDeepFlavB`|0.2431|
+|Run3Summer23BPix |`Jet_btagDeepFlavB`|0.2435|
 
 ***Source: https://btv-wiki.docs.cern.ch/ScaleFactors/***
 
 ### HLT paths used in different campaigns
-|Campaign|Electron trigger|Muon trigger|Offline pT cuts (e, mu)|
+|Campaign|Electron trigger|Muon trigger|Offline $p_{T}$ cuts (e, mu)|
 |--|--|--|--|
-|2016preVFP_UL |`HLT_Ele27_WPTight_Gsf`|`HLT_IsoMu24`|30, 26|
-|2016postVFP_UL|`HLT_Ele27_WPTight_Gsf`|`HLT_IsoMu24`|30, 26|
-|2017_UL       |`HLT_Ele35_WPTight_Gsf`|`HLT_IsoMu27`|37, 29|
-|2018_UL       |`HLT_Ele32_WPTight_Gsf`|`HLT_IsoMu24`|35, 26|
+|2016 (preVFP+postVFP) |`HLT_Ele27_WPTight_Gsf`|`HLT_IsoMu24`|30, 26|
+|2017_UL               |`HLT_Ele35_WPTight_Gsf`|`HLT_IsoMu27`|37, 29|
+|2018_UL + 2022        |`HLT_Ele32_WPTight_Gsf`|`HLT_IsoMu24`|35, 26|
 
-The trigger efficiencies are calculated by [Kumar Yash](https://github.com/ykumar05) using tag-and-probe methods, and the details can be found in [GitHub:ykumar05/TriggerEfficiency](https://github.com/ykumar05/TriggerEfficiency). The corrections are expressed as a function of pT of the triggering object, which is extracted from a fit.
+The trigger efficiencies are calculated by [Kumar Yash](https://github.com/ykumar05) using tag-and-probe methods, and the details can be found in [GitHub:ykumar05/TriggerEfficiency](https://github.com/ykumar05/TriggerEfficiency). The corrections are expressed as a function of $p_{T}$ of the triggering object, which is extracted from a fit.
 
 ### Baseline event selections
-- Exactly two L with same sign (L = electron, muon)
+- Exactly two $\ell$ with same sign ($\ell$ = electron, muon)
 - At least one lepton passes the offline trigger threshold.
 - Dilepton invariant mass > 15 GeV
 - In case of ee events, Z window (76-106 GeV) is vetoed.
