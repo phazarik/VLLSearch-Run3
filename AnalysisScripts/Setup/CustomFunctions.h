@@ -1,7 +1,4 @@
-void AnaScript::SortPt(vector<Particle> part){
-  //Note: This function is problematic.
-  //It fails at some instances (not all).
-  //Don't use it until it gets fixed.
+void AnaScript::SortPt(vector<Particle> &part){
   for(int i=0; i<(int)part.size()-1; i++){//first one
     for(int j=i+1; j<(int)part.size(); j++){//second one
       if( part[i].v.Pt() < part[j].v.Pt() ) swap(part.at(i), part.at(j));
