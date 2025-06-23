@@ -7,6 +7,8 @@
 *backup.h
 *dict*
 *pyc
+*linkdef.h
+*map.in
 *.ipynb_checkpoints
 *png
 *pdf

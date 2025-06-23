@@ -5,6 +5,8 @@
 #include "bTaggingSF/JetEff_DeepJet_MediumWP_2018_UL.h"
 #include "bTaggingSF/JetEff_DeepJet_MediumWP_Run3Summer22.h"
 #include "bTaggingSF/JetEff_DeepJet_MediumWP_Run3Summer22EE.h"
+#include "bTaggingSF/JetEff_DeepJet_MediumWP_Run3Summer23.h"
+#include "bTaggingSF/JetEff_DeepJet_MediumWP_Run3Summer23BPix.h"
 #include "TRandom3.h"
 
 double AnaScript::returnLeptonSF(Particle lepton, TString mode){
@@ -86,18 +88,22 @@ double AnaScript::returnbJetCorrection(vector<Particle> Jet, TString mode){
     double jet_prob_data = 1.0;
     
     // 1) Extract the MC efficiency.
-    if(_campaign=="2016postVFP_UL")      jet_mceff = (double)btagMCeff_2016postVFP_UL(Jet.at(i));
-    else if(_campaign=="2016preVFP_UL")  jet_mceff = (double)btagMCeff_2016preVFP_UL(Jet.at(i));    
-    else if(_campaign=="2017_UL")        jet_mceff = (double)btagMCeff_2017_UL(Jet.at(i));
-    else if(_campaign=="2018_UL")        jet_mceff = (double)btagMCeff_2018_UL(Jet.at(i));
-    else if(_campaign=="Run3Summer22")   jet_mceff = (double)btagMCeff_Run3Summer22(Jet.at(i));
-    else if(_campaign=="Run3Summer22EE") jet_mceff = (double)btagMCeff_Run3Summer22EE(Jet.at(i));
+    if(_campaign=="2016postVFP_UL")        jet_mceff = (double)btagMCeff_2016postVFP_UL(Jet.at(i));
+    else if(_campaign=="2016preVFP_UL")    jet_mceff = (double)btagMCeff_2016preVFP_UL(Jet.at(i));    
+    else if(_campaign=="2017_UL")          jet_mceff = (double)btagMCeff_2017_UL(Jet.at(i));
+    else if(_campaign=="2018_UL")          jet_mceff = (double)btagMCeff_2018_UL(Jet.at(i));
+    else if(_campaign=="Run3Summer22")     jet_mceff = (double)btagMCeff_Run3Summer22(Jet.at(i));
+    else if(_campaign=="Run3Summer22EE")   jet_mceff = (double)btagMCeff_Run3Summer22EE(Jet.at(i));
+    else if(_campaign=="Run3Summer23")     jet_mceff = (double)btagMCeff_Run3Summer23(Jet.at(i));
+    else if(_campaign=="Run3Summer23BPix") jet_mceff = (double)btagMCeff_Run3Summer23BPix(Jet.at(i));
     else return 1.0;
     //else cout<<"btv_deepjet.h : Provide correct btag SF file!"<<endl;
-
+    //cout<<"\nTest: bJet MC eff = "<<jet_mceff<<endl;
+   
     // 2) Extract the SF from POG.
     double SFfromPOG = returnbJetTaggingSFPOG(Jet.at(i), mode);
-
+    //cout<<"Test: bJet SF (POG) = "<<SFfromPOG<<endl;
+    
     // 3) Pick a working point.
     double WPth = _btagWP;
 
@@ -122,6 +128,8 @@ double AnaScript::returnbJetCorrection(vector<Particle> Jet, TString mode){
   // 6) The scale factor comes from the difference between data and MC probability for the jet configuration.
   double scaleFactor = 1.0;
   if (probability_mc > 0.0) scaleFactor = probability_data/probability_mc;
+  //cout << "Test: bJet SF = "<<scaleFactor <<endl;
+
   return scaleFactor;
 
 }

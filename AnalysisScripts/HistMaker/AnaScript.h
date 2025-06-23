@@ -272,7 +272,7 @@ public :
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-
+  
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -415,7 +415,7 @@ public :
   json loadJson();
   bool checkJson(bool isData, int runno, int lumisection);
   void LoadCorrectionsFromPOG();
-  void SortPt(vector<Particle> part);
+  void SortPt(vector<Particle> &part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
 
@@ -435,6 +435,8 @@ public :
   double btagMCeff_2018_UL(Particle jet);
   double btagMCeff_Run3Summer22(Particle jet);
   double btagMCeff_Run3Summer22EE(Particle jet);
+  double btagMCeff_Run3Summer23(Particle jet);
+  double btagMCeff_Run3Summer23BPix(Particle jet);
   double returnbJetCorrection(vector<Particle> Jet, TString mode);
 
   //Trigger corrections:

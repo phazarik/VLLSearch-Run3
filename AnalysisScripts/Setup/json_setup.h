@@ -52,6 +52,6 @@ bool AnaScript::checkJson(bool isData, int runno, int lumisection) {
     }
     //cout << "Match not found for run, lumi = " << runno << ", " << lumisection << endl;
   }
-  else cout << "Run number not found in JSON: " << runno << endl;
+  //else cout << "Run number not found in JSON: " << runno << endl;
   return false;
 }

@@ -6,6 +6,7 @@
 import os, sys, argparse
 import json
 import time
+from datetime import timedelta
 from rich.console import Console
 console = Console(highlight=False)
 print = console.print
@@ -28,17 +29,17 @@ debug   = args.debug   ### For debug statements.
 #  SET GLOBAL PARAMETERS BEFORE RUNNING
 #---------------------------------------------
 
-campaign = "Run3Summer22EE"
+campaign = "Run3Summer23"
 ### Options for Run2: 2016preVFP_UL, 2016postVFP_UL, 2017_UL, 2018_UL
 ### Options for Run3: Run3Summer22, Run3Summer22EE, Run3Summer23, Run3Summer23BPix
 
-mode = "TreeMaker"
-nanoAODv = 11
+mode = "HistMaker"
+nanoAODv = 12
 
-samples_to_run = ["Muon", "EGamma", "DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
+samples_to_run = ["DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
 #samples_to_run.extend(["Muon", "EGamma"])
-#samples_to_run = ["Muon", "EGamma"]
-#samples_to_run = ["QCDMu"]
+samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
+
 if nanoAODv==11:
     #samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
     #samples_to_run=["RareTop"]
@@ -48,13 +49,18 @@ if nanoAODv==11:
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
 if mode == "HistMaker": dumpdir = "ROOT_FILES/hists/"
-#nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22EE"
-nanoAODpath = "/mnt/d/work/skimmed_2LSS_Signal"
+nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer23"
+#nanoAODpath = "/mnt/d/work/skimmed_2LSS_Signal"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
 #---------------------------------------------
 # DON'T TOUCH BELOW
 #---------------------------------------------
+
+## Cleaning up:
+clean = f'python3 {codedir}/{mode}/cleanup.py'
+if not dryrun: os.system(clean)
+print("Code directory ready.")
 
 jsonfilepath = 'LumiJsons'
 jsonfile = os.path.join(jsonfilepath, f'lumidata_{campaign}.json')
@@ -78,14 +84,15 @@ for item in samples_to_run:
         #if sample not in ['QCDEM', 'QCDMu', 'VVSS', 'WGtoLNuG', 'WtoLNu', 'ZGamma']: continue
         #if 'VLL' not in sample: continue
         #if 'RareTop' not in sample: continue
-
+        #if not ('Muon' in sample or 'EGamma' in sample): continue
+        
         print('\n----------------------------------------------')
         print(f'Submitting jobs for {sample}', style='yellow bold')
         print('----------------------------------------------')
 
         flag = 'flag'
-        if sample == 'Muon':    flag='muon'
-        if sample == 'EGamma':  flag='egamma'
+        if 'Muon' in sample:    flag='muon'
+        if 'EGamma' in sample:  flag='egamma'
         if sample == 'QCDMu' :  flag='qcd'
         if sample == 'QCDEle' : flag='qcdele'
         if sample == 'DYto2L':  flag='dy'
@@ -171,11 +178,13 @@ for item in samples_to_run:
 
 end_time = time.time()
 time_taken = end_time-start_time
+time_fmt = str(timedelta(seconds=int(time_taken)))
+
 print('\n'+'-'*50, style='yellow bold')
 print('Summary', style='yellow bold')
 print(f'Samples processed: {list_processed}')
 print(f'Output directory: [yellow bold]{os.path.join(dumpdir, jobname)}[/yellow bold]')
-print(f'Total time taken : [yellow bold]{time_taken:.2f} seconds[/yellow bold]')
+print(f'Total time taken : [bold yellow]{time_fmt}[/bold yellow]')
 print(f'Number of jobs : {njobs}')
 print(f'Number of files : {nfiles}')
 if len(list_failed) > 0:

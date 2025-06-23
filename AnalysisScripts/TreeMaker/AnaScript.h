@@ -314,7 +314,7 @@ public :
   //TTreeReaderValue<Bool_t> HLT_SingleMuon = {fReader, "HLT_IsoMu27"};
   //TTreeReaderValue<Bool_t> HLT_SingleEle  = {fReader, "HLT_Ele35_WPTight_Gsf"};
   
-  // For 2018 and 2022:
+  // For 2018, 2022 and 2023:
   TTreeReaderValue<Bool_t> HLT_SingleMuon  = {fReader, "HLT_IsoMu24"};
   TTreeReaderValue<Bool_t> HLT_SingleEle   = {fReader, "HLT_Ele32_WPTight_Gsf"};
 
@@ -412,7 +412,7 @@ public :
   json loadJson();
   bool checkJson(bool isData, int runno, int lumisection);
   void LoadCorrectionsFromPOG();
-  void SortPt(vector<Particle> part);
+  void SortPt(vector<Particle> &part);
   bool clean_from_array(Particle target, vector<Particle> array, float dRcut);
   bool isMatchingWithGen(Particle reco, vector<Particle> gencollection);
 
@@ -432,6 +432,8 @@ public :
   double btagMCeff_2018_UL(Particle jet);
   double btagMCeff_Run3Summer22(Particle jet);
   double btagMCeff_Run3Summer22EE(Particle jet);
+  double btagMCeff_Run3Summer23(Particle jet);
+  double btagMCeff_Run3Summer23BPix(Particle jet);
   double returnbJetCorrection(vector<Particle> Jet, TString mode);
 
   //Trigger corrections:

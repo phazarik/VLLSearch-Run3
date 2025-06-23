@@ -39,6 +39,10 @@ void run(
   cout << "\033[33mInput  : " << ifname <<"\033[0m"<< endl;
   cout << "\033[33mOutput : " << ofname <<"\033[0m"<< endl;
   chain->Add(ifname);
+  if (chain->GetListOfFiles()->GetEntries() == 0) {
+    cout << "\033[1;31mERROR: No input files found or they could not be opened!\033[0m" << endl;
+    return;
+  }
   m_selec.SetHstFileName(outfilename); //Don't forget to set this!
   m_selec.SetCampaign(campaign);
   m_selec.SetSampleName(samplename);

@@ -11,12 +11,12 @@
 using namespace std;
 
 void compile_and_run(
-		     TString mode = "HistMaker",
-		     TString infile = "/mnt/d/work/skimmed_2LSS_Run3Summer22_v12/DYto2L/50toInf/*.root",
-		     TString outfile = "hist_test.root",
-		     TString campaign = "Run3Summer22",
-		     TString sample = "DYJetsToLL_M50",
-		     TString flag = "dy"
+		     TString mode = "TreeMaker",
+		     TString infile = "/mnt/d/work/skimmed_2LSS_Run3Summer23BPix/TT/TTtoLNu2Q/*.root",
+		     TString outfile = "tree_test.root",
+		     TString campaign = "Run3Summer23BPix",
+		     TString sample = "TT_TTtoLNu2Q",
+		     TString flag = "ttbar"
 		     )
 {
 
