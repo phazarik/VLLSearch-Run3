@@ -48,13 +48,43 @@ muon_trigger = {
         }
     },
     "Run3Summer22": {
-        "campaign": "2022",
+        "campaign": "2022-preEE",
         "trigger": "HLT_IsoMu24",
         "trigger_threshold": 24,
         "offline_threshold": 26,
         "fit_nominal": {
             "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.955504 * (1.0 + erf((pt - 24.7165) / (2.0 * 0.371029))),
             "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.931413 * (1.0 + erf((pt - 23.4266) / (2.0 * 0.200128)))
+        }
+    },
+    "Run3Summer22EE": {
+        "campaign": "2022-postEE",
+        "trigger": "HLT_IsoMu24",
+        "trigger_threshold": 24,
+        "offline_threshold": 26,
+        "fit_nominal": {
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.950136 * (1.0 + erf((pt - 24.2686) / (2.0 * 0.00194796))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.940207 * (1.0 + erf((pt - 23.8785) / (2.0 * 0.378177)))
+        }
+    },
+    "Run3Summer23": {
+        "campaign": "2023-preBPix",
+        "trigger": "HLT_IsoMu24",
+        "trigger_threshold": 24,
+        "offline_threshold": 26,
+        "fit_nominal": {
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.952283 * (1.0 + erf((pt - 25.3956) / (2.0 * 0.167536))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.955237 * (1.0 + erf((pt - 24.1104) / (2.0 * 0.0992034)))
+        }
+    },
+    "Run3Summer23BPix": {
+        "campaign": "2023-postBPix",
+        "trigger": "HLT_IsoMu24",
+        "trigger_threshold": 24,
+        "offline_threshold": 26,
+        "fit_nominal": {
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.949014 * (1.0 + erf((pt - 24.9446) / (2.0 * 0.0456965))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.955304 * (1.0 + erf((pt - 25.1877) / (2.0 * 0.0328055)))
         }
     }
 }
@@ -102,13 +132,43 @@ electron_trigger = {
         }
     },
     "Run3Summer22": {
-        "campaign": "2022",
+        "campaign": "2022-preEE",
         "trigger": "HLT_Ele32_WPTight_Gsf",
         "trigger_threshold": 32,
         "offline_threshold": 35,
         "fit_nominal": {
-            "barrel": lambda pt, eta: 0.5 * 0.976349 * (1.0 + erf((pt - 31.1233) / (2.0 * 1.68838))),
-            "endcap": lambda pt, eta: 0.5 * 0.971387 * (1.0 + erf((pt - 29.2013) / (2.0 * 2.10407)))
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.976349 * (1.0 + erf((pt - 31.1233) / (2.0 * 1.68838))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.971387 * (1.0 + erf((pt - 29.2013) / (2.0 * 2.10407)))
+        }
+    },
+    "Run3Summer22EE": {
+        "campaign": "2022-postEE",
+        "trigger": "HLT_Ele32_WPTight_Gsf",
+        "trigger_threshold": 32,
+        "offline_threshold": 35,
+        "fit_nominal": {
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.979149 * (1.0 + erf((pt - 33.3691) / (2.0 * 1.28607))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.975062 * (1.0 + erf((pt - 32.9815) / (2.0 * 1.47289)))
+        }
+    },
+    "Run3Summer23": {
+        "campaign": "2023-preBPix",
+        "trigger": "HLT_Ele32_WPTight_Gsf",
+        "trigger_threshold": 32,
+        "offline_threshold": 35,
+        "fit_nominal": {
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.974765 * (1.0 + erf((pt - 33.0725) / (2.0 * 1.43905))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.975377 * (1.0 + erf((pt - 32.6495) / (2.0 * 1.69333)))
+        }
+    },
+    "Run3Summer23BPix": {
+        "campaign": "2023-postBPix",
+        "trigger": "HLT_Ele32_WPTight_Gsf",
+        "trigger_threshold": 32,
+        "offline_threshold": 35,
+        "fit_nominal": {
+            "barrel": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.97538 * (1.0 + erf((pt - 33.2668) / (2.0 * 1.39703))),
+            "endcap": lambda pt, eta: 0.0 if pt < 10 or fabs(eta) > 2.4 else 0.5 * 0.970987 * (1.0 + erf((pt - 32.7315) / (2.0 * 1.64687)))
         }
     }
 }
@@ -163,12 +223,18 @@ def main():
     plot_efficiency(muon_trigger,     '2016postVFP_UL', xlim=(15, 35), index=2)
     plot_efficiency(muon_trigger,     '2017_UL',        xlim=(15, 35), index=3)
     plot_efficiency(muon_trigger,     '2018_UL',        xlim=(15, 35), index=4)
-    plot_efficiency(muon_trigger,     'Run3Summer22',   xlim=(15, 35), index=5)
-    plot_efficiency(electron_trigger, '2016preVFP_UL',  xlim=(10, 38), index=6)
-    plot_efficiency(electron_trigger, '2016postVFP_UL', xlim=(10, 38), index=7)
-    plot_efficiency(electron_trigger, '2017_UL',        xlim=(20, 42), index=8)
-    plot_efficiency(electron_trigger, '2018_UL',        xlim=(20, 42), index=9)
-    plot_efficiency(electron_trigger, 'Run3Summer22',   xlim=(12, 42), index=10)
+    plot_efficiency(muon_trigger,     'Run3Summer22',     xlim=(15, 35), index=5)
+    plot_efficiency(muon_trigger,     'Run3Summer22EE',   xlim=(15, 35), index=6)
+    plot_efficiency(muon_trigger,     'Run3Summer23',     xlim=(15, 35), index=7)
+    plot_efficiency(muon_trigger,     'Run3Summer23BPix', xlim=(15, 35), index=8)
+    plot_efficiency(electron_trigger, '2016preVFP_UL',  xlim=(10, 38), index=9)
+    plot_efficiency(electron_trigger, '2016postVFP_UL', xlim=(10, 38), index=10)
+    plot_efficiency(electron_trigger, '2017_UL',        xlim=(20, 42), index=11)
+    plot_efficiency(electron_trigger, '2018_UL',        xlim=(20, 42), index=12)
+    plot_efficiency(electron_trigger, 'Run3Summer22',     xlim=(12, 42), index=13)
+    plot_efficiency(electron_trigger, 'Run3Summer22EE',   xlim=(12, 42), index=14)
+    plot_efficiency(electron_trigger, 'Run3Summer23',     xlim=(12, 42), index=15)
+    plot_efficiency(electron_trigger, 'Run3Summer23BPix', xlim=(12, 42), index=16)
     #plt.show()
 
 if __name__ == "__main__": main()
