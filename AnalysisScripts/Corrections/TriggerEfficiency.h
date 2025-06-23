@@ -117,10 +117,25 @@ double AnaScript::TrigEFF_allCampaign_Isomu24_Data(Particle muon){
     return eff;
   }
   else if(_campaign == "Run3Summer22EE"){
-    return 1.0;
+    if( pt<10 || eta>2.4 ) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.950136*(1.0+TMath::Erf((pt-24.2686)/(2.0*0.00194796)));
+    else if(eta>1.479)  eff = 0.5*0.940207*(1.0+TMath::Erf((pt-23.8785)/(2.0*0.378177)));
+    return eff;
+  }
+  else if(_campaign == "Run3Summer23"){
+    if(pt<10 || eta>2.4) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.952283*(1.0+TMath::Erf((pt-25.3956)/(2.0*0.167536)));
+    else if(eta>1.479)  eff = 0.5*0.955237*(1.0+TMath::Erf((pt-24.1104)/(2.0*0.0992034)));
+    return eff;
+  }
+  else if(_campaign == "Run3Summer23BPix"){
+    if(pt<10 || eta>2.4) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.949014*(1.0+TMath::Erf((pt-24.9446)/(2.0*0.0456965)));
+    else if(eta>1.479)  eff = 0.5*0.955304*(1.0+TMath::Erf((pt-25.1877)/(2.0*0.0328055)));
+    return eff;
   }
   else{
-    cout<<"Warning: TrigEFF_allCampaign_Isomu24_Data: Give proper campaign name."<<endl;
+    cout<<"Warning: TrigEFF Mu Data: Give proper campaign name; not "<<_campaign<<endl;
     return 1.0;
   }
 }
@@ -195,21 +210,38 @@ double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron
     else if(eta>1.479)  eff = 0.5*0.962208*(1.0+TMath::Erf((pt-33.9927)/(2.0*1.55814)));
     return eff;
   }
-  else if(_campaign == "2018_UL"){ 
-    if(eta<=1.479)     eff = 0.5*0.962897*(1.0+TMath::Erf((pt-33.1188)/(2.0*0.844886)));
-    else if(eta>1.479) eff = 0.5*0.975043*(1.0+TMath::Erf((pt-32.9805)/(2.0*1.18094)));
+  else if(_campaign == "2018_UL"){
+    if( pt<10 || eta>2.4 ) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.962897*(1.0+TMath::Erf((pt-33.1188)/(2.0*0.844886)));
+    else if(eta>1.479)  eff = 0.5*0.975043*(1.0+TMath::Erf((pt-32.9805)/(2.0*1.18094)));
     return eff;
   }
   else if(_campaign == "Run3Summer22"){
-    if(eta<=1.479) eff = 0.5*0.976349*(1.0+TMath::Erf((pt-31.1233)/(2.0*1.68838)));
-    else if(eta>1.479) eff = 0.5*0.971387*(1.0+TMath::Erf((pt-29.2013)/(2.0*2.10407)));
+    if( pt<10 || eta>2.4 ) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.976349*(1.0+TMath::Erf((pt-31.1233)/(2.0*1.68838)));
+    else if(eta>1.479)  eff = 0.5*0.971387*(1.0+TMath::Erf((pt-29.2013)/(2.0*2.10407)));
     return eff;
   }
   else if(_campaign == "Run3Summer22EE"){
-    return 1.0;
+    if(pt<10 || eta>2.4) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.979149*(1.0+TMath::Erf((pt-33.3691)/(2.0*1.28607)));
+    else if(eta>1.479)  eff = 0.5*0.975062*(1.0+TMath::Erf((pt-32.9815)/(2.0*1.47289)));
+    return eff;
+  }
+  else if(_campaign == "Run3Summer23"){
+    if(pt<10 || eta>2.4) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.974765*(1.0+TMath::Erf((pt-33.0725)/(2.0*1.43905)));
+    else if(eta>1.479)  eff = 0.5*0.975377*(1.0+TMath::Erf((pt-32.6495)/(2.0*1.69333)));
+    return eff;
+  }
+  else if(_campaign == "Run3Summer23BPix"){
+    if(pt<10 || eta>2.4) return 0.0;
+    else if(eta<=1.479) eff = 0.5*0.97538*(1.0+TMath::Erf((pt-33.2668)/(2.0*1.39703)));
+    else if(eta>1.479)  eff = 0.5*0.970987*(1.0+TMath::Erf((pt-32.7315)/(2.0*1.64687)));
+    return eff;
   }
   else{
-    cout<<"Warning: TrigEFF_allCampaign_Ele27or32WPTightGSF_Data: Give proper campaign name."<<endl;
+    cout<<"Warning: TrigEFF ele data: Give proper campaign name; not "<<_campaign<<endl;
     return 1.0;
   }
 }
