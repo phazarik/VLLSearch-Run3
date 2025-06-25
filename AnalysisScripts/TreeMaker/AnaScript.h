@@ -49,8 +49,8 @@ public :
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
-  using uint_or_int  = UInt_t;
-  */
+  using uint_or_int  = UInt_t;*/
+  
   //Read only the important branches:
   TTreeReaderValue<UInt_t> run = {fReader, "run"};
   TTreeReaderValue<UInt_t> luminosityBlock = {fReader, "luminosityBlock"};
@@ -564,6 +564,7 @@ void AnaScript::Init(TTree *tree)
   _TreeFile->SetCompressionLevel(9);
   _TreeFile->SetCompressionSettings(209);
   _mytree = new TTree("myEvents", "myEvents");
+  _mytree->SetDirectory(nullptr);  // prevent auto-registration
   InitializeBranches(_mytree);
 }
 

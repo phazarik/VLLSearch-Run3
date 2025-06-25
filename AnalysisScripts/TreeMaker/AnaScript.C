@@ -90,6 +90,7 @@ void AnaScript::SlaveTerminate()
   double time_taken = double(end-start);
   cout<<"\nTime taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
   cout<<" sec \n"<<endl;
+  cout << "Final tree entries: " << _mytree->GetEntries() << endl;
 }
 void AnaScript::Terminate()
 {
