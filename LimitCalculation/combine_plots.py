@@ -21,7 +21,8 @@ svg     = args.svg
 
 
 #----------------------------------------------------------------------
-campaigns = ['2018_UL', '2017_UL', '2016postVFP_UL', '2016preVFP_UL']
+#campaigns = ['2018_UL', '2017_UL', '2016postVFP_UL', '2016preVFP_UL']
+campaigns = ['Run3Summer22', 'Run3Summer22EE']
 channels = ['mm', 'me', 'em', 'ee']
 #----------------------------------------------------------------------
 
@@ -43,24 +44,61 @@ outfile = os.path.join(outdir, outname)
 images = {}
 combined_files = []
 
+'''
 for campaign in campaigns:
     for channel in channels:
         for filename in figures:
-            if campaign in filename and channel in filename:
-                if svg: images[(campaign, channel)] = fromfile(os.path.join(indir, filename)).getroot()
-                else: images[(campaign, channel)] = Image.open(os.path.join(indir, filename))
-                combined_files.append(filename)
-                break
+            if 'Run3' in campaign:
+                name_parts = filename.replace(ext, '').split('_')
+                if len(name_parts) >= 5 and name_parts[3] == campaign and name_parts[4] == channel:
+                    if svg: images[(campaign, channel)] = fromfile(os.path.join(indir, filename)).getroot()
+                    else: images[(campaign, channel)] = Image.open(os.path.join(indir, filename))
+                    combined_files.append(filename)
+                    break
+            else:
+                if campaign in filename and channel in filename:
+                    if svg: images[(campaign, channel)] = fromfile(os.path.join(indir, filename)).getroot()
+                    else: images[(campaign, channel)] = Image.open(os.path.join(indir, filename))
+                    combined_files.append(filename)
+                    break
+'''
 
+for campaign in campaigns:
+    for channel in channels:
+        match_found = False
+        for filename in figures:
+            name_parts = filename.replace(ext, '').split('_')
+            if 'VLLD' in name_parts and modelname.split('_')[1] in name_parts and name_parts[-1] == channel:
+                if 'Run3' in campaign:
+                    if name_parts[-2] == campaign:
+                        match_found = True
+                        break
+                else:
+                    if len(name_parts) >= 6 and name_parts[3] + '_' + name_parts[4] == campaign:
+                        match_found = True
+                        break
+        if match_found:
+            filepath = os.path.join(indir, filename)
+            if svg: images[(campaign, channel)] = fromfile(filepath).getroot()
+            else:  images[(campaign, channel)] = Image.open(filepath)
+            combined_files.append(filename)
+        else:
+            print(f"Missing: {modelname}_{campaign}_{channel}{ext}")
+                    
 if combined_files:
     print("Combining:")
     for idx, file in enumerate(combined_files, 1):
         print(f"{idx}. {file}")
 
+'''
 if not images:
     print("Error: No images found to combine.")
     sys.exit(1)
-
+'''
+if not combined_files:
+    print("Error: No matching files found in directory.")
+    sys.exit(1)
+    
 rows = campaigns
 cols = channels
 if svg: img_width, img_height = 565, 540

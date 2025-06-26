@@ -8,13 +8,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve,auc
 from keras import layers
 from tqdm  import tqdm
+from datetime import timedelta
 #from keras import Sequential
 #from tensorflow.keras.layers import Dense
 
 #Global parameters:
 indir = '../ROOT_FILES/trees/'
-jobname = 'tree_2018UL_baseline_Dec30'
-outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_2018_UL_baseline'
+jobname = 'tree_Run3Summer23_baseline_Jun25'
+outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer23_baseline'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
@@ -50,7 +51,7 @@ def read_file_into_df(filepath, step_size=100000):
         dfs = []
 
         with tqdm(total=total_batches, unit="batch",
-                  bar_format="{l_bar}{bar}| [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
+                  bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
                   leave=True, ncols=100, desc="Reading", colour='green') as pbar:
             for batch in ttree.iterate(ttree.keys(), step_size=step_size, library="pd"):
                 dfs.append(batch)
@@ -66,7 +67,7 @@ def write_df_into_file(df, filepath, step_size=100000):
     total_entries = len(df)
     total_batches = (total_entries + step_size - 1) // step_size
 
-    with tqdm(total=total_batches, unit="batch", 
+    with tqdm(total=total_batches, unit="batch",
               bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
               leave=True, ncols=100, desc="Writing", colour='green') as pbar:
         
@@ -194,7 +195,7 @@ for f in list_of_files:
     #break #file
     
 end_time = time.time()
-time_taken = end_time-start_time
+time_taken = str(timedelta(seconds=int(end_time-start_time)))
 
 print(' \n\033[33mDone!\033[0m\n')
 print('------------------------------------------------------------------------------')
@@ -202,7 +203,7 @@ print( '\033[33mSummary:\033[0m')
 print(f'\033[33mSuccess : {list_success}\033[0m')
 print(f'\033[31mEmpty   : {list_failed}\033[0m')
 print(f'\033[33mOutput directory: {outdir}\033[0m')
-print(f'\033[33mtime taken : {time_taken:.2f} seconds\033[0m')
+print(f'\033[33mtime taken : {time_taken} seconds\033[0m')
 print('-------------------------------------------------------------------------------\n')
 
     

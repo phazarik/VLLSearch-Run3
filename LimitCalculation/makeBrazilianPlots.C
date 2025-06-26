@@ -24,7 +24,7 @@ vector<LimitData> ReadDataFromFile(const TString& filename);
 void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TString campaign, TString channel, float ymin, float ymax, bool bottomleft);
 string todays_date();
 
-void makeBrazillianPlots(){
+void makeBrazilianPlots(){
 
   TString timetag = "2025-05-15";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
