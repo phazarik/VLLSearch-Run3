@@ -7,6 +7,7 @@
 #include "../includeHeaders.h"
 #include "BookHistograms.h"
 #include "make_bJetSFPlots.h"
+#include "make_signalPlots.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -114,6 +115,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++;
 
     triggerRes         = true; //default, always true for MC
+    /*
     muon_trigger       = *HLT_SingleMuon;
     electron_trigger   = *HLT_SingleEle;
     overlapping_events = muon_trigger && electron_trigger;
@@ -132,7 +134,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	triggerRes = false;
       }
     }//Applying trigger on data
-
+    */
     if(triggerRes){
       nEvtTrigger++;
 
@@ -156,9 +158,10 @@ Bool_t AnaScript::Process(Long64_t entry)
 	//SortPt(genMuon);
 	//SortPt(genElectron);
 	//SortPt(genLightLepton);
-	createSignalArrays();
-	SortVLL();
+	//createSignalArrays(); //moved to signal-study
+	//SortVLL(); //moved to signal-study
 
+	/*
 	//Correcting the Doublet model (flagging out the invalid decays)
 	if(_flag=="doublet"){ //for VLLD files
 	  bad_event = false;
@@ -184,7 +187,7 @@ Bool_t AnaScript::Process(Long64_t entry)
 	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
 	    }
 	  }
-	}
+	  }*/
 	//Make gen-level plots here.
       }
       //Counting bad events:
@@ -222,10 +225,11 @@ Bool_t AnaScript::Process(Long64_t entry)
       }
 
       //----------------------------------------------------------------------------------------------------------
-      // Writing to tree
+      // Analysis:
       //----------------------------------------------------------------------------------------------------------
 
-      if(_data == 0) MakebJetSFPlots(); //nEvtPass is here
+      //if(_data == 0) MakebJetSFPlots(); //nEvtPass is here
+      if(_data == 0) MakeSignalPlots(); //nEvtPass is here
       
     }//Triggered Events
   }//GoodEvt
