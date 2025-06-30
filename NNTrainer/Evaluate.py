@@ -14,8 +14,8 @@ from datetime import timedelta
 
 #Global parameters:
 indir = '../ROOT_FILES/trees/'
-jobname = 'tree_Run3Summer23_baseline_Jun25'
-outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer23_baseline'
+jobname = 'tree_Run3Summer22EE_baseline_Jun30'
+outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer22EE_baseline'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {

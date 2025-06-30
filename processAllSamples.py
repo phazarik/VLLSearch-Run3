@@ -29,14 +29,14 @@ debug   = args.debug   ### For debug statements.
 #  SET GLOBAL PARAMETERS BEFORE RUNNING
 #---------------------------------------------
 
-campaign = "Run3Summer23BPix"
+campaign = "Run3Summer22EE"
 ### Options for Run2: 2016preVFP_UL, 2016postVFP_UL, 2017_UL, 2018_UL
 ### Options for Run3: Run3Summer22, Run3Summer22EE, Run3Summer23, Run3Summer23BPix
 
 mode = "TreeMaker"
 nanoAODv = 12
 
-samples_to_run = ["DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
+samples_to_run = ["DYGToLLG", "DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
 #samples_to_run.extend(["Muon", "EGamma"])
 samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
 
@@ -49,7 +49,7 @@ if nanoAODv==11:
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
 if mode == "HistMaker": dumpdir = "ROOT_FILES/hists/"
-nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer23BPix"
+nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22EE"
 #nanoAODpath = "/mnt/d/work/skimmed_2LSS_Signal"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
@@ -59,7 +59,10 @@ codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
 ## Cleaning up:
 clean = f'python3 {codedir}/{mode}/cleanup.py'
-if test and not dryrun: os.system(clean)
+if test and not dryrun:
+    print("Cleaning the code directory ..")
+    os.system(clean)
+
 print("Code directory ready.")
 
 jsonfilepath = 'LumiJsons'
@@ -81,6 +84,7 @@ for item in samples_to_run:
     for sample, subs in samplelist.items():
         
         if sample != item: continue
+        if 'DYG' not in sample: continue
         #if sample not in ['QCDEM', 'QCDMu', 'VVSS', 'WGtoLNuG', 'WtoLNu', 'ZGamma']: continue
         #if 'VLL' not in sample: continue
         #if 'RareTop' not in sample: continue
