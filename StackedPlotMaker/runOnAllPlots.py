@@ -20,37 +20,29 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-07-01_baseline/hist_Run3Summer22_baseline_mm":{
-        "campaign":"Run3Summer22",
+    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_mm":{
+        "campaign":"Run3Summer23",
         "channel":"mm"
     },
-    "2025-07-01_baseline/hist_Run3Summer22_baseline_me":{
-        "campaign":"Run3Summer22",
+    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_me":{
+        "campaign":"Run3Summer23",
         "channel":"me"
     },
-    "2025-07-01_baseline/hist_Run3Summer22_baseline_em":{
-        "campaign":"Run3Summer22",
+    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_em":{
+        "campaign":"Run3Summer23",
         "channel":"em"
     },
-    "2025-07-01_baseline/hist_Run3Summer22_baseline_ee":{
-        "campaign":"Run3Summer22",
+    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_ee":{
+        "campaign":"Run3Summer23",
         "channel":"ee"
     },
-    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_mm":{
-        "campaign":"Run3Summer22EE",
+    "2025-07-02_qcdvr/hist_Run3Summer23BPix_qcdvr_mm":{
+        "campaign":"Run3Summer23BPix",
         "channel":"mm"
     },
-    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_me":{
-        "campaign":"Run3Summer22EE",
+    "2025-07-02_qcdvr/hist_Run3Summer23BPix_qcdvr_me":{
+        "campaign":"Run3Summer23BPix",
         "channel":"me"
-    },
-    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_em":{
-        "campaign":"Run3Summer22EE",
-        "channel":"em"
-    },
-    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_ee":{
-        "campaign":"Run3Summer22EE",
-        "channel":"ee"
     }
 }
 
@@ -121,12 +113,14 @@ jobcount = 0
 plotcount = 0
 
 for jobname, info in jobdict.items():
+
+    #if not jobname.endswith("ee"): continue
     
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "baseline"
-    text     = "baseline"
+    tag      = "qcdvr"
+    text     = "QCD VR"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 

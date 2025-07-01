@@ -247,7 +247,7 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
        w[3], "nTarget", w[4], "ScaleFactor ± Error", w[5], "bin-range");
   print_line();
 
-  int total_ndata = 0, total_ntarget = 0, total_nothers = 0;
+  double total_ndata = 0, total_ntarget = 0, total_nothers = 0;
   float total_ndata_error = 0, total_ntarget_error = 0, total_nothers_error = 0;
 
   for (int bin = 0; bin < hst_data->GetNbinsX(); bin++) {
@@ -281,11 +281,11 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
 
     TString sf_string = TString::Format("%.6f ± %.6f", sf_bin, sf_error);
     TString range = TString::Format("%d–%d", (int)binxlow, (int)binxup);
-    printf("|%*d|%*d|%*d|%*d|%*s|%*s  |\n",
+    printf("|%*d|%*.1f|%*.1f|%*.1f|%*s|%*s  |\n",
 	   w[0], bin + 1,
-	   w[1], (int)ndata,
-	   w[2], (int)nothers,
-	   w[3], (int)ntarget,
+	   w[1], ndata,
+	   w[2], nothers,
+	   w[3], ntarget,
 	   w[4], sf_string.Data(),
 	   w[5], range.Data());
   }
@@ -300,7 +300,7 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
   );
   
   TString global_sf_string = TString::Format("%.6f ± %.6f", global_sf, global_sf_error);
-  printf("|%*s|%*d|%*d|%*d|%*s|%*s|\n",
+  printf("|%*s|%*.1f|%*.1f|%*.1f|%*s|%*s|\n",
 	 w[0], "all",
 	 w[1], total_ndata,
 	 w[2], total_nothers,
@@ -350,14 +350,14 @@ void DisplayBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1
       sf_bin = (ndata - nothers) / ntarget;
       sf_error = sf_bin * sqrt(pow(ndata_error / (ndata - nothers), 2) + pow(ntarget_error / ntarget, 2));
     }
-
-    TString high_str = (bin == nbins - 1) ? "\"inf\"" : TString::Format("%d", (int)binxup);
-    printf("    { \"low\": %d, \"high\": %s, \"scale\": [%.6f, %.6f] }%s\n",
-           (int)binxlow,
+    
+    TString high_str = (bin == nbins - 1) ? "\"inf\"" : TString::Format("%.1f", binxup);
+    printf("    { \"low\": %.1f, \"high\": %s, \"scale\": [%.6f, %.6f] }%s\n",
+           binxlow,
            high_str.Data(),
            sf_bin,
            sf_error,
-           (bin == nbins - 1 ? "" : ","));
+	   (bin == nbins - 1 ? "" : ","));
   }
 
   printf("  ]\n");
