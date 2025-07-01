@@ -152,11 +152,11 @@ for jobname, info in jobdict.items():
             f'"{text}"'
         )
         ## For plotmaker:
-        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
 
         ## For writing yields"
-        if var != "dilep_pt": continue
-        command = f"root -q -b -l 'writeYields.C({arguments})'"
+        #if var != "dilep_pt": continue
+        #command = f"root -q -b -l 'writeYields.C({arguments})'"
 
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output
