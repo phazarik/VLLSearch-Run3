@@ -178,23 +178,24 @@ void processTree(
 	
     Double_t wt = 1.0;
     
-    if((string)campaign == "Run3Summer22" || (string)campaign == "Run3Summer22EE") wt_pileup = 1.0;
-    if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
+    //if((string)campaign == "Run3Summer22" || (string)campaign == "Run3Summer22EE") wt_pileup = 1.0;
+    //if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
 
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    wt = wt*wt_bjet;             //Adding b-tagging corrections
+    //wt = wt*wt_bjet;             //Adding b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-    
+
+    /*
     //1) DY correction for the ee channel:
     bool flag_dy = (channelval == 3) && find_key(inputFilename, "DY");
     if(flag_dy){
       Double_t scale_dy = 1.0;
       Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
       //Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
-      scale_dy = scale_dy1;//*scale_dy2;
+      scale_dy = scale_dy1;/scale_dy2;
       wt = wt * scale_dy;
       //cout<<"Correcting DY by : "<<scale_dy<<endl;
     }
@@ -213,7 +214,7 @@ void processTree(
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
       //cout<<"Correcting TTBar by : "<<scale_ttbar<<"\t"<<up<<"\t"<<down<<endl;
-    }
+      }*/
     
     //--------------------------------
     // Filling up the histograms:

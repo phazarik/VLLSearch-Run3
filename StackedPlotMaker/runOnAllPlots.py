@@ -2,6 +2,7 @@ import os, sys
 import argparse
 import subprocess
 import time
+from datetime import timedelta
 from tqdm import tqdm
 from rich.console import Console
 console = Console(highlight=False)
@@ -19,36 +20,36 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-05-15_sr/hist_Run3Summer22_sr_mm":{
-        "campaign":"Run3Summer22",
+    "2025-07-01_baseline/hist_Run3Summer23_baseline_mm":{
+        "campaign":"Run3Summer23",
         "channel":"mm"
     },
-    "2025-05-15_sr/hist_Run3Summer22_sr_me":{
-        "campaign":"Run3Summer22",
+    "2025-07-01_baseline/hist_Run3Summer23_baseline_me":{
+        "campaign":"Run3Summer23",
         "channel":"me"
     },
-    "2025-05-15_sr/hist_Run3Summer22_sr_em":{
-        "campaign":"Run3Summer22",
+    "2025-07-01_baseline/hist_Run3Summer23_baseline_em":{
+        "campaign":"Run3Summer23",
         "channel":"em"
     },
-    "2025-05-15_sr/hist_Run3Summer22_sr_ee":{
-        "campaign":"Run3Summer22",
+    "2025-07-01_baseline/hist_Run3Summer23_baseline_ee":{
+        "campaign":"Run3Summer23",
         "channel":"ee"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_mm":{
-        "campaign":"Run3Summer22EE",
+    "2025-07-01_baseline/hist_Run3Summer23BPix_baseline_mm":{
+        "campaign":"Run3Summer23BPix",
         "channel":"mm"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_me":{
-        "campaign":"Run3Summer22EE",
+    "2025-07-01_baseline/hist_Run3Summer23BPix_baseline_me":{
+        "campaign":"Run3Summer23BPix",
         "channel":"me"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_em":{
-        "campaign":"Run3Summer22EE",
+    "2025-07-01_baseline/hist_Run3Summer23BPix_baseline_em":{
+        "campaign":"Run3Summer23BPix",
         "channel":"em"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_ee":{
-        "campaign":"Run3Summer22EE",
+    "2025-07-01_baseline/hist_Run3Summer23BPix_baseline_ee":{
+        "campaign":"Run3Summer23BPix",
         "channel":"ee"
     }
 }
@@ -124,8 +125,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "sr"
-    text     = "Signal region"
+    tag      = "baseline"
+    text     = "baseline"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
@@ -151,11 +152,11 @@ for jobname, info in jobdict.items():
             f'"{text}"'
         )
         ## For plotmaker:
-        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
 
         ## For writing yields"
-        if var != "dilep_pt": continue
-        command = f"root -q -b -l 'writeYields.C({arguments})'"
+        #if var != "dilep_pt": continue
+        #command = f"root -q -b -l 'writeYields.C({arguments})'"
 
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output
@@ -166,9 +167,7 @@ for jobname, info in jobdict.items():
 
 end_time = time.time()
 time_taken = end_time - start_time
-hours, rem = divmod(time_taken, 3600)
-minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
-print(f"Time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
+print(f"Time taken = {str(timedelta(seconds=int(time_taken)))}\n", style='yellow bold')
 print(f"Total number of plots = {plotcount}\n", style='yellow bold')

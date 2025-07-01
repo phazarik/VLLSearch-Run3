@@ -39,6 +39,12 @@ TH1D *get_hist(
 	       int rebin=1.0
 	       ){
   TString filename = input_path+"/"+"hst_"+sample+"_"+subsample+".root";
+
+  //Skip samples here:
+  if (sample.Contains("ZGamma"))   return nullptr; //For Run-3 only
+  if (sample.Contains("VVSS"))     return nullptr;
+  if (sample.Contains("WJetsNLO")) return nullptr;
+  
   if(!file_exists(filename)){
     DisplayText("Not found: "+filename, 31);
     return nullptr;
@@ -147,40 +153,40 @@ vector<TH1D *> return_hist_collection(
   }
 
   vector<SampleConfig> config = {
-    //Run3:
-    {"DYto2L",     "DY",        kRed-7},
-    {"DYJetsToLL", "DY",        kRed-7},
-    {"Higgs",      "Higgs",       kMagenta},
+    {"DYto2L",         "DY",        kRed-7},
+    {"DYJetsToLL",     "DY",        kRed-7},
+    {"Higgs",          "Higgs",     kMagenta},
     {"QCDMu",          "QCD (#mu)", kYellow},
     {"QCD_MuEnriched", "QCD (#mu)", kYellow},
     {"QCDEM",          "QCD (e#gamma)", kYellow+1},
     {"QCD_EMEnriched", "QCD (e#gamma)", kYellow+1},
-    {"RareTop",   "RareTop", kCyan-2},
-    {"Rare",      "Rare",    kCyan-2},
-    {"ST",        "tX",      kCyan-7},
-    {"SingleTop", "tX",      kCyan-7},
+    {"RareTop",        "RareTop", kCyan-2},
+    {"Rare",           "Rare",    kCyan-2},
+    {"ST",             "tX",      kCyan-7},
+    {"SingleTop",      "tX",      kCyan-7},
     {"TT",    "t#bar{t}",      kAzure+1},
     {"TTBar", "t#bar{t}",      kAzure+1},
     {"TTV",   "t#bar{t}V",     kAzure+2},
     {"TTW",   "t#bar{t}W",     kAzure+2},
     {"TTZ",   "t#bar{t}Z",     kAzure+2},
-    {"TW",     "tW",           kBlue-3},
+    {"TW", "tW", kBlue-3},
     {"VV", "VV", kGreen+1},
     {"WW", "WW", kGreen+1},
     {"WZ", "WZ", kGreen+1},
     {"ZZ", "ZZ", kGreen+1},
     {"VVSS", "WWss", kGreen-5},
     {"WpWp", "WWss", kGreen-5},
-    {"VVV", "VVV", kGreen+3},
-    {"WWW", "WWW", kGreen+3},
-    {"WWZ", "WWZ", kGreen+3},
-    {"WZZ", "WZZ", kGreen+3},
-    {"ZZZ", "ZZZ", kGreen+3},
+    {"VVV",  "VVV", kGreen+3},
+    {"WWW",  "WWW", kGreen+3},
+    {"WWZ",  "WWZ", kGreen+3},
+    {"WZZ",  "WZZ", kGreen+3},
+    {"ZZZ",  "ZZZ", kGreen+3},
     {"WGtoLNuG", "W#gamma", kGray+2},
     {"WGamma",   "W#gamma", kGray+2},
     {"WtoLNu",        "W+jets", kGray+1},
     {"HTbinnedWJets", "W+jets", kGray+1},
     {"ZGamma",   "Z#gamma", kRed-9},
+    {"DYGToLLG", "Z#gamma",   kRed-9},
   };
   
   vector<TH1D *> hist_collection;
@@ -189,7 +195,7 @@ vector<TH1D *> return_hist_collection(
   for (auto& [sample_str, subsamples] : sample_info.items()) {
     TString sample = sample_str.c_str();
 
-    if (sample == "WJetsNLO") continue;
+    //if (sample == "WJetsNLO") continue;
     //if (sample == "TTZ") continue; //For DY CR
     
     if (sample.Contains("VLLS") || sample.Contains("VLLD")) {

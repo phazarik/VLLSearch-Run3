@@ -2,6 +2,7 @@ import os, sys
 import argparse
 import time
 from datetime import date
+from datetime import timedelta
 from tqdm import tqdm
 from rich.console import Console
 console = Console(highlight=False)
@@ -20,6 +21,7 @@ print()
 
 channels = ["mm", "me", "em", "ee"]
 
+'''
 jobdict = {
     "baseline/tree_2016preVFP_UL_baseline":{
         "dump":"hist_2016preVFP_UL_baseline",
@@ -36,25 +38,18 @@ jobdict = {
     "baseline/tree_2018_UL_baseline":{
         "dump":"hist_2018_UL_baseline",
         "campaign":"2018_UL"
-    },
-    "baseline/tree_Run3Summer22_baseline":{
-        "dump":"hist_Run3Summer22_baseline",
-        "campaign":"Run3Summer22"
-    },
-    "baseline/tree_Run3Summer22EE_baseline":{
-        "dump":"hist_Run3Summer22EE_baseline",
-        "campaign":"Run3Summer22EE"
     }
 }
+'''
 
 jobdict = {
-    "wjetscr/tree_Run3Summer22_wjetscr":{
-        "dump":"hist_Run3Summer22_wjetscr_unscaled",
-        "campaign":"Run3Summer22"
+    "baseline/tree_Run3Summer23_baseline":{
+        "dump":"hist_Run3Summer23_baseline",
+        "campaign":"Run3Summer23"
     },
-    "wjetscr/tree_Run3Summer22EE_wjetscr":{
-        "dump":"hist_Run3Summer22EE_wjetscr_unscaled",
-        "campaign":"Run3Summer22EE"
+    "baseline/tree_Run3Summer23BPix_baseline":{
+        "dump":"hist_Run3Summer23BPix_baseline",
+        "campaign":"Run3Summer23BPix"
     }
 }
 
@@ -95,12 +90,11 @@ for jobname, info in jobdict.items():
 
 end_time = time.time()
 time_taken = end_time - start_time
-hours, rem = divmod(time_taken, 3600)
-minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
 if processed:
     print("Histograms are created in the following directories:")
     for name in processed: print(f"../ROOT_FILES/hists/{today}/{name}")
-print(f"Total time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
+
+print(f"Total time taken = {str(timedelta(seconds=int(time_taken)))}\n", style='yellow bold')
     

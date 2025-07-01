@@ -86,6 +86,14 @@ void extractHistsFromTrees(
     lumifile = "../LumiJsons/lumidata_Run3Summer22EE.json";
     datalumi = 26671.7;
   }
+  else if (campaign == "Run3Summer23") {
+    lumifile = "../LumiJsons/lumidata_Run3Summer23.json";
+    datalumi = 17794.0;
+  }
+  else if (campaign == "Run3Summer23BPix") {
+    lumifile = "../LumiJsons/lumidata_Run3Summer23BPix.json";
+    datalumi = 9451.0;
+  }
   else cout<<"Provide correct campaign name!"<<endl;
 
   // Load luminosity data
