@@ -18,38 +18,27 @@ dryrun = args.dryrun
 
 if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
-default = True
+#default = True
 
 basedir = '../ROOT_FILES/treesWithNN/'
 
 jobdict = {
-    "baseline/tree_2016preVFP_UL_baseline":{
-        "outjob":"sigregion/tree_2016preVFP_UL_sigregion",
-        "campaign":"2016preVFP_UL"
-    },
-    "baseline/tree_2016postVFP_UL_baseline":{
-        "outjob":"sigregion/tree_2016postVFP_UL_sigregion",
-        "campaign":"2016postVFP_UL"
-    },
-    "baseline/tree_2017_UL_baseline":{
-        "outjob":"sigregion/tree_2017_UL_sigregion",
-        "campaign":"2017_UL"
-    },
-    "baseline/tree_2018_UL_baseline":{
-        "outjob":"sigregion/tree_2018_UL_sigregion",
-        "campaign":"2018_UL"
-    },
-}
-
-jobdict = {
     "baseline/tree_Run3Summer22_baseline":{
-        "outjob":"wjetscr/tree_Run3Summer22_wjetscr",
+        "outjob":"dycr/tree_Run3Summer22_dycr",
         "campaign":"Run3Summer22"
     },
     "baseline/tree_Run3Summer22EE_baseline":{
-        "outjob":"wjetscr/tree_Run3Summer22EE_wjetscr",
+        "outjob":"dycr/tree_Run3Summer22EE_dycr",
         "campaign":"Run3Summer22EE"
-    }
+    },
+    "baseline/tree_Run3Summer23_baseline":{
+        "outjob":"dycr/tree_Run3Summer23_dycr",
+        "campaign":"Run3Summer23"
+    },
+    "baseline/tree_Run3Summer23BPix_baseline":{
+        "outjob":"dycr/tree_Run3Summer23BPix_dycr",
+        "campaign":"Run3Summer23BPix"
+    },
 }
 
 def read_file_into_df(filepath, step_size=100000, test=False):
@@ -157,7 +146,7 @@ for injob, info in jobdict.items():
         
         #------------------------------
         # Final event selection:
-        event_selection = wjets_cr
+        event_selection = dy_cr
         #------------------------------
 
         filecount += 1
@@ -190,7 +179,6 @@ hours, rem = divmod(time_taken, 3600)
 minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
-print(f"Time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
 print(f"Time taken = {time_taken:.2f} seconds.", style='yellow bold')
 print(f"Total number of jobs  = {jobcount}",     style='yellow bold')
 print(f"Total number of files = {filecount}\n",  style='yellow bold')

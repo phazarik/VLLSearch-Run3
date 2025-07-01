@@ -21,35 +21,22 @@ print()
 
 channels = ["mm", "me", "em", "ee"]
 
-'''
 jobdict = {
-    "baseline/tree_2016preVFP_UL_baseline":{
-        "dump":"hist_2016preVFP_UL_baseline",
-        "campaign":"2016preVFP_UL"
-    },
-    "baseline/tree_2016postVFP_UL_baseline":{
-        "dump":"hist_2016postVFP_UL_baseline",
-        "campaign":"2016postVFP_UL"
-    },
-    "baseline/tree_2017_UL_baseline":{
-        "dump":"hist_2017_UL_baseline",
-        "campaign":"2017_UL"
-    },
-    "baseline/tree_2018_UL_baseline":{
-        "dump":"hist_2018_UL_baseline",
-        "campaign":"2018_UL"
-    }
-}
-'''
-
-jobdict = {
-    "baseline/tree_Run3Summer22_baseline":{
-        "dump":"hist_Run3Summer22_baseline",
+    "qcdvr/tree_Run3Summer22_qcdvr":{
+        "dump":"hist_Run3Summer22_qcdvr",
         "campaign":"Run3Summer22"
     },
-    "baseline/tree_Run3Summer22EE_baseline":{
-        "dump":"hist_Run3Summer22EE_baseline",
+    "qcdvr/tree_Run3Summer22EE_qcdvr":{
+        "dump":"hist_Run3Summer22EE_qcdvr",
         "campaign":"Run3Summer22EE"
+    },
+    "qcdvr/tree_Run3Summer23_qcdvr":{
+        "dump":"hist_Run3Summer23_qcdvr",
+        "campaign":"Run3Summer23"
+    },
+    "qcdvr/tree_Run3Summer23BPix_qcdvr":{
+        "dump":"hist_Run3Summer23BPix_qcdvr",
+        "campaign":"Run3Summer23BPix"
     }
 }
 
@@ -64,6 +51,9 @@ processed = []
 for jobname, info in jobdict.items():
     #if 'EE' not in jobname: continue
     for channel in channels:
+
+        #if channel != "ee" : continue
+        
         jobcount += 1
         campaign = info["campaign"]
         dump = info["dump"]+"_"+channel
