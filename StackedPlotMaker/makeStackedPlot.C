@@ -9,11 +9,11 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void makeStackedPlot(
 		     TString _var = "HT",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-05-15_sr/hist_Run3Summer22EE_sr_mm",
+		     TString _jobname = "2025-07-01_baseline_Run3/hist_Run3Summer22EE_baseline_mm",
 		     TString _campaign = "Run3Summer22EE",
 		     TString _channel = "mm",
-		     TString _tag = "sr",
-		     TString _displaytext = "Signal region"
+		     TString _tag = "baseline",
+		     TString _displaytext = "Baseline"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -26,8 +26,8 @@ void makeStackedPlot(
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
   bool toOverlayData=false;
-  bool toSave=false;
-  Double_t ymin = 0.1; Double_t ymax = 10E6;
+  bool toSave=true;
+  Double_t ymin = 0.1; Double_t ymax = 10E8;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
@@ -102,6 +102,20 @@ void makeStackedPlot(
     vector<string> eras = {"E", "F", "G"};
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+  }
+  if(_campaign == "Run3Summer23"){
+    vector<string> eras = {"C1", "C2", "C3", "C4"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
+  }
+  if(_campaign == "Run3Summer23BPix"){
+    vector<string> eras = {"D1", "D2"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
   
   TH1D* hst_data  = nullptr;
@@ -334,7 +348,7 @@ void makeStackedPlot(
   }
 
   // 3) Drawing veto region for Drell-Yan:
-  //if(_channel=="ee" && _var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
+  if(_channel=="ee" && _var=="dilep_mass") draw_veto_region(ratioPad, 76, 106);
 
   //-------------------------------------------------------------
   //                    Texts and legend
@@ -344,12 +358,14 @@ void makeStackedPlot(
 
   put_text("CMS", 0.17, 0.83, 62, 0.07);          // Larger, bold CMS label
   put_text("Preliminary", 0.27, 0.83, 52, 0.05);  // Smaller preliminary label
-  if(_campaign == "2016preVFP_UL")  put_latex_text("19.7 fb^{-1} (2016-preVFP)", 0.62, 0.94, 42, 0.05);
-  if(_campaign == "2016postVFP_UL") put_latex_text("16.2 fb^{-1} (2016-postVFP)", 0.60, 0.94, 42, 0.05);
-  if(_campaign == "2017_UL")        put_latex_text("41.5 fb^{-1} (2017)", 0.74, 0.94, 42, 0.05);
-  if(_campaign == "2018_UL")        put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05);
-  if(_campaign == "Run3Summer22")   put_latex_text("7.98 fb^{-1} (2022)", 0.74, 0.94, 42, 0.05);
-  if(_campaign == "Run3Summer22EE") put_latex_text("26.67 fb^{-1} (2022-postEE)", 0.61, 0.94, 42, 0.05);
+  if(_campaign == "2016preVFP_UL")    put_latex_text("19.7 fb^{-1} (2016-preVFP)", 0.62, 0.94, 42, 0.05);
+  if(_campaign == "2016postVFP_UL")   put_latex_text("16.2 fb^{-1} (2016-postVFP)", 0.60, 0.94, 42, 0.05);
+  if(_campaign == "2017_UL")          put_latex_text("41.5 fb^{-1} (2017)", 0.74, 0.94, 42, 0.05);
+  if(_campaign == "2018_UL")          put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05);
+  if(_campaign == "Run3Summer22")     put_latex_text("7.98 fb^{-1} (2022-preEE)", 0.64, 0.94, 42, 0.05);
+  if(_campaign == "Run3Summer22EE")   put_latex_text("26.7 fb^{-1} (2022-postEE)", 0.63, 0.94, 42, 0.05);
+  if(_campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)", 0.62, 0.94, 42, 0.05);
+  if(_campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", 0.61, 0.94, 42, 0.05);
   put_latex_text(info1, 0.17, 0.78, 42, 0.04);     //Additional information
   put_latex_text(info2, 0.17, 0.73, 42, 0.04);     //Additional information
 

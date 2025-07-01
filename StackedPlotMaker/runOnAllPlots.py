@@ -2,6 +2,7 @@ import os, sys
 import argparse
 import subprocess
 import time
+from datetime import timedelta
 from tqdm import tqdm
 from rich.console import Console
 console = Console(highlight=False)
@@ -19,35 +20,35 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-05-15_sr/hist_Run3Summer22_sr_mm":{
+    "2025-07-01_baseline/hist_Run3Summer22_baseline_mm":{
         "campaign":"Run3Summer22",
         "channel":"mm"
     },
-    "2025-05-15_sr/hist_Run3Summer22_sr_me":{
+    "2025-07-01_baseline/hist_Run3Summer22_baseline_me":{
         "campaign":"Run3Summer22",
         "channel":"me"
     },
-    "2025-05-15_sr/hist_Run3Summer22_sr_em":{
+    "2025-07-01_baseline/hist_Run3Summer22_baseline_em":{
         "campaign":"Run3Summer22",
         "channel":"em"
     },
-    "2025-05-15_sr/hist_Run3Summer22_sr_ee":{
+    "2025-07-01_baseline/hist_Run3Summer22_baseline_ee":{
         "campaign":"Run3Summer22",
         "channel":"ee"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_mm":{
+    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_mm":{
         "campaign":"Run3Summer22EE",
         "channel":"mm"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_me":{
+    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_me":{
         "campaign":"Run3Summer22EE",
         "channel":"me"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_em":{
+    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_em":{
         "campaign":"Run3Summer22EE",
         "channel":"em"
     },
-    "2025-05-15_sr/hist_Run3Summer22EE_sr_ee":{
+    "2025-07-01_baseline/hist_Run3Summer22EE_baseline_ee":{
         "campaign":"Run3Summer22EE",
         "channel":"ee"
     }
@@ -124,8 +125,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "sr"
-    text     = "Signal region"
+    tag      = "baseline"
+    text     = "baseline"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
@@ -166,9 +167,7 @@ for jobname, info in jobdict.items():
 
 end_time = time.time()
 time_taken = end_time - start_time
-hours, rem = divmod(time_taken, 3600)
-minutes, seconds = divmod(rem, 60)
 
 print("\nDone!", style='yellow bold')
-print(f"Time taken = {int(hours):02d}h {int(minutes):02d}m {int(seconds):02d}s\n", style='yellow bold')
+print(f"Time taken = {str(timedelta(seconds=int(time_taken)))}\n", style='yellow bold')
 print(f"Total number of plots = {plotcount}\n", style='yellow bold')
