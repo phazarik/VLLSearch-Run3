@@ -48,29 +48,23 @@ Double_t GetStatUncertainty(TH1D *hist) {
 }
 
 TGraphErrors *GetUncertainty(TH1D* hist){
-  //Returns a TGraph containing uncertainties per bin on a hist.  
-  //Preparing the points:
   int nBins = hist->GetNbinsX();
-  Double_t x[nBins];
-  Double_t y[nBins];
-  Double_t ex[nBins];
-  Double_t ey[nBins];
+  std::vector<Double_t> x(nBins), y(nBins), ex(nBins), ey(nBins);
   for (int i = 0; i < nBins; i++) {
-    int bin = i+1;
-    Double_t nevt = hist->GetBinContent(bin);
-    Double_t binlow = hist->GetBinLowEdge(bin);
-    Double_t binhi  = binlow + hist->GetBinWidth(bin);
-    Double_t nevtErr= hist->GetBinError(bin);
-    x[i]  = (binlow+binhi)/2;
-    ex[i] = (binhi-binlow)/2;
+    int bin = i + 1;
+    Double_t nevt    = hist->GetBinContent(bin);
+    Double_t binlow  = hist->GetBinLowEdge(bin);
+    Double_t binhi   = binlow + hist->GetBinWidth(bin);
+    Double_t nevtErr = hist->GetBinError(bin);
+    x[i]  = (binlow + binhi) / 2;
+    ex[i] = (binhi - binlow) / 2;
     y[i]  = 1;
-    ey[i] = 0; if(nevt !=0) ey[i] = nevtErr/nevt;
+    ey[i] = (nevt != 0) ? nevtErr / nevt : 0;
   }
-  TGraphErrors *err = new TGraphErrors(nBins, x, y, ex, ey);
-  //Decoration:
+  TGraphErrors *err = new TGraphErrors(nBins, x.data(), y.data(), ex.data(), ey.data());
   err->SetMarkerStyle(0);
-  err->SetFillColor(kGray+1);
-  err->SetLineColor(kGray+1);
+  err->SetFillColor(kGray + 1);
+  err->SetLineColor(kGray + 1);
   err->SetFillStyle(3001);
   return err;
 }
