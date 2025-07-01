@@ -39,8 +39,6 @@ void AnaScript::MakeSignalPlots(){
     //temp.momid= MotherID(i,GenPart_genPartIdxMother[i]);
     temp.momid = GenPart_pdgId[GenPart_genPartIdxMother[i]]; //Not fixing the mother right now
 
-    //h.sig[0]->Fill(GenPart_pdgId[i], 1.0);
-
     bool mother_is_Z = (temp.momid == 23);
     bool mother_is_W = (fabs(temp.momid) == 24);
     bool not_its_own_mother = (temp.momid != temp.pdgid); //To avoid overcounting
@@ -100,34 +98,75 @@ void AnaScript::MakeSignalPlots(){
   //-------------------------------
   
   bad_event = false;
-  cout<<"\n----- Event no. "<<nEvtTotal<<" -----"<<endl;
+  bool todisplay = false;
+  if(todisplay) cout<<"\n----- Event no. "<<nEvtTotal<<" -----"<<endl;
   
   //1. Counting VLLS:
   int nvll = (int)vllep.size();
   int nvlnu = (int)vlnu.size();
-  cout<<"nVLL = "<<nvll<<" , nVLNu = "<<nvlnu<<", total = "<<nvll+nvlnu<<endl;
+  if(todisplay) cout<<"nVLL = "<<nvll<<" , nVLNu = "<<nvlnu<<", total = "<<nvll+nvlnu<<endl;
 
   //2. Daughters:
-  cout<<"Daughters of VLL:  ";
+  if(todisplay) cout<<"Daughters of VLL:  ";
   for(int i=0; i<(int)vllep.size(); i++){
     for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
-      cout << setw(4) << vllep.at(i).dauid[j] << ", ";
+      if(todisplay) cout << setw(4) << vllep.at(i).dauid[j] << ", ";
       if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
       //The charged lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
     }
   }
-  cout<<endl;
-  cout<<"Daughters of VLNu: ";
+  if(todisplay) cout<<endl<<"Daughters of VLNu: ";
   for(int i=0; i<(int)vlnu.size(); i++){
     for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
-      cout << setw(4) << vlnu.at(i).dauid[j] << ", ";
+      if(todisplay) cout << setw(4) << vlnu.at(i).dauid[j] << ", ";
       if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
       else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
       //The neutral lepton  cannot decay to H,nu or Z,nu.
     }
   }
-  cout<<endl;
-  if(bad_event) cout<<"\033[31mInvalid decay!\033[0m"<<endl;
-  else cout<<"\033[93mValid decay.\033[0m"<<endl;
+  if(todisplay) {
+    cout<<endl;
+    if(bad_event) cout<<"\033[31mInvalid decay!\033[0m"<<endl;
+    else cout<<"\033[93mValid decay.\033[0m"<<endl;
+  }
+  
+  if(bad_event) return;
+  
+  //--------------------
+  // Properties of VLLs
+  //--------------------
+
+  for(int i=0; i<(int)vllep.size(); i++){
+    h.vllep[0]->Fill(vllep.at(i).v.Pt());
+    h.vllep[1]->Fill(vllep.at(i).v.Eta());
+    h.vllep[2]->Fill(vllep.at(i).v.Phi());
+    h.vllep[3]->Fill(vllep.at(i).v.M());
+    h.vllep[4]->Fill(vllep.at(i).pdgid);
+    for(int j=0; j<(int)vllep[i].dauid.size(); j++) h.vllep[5]->Fill(vllep[i].dauid[j]);
+  }
+
+  for(int i=0; i<(int)vlnu.size(); i++){
+    h.vlnu[0]->Fill(vlnu.at(i).v.Pt());
+    h.vlnu[1]->Fill(vlnu.at(i).v.Eta());
+    h.vlnu[2]->Fill(vlnu.at(i).v.Phi());
+    h.vlnu[3]->Fill(vlnu.at(i).v.M());
+    h.vlnu[4]->Fill(vlnu.at(i).pdgid);
+    for(int j=0; j<(int)vlnu[i].dauid.size(); j++) h.vlnu[5]->Fill(vlnu[i].dauid[j]);
+  }
+
+  //Production mode: LL
+  if((int)vllep.size()==2){
+    h.mode[0]->Fill(delta_phi(vllep.at(0).v.Phi(), vllep.at(1).v.Phi()));
+  }
+
+  //Production mode: LN
+  if((int)vllep.size()==1 && (int)vlnu.size()==1){
+    h.mode[1]->Fill(delta_phi(vllep.at(0).v.Phi(), vlnu.at(0).v.Phi()));
+  }
+
+  //Production mode: NN
+  if((int)vlnu.size()==2){
+    h.mode[2]->Fill(delta_phi(vlnu.at(0).v.Phi(), vlnu.at(1).v.Phi()));
+  }
 
 }

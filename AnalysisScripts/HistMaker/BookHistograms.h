@@ -32,4 +32,31 @@ void AnaScript::BookHistograms(){
   h.lJets[0] = new TH2F("LightJet_PtEta", "LightJet_PtEta", ptBins.size()-1, &ptBins[0], etaBins.size()-1, &etaBins[0]);
   h.lJets[1] = new TH2F("LightJet_Mis_PtEta", "LightJet_Mis_PtEta", ptBins.size()-1, &ptBins[0], etaBins.size()-1, &etaBins[0]);
 
+  //---------------
+  // Signal study:
+  //---------------
+  
+  //Properties of VLLs:
+  h.vllep.resize(6);
+  h.vllep[0] = new TH1F("vllep_all_pt",        "p_T(L)",  500, 0, 500);
+  h.vllep[1] = new TH1F("vllep_all_eta",       "#eta(L)", 100, -4, 4);
+  h.vllep[2] = new TH1F("vllep_all_phi",       "#phi(L)", 100, -4, 4);
+  h.vllep[3] = new TH1F("vllep_all_M",         "M(L)", 1000, 0, 1000);
+  h.vllep[4] = new TH1F("vllep_all_pdgid",     "pdgId(L)", 60, -30, 30);
+  h.vllep[5] = new TH1F("vllep_all_dau_pdgid", "pdgId(daughter(L))", 60, -30, 30);
+
+  h.vlnu.resize(6);
+  h.vlnu[0] = new TH1F("vlnu_all_pt",        "p_T(L)",  500, 0, 500);
+  h.vlnu[1] = new TH1F("vlnu_all_eta",       "#eta(N)", 100, -4, 4);
+  h.vlnu[2] = new TH1F("vlnu_all_phi",       "#phi(N)", 100, -4, 4);
+  h.vlnu[3] = new TH1F("vlnu_all_M",         "M(N)", 1000, 0, 1000);
+  h.vlnu[4] = new TH1F("vlnu_all_pdgid",     "pdgId(N)", 60, -30, 30);
+  h.vlnu[5] = new TH1F("vlnu_all_dau_pdgid", "pdgId(daughter(N))", 60, -30, 30);
+
+  //Production modes:
+  h.mode.resize(3);
+  h.mode[0] = new TH1F("LL_dphi_vlls", "d#phi(L, L)", 100, 0, 4);
+  h.mode[1] = new TH1F("LN_dphi_vlls", "d#phi(L, N)", 100, 0, 4);
+  h.mode[2] = new TH1F("NN_dphi_vlls", "d#phi(N, N)", 100, 0, 4);
+  
 }

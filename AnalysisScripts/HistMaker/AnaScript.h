@@ -43,6 +43,7 @@ public :
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;
   using uint_or_int   = Int_t;
+
   /*
   //For NanoAODv11-
   using iterator     = UInt_t; 
@@ -272,7 +273,7 @@ public :
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-  
+ 
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -350,6 +351,10 @@ public :
     vector<TH2F *> bJets;
     vector<TH2F *> cJets;
     vector<TH2F *> lJets;
+    //signal study:
+    vector<TH1F *> vllep;
+    vector<TH1F *> vlnu;
+    vector<TH1F *> mode;
   };
   struct Particle {
     TLorentzVector v;
