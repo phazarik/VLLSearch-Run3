@@ -178,8 +178,9 @@ void processTree(
 	
     Double_t wt = 1.0;
     
-    //if((string)campaign == "Run3Summer22" || (string)campaign == "Run3Summer22EE") wt_pileup = 1.0;
-    //if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL") wt_pileup = 1.0;
+    if((string)campaign == "Run3Summer22"  || (string)campaign == "Run3Summer22EE")   wt_pileup = 1.0;
+    if((string)campaign == "Run3Summer23"  || (string)campaign == "Run3Summer23BPix") wt_pileup = 1.0;
+    if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL")   wt_pileup = 1.0;
 
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
     //wt = wt*wt_bjet;             //Adding b-tagging corrections
@@ -188,14 +189,13 @@ void processTree(
     // Corrections to the histograms:
     //--------------------------------
 
-    /*
     //1) DY correction for the ee channel:
-    bool flag_dy = (channelval == 3) && find_key(inputFilename, "DY");
+    bool flag_dy = (channelval == 3) && (find_key(inputFilename, "DYto2L")||find_key(inputFilename, "DYJets"));
     if(flag_dy){
       Double_t scale_dy = 1.0;
       Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
-      //Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
-      scale_dy = scale_dy1;/scale_dy2;
+      Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
+      scale_dy = scale_dy1*scale_dy2;
       wt = wt * scale_dy;
       //cout<<"Correcting DY by : "<<scale_dy<<endl;
     }
@@ -206,7 +206,7 @@ void processTree(
       scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd, "nom");
       wt = wt * scale_qcd;
       //cout<<"Correcting QCD by : "<<scale_qcd<<endl;
-    }
+    }/*
     //3) TTBar HT binned correction
     bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_");
     if(flag_ttbar){
@@ -361,12 +361,16 @@ void processTree(
 double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors, TString mode="nom") {
   std::string campaign(campaign_cstr);
   std::string channel_key = std::to_string(channelval);
-  if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
+  //if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key))
+  if (scale_factors.find(campaign) != scale_factors.end() &&
+      scale_factors[campaign].find(channel_key) != scale_factors[campaign].end()){
+    
     const auto& ranges = scale_factors[campaign][channel_key];
     for (const auto& range : ranges) {
       double low = range["low"];
       double high = 0.0;
-      if (range["high"].is_string() && range["high"] == "inf") high = std::numeric_limits<double>::infinity();
+      //if (range["high"].is_string() && range["high"] == "inf") high = std::numeric_limits<double>::infinity();
+      if (range["high"].is_string() && range["high"] == "inf") high = 9999;
       else high = range["high"];
       if (var >= low && var < high) {
         double sf  = range["scale"][0];
@@ -383,13 +387,16 @@ double getScaleFactorInBins(const char* campaign_cstr, int channelval, double va
 double getScaleFactorGlobal(const char* campaign_cstr, int channelval, const json& scale_factors, TString mode="nom") {
   std::string campaign(campaign_cstr);
   std::string channel_key = std::to_string(channelval);
-  if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
+  //if (scale_factors.contains(campaign) && scale_factors[campaign].contains(channel_key)) {
+  if (scale_factors.find(campaign) != scale_factors.end() &&
+      scale_factors[campaign].find(channel_key) != scale_factors[campaign].end()) {
+    
     double sf = scale_factors[campaign][channel_key][0];
     double err = scale_factors[campaign][channel_key][1];
-
     if (mode == "nom")  return sf;
     if (mode == "up")   return sf + err;
     if (mode == "down") return sf - err;
+
   }
   return 1.0;
 }

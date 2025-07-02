@@ -8,12 +8,13 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
 		     TString _var = "HT",
+		     //TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-07-01_baseline_Run3/hist_Run3Summer22EE_baseline_mm",
-		     TString _campaign = "Run3Summer22EE",
+		     TString _jobname = "2025-07-02/hist_Run3Summer22_qcdvr_mm",
+		     TString _campaign = "Run3Summer22",
 		     TString _channel = "mm",
-		     TString _tag = "baseline",
-		     TString _displaytext = "Baseline"
+		     TString _tag = "qcdvr",
+		     TString _displaytext = "QCD VR"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -22,16 +23,16 @@ void makeStackedPlot(
   if (_channel == "me") channelname = "#mue";
   if (_channel == "em") channelname = "e#mu";
   if (_channel == "ee") channelname = "ee";
+  if (_channel == "combined") channelname = "combined";
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=false;
+  bool toOverlayData=true;
   bool toSave=true;
-  Double_t ymin = 0.1; Double_t ymax = 10E8;
+  Double_t ymin = 0.1; Double_t ymax = 10E6;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
-  //TString info2 = "corrected";
   
   //--------------------------------------------------------------------------
   TString dump_folder = "plots/"+date_stamp+"/"+output_tag+"_"+_campaign+"_"+_channel;  
@@ -117,6 +118,17 @@ void makeStackedPlot(
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
+  /*
+  if(_campaign == "Run3"){
+    vector<string> era_2022 = {"C", "D", "E", "F", "G"};
+    vector<string> era_2023 = {"C1", "C2", "D1", "D2"};
+    for(auto& era : era_2022) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : era_2022) data_collection.push_back(get_hist(_var, input_path, "Muon", era));   
+    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
+    }*/
   
   TH1D* hst_data  = nullptr;
   TH1D* hst_smuon = nullptr;
@@ -207,12 +219,14 @@ void makeStackedPlot(
   //                     ON-SCREEN DISPLAYS
   //______________________________________________________________
 
-  GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
-  //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
   //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
+  GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
   //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets");
-  //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+  //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+
+  //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
   //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+#gamma");
+  //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
   
   //______________________________________________________________
   
@@ -366,6 +380,7 @@ void makeStackedPlot(
   if(_campaign == "Run3Summer22EE")   put_latex_text("26.7 fb^{-1} (2022-postEE)", 0.63, 0.94, 42, 0.05);
   if(_campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)", 0.62, 0.94, 42, 0.05);
   if(_campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", 0.61, 0.94, 42, 0.05);
+  if(_campaign == "Run3")             put_latex_text("61.9 fb^{-1} (2022+2023)", 0.61, 0.94, 42, 0.05);
   put_latex_text(info1, 0.17, 0.78, 42, 0.04);     //Additional information
   put_latex_text(info2, 0.17, 0.73, 42, 0.04);     //Additional information
 
@@ -388,7 +403,7 @@ void makeStackedPlot(
   if(sig1) SetLegendEntry(lg, sig1);
   if(sig2) SetLegendEntry(lg, sig2);
   if(sig3) SetLegendEntry(lg, sig3);
-  TString legendheader = Form("Global S/#sqrt{B} = %.3f ± %.3f", globalSbyB, globalSbyBErr);
+  TString legendheader = Form("Global S/#sqrt{B} = %.3f #pm %.3f", globalSbyB, globalSbyBErr);
   if(toOverlayData){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);
     TString err = Form("%.3f", globalObsbyExpErr);

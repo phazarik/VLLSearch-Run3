@@ -45,10 +45,10 @@ void processTree(
 //________________________________________________________________________________________________________________
 
 void extractHistsFromTrees(
-			   const std::string& jobname  = "baseline/tree_Run3Summer22EE_baseline",
-			   const std::string& dump     = "hist_Run3Summer22EE_baseline_mm",
-			   const std::string& campaign = "Run3Summer22EE",
-			   const std::string& channel  = "mm",
+			   const std::string& jobname  = "qcdcr/tree_Run3Summer23BPix_qcdcr",
+			   const std::string& dump     = "hist_Run3Summer23BPix_qcdcr_unscaled_ee",
+			   const std::string& campaign = "Run3Summer23BPix",
+			   const std::string& channel  = "ee",
 			   bool test   = false,
 			   bool dryrun = false)
 {

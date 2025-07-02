@@ -97,11 +97,12 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
-    ax.set_xlim(-1.0, len(channels) - 0.5 + x_offset)
+    ax.set_xlim(-0.5, len(channels) + x_offset)
+    ax.set_ylim(0, 1)
     
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2
-    ax.legend(handles, labels, fontsize=8, frameon=False, ncol=ncol, loc='lower left')
+    ax.legend(handles, labels, fontsize=8, frameon=False, ncol=ncol, loc='best')
 
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
@@ -109,13 +110,13 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     plt.savefig(fullname, dpi=150)
     print(f'Created: {fullname}')
     plt.close(fig)
-
+    #plt.show()
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
 def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
 
-    if 'TTBar' not in jsonfile: return
+    #if 'TTBar' not in jsonfile: return
     
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
