@@ -24,19 +24,19 @@ basedir = '../ROOT_FILES/treesWithNN/'
 
 jobdict = {
     "baseline/tree_Run3Summer22_baseline":{
-        "outjob":"dycr/tree_Run3Summer22_dycr",
+        "outjob":"val/tree_Run3Summer22_val",
         "campaign":"Run3Summer22"
     },
     "baseline/tree_Run3Summer22EE_baseline":{
-        "outjob":"dycr/tree_Run3Summer22EE_dycr",
+        "outjob":"val/tree_Run3Summer22EE_val",
         "campaign":"Run3Summer22EE"
     },
     "baseline/tree_Run3Summer23_baseline":{
-        "outjob":"dycr/tree_Run3Summer23_dycr",
+        "outjob":"val/tree_Run3Summer23_val",
         "campaign":"Run3Summer23"
     },
     "baseline/tree_Run3Summer23BPix_baseline":{
-        "outjob":"dycr/tree_Run3Summer23BPix_dycr",
+        "outjob":"val/tree_Run3Summer23BPix_val",
         "campaign":"Run3Summer23BPix"
     },
 }
@@ -103,7 +103,8 @@ for injob, info in jobdict.items():
 
     count = 0
     for f in tqdm(list_of_files, desc="Processing files", unit="file",
-                  colour='green', dynamic_ncols=False, mininterval=0.5):
+              bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
+              leave=True, ncols=100, colour='blue', mininterval=0.5):
 
         if not f.endswith('.root'): continue
         if test: print(f'TEST: Processing file: {f}')
@@ -130,23 +131,23 @@ for injob, info in jobdict.items():
 
         ## Step3: Controlling WJets:
         tight_sip3d =  'lep0_sip3d<5 and lep1_sip3d<10'
-        qcd_veto    = f'{tight_sip3d} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50' 
-        wjets_cr    = f'{qcd_veto} and {nnscore_wjets}<0.50'
+        qcd_veto    = f'{tight_sip3d} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50' ##Every event is qcdveto onwards
+        wjets_cr    = f'{qcd_veto} and {nnscore_wjets}<0.50 and nbjet==0'
         wjets_veto  = f'{qcd_veto} and {nnscore_wjets}>0.50' 
         
         ## Step4: Controlling TTbar:
-        good_events = wjets_veto
-        top_cr = f'{good_events} and {nnscore_qcd}>0.70 and nbjet>0'
+        top_cr = f'{wjets_veto} and nbjet>0'
         
         ## Step5: Validation:
-        val_region = f'{good_events} and 0.50<{nnscore_qcd}<0.70'
+        val_region = f'{dy_veto} and 0.50<{nnscore_qcd}<0.70 and {nnscore_wjets}>0.50'
+        val_region = val_region+f'and HT>50 and {tight_sip3d}'
         
         ## Step6: Signal regions:
-        sr = f'{good_events} and {nnscore_qcd}>0.70 and nbjet==0'
+        sr = f'{wjets_veto} and nbjet==0'
         
         #------------------------------
         # Final event selection:
-        event_selection = dy_cr
+        event_selection = val_region
         #------------------------------
 
         filecount += 1

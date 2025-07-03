@@ -37,29 +37,36 @@ def main():
 
     plotCorrectionsBinned(
         jsonfile = "corrections/TTBar_HTbinned_corrections.json",
-        name     = "TTBar SF (HT-binned)",
+        name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
         outfile  = "TTBar_HTbinned_corrections.png"
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_chargemisID_corrections.json",
-        name     = "DY charge-misID SF (Zpt binned)",
+        name     = r"$\mathrm{DY\ charge\text{-}misID\ SF\ (Z\ {p_T}\text{-}binned)}$",
         outfile  = "DY_Zptbinned_chargemisID_corrections.png"
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_corrections.json",
-        name     = "DY SF (Zpt binned)",
+        name     = r"$\mathrm{DY\ SF\ (Z\ {p_T}\text{-}binned)}$",
         outfile  = "DY_Zptbinned_corrections.png"
     )
     plotGlobalCorrections(
         jsonfile = "corrections/QCD_global_corrections.json",
         name     = "QCD SF",
-        outfile  = "QCD_global_corrections.png"
+        outfile  = "QCD_global_corrections.png",
+        yrange   = [0, 1.2]
+    )
+    plotGlobalCorrections(
+        jsonfile = "corrections/Wjets_global_corrections.json",
+        name     = r"$\mathrm{W{+}jets/\gamma\ SF}$",
+        outfile  = "Wjets_global_corrections.png",
+        yrange   = [0, 2]
     )
     
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotGlobalCorrections(jsonfile, name, outfile):
+def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
     
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
@@ -69,6 +76,7 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     os.makedirs(outdir, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(6, 3))
+    ax.axhline(1, color='gray', linestyle=':', linewidth=1)
     all_vals = []
     x_offset = 0.1
     for index, (key, props) in enumerate(campaign_dict.items()):
@@ -98,7 +106,8 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
     ax.set_xlim(-0.5, len(channels) + x_offset)
-    ax.set_ylim(0, 1)
+    #ax.set_ylim(0, 1)
+    if yrange is not None: ax.set_ylim(yrange[0], yrange[1])
     
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2

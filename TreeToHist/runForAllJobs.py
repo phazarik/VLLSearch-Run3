@@ -22,20 +22,12 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "qcdvr/tree_Run3Summer22_qcdvr":{
-        "dump":"hist_Run3Summer22_qcdvr",
-        "campaign":"Run3Summer22"
-    },
-    "qcdvr/tree_Run3Summer22EE_qcdvr":{
-        "dump":"hist_Run3Summer22EE_qcdvr",
-        "campaign":"Run3Summer22EE"
-    },
-    "qcdvr/tree_Run3Summer23_qcdvr":{
-        "dump":"hist_Run3Summer23_qcdvr",
+    "wjetscr/tree_Run3Summer23_wjetscr":{
+        "dump":"hist_Run3Summer23_wjetscr",
         "campaign":"Run3Summer23"
     },
-    "qcdvr/tree_Run3Summer23BPix_qcdvr":{
-        "dump":"hist_Run3Summer23BPix_qcdvr",
+    "wjetscr/tree_Run3Summer23BPix_wjetscr":{
+        "dump":"hist_Run3Summer23BPix_wjetscr",
         "campaign":"Run3Summer23BPix"
     }
 }
