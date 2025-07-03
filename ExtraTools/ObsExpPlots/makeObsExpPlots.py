@@ -24,36 +24,49 @@ if test: print('[WARNING]: test mode', style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 
 campaign_dict = {
-    "2016preVFP_UL":    {"name": "2016-preVFP",  "color": "xkcd:royal blue"},
-    "2016postVFP_UL":   {"name": "2016-postVFP", "color": "xkcd:deep sky blue"},
-    "2017_UL":          {"name": "2017",         "color": "xkcd:medium green"},
-    "2018_UL":          {"name": "2018",         "color": "xkcd:tomato"},
-    "Run3Summer22":     {"name": "2022",     "color": "xkcd:purple"},
-    "Run3Summer22EE":   {"name": "2022EE",   "color": "xkcd:magenta"},
-    "Run3Summer23":     {"name": "2023",     "color": "xkcd:burnt orange"},
-    "Run3Summer23BPix": {"name": "2023BPix", "color": "xkcd:teal"},
+    "2016preVFP_UL":    {"name": "2016-preVFP",   "color": "xkcd:royal blue",    "style": "o"},
+    "2016postVFP_UL":   {"name": "2016-postVFP",  "color": "xkcd:deep sky blue", "style": "s"},
+    "2017_UL":          {"name": "2017",          "color": "xkcd:teal",          "style": "^"},
+    "2018_UL":          {"name": "2018",          "color": "green",              "style": "D"},
+    "Run3Summer22":     {"name": "2022-preEE",    "color": "xkcd:purple",        "style": "o"},
+    "Run3Summer22EE":   {"name": "2022-postEE",   "color": "xkcd:magenta",       "style": "s"},
+    "Run3Summer23":     {"name": "2023-preBPix",  "color": "xkcd:burnt orange",  "style": "^"},
+    "Run3Summer23BPix": {"name": "2023-postBPix", "color": "xkcd:salmon",        "style": "D"},
 }
 
 def main():
     plotObsExp(
         jsonfile = "jsons/ttbar_uncorrected.json",
-        outfile  = "ttbar_uncorrected.png"
+        outfile  = "ttbar_uncorrected.png",
+        name     = "Obs/exp",
+        moretext = r"$t\bar{t}+x$ CR, before correction",
+        yrange   = [0.5, 1.5]
     )
     plotObsExp(
         jsonfile = "jsons/qcd_validation.json",
-        outfile  = "qcd_validation.png"
+        outfile  = "qcd_validation.png",
+        name     = "Obs/exp",
+        moretext = "QCD VR"
+    )
+    plotObsExp(
+        jsonfile = "jsons/validation.json",
+        outfile  = "validation.png",
+        name     = "Obs/exp",
+        moretext = "Validation region",
+        yrange   = [0.5, 1.5] 
     )
     plotObsExp(
         jsonfile = "jsons/signal_significance.json",
         outfile  = "signal_significance.png",
-        name     = "S/sqrt{B}",
-        signal   = True
+        name     = r"$S/\sqrt{B}$",
+        signal   = True,
+        yrange   = [0, 1.5]
     )
 
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
+def plotObsExp(jsonfile, outfile, name="Obs/Exp", yrange=None, signal=False, moretext=None):
 
     #if 'qcd' not in jsonfile: return
 
@@ -66,7 +79,9 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
 
     fig_size = (6, 3)
     fig, ax = plt.subplots(figsize=fig_size)    
-    if not signal: ax.axhspan(0.95, 1.05, color='green', alpha=0.2)
+    if not signal:
+        ax.axhspan(0.95, 1.05, color='green', alpha=0.2)
+        ax.text(-0.45, 1.05, r'$\pm5\%$', color='green', fontsize=10, va='bottom')
 
     all_vals = []
     x_offset = 0.1
@@ -88,7 +103,8 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
 
         x_offset_values = []
         for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
-        ax.errorbar(x_offset_values, y, yerr=yerr, fmt='o', label=props["name"], color=props["color"], capsize=3)
+        ax.errorbar(x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
+                    fmt=props["style"], label=props["name"], color=props["color"])
 
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)
@@ -96,14 +112,12 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", signal=False):
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    if moretext: ax.text(0.03, 0.78, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif')
     if not signal: ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
-    ax.set_xlim(-0.5, len(channels) - 0.5 + x_offset)
+    ax.set_xlim(-0.5, len(channels) + x_offset)
 
-    ymin, ymax = 0, 1.5
-    if not signal:
-        max_dev = max(abs(v - 1.0) for v in all_vals if v is not None)
-        delta = max(max_dev * 1.2, 0.05)
-        ymin, ymax = 1 - delta, 1 + delta
+    ymin, ymax = 0, 2
+    if yrange: ymin, ymax = yrange[0], yrange[1]
     ax.set_ylim(ymin, ymax)
     
     ncol = 1 if len([k for k in campaign_dict if k in data]) <= 5 else 2
