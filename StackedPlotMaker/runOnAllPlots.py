@@ -20,29 +20,37 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_mm":{
+    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_mm":{
         "campaign":"Run3Summer23",
         "channel":"mm"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_me":{
+    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_me":{
         "campaign":"Run3Summer23",
         "channel":"me"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_em":{
+    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_em":{
         "campaign":"Run3Summer23",
         "channel":"em"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer23_qcdvr_ee":{
+    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_ee":{
         "campaign":"Run3Summer23",
         "channel":"ee"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer23BPix_qcdvr_mm":{
+    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_mm":{
         "campaign":"Run3Summer23BPix",
         "channel":"mm"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer23BPix_qcdvr_me":{
+    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_me":{
         "campaign":"Run3Summer23BPix",
         "channel":"me"
+    },
+    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_em":{
+        "campaign":"Run3Summer23BPix",
+        "channel":"em"
+    },
+    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_ee":{
+        "campaign":"Run3Summer23BPix",
+        "channel":"ee"
     }
 }
 
@@ -119,8 +127,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "qcdvr"
-    text     = "QCD VR"
+    tag      = "wjetscr"
+    text     = "W+jets/#gamma CR"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
