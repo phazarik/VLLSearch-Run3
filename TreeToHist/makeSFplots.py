@@ -23,14 +23,14 @@ if test: print('[WARNING]: test mode', style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 
 campaign_dict = {
-    "2016preVFP_UL":    {"name": "2016-preVFP",  "color": "xkcd:royal blue"},
-    "2016postVFP_UL":   {"name": "2016-postVFP", "color": "xkcd:deep sky blue"},
-    "2017_UL":          {"name": "2017",         "color": "xkcd:medium green"},
-    "2018_UL":          {"name": "2018",         "color": "xkcd:tomato"},
-    "Run3Summer22":     {"name": "2022",     "color": "xkcd:purple"},
-    "Run3Summer22EE":   {"name": "2022EE",   "color": "xkcd:magenta"},
-    "Run3Summer23":     {"name": "2023",     "color": "xkcd:burnt orange"},
-    "Run3Summer23BPix": {"name": "2023BPix", "color": "xkcd:teal"},
+    "2016preVFP_UL":    {"name": "2016-preVFP",   "color": "xkcd:royal blue",    "style": "o"},
+    "2016postVFP_UL":   {"name": "2016-postVFP",  "color": "xkcd:deep sky blue", "style": "s"},
+    "2017_UL":          {"name": "2017",          "color": "xkcd:teal",          "style": "^"},
+    "2018_UL":          {"name": "2018",          "color": "green",              "style": "D"},
+    "Run3Summer22":     {"name": "2022-preEE",    "color": "xkcd:purple",        "style": "o"},
+    "Run3Summer22EE":   {"name": "2022-postEE",   "color": "xkcd:magenta",       "style": "s"},
+    "Run3Summer23":     {"name": "2023-preBPix",  "color": "xkcd:burnt orange",  "style": "^"},
+    "Run3Summer23BPix": {"name": "2023-postBPix", "color": "xkcd:salmon",        "style": "D"},
 }
 
 def main():
@@ -97,8 +97,9 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
 
         x_offset_values = []
         for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
-        ax.errorbar(x_offset_values, y, yerr=yerr, fmt='o', label=props["name"], color=props["color"], capsize=3)
-
+        ax.errorbar(x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
+            fmt=props["style"], label=props["name"], color=props["color"])
+        
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)
     ax.set_ylabel(name, fontsize=12)
@@ -116,7 +117,7 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
     plt.tight_layout()
-    plt.savefig(fullname, dpi=150)
+    plt.savefig(fullname, dpi=150, bbox_inches='tight', pad_inches=0.1)
     print(f'Created: {fullname}')
     plt.close(fig)
     #plt.show()
@@ -176,8 +177,8 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
                 xticks.append(offset + high)
 
             label = props["name"] if not added_label else ""
-            ax.errorbar(xvals, yvals, xerr=xerrs, yerr=yerrs, fmt='o', capsize=3,
-                        color=props["color"], label=label)
+            ax.errorbar(xvals, yvals, xerr=xerrs, yerr=yerrs, markersize=4, capsize=3,
+                        fmt=props["style"], color=props["color"], label=label)
             added_label = True
 
             if xvals:
@@ -217,7 +218,7 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
     plt.tight_layout()
-    plt.savefig(fullname, dpi=150)
+    plt.savefig(fullname, dpi=150, bbox_inches='tight', pad_inches=0.1)
     print(f'Created: {fullname}')
     plt.close(fig)
     

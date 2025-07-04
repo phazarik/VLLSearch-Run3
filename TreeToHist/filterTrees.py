@@ -24,19 +24,19 @@ basedir = '../ROOT_FILES/treesWithNN/'
 
 jobdict = {
     "baseline/tree_Run3Summer22_baseline":{
-        "outjob":"val/tree_Run3Summer22_val",
+        "outjob":"sr2/tree_Run3Summer22_sr2",
         "campaign":"Run3Summer22"
     },
     "baseline/tree_Run3Summer22EE_baseline":{
-        "outjob":"val/tree_Run3Summer22EE_val",
+        "outjob":"sr2/tree_Run3Summer22EE_sr2",
         "campaign":"Run3Summer22EE"
     },
     "baseline/tree_Run3Summer23_baseline":{
-        "outjob":"val/tree_Run3Summer23_val",
+        "outjob":"sr2/tree_Run3Summer23_sr2",
         "campaign":"Run3Summer23"
     },
     "baseline/tree_Run3Summer23BPix_baseline":{
-        "outjob":"val/tree_Run3Summer23BPix_val",
+        "outjob":"sr2/tree_Run3Summer23BPix_sr2",
         "campaign":"Run3Summer23BPix"
     },
 }
@@ -143,11 +143,11 @@ for injob, info in jobdict.items():
         val_region = val_region+f'and HT>50 and {tight_sip3d}'
         
         ## Step6: Signal regions:
-        sr = f'{wjets_veto} and nbjet==0'
+        sr = f'{wjets_veto} and nbjet==0 and ST>300'
         
         #------------------------------
         # Final event selection:
-        event_selection = val_region
+        event_selection = sr
         #------------------------------
 
         filecount += 1

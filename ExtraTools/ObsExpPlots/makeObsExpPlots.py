@@ -46,7 +46,8 @@ def main():
         jsonfile = "jsons/qcd_validation.json",
         outfile  = "qcd_validation.png",
         name     = "Obs/exp",
-        moretext = "QCD VR"
+        moretext = "QCD VR",
+        yrange   = [0, 2]
     )
     plotObsExp(
         jsonfile = "jsons/validation.json",
@@ -60,7 +61,7 @@ def main():
         outfile  = "signal_significance.png",
         name     = r"$S/\sqrt{B}$",
         signal   = True,
-        yrange   = [0, 1.5]
+        yrange   = [0, 2]
     )
 
 #____________________________________________________________________________________________________
@@ -128,7 +129,7 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", yrange=None, signal=False, mor
     fig.set_size_inches(fig_size, forward=True)
     fig.subplots_adjust(left=0.12, right=0.98, top=0.95, bottom=0.2)
     #plt.tight_layout()
-    plt.savefig(fullname, dpi=150)
+    plt.savefig(fullname, dpi=150, bbox_inches='tight', pad_inches=0.1)
     print(f'Created: {fullname}')
     plt.close(fig)
 
