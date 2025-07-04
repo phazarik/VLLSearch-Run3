@@ -51,15 +51,17 @@ void processTree(
 		 )
 { 
   // Load corrections from JSON:
-  std::ifstream json_ttbar("corrections/TTBar_HTbinned_corrections.json");
-  std::ifstream json_qcd("corrections/QCD_global_corrections.json");
-  std::ifstream json_dy("corrections/DY_Zptbinned_corrections.json");
   std::ifstream json_chargemisID("corrections/DY_Zptbinned_chargemisID_corrections.json");
-  json sf_ttbar, sf_qcd, sf_dy, sf_chargemisID;
-  json_ttbar >> sf_ttbar;
-  json_qcd >> sf_qcd;
-  json_dy >> sf_dy;
+  std::ifstream json_dy("corrections/DY_Zptbinned_corrections.json");
+  std::ifstream json_qcd("corrections/QCD_global_corrections.json");
+  std::ifstream json_ttbar("corrections/TTBar_HTbinned_corrections.json");
+  std::ifstream json_wjets("corrections/Wjets_global_corrections.json");
+  json sf_chargemisID, sf_dy, sf_qcd, sf_ttbar, sf_wjets;
   json_chargemisID >> sf_chargemisID;
+  json_dy >> sf_dy;
+  json_qcd >> sf_qcd;
+  json_ttbar >> sf_ttbar;
+  json_wjets >> sf_wjets;
   cout << "Corrections loaded from JSON." << endl;
   
   vector<TH1D*> hst_collection;
@@ -152,9 +154,20 @@ void processTree(
     return;
   }
 
+  //-------------------------------------------------------------------------
+  //Flagging specific files for corrections:
+  bool flag_dy = (channelval == 3) && (find_key(inputFilename, "DYto2L")||find_key(inputFilename, "DYJets"));
+  bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
+  bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_") || find_key(inputFilename, "TTV_") || find_key(inputFilename, "TTZ_") || find_key(inputFilename, "TTW_");
+  bool flag_wjets = find_key(inputFilename, "WGtoLNuG") || find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
+  if(flag_dy)    cout<<"\033[33;3m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
+  if(flag_qcd)   cout<<"\033[33;3m==> Correcting QCD globally.\033[0m"<<endl;
+  if(flag_ttbar) cout<<"\033[33;3m==> Correcting tt+X in HT bins.\033[0m"<<endl;
+  if(flag_wjets) cout<<"\033[33;3m==> Correcting W+jets/gamma globally.\033[0m"<<endl;
+  //-------------------------------------------------------------------------
+  
   TTree* tree = (TTree*)file->Get("myEvents");
   setBranches(tree);
-  
   Long64_t nentries = tree->GetEntries();
   for (Long64_t i = 0; i < nentries; i++) {
     
@@ -183,14 +196,13 @@ void processTree(
     if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL")   wt_pileup = 1.0;
 
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    //wt = wt*wt_bjet;             //Adding b-tagging corrections
+    wt = wt*wt_bjet;                       //Adding b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
 
     //1) DY correction for the ee channel:
-    bool flag_dy = (channelval == 3) && (find_key(inputFilename, "DYto2L")||find_key(inputFilename, "DYJets"));
     if(flag_dy){
       Double_t scale_dy = 1.0;
       Double_t scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
@@ -200,21 +212,26 @@ void processTree(
       //cout<<"Correcting DY by : "<<scale_dy<<endl;
     }
     //2) QCD global correction:
-    bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
     if(flag_qcd){
       Double_t scale_qcd = 1.0;
       scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd, "nom");
       wt = wt * scale_qcd;
       //cout<<"Correcting QCD by : "<<scale_qcd<<endl;
-    }/*
-    //3) TTBar HT binned correction
-    bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_");
+    }
+    //3) TTBar+TTV HT binned correction
     if(flag_ttbar){
       Double_t scale_ttbar = 1.0;
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-      //cout<<"Correcting TTBar by : "<<scale_ttbar<<"\t"<<up<<"\t"<<down<<endl;
-      }*/
+      //cout<<"Correcting TT+x by : "<<scale_ttbar<<"\t"<<up<<"\t"<<down<<endl;
+    }
+    //4)WJets+WGamma global correction
+    if(flag_wjets){
+      Double_t scale_wjets = 1.0;
+      scale_wjets = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_wjets, "nom");
+      wt = wt * scale_wjets;
+      //cout<<"Correcting W+jets/gamma by : "<<scale_wjets<<endl;
+    }
     
     //--------------------------------
     // Filling up the histograms:

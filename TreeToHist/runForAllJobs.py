@@ -22,37 +22,13 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "qcdcr/tree_Run3Summer22_qcdcr":{
-        "dump":"hist_Run3Summer22_qcdcr",
+    "sr2/tree_Run3Summer22_sr2":{
+        "dump":"hist_Run3Summer22_sr2",
         "campaign":"Run3Summer22"
     },
-    "qcdcr/tree_Run3Summer22EE_qcdcr":{
-        "dump":"hist_Run3Summer22EE_qcdcr",
+    "sr2/tree_Run3Summer22EE_sr2":{
+        "dump":"hist_Run3Summer22EE_sr2",
         "campaign":"Run3Summer22EE"
-    },
-    "qcdcr/tree_Run3Summer23_qcdcr":{
-        "dump":"hist_Run3Summer23_qcdcr",
-        "campaign":"Run3Summer23"
-    },
-    "qcdcr/tree_Run3Summer23BPix_qcdcr":{
-        "dump":"hist_Run3Summer23BPix_qcdcr",
-        "campaign":"Run3Summer23BPix"
-    },
-    "qcdvr/tree_Run3Summer22_qcdvr":{
-        "dump":"hist_Run3Summer22_qcdvr",
-        "campaign":"Run3Summer22"
-    },
-    "qcdvr/tree_Run3Summer22EE_qcdvr":{
-        "dump":"hist_Run3Summer22EE_qcdvr",
-        "campaign":"Run3Summer22EE"
-    },
-    "qcdvr/tree_Run3Summer23_qcdvr":{
-        "dump":"hist_Run3Summer23_qcdvr",
-        "campaign":"Run3Summer23"
-    },
-    "qcdvr/tree_Run3Summer23BPix_qcdvr":{
-        "dump":"hist_Run3Summer23BPix_qcdvr",
-        "campaign":"Run3Summer23BPix"
     }
 }
 
@@ -68,7 +44,7 @@ for jobname, info in jobdict.items():
     #if 'EE' not in jobname: continue
     for channel in channels:
 
-        if channel != "ee" : continue
+        #if channel != "ee" : continue
         
         jobcount += 1
         campaign = info["campaign"]

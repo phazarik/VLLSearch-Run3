@@ -23,43 +23,50 @@ if test: print('[WARNING]: test mode', style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 
 campaign_dict = {
-    "2016preVFP_UL":    {"name": "2016-preVFP",  "color": "xkcd:royal blue"},
-    "2016postVFP_UL":   {"name": "2016-postVFP", "color": "xkcd:deep sky blue"},
-    "2017_UL":          {"name": "2017",         "color": "xkcd:medium green"},
-    "2018_UL":          {"name": "2018",         "color": "xkcd:tomato"},
-    "Run3Summer22":     {"name": "2022",     "color": "xkcd:purple"},
-    "Run3Summer22EE":   {"name": "2022EE",   "color": "xkcd:magenta"},
-    "Run3Summer23":     {"name": "2023",     "color": "xkcd:burnt orange"},
-    "Run3Summer23BPix": {"name": "2023BPix", "color": "xkcd:teal"},
+    "2016preVFP_UL":    {"name": "2016-preVFP",   "color": "xkcd:royal blue",    "style": "o"},
+    "2016postVFP_UL":   {"name": "2016-postVFP",  "color": "xkcd:deep sky blue", "style": "s"},
+    "2017_UL":          {"name": "2017",          "color": "xkcd:teal",          "style": "^"},
+    "2018_UL":          {"name": "2018",          "color": "green",              "style": "D"},
+    "Run3Summer22":     {"name": "2022-preEE",    "color": "xkcd:purple",        "style": "o"},
+    "Run3Summer22EE":   {"name": "2022-postEE",   "color": "xkcd:magenta",       "style": "s"},
+    "Run3Summer23":     {"name": "2023-preBPix",  "color": "xkcd:burnt orange",  "style": "^"},
+    "Run3Summer23BPix": {"name": "2023-postBPix", "color": "xkcd:salmon",        "style": "D"},
 }
 
 def main():
 
     plotCorrectionsBinned(
         jsonfile = "corrections/TTBar_HTbinned_corrections.json",
-        name     = "TTBar SF (HT-binned)",
+        name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
         outfile  = "TTBar_HTbinned_corrections.png"
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_chargemisID_corrections.json",
-        name     = "DY charge-misID SF (Zpt binned)",
+        name     = r"$\mathrm{DY\ charge\text{-}misID\ SF\ (Z\ {p_T}\text{-}binned)}$",
         outfile  = "DY_Zptbinned_chargemisID_corrections.png"
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_corrections.json",
-        name     = "DY SF (Zpt binned)",
+        name     = r"$\mathrm{DY\ SF\ (Z\ {p_T}\text{-}binned)}$",
         outfile  = "DY_Zptbinned_corrections.png"
     )
     plotGlobalCorrections(
         jsonfile = "corrections/QCD_global_corrections.json",
         name     = "QCD SF",
-        outfile  = "QCD_global_corrections.png"
+        outfile  = "QCD_global_corrections.png",
+        yrange   = [0, 1.2]
+    )
+    plotGlobalCorrections(
+        jsonfile = "corrections/Wjets_global_corrections.json",
+        name     = r"$\mathrm{W{+}jets/\gamma\ SF}$",
+        outfile  = "Wjets_global_corrections.png",
+        yrange   = [0, 2]
     )
     
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotGlobalCorrections(jsonfile, name, outfile):
+def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
     
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
@@ -69,6 +76,7 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     os.makedirs(outdir, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(6, 3))
+    ax.axhline(1, color='gray', linestyle=':', linewidth=1)
     all_vals = []
     x_offset = 0.1
     for index, (key, props) in enumerate(campaign_dict.items()):
@@ -89,8 +97,9 @@ def plotGlobalCorrections(jsonfile, name, outfile):
 
         x_offset_values = []
         for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
-        ax.errorbar(x_offset_values, y, yerr=yerr, fmt='o', label=props["name"], color=props["color"], capsize=3)
-
+        ax.errorbar(x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
+            fmt=props["style"], label=props["name"], color=props["color"])
+        
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)
     ax.set_ylabel(name, fontsize=12)
@@ -98,7 +107,8 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
     ax.set_xlim(-0.5, len(channels) + x_offset)
-    ax.set_ylim(0, 1)
+    #ax.set_ylim(0, 1)
+    if yrange is not None: ax.set_ylim(yrange[0], yrange[1])
     
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2
@@ -107,7 +117,7 @@ def plotGlobalCorrections(jsonfile, name, outfile):
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
     plt.tight_layout()
-    plt.savefig(fullname, dpi=150)
+    plt.savefig(fullname, dpi=150, bbox_inches='tight', pad_inches=0.1)
     print(f'Created: {fullname}')
     plt.close(fig)
     #plt.show()
@@ -167,8 +177,8 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
                 xticks.append(offset + high)
 
             label = props["name"] if not added_label else ""
-            ax.errorbar(xvals, yvals, xerr=xerrs, yerr=yerrs, fmt='o', capsize=3,
-                        color=props["color"], label=label)
+            ax.errorbar(xvals, yvals, xerr=xerrs, yerr=yerrs, markersize=4, capsize=3,
+                        fmt=props["style"], color=props["color"], label=label)
             added_label = True
 
             if xvals:
@@ -208,7 +218,7 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)
     plt.tight_layout()
-    plt.savefig(fullname, dpi=150)
+    plt.savefig(fullname, dpi=150, bbox_inches='tight', pad_inches=0.1)
     print(f'Created: {fullname}')
     plt.close(fig)
     

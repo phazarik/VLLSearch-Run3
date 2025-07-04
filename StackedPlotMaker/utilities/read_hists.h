@@ -165,15 +165,15 @@ vector<TH1D *> return_hist_collection(
     {"QCD_MuEnriched", "QCD (#mu)", kYellow},
     {"QCDEM",          "QCD (e#gamma)", kYellow+1},
     {"QCD_EMEnriched", "QCD (e#gamma)", kYellow+1},
-    {"RareTop",        "RareTop", kCyan-2},
-    {"Rare",           "Rare",    kCyan-2},
+    {"RareTop",        "multi-top", kCyan-2},
+    {"Rare",           "multi-top", kCyan-2},
     {"ST",             "tX",      kCyan-7},
     {"SingleTop",      "tX",      kCyan-7},
     {"TT",    "t#bar{t}",      kAzure+1},
     {"TTBar", "t#bar{t}",      kAzure+1},
     {"TTV",   "t#bar{t}V",     kAzure+2},
-    {"TTW",   "t#bar{t}W",     kAzure+2},
-    {"TTZ",   "t#bar{t}Z",     kAzure+2},
+    //{"TTW",   "t#bar{t}W",     kAzure+2}, //Disable for Run3
+    //{"TTZ",   "t#bar{t}Z",     kAzure+2}, //Disable for Run3
     {"TW", "tW", kBlue-3},
     {"VV", "VV", kGreen+1},
     {"WW", "WW", kGreen+1},
@@ -273,11 +273,11 @@ void combine_hists(vector<TH1D *> &hst_collection, vector<TString> innames, TStr
   }
   if (to_combine.empty()) return;
 
-  cout << "Combining : " << outname << " = ";
+  cout << "\033[33;3m==> Combining : " << outname << " = ";
   for (size_t i = 0; i < match.size(); ++i) {
     cout << match[i]; if (i != match.size() - 1) cout << " + ";
   }
-  cout << endl;
+  cout <<"\033[0m"<< endl;
 
   TH1D *combined = (TH1D *)to_combine[0]->Clone(outname);
   combined->SetDirectory(0);

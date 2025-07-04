@@ -20,44 +20,36 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-07-02_qcdvr/hist_Run3Summer22_qcdvr_mm":{
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_mm":{
         "campaign":"Run3Summer22",
         "channel":"mm"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22_qcdvr_me":{
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_me":{
         "campaign":"Run3Summer22",
         "channel":"me"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22_qcdvr_em":{
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_em":{
         "campaign":"Run3Summer22",
         "channel":"em"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22_qcdvr_ee":{
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_ee":{
         "campaign":"Run3Summer22",
         "channel":"ee"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22EE_qcdvr_mm":{
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_mm":{
         "campaign":"Run3Summer22EE",
         "channel":"mm"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22EE_qcdvr_me":{
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_me":{
         "campaign":"Run3Summer22EE",
         "channel":"me"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22EE_qcdvr_em":{
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_em":{
         "campaign":"Run3Summer22EE",
         "channel":"em"
     },
-    "2025-07-02_qcdvr/hist_Run3Summer22EE_qcdvr_ee":{
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_ee":{
         "campaign":"Run3Summer22EE",
-        "channel":"ee"
-    },
-    "2025-07-02_qcdvr/hist_Run3Summer23BPix_qcdvr_em":{
-        "campaign":"Run3Summer23BPix",
-        "channel":"em"
-    },
-    "2025-07-02_qcdvr/hist_Run3Summer23BPix_qcdvr_ee":{
-        "campaign":"Run3Summer23BPix",
         "channel":"ee"
     }
 }
@@ -135,8 +127,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "qcdvr"
-    text     = "QCD VR"
+    tag      = "sr"
+    text     = "Signal region"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 

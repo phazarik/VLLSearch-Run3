@@ -10,11 +10,11 @@ void makeStackedPlot(
 		     TString _var = "HT",
 		     //TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-07-02/hist_Run3Summer22_qcdvr_mm",
-		     TString _campaign = "Run3Summer22",
+		     TString _jobname = "2025-07-03_sr1/hist_Run3Summer23_sr_ee",
+		     TString _campaign = "Run3Summer23",
 		     TString _channel = "mm",
-		     TString _tag = "qcdvr",
-		     TString _displaytext = "QCD VR"
+		     TString _tag = "sr",
+		     TString _displaytext = "Signal region"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -27,9 +27,9 @@ void makeStackedPlot(
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=true;
+  bool toOverlayData=false;
   bool toSave=true;
-  Double_t ymin = 0.1; Double_t ymax = 10E6;
+  Double_t ymin = 0.1; Double_t ymax = 10E5;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
@@ -55,7 +55,10 @@ void makeStackedPlot(
   combine_hists(hist_collection, {"WWW", "WWZ", "WZZ", "ZZZ"},   "VVV", kGreen+3);
   combine_hists(hist_collection, {"WW", "WZ", "ZZ"},             "VV", kGreen+1);
   combine_hists(hist_collection, {"QCD (#mu)", "QCD (e#gamma)"}, "QCD", kYellow);
-  combine_hists(hist_collection, {"t#bar{t}W", "t#bar{t}Z"},     "t#bar{t}V", kAzure+2);
+  combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
+  //combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V"},      "t#bar{t}+x", kAzure+1);
+  combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
+  combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
   /*
   cout<<"\nAfter combining:"<<endl;
   total = 0;
@@ -219,14 +222,16 @@ void makeStackedPlot(
   //                     ON-SCREEN DISPLAYS
   //______________________________________________________________
 
-  //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-  GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-  //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets");
-  //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
-
-  //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-  //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+#gamma");
-  //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}");
+  if(toOverlayData){
+    //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
+    //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
+    //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    
+    //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
+    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+  }
   
   //______________________________________________________________
   
@@ -265,8 +270,8 @@ void makeStackedPlot(
   allbkg2->SetLineColor(kGray+3);
   allbkg2->Draw("hist same");  //Black hist over the stack (to outline the total background)
   if(sig1) sig1->Draw("HIST same");
-  if(sig2) sig2->Draw("HIST same");
-  if(sig3) sig3->Draw("HIST same");
+  //if(sig2) sig2->Draw("HIST same");
+  //if(sig3) sig3->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
   dummy->Draw("sameaxis"); //Drawing axis ticks on top
 
@@ -425,7 +430,7 @@ void makeStackedPlot(
   if(toSave){
     createFolder(dump_folder);
     canvas->SaveAs(filename+".png");
-    cout<<"File created: "<<filename<<".png"<<endl;
+    cout<<"File created: \033[33;1m"<<filename<<".png\033[0m"<<endl;
   }
   
   cout<<"Done!"<<endl;

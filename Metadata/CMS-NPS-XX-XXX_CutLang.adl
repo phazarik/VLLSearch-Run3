@@ -91,7 +91,7 @@ region dy_cr
 
 region dy_veto
   select baseline
-  select not (N(electrons) == 2 and 76 < M(leptons[0], leptons[1]) < 106)
+  select not (size(electrons) == 2 and 76 < M(leptons[0], leptons[1]) < 106)
   
 region qcd_cr
   select dy_veto
@@ -115,16 +115,25 @@ region qcd_veto
 region wjets_cr
   select qcd_veto
   select nnscore_wjets < 0.50
-
+  select size(bjets) == 0
+  
 region wjets_veto
   select qcd_veto
   select nnscore_wjets > 0.50
 
 region top_cr
   select wjets_veto
-  select nnscore_qcd > 0.70
   select size(bjets) > 0
 
 region val_region
-  select wjets_veto
+  select dy_veto
+  select leptons[0].sip3d < 5
+  select leptons[1].sip3d < 10
+  select sum(jets.pt) > 50
   select 0.50 < nnscore_qcd < 0.70
+  select nnscore_wjets > 0.50
+  select HT > 50
+
+region signal
+  select wjets_veto
+  select size(bjets) == 0
