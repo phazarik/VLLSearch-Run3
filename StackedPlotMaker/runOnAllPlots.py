@@ -20,36 +20,68 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
 jobdict = {
-    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_mm":{
+    "2025-07-03_sr2/hist_Run3Summer23_sr2_mm":{
         "campaign":"Run3Summer23",
         "channel":"mm"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_me":{
+    "2025-07-03_sr2/hist_Run3Summer23_sr2_me":{
         "campaign":"Run3Summer23",
         "channel":"me"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_em":{
+    "2025-07-03_sr2/hist_Run3Summer23_sr2_em":{
         "campaign":"Run3Summer23",
         "channel":"em"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_ee":{
+    "2025-07-03_sr2/hist_Run3Summer23_sr2_ee":{
         "campaign":"Run3Summer23",
         "channel":"ee"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_mm":{
+    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_mm":{
         "campaign":"Run3Summer23BPix",
         "channel":"mm"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_me":{
+    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_me":{
         "campaign":"Run3Summer23BPix",
         "channel":"me"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_em":{
+    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_em":{
         "campaign":"Run3Summer23BPix",
         "channel":"em"
     },
-    "2025-07-03_wjetscr/hist_Run3Summer23BPix_wjetscr_ee":{
+    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_ee":{
         "campaign":"Run3Summer23BPix",
+        "channel":"ee"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_mm":{
+        "campaign":"Run3Summer22",
+        "channel":"mm"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_me":{
+        "campaign":"Run3Summer22",
+        "channel":"me"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_em":{
+        "campaign":"Run3Summer22",
+        "channel":"em"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22_sr2_ee":{
+        "campaign":"Run3Summer22",
+        "channel":"ee"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_mm":{
+        "campaign":"Run3Summer22EE",
+        "channel":"mm"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_me":{
+        "campaign":"Run3Summer22EE",
+        "channel":"me"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_em":{
+        "campaign":"Run3Summer22EE",
+        "channel":"em"
+    },
+    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_ee":{
+        "campaign":"Run3Summer22EE",
         "channel":"ee"
     }
 }
@@ -127,8 +159,8 @@ for jobname, info in jobdict.items():
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "wjetscr"
-    text     = "W+jets/#gamma CR"
+    tag      = "sr"
+    text     = "Signal region"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
@@ -154,11 +186,11 @@ for jobname, info in jobdict.items():
             f'"{text}"'
         )
         ## For plotmaker:
-        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
 
         ## For writing yields"
-        #if var != "dilep_pt": continue
-        #command = f"root -q -b -l 'writeYields.C({arguments})'"
+        if var != "dilep_pt": continue
+        command = f"root -q -b -l 'writeYields.C({arguments})'"
 
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output

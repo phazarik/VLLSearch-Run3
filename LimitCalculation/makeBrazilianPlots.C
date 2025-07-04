@@ -26,7 +26,7 @@ string todays_date();
 
 void makeBrazilianPlots(){
 
-  TString timetag = "2025-05-15";
+  TString timetag = "2025-07-04";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
   TString outdir = gSystem->ConcatFileName("plots", todays_date().c_str());
   gSystem->mkdir(outdir, true);

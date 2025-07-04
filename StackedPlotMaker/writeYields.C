@@ -9,8 +9,8 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "dilep_pt",
 		 TString _name = "p_{T}^{LL} (GeV)",
-		 TString _jobname = "2025-05-15_sr/hist_Run3Summer22EE_sr_mm/",
-		 TString _campaign = "2016preVFP_UL",
+		 TString _jobname = "2025-07-03_sr2/hist_Run3Summer22EE_sr2_mm/",
+		 TString _campaign = "Run3Summer22EE",
 		 TString _channel = "mm",
 		 TString _tag = "sr",
 		 TString _displaytext = "Signal region"
@@ -27,7 +27,10 @@ void writeYields(
   combine_hists(hist_collection, {"WWW", "WWZ", "WZZ", "ZZZ"},   "VVV", kGreen+3);
   combine_hists(hist_collection, {"WW", "WZ", "ZZ"},             "VV", kGreen+1);
   combine_hists(hist_collection, {"QCD (#mu)", "QCD (e#gamma)"}, "QCD", kYellow);
-  combine_hists(hist_collection, {"t#bar{t}W", "t#bar{t}Z"},     "t#bar{t}V", kAzure+2);
+  combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
+  //combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V"},      "t#bar{t}+x", kAzure+1);
+  combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
+  combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
   cout<<"Histogram collection read."<<endl;
 
   //______________________________________________________________
@@ -65,6 +68,20 @@ void writeYields(
     vector<string> eras = {"E", "F", "G"};
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+  }
+  if(_campaign == "Run3Summer23"){
+    vector<string> eras = {"C1", "C2", "C3", "C4"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
+  }
+  if(_campaign == "Run3Summer23BPix"){
+    vector<string> eras = {"D1", "D2"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
   
   TH1D* hst_data  = nullptr;

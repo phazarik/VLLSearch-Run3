@@ -27,7 +27,7 @@ sigdict = {
     }
 }
 
-combine_output_path = 'fromCMScombine/2025-05-15'
+combine_output_path = 'fromCMScombine/2025-07-04'
 files = os.listdir(combine_output_path)
 outdir = 'sigmaBlimits/' + today
 os.makedirs(outdir, exist_ok=True)

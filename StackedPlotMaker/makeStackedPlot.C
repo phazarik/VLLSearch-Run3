@@ -10,11 +10,11 @@ void makeStackedPlot(
 		     TString _var = "HT",
 		     //TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-07-03_wjetscr/hist_Run3Summer23_wjetscr_em",
-		     TString _campaign = "Run3Summer23",
-		     TString _channel = "em",
-		     TString _tag = "wjetscr",
-		     TString _displaytext = "W+jets/#gamma CR"
+		     TString _jobname = "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_mm",
+		     TString _campaign = "Run3Summer23BPix",
+		     TString _channel = "mm",
+		     TString _tag = "sr",
+		     TString _displaytext = "Signal region"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -27,7 +27,7 @@ void makeStackedPlot(
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=true;
+  bool toOverlayData=false;
   bool toSave=true;
   Double_t ymin = 0.1; Double_t ymax = 10E5;
   TString output_tag = _tag;
@@ -406,8 +406,8 @@ void makeStackedPlot(
     SetLegendEntry(lg, bkg[i]);
   }
   if(sig1) SetLegendEntry(lg, sig1);
-  //if(sig2) SetLegendEntry(lg, sig2);
-  //if(sig3) SetLegendEntry(lg, sig3);
+  if(sig2) SetLegendEntry(lg, sig2);
+  if(sig3) SetLegendEntry(lg, sig3);
   TString legendheader = Form("Global S/#sqrt{B} = %.3f #pm %.3f", globalSbyB, globalSbyBErr);
   if(toOverlayData){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);
@@ -418,6 +418,7 @@ void makeStackedPlot(
     cout << "S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << "\n";
     cout << defaultfloat << endl;
   }
+  //else cout<<"S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << "\n";
   else cout<<legendheader<<"\n"<<endl;
 					 
   lg->SetHeader(legendheader);
