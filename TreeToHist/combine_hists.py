@@ -10,7 +10,7 @@ parser.add_argument("--dryrun", action="store_true")
 args = parser.parse_args()
 
 ## CONFIG ##
-basedir = "../ROOT_FILES/hists/2025-07-01"
+basedir = "../ROOT_FILES/hists/backup_run3/2025-07-03_topcr/"
 campaigns = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 channels = ["ee", "em", "me", "mm"]
 flag = "dycr_corrected"
@@ -27,13 +27,14 @@ for camp in campaigns:
         fullpath = os.path.join(basedir, folder)
         if os.path.isdir(fullpath):
             folders.append(fullpath)
+if len(folders)==0: print('\033[31m[Error] folders not found.')
 
 all_files = {}
 for folder in folders:
     for fname in os.listdir(folder):
         if fname.endswith(".root"):
             all_files.setdefault(fname, []).append(os.path.join(folder, fname))
-
+if len(all_files)==0: print('\033[31m[Error] files not found.')
 
 print("\n\033[33;1mInput folders:\033[0m")
 for f in folders: print(f"- {f}")

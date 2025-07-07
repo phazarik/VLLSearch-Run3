@@ -38,7 +38,8 @@ def main():
     plotCorrectionsBinned(
         jsonfile = "corrections/TTBar_HTbinned_corrections.json",
         name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
-        outfile  = "TTBar_HTbinned_corrections.png"
+        outfile  = "TTBar_HTbinned_corrections.png",
+        yrange   = [0, 2]
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_chargemisID_corrections.json",
@@ -124,7 +125,7 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
+def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None):
 
     #if 'TTBar' not in jsonfile: return
     
@@ -188,8 +189,10 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     xticks = sorted(set(xticks))
     xticklabels = [str(int(x % spacing)) if x % spacing != maxval else '∞' for x in xticks]
 
-    ymin = min(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
-    ymax = max(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
+    if yrange: ymin, ymax =yrange[0], yrange[1]
+    else:
+        ymin = min(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
+        ymax = max(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
     center = 1.0
     max_deviation = max(abs(center - ymin), abs(ymax - center))
     pad = max_deviation * 0.1
@@ -211,7 +214,7 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
 
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2
-    ax.legend(handles, labels, fontsize=9, frameon=True, ncol=ncol)
+    ax.legend(handles, labels, fontsize=9, frameon=True, ncol=ncol, framealpha=1.0)
     ax.tick_params(axis='both', which='both', top=True, right=True)
     ax.text(0.015, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
 
