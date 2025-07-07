@@ -61,15 +61,18 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, bool bottom
   latex.SetTextSize(0.040);
   latex.DrawLatex(xpos, ypos - 0.05, "Asymptotic, stat only");
   latex.DrawLatex(xpos, ypos - 0.10, channel);
-  if      (campaign == "2016preVFP_UL")  latex.DrawLatex(0.59, 0.95, "19.7 fb^{-1} (2016-preVFP)");
-  else if (campaign == "2016postVFP_UL") latex.DrawLatex(0.57, 0.95, "16.2 fb^{-1} (2016-postVFP)");
-  else if (campaign == "2017_UL")        latex.DrawLatex(0.71, 0.95, "41.5 fb^{-1} (2017)");
-  else if (campaign == "2018_UL")        latex.DrawLatex(0.71, 0.95, "59.8 fb^{-1} (2018)");
-  else if (campaign == "2017+2018")      latex.DrawLatex(0.59, 0.95, "101.3 fb^{-1} (2017+2018)");
-  else if (campaign == "Run2_UL")        latex.DrawLatex(0.69, 0.95, "137 fb^{-1} (13 TeV)");
-  else if (campaign == "Run3Summer22")   latex.DrawLatex(0.61, 0.95, "7.98 fb^{-1} (2022-preEE)");
-  else if (campaign == "Run3Summer22EE") latex.DrawLatex(0.57, 0.95, "26.67 fb^{-1} (2022-postEE)");
-  else if (campaign == "2022")           latex.DrawLatex(0.71, 0.95, "34.65 fb^{-1} (2022)");
+  if      (campaign == "2016preVFP_UL")    latex.DrawLatex(0.59, 0.95, "19.7 fb^{-1} (2016-preVFP)");
+  else if (campaign == "2016postVFP_UL")   latex.DrawLatex(0.57, 0.95, "16.2 fb^{-1} (2016-postVFP)");
+  else if (campaign == "2017_UL")          latex.DrawLatex(0.71, 0.95, "41.5 fb^{-1} (2017)");
+  else if (campaign == "2018_UL")          latex.DrawLatex(0.71, 0.95, "59.8 fb^{-1} (2018)");
+  else if (campaign == "2017+2018")        latex.DrawLatex(0.59, 0.95, "101.3 fb^{-1} (2017+2018)");
+  else if (campaign == "Run2_UL")          latex.DrawLatex(0.69, 0.95, "137 fb^{-1} (13 TeV)");
+  else if (campaign == "Run3Summer22")     latex.DrawLatex(0.61, 0.95, "7.98 fb^{-1} (2022-preEE)");
+  else if (campaign == "Run3Summer22EE")   latex.DrawLatex(0.57, 0.95, "26.67 fb^{-1} (2022-postEE)");
+  else if (campaign == "Run3Summer23")     latex.DrawLatex(0.56, 0.95, "17.79 fb^{-1} (2023-preBPix)");
+  else if (campaign == "Run3Summer23BPix") latex.DrawLatex(0.57, 0.95, "9.45 fb^{-1} (2023-postBPix)");
+  else if (campaign == "Run3")             latex.DrawLatex(0.69, 0.95, "62 fb^{-1} (13.6 TeV)");
+  else if (campaign == "2022")             latex.DrawLatex(0.71, 0.95, "34.65 fb^{-1} (2022)");
   else std::cout << "Put correct campaign name!" << std::endl;
 }
 

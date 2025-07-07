@@ -26,7 +26,7 @@ string todays_date();
 
 void makeBrazilianPlots(){
 
-  TString timetag = "2025-07-04";
+  TString timetag = "2025-07-07";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
   TString outdir = gSystem->ConcatFileName("plots", todays_date().c_str());
   gSystem->mkdir(outdir, true);
@@ -46,21 +46,29 @@ void makeBrazilianPlots(){
     {"sigmaB_VLLD_ele_2017_UL_em.txt", "VLLD-e", "2017_UL", "e#mu"},
     {"sigmaB_VLLD_ele_2017_UL_me.txt", "VLLD-e", "2017_UL", "#mue"},
     {"sigmaB_VLLD_ele_2017_UL_mm.txt", "VLLD-e", "2017_UL", "#mu#mu"},
-    {"sigmaB_VLLD_ele_2018_UL_ee.txt", "VLLD-e", "2018_UL", "#ee"},
+    {"sigmaB_VLLD_ele_2018_UL_ee.txt", "VLLD-e", "2018_UL", "ee"},
     {"sigmaB_VLLD_ele_2018_UL_em.txt", "VLLD-e", "2018_UL", "e#mu"},
     {"sigmaB_VLLD_ele_2018_UL_me.txt", "VLLD-e", "2018_UL", "#mue"},
     {"sigmaB_VLLD_ele_2018_UL_mm.txt", "VLLD-e", "2018_UL", "#mu#mu"},
     {"sigmaB_VLLD_ele_combined_Run2.txt", "VLLD-e",   "Run2_UL", "combined"},
 
-    {"sigmaB_VLLD_ele_Run3Summer22_ee.txt", "VLLD-e", "Run3Summer22", "#ee"},
+    {"sigmaB_VLLD_ele_Run3Summer22_ee.txt", "VLLD-e", "Run3Summer22", "ee"},
     {"sigmaB_VLLD_ele_Run3Summer22_em.txt", "VLLD-e", "Run3Summer22", "e#mu"},
     {"sigmaB_VLLD_ele_Run3Summer22_me.txt", "VLLD-e", "Run3Summer22", "#mue"},
     {"sigmaB_VLLD_ele_Run3Summer22_mm.txt", "VLLD-e", "Run3Summer22", "#mu#mu"},
-    {"sigmaB_VLLD_ele_Run3Summer22EE_ee.txt", "VLLD-e", "Run3Summer22EE", "#ee"},
+    {"sigmaB_VLLD_ele_Run3Summer22EE_ee.txt", "VLLD-e", "Run3Summer22EE", "ee"},
     {"sigmaB_VLLD_ele_Run3Summer22EE_em.txt", "VLLD-e", "Run3Summer22EE", "e#mu"},
     {"sigmaB_VLLD_ele_Run3Summer22EE_me.txt", "VLLD-e", "Run3Summer22EE", "#mue"},
     {"sigmaB_VLLD_ele_Run3Summer22EE_mm.txt", "VLLD-e", "Run3Summer22EE", "#mu#mu"},
-    {"sigmaB_VLLD_ele_combined_2022.txt", "VLLD-e", "2022", "combined"},
+    {"sigmaB_VLLD_ele_Run3Summer23_ee.txt", "VLLD-e", "Run3Summer23", "ee"},
+    {"sigmaB_VLLD_ele_Run3Summer23_em.txt", "VLLD-e", "Run3Summer23", "e#mu"},
+    {"sigmaB_VLLD_ele_Run3Summer23_me.txt", "VLLD-e", "Run3Summer23", "#mue"},
+    {"sigmaB_VLLD_ele_Run3Summer23_mm.txt", "VLLD-e", "Run3Summer23", "#mu#mu"},
+    {"sigmaB_VLLD_ele_Run3Summer23BPix_ee.txt", "VLLD-e", "Run3Summer23BPix", "ee"},
+    {"sigmaB_VLLD_ele_Run3Summer23BPix_em.txt", "VLLD-e", "Run3Summer23BPix", "e#mu"},
+    {"sigmaB_VLLD_ele_Run3Summer23BPix_me.txt", "VLLD-e", "Run3Summer23BPix", "#mue"},
+    {"sigmaB_VLLD_ele_Run3Summer23BPix_mm.txt", "VLLD-e", "Run3Summer23BPix", "#mu#mu"},
+    {"sigmaB_VLLD_ele_combined_Run3.txt", "VLLD-e", "Run3", "combined"},
     
     //mu-type:
     {"sigmaB_VLLD_mu_2016preVFP_UL_ee.txt", "VLLD-#mu", "2016preVFP_UL", "ee"},
@@ -81,15 +89,23 @@ void makeBrazilianPlots(){
     {"sigmaB_VLLD_mu_2018_UL_mm.txt",     "VLLD-#mu", "2018_UL", "#mu#mu"},
     {"sigmaB_VLLD_mu_combined_Run2.txt", " VLLD-#mu", "Run2_UL", "combined"},
 
-    {"sigmaB_VLLD_mu_Run3Summer22_ee.txt", "VLLD-#mu", "Run3Summer22", "#ee"},
+    {"sigmaB_VLLD_mu_Run3Summer22_ee.txt", "VLLD-#mu", "Run3Summer22", "ee"},
     {"sigmaB_VLLD_mu_Run3Summer22_em.txt", "VLLD-#mu", "Run3Summer22", "e#mu"},
     {"sigmaB_VLLD_mu_Run3Summer22_me.txt", "VLLD-#mu", "Run3Summer22", "#mue"},
     {"sigmaB_VLLD_mu_Run3Summer22_mm.txt", "VLLD-#mu", "Run3Summer22", "#mu#mu"},
-    {"sigmaB_VLLD_mu_Run3Summer22EE_ee.txt", "VLLD-#mu", "Run3Summer22EE", "#ee"},
+    {"sigmaB_VLLD_mu_Run3Summer22EE_ee.txt", "VLLD-#mu", "Run3Summer22EE", "ee"},
     {"sigmaB_VLLD_mu_Run3Summer22EE_em.txt", "VLLD-#mu", "Run3Summer22EE", "e#mu"},
     {"sigmaB_VLLD_mu_Run3Summer22EE_me.txt", "VLLD-#mu", "Run3Summer22EE", "#mue"},
     {"sigmaB_VLLD_mu_Run3Summer22EE_mm.txt", "VLLD-#mu", "Run3Summer22EE", "#mu#mu"},
-    {"sigmaB_VLLD_mu_combined_2022.txt", "VLLD-#mu", "2022", "combined"},
+    {"sigmaB_VLLD_mu_Run3Summer23_ee.txt", "VLLD-#mu", "Run3Summer23", "ee"},
+    {"sigmaB_VLLD_mu_Run3Summer23_em.txt", "VLLD-#mu", "Run3Summer23", "e#mu"},
+    {"sigmaB_VLLD_mu_Run3Summer23_me.txt", "VLLD-#mu", "Run3Summer23", "#mue"},
+    {"sigmaB_VLLD_mu_Run3Summer23_mm.txt", "VLLD-#mu", "Run3Summer23", "#mu#mu"},
+    {"sigmaB_VLLD_mu_Run3Summer23BPix_ee.txt", "VLLD-#mu", "Run3Summer23BPix", "ee"},
+    {"sigmaB_VLLD_mu_Run3Summer23BPix_em.txt", "VLLD-#mu", "Run3Summer23BPix", "e#mu"},
+    {"sigmaB_VLLD_mu_Run3Summer23BPix_me.txt", "VLLD-#mu", "Run3Summer23BPix", "#mue"},
+    {"sigmaB_VLLD_mu_Run3Summer23BPix_mm.txt", "VLLD-#mu", "Run3Summer23BPix", "#mu#mu"},
+    {"sigmaB_VLLD_mu_combined_Run3.txt", "VLLD-#mu", "Run3", "combined"},
   };
 
   
@@ -97,7 +113,7 @@ void makeBrazilianPlots(){
   for (size_t i = 0; i < limitdict.size(); i++) {
     TString infile   = gSystem->ConcatFileName(indir,  limitdict[i].filename);
     if (gSystem->AccessPathName(infile, kFileExists)) {
-      cout << "Skipping absent file: " << infile << endl;
+      cout << "\033[33;3mSkipping absent file: " << infile <<"\033[0m"<< endl;
       continue;
     }
 
@@ -147,7 +163,7 @@ void makeOneLimitPlot(
   vector<LimitData> limits = ReadDataFromFile(infile); if(limits.empty()) return;
   int nPoints = limits.size();
   if (nPoints < 3) {
-    cout << "\033[31mInsufficient points (" << nPoints << ") in file: " << infile.Data();
+    cout << "\033[31;3mInsufficient points (" << nPoints << ") in file: " << infile.Data();
     cout << "; Skipping plot generation.\033[0m" << std::endl;
     return;
   }
@@ -230,7 +246,7 @@ void makeOneLimitPlot(
 vector<LimitData> ReadDataFromFile(const TString& infile) {
   ifstream txtfile(infile.Data());
   if (!txtfile.is_open()) {
-    cerr << "\033[31mError: Unable to open txtfile " << infile.Data() <<"\033[0m"<< endl;
+    cerr << "\033[31;1mError: Unable to open txtfile " << infile.Data() <<"\033[0m"<< endl;
     return {};
   }
   vector<LimitData> limits;

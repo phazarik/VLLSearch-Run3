@@ -30,7 +30,9 @@ def main(combine_str, test=False):
         #"yields_2016postVFP_UL_ee", "yields_2016postVFP_UL_me", "yields_2016preVFP_UL_ee", "yields_2016preVFP_UL_me", "yields_2017_UL_ee", "yields_2017_UL_me", "yields_2018_UL_ee", "yields_2018_UL_me",
         #"yields_2016postVFP_UL_em", "yields_2016postVFP_UL_mm", "yields_2016preVFP_UL_em", "yields_2016preVFP_UL_mm", "yields_2017_UL_em", "yields_2017_UL_mm", "yields_2018_UL_em", "yields_2018_UL_mm",
         "yields_Run3Summer22_ee",   "yields_Run3Summer22_em",   "yields_Run3Summer22_me",   "yields_Run3Summer22_mm",
-        "yields_Run3Summer22EE_ee", "yields_Run3Summer22EE_em", "yields_Run3Summer22EE_me", "yields_Run3Summer22EE_mm"
+        "yields_Run3Summer22EE_ee", "yields_Run3Summer22EE_em", "yields_Run3Summer22EE_me", "yields_Run3Summer22EE_mm",
+        "yields_Run3Summer23_ee",   "yields_Run3Summer23_em",   "yields_Run3Summer23_me",   "yields_Run3Summer23_mm",
+        "yields_Run3Summer23BPix_ee",   "yields_Run3Summer23BPix_em",   "yields_Run3Summer23BPix_me",   "yields_Run3Summer23BPix_mm"
     ]
     
     ## signals:

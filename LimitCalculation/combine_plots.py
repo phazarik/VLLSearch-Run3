@@ -22,7 +22,7 @@ svg     = args.svg
 
 #----------------------------------------------------------------------
 #campaigns = ['2018_UL', '2017_UL', '2016postVFP_UL', '2016preVFP_UL']
-campaigns = ['Run3Summer22', 'Run3Summer22EE']
+campaigns = ['Run3Summer22', 'Run3Summer22EE', 'Run3Summer23', 'Run3Summer23BPix']
 channels = ['mm', 'me', 'em', 'ee']
 #----------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ for campaign in campaigns:
             else:  images[(campaign, channel)] = Image.open(filepath)
             combined_files.append(filename)
         else:
-            print(f"Missing: {modelname}_{campaign}_{channel}{ext}")
+            print(f"\033[31;1mMissing: {modelname}_{campaign}_{channel}{ext}\033[0m")
                     
 if combined_files:
     print("Combining:")
@@ -155,4 +155,4 @@ else:
                           anchor="mm")
     if not args.dryrun: stitched_img.save(outfile)
 
-print(f"Saved: {outfile} ({len(rows)} rows x {len(cols)} cols)")
+print(f"Saved: \033[93m{outfile}\033[0m ({len(rows)} rows x {len(cols)} cols)")
