@@ -6,16 +6,19 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--plotname', type=str, required=True, help='Plot file name to search for (e.g., "efficiency.png").')
 parser.add_argument('--find',     type=str, required=True, help='Directory to search within.')
 parser.add_argument('--name',     type=str, required=False, help='Output name tag without extension.')
-parser.add_argument('--test',     action='store_true', required=False, help='Run once.')
-parser.add_argument('--dryrun',   action='store_true', required=False, help='Dryrun.')
+parser.add_argument('--relaxgrid', action='store_true', help='Arrange images in a square‑like grid')
+parser.add_argument('--test',     action='store_true', help='Run once.')
+parser.add_argument('--dryrun',   action='store_true', help='Dryrun.')
 args = parser.parse_args()
 
 search_key = args.find
 plotname   = args.plotname
 
 #campaigns = ["2018_UL", "2017_UL", "2016postVFP_UL", "2016preVFP_UL"]
-campaigns = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23EE"]
+#campaigns = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23EE"]
+campaigns = ["Run3Summer22EE"]
 channels  = ["mm", "me", "em", "ee"]
+#channels = ["mm"]
 
 parent_dir = search_key.rstrip('/')
 matching_dirs = []
@@ -53,18 +56,27 @@ for d in ordered_dirs:
 if not args.dryrun and images:
     rows = len(campaigns)
     cols = len(channels)
+    if args.relaxgrid:
+        cols = ceil(sqrt(len(images)))
+        rows = ceil(len(images) / cols)
 
     w, h = images[0].size
+
     canvas = Image.new('RGB', (cols * w, rows * h), 'white')
 
-    for row_idx, camp in enumerate(campaigns):
-        for col_idx, ch in enumerate(channels):
-            idx = row_idx * cols + col_idx
-            if idx >= len(images): continue
-            img = images[idx]
-            x = col_idx * w
-            y = row_idx * h
-            canvas.paste(img, (x, y))
+    if args.relaxgrid:
+        for idx, img in enumerate(images):
+            r, c = divmod(idx, cols)
+            canvas.paste(img, (c * w, r * h))
+    else:
+        for row_idx, camp in enumerate(campaigns):
+            for col_idx, ch in enumerate(channels):
+                idx = row_idx * cols + col_idx
+                if idx >= len(images): continue
+                img = images[idx]
+                x = col_idx * w
+                y = row_idx * h
+                canvas.paste(img, (x, y))
 
     out_dir = os.path.join("plots", "combined")
     os.makedirs(out_dir, exist_ok=True)
@@ -72,4 +84,4 @@ if not args.dryrun and images:
     if args.name: out_name = f"combined_{args.name}_{plotname}.png"
     out_path = os.path.join(out_dir, out_name)
     canvas.save(out_path)
-    print(f"\nSaved: \033[93m{out_path}\033[0m")
+    print(f"\nSaved: \033[93m{out_path}\033[0m ({rows} rows x {cols} cols)")

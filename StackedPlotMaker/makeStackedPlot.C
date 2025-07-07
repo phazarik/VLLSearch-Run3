@@ -10,11 +10,11 @@ void makeStackedPlot(
 		     TString _var = "HT",
 		     //TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_mm",
-		     TString _campaign = "Run3Summer23BPix",
+		     TString _jobname = "2025-07-07_topcr_unscaled/hist_Run3Summer23_topcr_mm",
+		     TString _campaign = "Run3Summer23",
 		     TString _channel = "mm",
-		     TString _tag = "sr",
-		     TString _displaytext = "Signal region"
+		     TString _tag = "topcr_unscaled",
+		     TString _displaytext = "t#bar{t}+x CR"
 		     )
 {
   TString date_stamp  = todays_date();
@@ -27,8 +27,8 @@ void makeStackedPlot(
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=false;
-  bool toSave=true;
+  bool toOverlayData=true;
+  bool toSave=false;
   Double_t ymin = 0.1; Double_t ymax = 10E5;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
@@ -58,7 +58,7 @@ void makeStackedPlot(
   combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
   //combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V"},      "t#bar{t}+x", kAzure+1);
   combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
-  combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
+  //combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
   /*
   cout<<"\nAfter combining:"<<endl;
   total = 0;
@@ -194,25 +194,34 @@ void makeStackedPlot(
     if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_ele", "M200");
     if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD_ele", "M600");
+    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
   }
   else if (_channel == "em"){
     sig1 = get_hist(_var, input_path, "VLLD_ele", "M400");
     if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_mu", "M400");
     if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD_ele", "M600");
+    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
   }
   else if (_channel == "me"){
     sig1 = get_hist(_var, input_path, "VLLD_mu", "M400");
     if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_ele", "M400");
     if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD_mu", "M600");
+    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
   else if (_channel == "mm"){
     sig1 = get_hist(_var, input_path, "VLLD_mu", "M400");
     if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD_mu", "M200");
     if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD_mu", "M600");
+    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
+  sig2 = nullptr;
   sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
   cout<<"Signal ready!"<<endl;
@@ -225,12 +234,12 @@ void makeStackedPlot(
   if(toOverlayData){
     //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-    //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
-    GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
     
     //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
-    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
   }
   
   //______________________________________________________________
@@ -270,8 +279,8 @@ void makeStackedPlot(
   allbkg2->SetLineColor(kGray+3);
   allbkg2->Draw("hist same");  //Black hist over the stack (to outline the total background)
   if(sig1) sig1->Draw("HIST same");
-  //if(sig2) sig2->Draw("HIST same");
-  //if(sig3) sig3->Draw("HIST same");
+  if(sig2) sig2->Draw("HIST same");
+  if(sig3) sig3->Draw("HIST same");
   if(toOverlayData) hst_data->Draw("ep same");
   dummy->Draw("sameaxis"); //Drawing axis ticks on top
 
@@ -381,6 +390,7 @@ void makeStackedPlot(
   if(_campaign == "2016postVFP_UL")   put_latex_text("16.2 fb^{-1} (2016-postVFP)", 0.60, 0.94, 42, 0.05);
   if(_campaign == "2017_UL")          put_latex_text("41.5 fb^{-1} (2017)", 0.74, 0.94, 42, 0.05);
   if(_campaign == "2018_UL")          put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05);
+  if(_campaign == "Run2")             put_latex_text("137.2 fb^{-1} (Run-2)", 0.63, 0.94, 42, 0.05);
   if(_campaign == "Run3Summer22")     put_latex_text("7.98 fb^{-1} (2022-preEE)", 0.64, 0.94, 42, 0.05);
   if(_campaign == "Run3Summer22EE")   put_latex_text("26.7 fb^{-1} (2022-postEE)", 0.63, 0.94, 42, 0.05);
   if(_campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)", 0.62, 0.94, 42, 0.05);

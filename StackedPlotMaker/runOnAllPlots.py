@@ -2,6 +2,7 @@ import os, sys
 import argparse
 import subprocess
 import time
+import json
 from datetime import timedelta
 from tqdm import tqdm
 from rich.console import Console
@@ -19,72 +20,8 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
-jobdict = {
-    "2025-07-03_sr2/hist_Run3Summer23_sr2_mm":{
-        "campaign":"Run3Summer23",
-        "channel":"mm"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23_sr2_me":{
-        "campaign":"Run3Summer23",
-        "channel":"me"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23_sr2_em":{
-        "campaign":"Run3Summer23",
-        "channel":"em"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23_sr2_ee":{
-        "campaign":"Run3Summer23",
-        "channel":"ee"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_mm":{
-        "campaign":"Run3Summer23BPix",
-        "channel":"mm"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_me":{
-        "campaign":"Run3Summer23BPix",
-        "channel":"me"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_em":{
-        "campaign":"Run3Summer23BPix",
-        "channel":"em"
-    },
-    "2025-07-03_sr2/hist_Run3Summer23BPix_sr2_ee":{
-        "campaign":"Run3Summer23BPix",
-        "channel":"ee"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_mm":{
-        "campaign":"Run3Summer22",
-        "channel":"mm"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_me":{
-        "campaign":"Run3Summer22",
-        "channel":"me"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_em":{
-        "campaign":"Run3Summer22",
-        "channel":"em"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_ee":{
-        "campaign":"Run3Summer22",
-        "channel":"ee"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_mm":{
-        "campaign":"Run3Summer22EE",
-        "channel":"mm"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_me":{
-        "campaign":"Run3Summer22EE",
-        "channel":"me"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_em":{
-        "campaign":"Run3Summer22EE",
-        "channel":"em"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_ee":{
-        "campaign":"Run3Summer22EE",
-        "channel":"ee"
-    }
-}
+jobdict = {}
+with open('jobdict_run3.json') as f: jobdict = json.load(f)
 
 variables = [
     ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
@@ -155,6 +92,7 @@ plotcount = 0
 for jobname, info in jobdict.items():
 
     #if not jobname.endswith("ee"): continue
+    #if 'Summer23' in jobname: continue
     
     jobcount += 1
     campaign = info['campaign']
@@ -186,11 +124,11 @@ for jobname, info in jobdict.items():
             f'"{text}"'
         )
         ## For plotmaker:
-        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
 
         ## For writing yields"
-        if var != "dilep_pt": continue
-        command = f"root -q -b -l 'writeYields.C({arguments})'"
+        #if var != "dilep_pt": continue
+        #command = f"root -q -b -l 'writeYields.C({arguments})'"
 
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output

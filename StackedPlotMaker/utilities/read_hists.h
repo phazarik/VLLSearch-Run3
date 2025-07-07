@@ -47,7 +47,7 @@ TH1D *get_hist(
 
   //Skip samples here:
   if (sample.Contains("ZGamma"))   return nullptr; //For Run-3 only
-  if (sample.Contains("VVSS"))     return nullptr;
+  //if (sample.Contains("VVSS"))     return nullptr;
   if (sample.Contains("WJetsNLO")) return nullptr;
   
   if(!file_exists(filename)){
@@ -172,8 +172,8 @@ vector<TH1D *> return_hist_collection(
     {"TT",    "t#bar{t}",      kAzure+1},
     {"TTBar", "t#bar{t}",      kAzure+1},
     {"TTV",   "t#bar{t}V",     kAzure+2},
-    //{"TTW",   "t#bar{t}W",     kAzure+2}, //Disable for Run3
-    //{"TTZ",   "t#bar{t}Z",     kAzure+2}, //Disable for Run3
+    {"TTW",   "t#bar{t}W",     kAzure+2}, //Disable for Run3
+    {"TTZ",   "t#bar{t}Z",     kAzure+2}, //Disable for Run3
     {"TW", "tW", kBlue-3},
     {"VV", "VV", kGreen+1},
     {"WW", "WW", kGreen+1},
