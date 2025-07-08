@@ -84,4 +84,4 @@ if not args.dryrun and images:
     if args.name: out_name = f"combined_{args.name}_{plotname}.png"
     out_path = os.path.join(out_dir, out_name)
     canvas.save(out_path)
-    print(f"\nSaved: \033[93m{out_path}\033[0m ({rows} rows x {cols} cols)")
+    print(f"\nOutput: \033[93m{out_path}\033[0m ({rows} rows x {cols} cols)")

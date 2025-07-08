@@ -20,8 +20,11 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
+tag      = "sr"
+text     = "SR"
 jobdict = {}
-with open('jobdict_run3.json') as f: jobdict = json.load(f)
+with open('jobdicts/jobdict_run3.json') as f: jobdict = json.load(f)
+with open('jobdicts/jobdict_run2.json') as f: jobdict.update(json.load(f))
 
 variables = [
     ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
@@ -90,15 +93,10 @@ jobcount = 0
 plotcount = 0
 
 for jobname, info in jobdict.items():
-
-    #if not jobname.endswith("ee"): continue
-    #if 'Summer23' in jobname: continue
     
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "sr"
-    text     = "Signal region"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
@@ -124,11 +122,12 @@ for jobname, info in jobdict.items():
             f'"{text}"'
         )
         ## For plotmaker:
-        command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
+        #command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"
 
         ## For writing yields"
         #if var != "dilep_pt": continue
-        #command = f"root -q -b -l 'writeYields.C({arguments})'"
+        if var != "LT": continue
+        command = f"root -q -b -l 'writeYields.C({arguments})'"
 
         if test: print(command, style="italic dim")
         if not test: command += " > /dev/null 2>&1" ## supress output

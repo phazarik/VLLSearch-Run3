@@ -9,7 +9,7 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "dilep_pt",
 		 TString _name = "p_{T}^{LL} (GeV)",
-		 TString _jobname = "2025-07-03_sr2/hist_Run3Summer22EE_sr2_mm/",
+		 TString _jobname = "2025-07-08_sr/hist_Run3Summer22EE_sr_mm/",
 		 TString _campaign = "Run3Summer22EE",
 		 TString _channel = "mm",
 		 TString _tag = "sr",

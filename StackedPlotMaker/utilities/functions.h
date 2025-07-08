@@ -310,6 +310,7 @@ void GetBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> 
   
   print_line();
   cout<<endl;
+  cout<<"Global SF = "<<global_sf_string.Data()<<endl;
 }
 
 void DisplayBinwiseSF(TString var, TString targetvar, TH1D *hst_data, vector<TH1D*> bkg, TString targetname) {

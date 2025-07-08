@@ -26,7 +26,7 @@ string todays_date();
 
 void makeBrazilianPlots(){
 
-  TString timetag = "2025-07-07";
+  TString timetag = "2025-07-08";
   TString indir   = gSystem->ConcatFileName("sigmaBlimits", timetag);
   TString outdir = gSystem->ConcatFileName("plots", todays_date().c_str());
   gSystem->mkdir(outdir, true);
@@ -69,6 +69,8 @@ void makeBrazilianPlots(){
     {"sigmaB_VLLD_ele_Run3Summer23BPix_me.txt", "VLLD-e", "Run3Summer23BPix", "#mue"},
     {"sigmaB_VLLD_ele_Run3Summer23BPix_mm.txt", "VLLD-e", "Run3Summer23BPix", "#mu#mu"},
     {"sigmaB_VLLD_ele_combined_Run3.txt", "VLLD-e", "Run3", "combined"},
+
+    {"sigmaB_VLLD_ele_combined_All.txt", "VLLD-e", "All", "combined"},
     
     //mu-type:
     {"sigmaB_VLLD_mu_2016preVFP_UL_ee.txt", "VLLD-#mu", "2016preVFP_UL", "ee"},
@@ -106,6 +108,8 @@ void makeBrazilianPlots(){
     {"sigmaB_VLLD_mu_Run3Summer23BPix_me.txt", "VLLD-#mu", "Run3Summer23BPix", "#mue"},
     {"sigmaB_VLLD_mu_Run3Summer23BPix_mm.txt", "VLLD-#mu", "Run3Summer23BPix", "#mu#mu"},
     {"sigmaB_VLLD_mu_combined_Run3.txt", "VLLD-#mu", "Run3", "combined"},
+
+    {"sigmaB_VLLD_mu_combined_All.txt", "VLLD-#mu", "All", "combined"}
   };
 
   

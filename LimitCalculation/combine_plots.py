@@ -21,8 +21,8 @@ svg     = args.svg
 
 
 #----------------------------------------------------------------------
-#campaigns = ['2018_UL', '2017_UL', '2016postVFP_UL', '2016preVFP_UL']
-campaigns = ['Run3Summer22', 'Run3Summer22EE', 'Run3Summer23', 'Run3Summer23BPix']
+campaigns = ['2018_UL', '2017_UL', '2016postVFP_UL', '2016preVFP_UL']
+#campaigns = ['Run3Summer22', 'Run3Summer22EE', 'Run3Summer23', 'Run3Summer23BPix']
 channels = ['mm', 'me', 'em', 'ee']
 #----------------------------------------------------------------------
 
@@ -43,25 +43,6 @@ outfile = os.path.join(outdir, outname)
 
 images = {}
 combined_files = []
-
-'''
-for campaign in campaigns:
-    for channel in channels:
-        for filename in figures:
-            if 'Run3' in campaign:
-                name_parts = filename.replace(ext, '').split('_')
-                if len(name_parts) >= 5 and name_parts[3] == campaign and name_parts[4] == channel:
-                    if svg: images[(campaign, channel)] = fromfile(os.path.join(indir, filename)).getroot()
-                    else: images[(campaign, channel)] = Image.open(os.path.join(indir, filename))
-                    combined_files.append(filename)
-                    break
-            else:
-                if campaign in filename and channel in filename:
-                    if svg: images[(campaign, channel)] = fromfile(os.path.join(indir, filename)).getroot()
-                    else: images[(campaign, channel)] = Image.open(os.path.join(indir, filename))
-                    combined_files.append(filename)
-                    break
-'''
 
 for campaign in campaigns:
     for channel in channels:
@@ -149,7 +130,7 @@ else:
                 stitched_img.paste(img, (x_offset, y_offset))
             else:
                 draw.text((x_offset + img_width // 2, y_offset + img_height // 2), 
-                          "No yield", 
+                          "Not sensitive", 
                           fill=(255, 0, 0), 
                           font=font, 
                           anchor="mm")

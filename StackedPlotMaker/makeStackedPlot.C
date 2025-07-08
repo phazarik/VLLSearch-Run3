@@ -10,11 +10,13 @@ void makeStackedPlot(
 		     TString _var = "HT",
 		     //TString _var = "dilep_pt",
 		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-07-07_topcr_unscaled/hist_Run3Summer23_topcr_mm",
+		     TString _jobname = "2025-07-08_val/hist_Run3Summer23_val_mm",
 		     TString _campaign = "Run3Summer23",
 		     TString _channel = "mm",
-		     TString _tag = "topcr_unscaled",
-		     TString _displaytext = "t#bar{t}+x CR"
+		     TString _tag = "val",
+		     TString _displaytext = "val",
+		     bool _data = false,
+		     bool _save = true
 		     )
 {
   TString date_stamp  = todays_date();
@@ -27,8 +29,8 @@ void makeStackedPlot(
 
   //--------------------------------------------------------------------------
   // SET GLOBAL SETTINGS 
-  bool toOverlayData=true;
-  bool toSave=false;
+  bool toOverlayData=_data;
+  bool toSave=_save;
   Double_t ymin = 0.1; Double_t ymax = 10E5;
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
@@ -58,7 +60,7 @@ void makeStackedPlot(
   combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
   //combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V"},      "t#bar{t}+x", kAzure+1);
   combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
-  //combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
+  combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
   /*
   cout<<"\nAfter combining:"<<endl;
   total = 0;
@@ -221,8 +223,8 @@ void makeStackedPlot(
     sig3 = get_hist(_var, input_path, "VLLD_mu", "M600");
     if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
-  sig2 = nullptr;
-  sig3 = nullptr;
+  //sig2 = nullptr;
+  //sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
   cout<<"Signal ready!"<<endl;
 
@@ -234,12 +236,12 @@ void makeStackedPlot(
   if(toOverlayData){
     //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-    GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
-    //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
     
     //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
-    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
   }
   
   //______________________________________________________________
@@ -422,14 +424,19 @@ void makeStackedPlot(
   if(toOverlayData){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);
     TString err = Form("%.3f", globalObsbyExpErr);
-    legendheader = val+" #pm "+err;
-    cout << fixed << setprecision(3);
-    cout << "Obs/Exp = " << globalObsbyExp << " ± " << globalObsbyExpErr << endl;
-    cout << "S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << "\n";
-    cout << defaultfloat << endl;
+    legendheader = val + " #pm " + err;
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "Obs/Exp = " << globalObsbyExp << " ± " << globalObsbyExpErr << std::endl;
+    std::cout << "S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << std::endl;
+    std::cout.unsetf(std::ios::fixed); // Reset to defaultfloat
+    std::cout << std::endl;
   }
-  //else cout<<"S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << "\n";
-  else cout<<legendheader<<"\n"<<endl;
+  else{
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "S/sqrt(B) = " << globalSbyB << " ± " << globalSbyBErr << std::endl;
+    std::cout.unsetf(std::ios::fixed); // Reset to defaultfloat
+    std::cout << std::endl;
+  }
 					 
   lg->SetHeader(legendheader);
   lg->Draw();

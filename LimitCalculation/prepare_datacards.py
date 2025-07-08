@@ -15,7 +15,7 @@ import ROOT
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test",    action="store_true", required=False, help="test mode")
-parser.add_argument("--combine", type=str,            required=False, help="combine tag, e.g.: Run2")
+parser.add_argument("--combine", type=str,            required=False, help="combine tag, e.g.: Run2, Run3, All")
 args = parser.parse_args()
 test = args.test
 combine_str = args.combine
@@ -25,15 +25,17 @@ def main(combine_str, test=False):
     combine = bool(combine_str) 
     outtag = f"_{combine_str}" if combine else ""
     
-    basedir = '../StackedPlotMaker/signalyields/2025-07-04/'
-    jobs = [
-        #"yields_2016postVFP_UL_ee", "yields_2016postVFP_UL_me", "yields_2016preVFP_UL_ee", "yields_2016preVFP_UL_me", "yields_2017_UL_ee", "yields_2017_UL_me", "yields_2018_UL_ee", "yields_2018_UL_me",
-        #"yields_2016postVFP_UL_em", "yields_2016postVFP_UL_mm", "yields_2016preVFP_UL_em", "yields_2016preVFP_UL_mm", "yields_2017_UL_em", "yields_2017_UL_mm", "yields_2018_UL_em", "yields_2018_UL_mm",
-        "yields_Run3Summer22_ee",   "yields_Run3Summer22_em",   "yields_Run3Summer22_me",   "yields_Run3Summer22_mm",
-        "yields_Run3Summer22EE_ee", "yields_Run3Summer22EE_em", "yields_Run3Summer22EE_me", "yields_Run3Summer22EE_mm",
-        "yields_Run3Summer23_ee",   "yields_Run3Summer23_em",   "yields_Run3Summer23_me",   "yields_Run3Summer23_mm",
-        "yields_Run3Summer23BPix_ee",   "yields_Run3Summer23BPix_em",   "yields_Run3Summer23BPix_me",   "yields_Run3Summer23BPix_mm"
-    ]
+    basedir = '../StackedPlotMaker/signalyields/2025-07-08/'
+
+    channels = ["mm", "me", "em", "ee"]
+    campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL", "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+    if   combine_str and "Run2" in combine_str: campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
+    elif combine_str and "Run3" in combine_str: campaigns = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+
+    jobs = []
+    for camp in campaigns:
+        for ch in channels:
+            jobs.append(f"yields_{camp}_{ch}")
     
     ## signals:
     signal_ele = {
@@ -69,7 +71,7 @@ def prepare_datacard(sigdict, joblist, baseinputdir, tag="", combine=False, filt
 
     if combine:
         combined_dict = {}
-        print(f'Reading job(s):', end=' ')
+        print(f'==> Combining job(s):', end=' ')
         for jobname in joblist:
             print(jobname, end=' ')
             dict_job = return_dict(jobname, baseinputdir, sigdict, signame)
@@ -96,7 +98,7 @@ def prepare_datacard(sigdict, joblist, baseinputdir, tag="", combine=False, filt
 
     else:
         for jobname in joblist:
-            print(f'\nProcessing job: {jobname}', style="bold yellow")
+            print(f'\n==> Processing job: {jobname}', style="bold yellow")
             dict_job = return_dict(jobname, baseinputdir, sigdict, signame)
             outdir = os.path.join(parent_outdir, jobname)
             process_datadict(sigdict, dict_job, outdir, filtersig)
@@ -114,6 +116,11 @@ def process_datadict(sigdict, datadict, outdir, filtersig):
             sample_df = pd.DataFrame(sampleyield)
             sample_df['bin'] = sample_df['bin'].astype(int)
             sample_df['obs'] = sample_df['obs'].astype(int)
+
+            # Dropping bins with zero signal, zero expected bkg, and zero obs
+            sample_df = sample_df[~((sample_df['sig'] < 1e-5) & (sample_df['exp'] < 1e-5) & (sample_df['obs'] == 0))]
+
+            # Sorting according to S/sqrtB
             sample_df = sample_df.sort_values(by='S/sqrtB', ascending=False).reset_index(drop=True)
 
             # Ensure signal yields are not invalid. Zeros and negatives are not allowed
