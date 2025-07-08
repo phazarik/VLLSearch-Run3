@@ -40,7 +40,7 @@ def main():
         outfile  = "ttbar_uncorrected.png",
         name     = "Obs/exp",
         moretext = r"$t\bar{t}+x$ CR, before correction",
-        yrange   = [0.5, 1.5]
+        yrange   = [0.4, 1.6]
     )
     plotObsExp(
         jsonfile = "jsons/qcd_validation.json",
@@ -54,7 +54,7 @@ def main():
         outfile  = "validation.png",
         name     = "Obs/exp",
         moretext = "Validation region",
-        yrange   = [0.5, 1.5] 
+        yrange   = [0.4, 1.8] 
     )
     plotObsExp(
         jsonfile = "jsons/signal_significance.json",
@@ -112,8 +112,12 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", yrange=None, signal=False, mor
     ax.set_ylabel(name, fontsize=12)
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
-    if moretext: ax.text(0.03, 0.78, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif')
+
+    #ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    #if moretext: ax.text(0.03, 0.78, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif')
+    ax.text(0.02, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
+    if moretext: ax.text(0.98, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
+
     if not signal: ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
     ax.set_xlim(-0.5, len(channels) + x_offset)
 
