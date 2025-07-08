@@ -81,25 +81,23 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
     all_vals = []
     x_offset = 0.1
     for index, (key, props) in enumerate(campaign_dict.items()):
-        #if 'Run3' in key: continue
         if key not in data: continue
         values = data[key]
-        
-        y, yerr = [], []
-        for i in range(4):
-            val = values.get(str(i), None)
-            if val is not None:
-                y.append(val[0])
-                yerr.append(val[1])
-                all_vals.append(val[0])
-            else:
-                y.append(None)
-                yerr.append(0)
 
-        x_offset_values = []
-        for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
-        ax.errorbar(x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
-            fmt=props["style"], label=props["name"], color=props["color"])
+        x_offset_values, y, yerr = [], [], []
+        for i in range(len(channels)):
+            val = values.get(str(i))
+            if val is None: continue
+            x_offset_values.append(x[i] + x_offset * index)
+            y.append(val[0])
+            yerr.append(val[1])
+            all_vals.append(val[0])
+
+        if not y: continue
+        ax.errorbar(
+            x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
+            fmt=props["style"], label=props["name"], color=props["color"]
+        )
         
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)

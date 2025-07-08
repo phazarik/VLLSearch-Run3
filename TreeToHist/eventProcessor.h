@@ -159,8 +159,8 @@ void processTree(
   bool flag_dy = (channelval == 3) && (find_key(inputFilename, "DYto2L")||find_key(inputFilename, "DYJets"));
   bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
   bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_") || find_key(inputFilename, "TTV_") || find_key(inputFilename, "TTZ_") || find_key(inputFilename, "TTW_");
-  //bool flag_wjets = find_key(inputFilename, "WGtoLNuG") || find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
-  bool flag_wjets = find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
+  bool flag_wjets = find_key(inputFilename, "WGtoLNuG") || find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
+  //bool flag_wjets = find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
   if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
   if(flag_qcd)   cout<<"\033[35;1m==> Correcting QCD globally.\033[0m"<<endl;
   if(flag_ttbar) cout<<"\033[35;1m==> Correcting tt+X in HT bins.\033[0m"<<endl;
@@ -222,13 +222,14 @@ void processTree(
       Double_t scale_ttbar = 1.0;
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-    }/*
+    }
     //4)WJets+WGamma global correction
     if(flag_wjets){
       Double_t scale_wjets = 1.0;
       scale_wjets = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_wjets, "nom");
+      if(channelval==0) scale_wjets = 1.0;
       wt = wt * scale_wjets;
-      }*/
+    }
     
     //--------------------------------
     // Filling up the histograms:

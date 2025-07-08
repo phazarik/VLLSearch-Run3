@@ -22,36 +22,36 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "topcr/tree_2016preVFP_UL_topcr":{
-        "dump":"hist_2016preVFP_UL_topcr",
+    "presr/tree_2016preVFP_UL_presr":{
+        "dump":"hist_2016preVFP_UL_presr",
         "campaign":"2016preVFP_UL"
     },
-    "topcr/tree_2016postVFP_UL_topcr":{
-        "dump":"hist_2016postVFP_UL_topcr",
+    "presr/tree_2016postVFP_UL_presr":{
+        "dump":"hist_2016postVFP_UL_presr",
         "campaign":"2016postVFP_UL"
     },
-    "topcr/tree_2017_UL_topcr":{
-        "dump":"hist_2017_UL_topcr",
+    "presr/tree_2017_UL_presr":{
+        "dump":"hist_2017_UL_presr",
         "campaign":"2017_UL"
     },
-    "topcr/tree_2018_UL_topcr":{
-        "dump":"hist_2018_UL_topcr",
+    "presr/tree_2018_UL_presr":{
+        "dump":"hist_2018_UL_presr",
         "campaign":"2018_UL"
     },
-    "topcr/tree_Run3Summer22_topcr":{
-        "dump":"hist_Run3Summer22_topcr",
+    "presr/tree_Run3Summer22_presr":{
+        "dump":"hist_Run3Summer22_presr",
         "campaign":"Run3Summer22"
     },
-    "topcr/tree_Run3Summer22EE_topcr":{
-        "dump":"hist_Run3Summer22EE_topcr",
+    "presr/tree_Run3Summer22EE_presr":{
+        "dump":"hist_Run3Summer22EE_presr",
         "campaign":"Run3Summer22EE"
     },
-    "topcr/tree_Run3Summer23_topcr":{
-        "dump":"hist_Run3Summer23_topcr",
+    "presr/tree_Run3Summer23_presr":{
+        "dump":"hist_Run3Summer23_presr",
         "campaign":"Run3Summer23"
     },
-    "topcr/tree_Run3Summer23BPix_topcr":{
-        "dump":"hist_Run3Summer23BPix_topcr",
+    "presr/tree_Run3Summer23BPix_presr":{
+        "dump":"hist_Run3Summer23BPix_presr",
         "campaign":"Run3Summer23BPix"
     }
 }
