@@ -160,10 +160,11 @@ void processTree(
   bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
   bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_") || find_key(inputFilename, "TTV_") || find_key(inputFilename, "TTZ_") || find_key(inputFilename, "TTW_");
   bool flag_wjets = find_key(inputFilename, "WGtoLNuG") || find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
-  if(flag_dy)    cout<<"\033[33;3m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
-  if(flag_qcd)   cout<<"\033[33;3m==> Correcting QCD globally.\033[0m"<<endl;
-  if(flag_ttbar) cout<<"\033[33;3m==> Correcting tt+X in HT bins.\033[0m"<<endl;
-  if(flag_wjets) cout<<"\033[33;3m==> Correcting W+jets/gamma globally.\033[0m"<<endl;
+  //bool flag_wjets = find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
+  if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
+  if(flag_qcd)   cout<<"\033[35;1m==> Correcting QCD globally.\033[0m"<<endl;
+  if(flag_ttbar) cout<<"\033[35;1m==> Correcting tt+X in HT bins.\033[0m"<<endl;
+  if(flag_wjets) cout<<"\033[35;1m==> Correcting W+jets/gamma globally.\033[0m"<<endl;
   //-------------------------------------------------------------------------
   
   TTree* tree = (TTree*)file->Get("myEvents");
@@ -209,28 +210,25 @@ void processTree(
       Double_t scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
       scale_dy = scale_dy1*scale_dy2;
       wt = wt * scale_dy;
-      //cout<<"Correcting DY by : "<<scale_dy<<endl;
     }
     //2) QCD global correction:
     if(flag_qcd){
       Double_t scale_qcd = 1.0;
       scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd, "nom");
       wt = wt * scale_qcd;
-      //cout<<"Correcting QCD by : "<<scale_qcd<<endl;
     }
     //3) TTBar+TTV HT binned correction
     if(flag_ttbar){
       Double_t scale_ttbar = 1.0;
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-      //cout<<"Correcting TT+x by : "<<scale_ttbar<<"\t"<<up<<"\t"<<down<<endl;
     }
     //4)WJets+WGamma global correction
     if(flag_wjets){
       Double_t scale_wjets = 1.0;
       scale_wjets = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_wjets, "nom");
+      if(channelval==0) scale_wjets = 1.0;
       wt = wt * scale_wjets;
-      //cout<<"Correcting W+jets/gamma by : "<<scale_wjets<<endl;
     }
     
     //--------------------------------
@@ -313,43 +311,6 @@ void processTree(
     
   // Event loop ends
   //________________________________________________________________________________________________
-
-  /*
-  //Debug:
-  cout << fixed << setprecision(3);
-  cout << setw(20) << left << "Histogram Name"
-       << setw(15) << right << "Entries"
-       << setw(20) << "Overflow"
-       << setw(20) << "Integral (Before Overflow)"
-       << setw(20) << "Integral (After Overflow)"
-       << setw(20) << "Integral (After Lumi)" << endl;
-  cout << string(115, '-') << endl;
-
-  for(int i = 0; i < (int)hst_collection.size(); i++) {
-
-    if(i == 2 || i == 20 || i == 26) {
-      double entries = hst_collection[i]->GetEntries();
-      double overflow = hst_collection[i]->GetBinContent(hst_collection[i]->GetNbinsX() + 1);
-      double integral_before = hst_collection[i]->Integral();
-
-      // Handle overflow
-      SetLastBinAsOverflow(hst_collection[i]);
-
-      double integral_after = hst_collection[i]->Integral();
-
-      // Apply lumi scaling
-      hst_collection[i]->Scale(lumisf);
-      double integral_after_lumi = hst_collection[i]->Integral();
-
-      cout << setw(20) << left << hst_collection[i]->GetTitle()
-	   << setw(15) << right << entries
-	   << setw(20) << overflow
-	   << setw(20) << integral_before
-	   << setw(20) << integral_after
-	   << setw(20) << integral_after_lumi << endl;
-    }
-  }
-  */
   
   //Luminosity scaling and overflow handling:
   if(test) cout << "Before SetLastBinAsOverflow: channel entries = " << hst_collection[0]->GetEntries() << endl;

@@ -38,7 +38,8 @@ def main():
     plotCorrectionsBinned(
         jsonfile = "corrections/TTBar_HTbinned_corrections.json",
         name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
-        outfile  = "TTBar_HTbinned_corrections.png"
+        outfile  = "TTBar_HTbinned_corrections.png",
+        yrange   = [0, 2]
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_chargemisID_corrections.json",
@@ -66,7 +67,7 @@ def main():
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
+def plotGlobalCorrections(jsonfile, name, outfile, yrange=None, moretext=None):
     
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
@@ -80,32 +81,32 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
     all_vals = []
     x_offset = 0.1
     for index, (key, props) in enumerate(campaign_dict.items()):
-        #if 'Run3' in key: continue
         if key not in data: continue
         values = data[key]
-        
-        y, yerr = [], []
-        for i in range(4):
-            val = values.get(str(i), None)
-            if val is not None:
-                y.append(val[0])
-                yerr.append(val[1])
-                all_vals.append(val[0])
-            else:
-                y.append(None)
-                yerr.append(0)
 
-        x_offset_values = []
-        for i in range(len(channels)): x_offset_values.append(x[i] + x_offset * (index))
-        ax.errorbar(x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
-            fmt=props["style"], label=props["name"], color=props["color"])
+        x_offset_values, y, yerr = [], [], []
+        for i in range(len(channels)):
+            val = values.get(str(i))
+            if val is None: continue
+            x_offset_values.append(x[i] + x_offset * index)
+            y.append(val[0])
+            yerr.append(val[1])
+            all_vals.append(val[0])
+
+        if not y: continue
+        ax.errorbar(
+            x_offset_values, y, yerr=yerr, capsize=3, markersize=4,
+            fmt=props["style"], label=props["name"], color=props["color"]
+        )
         
     ax.set_xticks(x)
     ax.set_xticklabels(channels, fontsize=11)
     ax.set_ylabel(name, fontsize=12)
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    #ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.text(0, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
+    if moretext: ax.text(1, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
     ax.set_xlim(-0.5, len(channels) + x_offset)
     #ax.set_ylim(0, 1)
     if yrange is not None: ax.set_ylim(yrange[0], yrange[1])
@@ -124,7 +125,7 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
+def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None, moretext=None):
 
     #if 'TTBar' not in jsonfile: return
     
@@ -188,8 +189,10 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
     xticks = sorted(set(xticks))
     xticklabels = [str(int(x % spacing)) if x % spacing != maxval else '∞' for x in xticks]
 
-    ymin = min(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
-    ymax = max(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
+    if yrange: ymin, ymax =yrange[0], yrange[1]
+    else:
+        ymin = min(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
+        ymax = max(b["scale"][0] for v in data.values() for ch in v.values() for b in ch)
     center = 1.0
     max_deviation = max(abs(center - ymin), abs(ymax - center))
     pad = max_deviation * 0.1
@@ -211,9 +214,11 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500):
 
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2
-    ax.legend(handles, labels, fontsize=9, frameon=True, ncol=ncol)
+    ax.legend(handles, labels, fontsize=9, frameon=False, ncol=ncol, framealpha=1.0)
     ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.015, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    #ax.text(0.015, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.text(0, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
+    if moretext: ax.text(1, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
 
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)

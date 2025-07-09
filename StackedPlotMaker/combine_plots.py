@@ -10,7 +10,8 @@ args = parser.parse_args()
 indir = args.indir
 
 set0 = ["njet", "nbjet", "HT", "LT", "ST", "STfrac", "dilep_ptratio", "metpt", "metphi"]
-set1 = ["nnscore_qcd_vlld_2016preVFP", "nnscore_qcd_vlld_2016postVFP", "nnscore_qcd_vlld_2017", "nnscore_qcd_vlld_2018"]
+set1 = ["nnscore_Run2_vlld_qcd", "nnscore_Run2_vlld_wjets", "nnscore_Run2_vlld_ttbar",
+        "nnscore_Run3_vlld_qcd", "nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_ttbar"]
 set2 = ["lep0_pt", "lep0_eta", "lep0_phi", "lep0_mt", "lep0_iso", "lep0_sip3d"]
 set3 = ["lep1_pt", "lep1_eta", "lep1_phi", "lep1_mt", "lep1_iso", "lep1_sip3d"]
 set4 = ["dilep_pt", "dilep_eta", "dilep_phi", "dilep_mt", "dilep_dphi", "dilep_dR"]
@@ -46,7 +47,7 @@ for plotname, plotset in plotdict.items():
     #infiles.sort()
     if not infiles: continue
 
-    print("Combining: ")
+    print("==> Combining the following plots: ")
     index = 0
     for fig in infiles:
         index+=1
@@ -67,7 +68,7 @@ for plotname, plotset in plotdict.items():
 
     outname = os.path.join(indir, f"combined_{plotname}.png")
     if not args.dryrun: combined.save(outname)
-    print(f"Saved: {outname} ({rows} rows x {cols} cols)\n")
+    print(f"Saved: \033[93m{outname}\033[0m ({rows} rows x {cols} cols)\n")
 
     if args.test: break
 

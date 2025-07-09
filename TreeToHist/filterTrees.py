@@ -1,5 +1,6 @@
 import os, sys
 import time
+from datetime import timedelta
 import argparse
 import numpy as np
 import uproot
@@ -23,20 +24,36 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 basedir = '../ROOT_FILES/treesWithNN/'
 
 jobdict = {
+    "baseline/tree_2016preVFP_UL_baseline":{
+        "outjob":"topcr/tree_2016preVFP_UL_topcr",
+        "campaign":"2016preVFP_UL"
+    },
+    "baseline/tree_2016postVFP_UL_baseline":{
+        "outjob":"topcr/tree_2016postVFP_UL_topcr",
+        "campaign":"2016postVFP_UL"
+    },
+    "baseline/tree_2017_UL_baseline":{
+        "outjob":"topcr/tree_2017_UL_topcr",
+        "campaign":"2017_UL"
+    },
+    "baseline/tree_2018_UL_baseline":{
+        "outjob":"topcr/tree_2018_UL_topcr",
+        "campaign":"2018_UL"
+    },
     "baseline/tree_Run3Summer22_baseline":{
-        "outjob":"sr2/tree_Run3Summer22_sr2",
+        "outjob":"topcr/tree_Run3Summer22_topcr",
         "campaign":"Run3Summer22"
     },
     "baseline/tree_Run3Summer22EE_baseline":{
-        "outjob":"sr2/tree_Run3Summer22EE_sr2",
+        "outjob":"topcr/tree_Run3Summer22EE_topcr",
         "campaign":"Run3Summer22EE"
     },
     "baseline/tree_Run3Summer23_baseline":{
-        "outjob":"sr2/tree_Run3Summer23_sr2",
+        "outjob":"topcr/tree_Run3Summer23_topcr",
         "campaign":"Run3Summer23"
     },
     "baseline/tree_Run3Summer23BPix_baseline":{
-        "outjob":"sr2/tree_Run3Summer23BPix_sr2",
+        "outjob":"topcr/tree_Run3Summer23BPix_topcr",
         "campaign":"Run3Summer23BPix"
     },
 }
@@ -121,33 +138,35 @@ for injob, info in jobdict.items():
         #         EVENT SELECTION          #
         ####################################
 
-        ## Step1: Controlling QCD:
         dy_veto = 'not (channel == 3 and 76 < dilep_mass < 106)'
+        
+        ## Step1: Controlling QCD:
         qcd_cr = f'{dy_veto} and {nnscore_qcd}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d>5'
         qcd_vr = f'{dy_veto} and {nnscore_qcd}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d<5'
+        tight_sip3d = 'lep0_sip3d<5 and lep1_sip3d<10'
+        qcd_veto    = f'{tight_sip3d} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50'
         
         ## Step2: Controlling Drell-Yan:
         dy_cr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
 
         ## Step3: Controlling WJets:
-        tight_sip3d =  'lep0_sip3d<5 and lep1_sip3d<10'
-        qcd_veto    = f'{tight_sip3d} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50' ##Every event is qcdveto onwards
         wjets_cr    = f'{qcd_veto} and {nnscore_wjets}<0.50 and nbjet==0'
         wjets_veto  = f'{qcd_veto} and {nnscore_wjets}>0.50' 
         
         ## Step4: Controlling TTbar:
-        top_cr = f'{wjets_veto} and nbjet>0'
+        top_cr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet>0'
         
         ## Step5: Validation:
         val_region = f'{dy_veto} and 0.50<{nnscore_qcd}<0.70 and {nnscore_wjets}>0.50'
         val_region = val_region+f'and HT>50 and {tight_sip3d}'
         
         ## Step6: Signal regions:
-        sr = f'{wjets_veto} and nbjet==0 and ST>300'
+        presr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet==0'
+        sr = f'{presr} and ST>300'
         
         #------------------------------
         # Final event selection:
-        event_selection = sr
+        event_selection = top_cr
         #------------------------------
 
         filecount += 1
@@ -175,11 +194,9 @@ for injob, info in jobdict.items():
     if test: break ##job
     
 end_time = time.time()
-time_taken = end_time - start_time
-hours, rem = divmod(time_taken, 3600)
-minutes, seconds = divmod(rem, 60)
+time_taken = timedelta(seconds=round(end_time - start_time))
 
 print("\nDone!", style='yellow bold')
-print(f"Time taken = {time_taken:.2f} seconds.", style='yellow bold')
+print(f"Time taken = {time_taken}",              style='yellow bold')
 print(f"Total number of jobs  = {jobcount}",     style='yellow bold')
 print(f"Total number of files = {filecount}\n",  style='yellow bold')

@@ -22,13 +22,37 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "sr2/tree_Run3Summer22_sr2":{
-        "dump":"hist_Run3Summer22_sr2",
+    "presr/tree_2016preVFP_UL_presr":{
+        "dump":"hist_2016preVFP_UL_presr",
+        "campaign":"2016preVFP_UL"
+    },
+    "presr/tree_2016postVFP_UL_presr":{
+        "dump":"hist_2016postVFP_UL_presr",
+        "campaign":"2016postVFP_UL"
+    },
+    "presr/tree_2017_UL_presr":{
+        "dump":"hist_2017_UL_presr",
+        "campaign":"2017_UL"
+    },
+    "presr/tree_2018_UL_presr":{
+        "dump":"hist_2018_UL_presr",
+        "campaign":"2018_UL"
+    },
+    "presr/tree_Run3Summer22_presr":{
+        "dump":"hist_Run3Summer22_presr",
         "campaign":"Run3Summer22"
     },
-    "sr2/tree_Run3Summer22EE_sr2":{
-        "dump":"hist_Run3Summer22EE_sr2",
+    "presr/tree_Run3Summer22EE_presr":{
+        "dump":"hist_Run3Summer22EE_presr",
         "campaign":"Run3Summer22EE"
+    },
+    "presr/tree_Run3Summer23_presr":{
+        "dump":"hist_Run3Summer23_presr",
+        "campaign":"Run3Summer23"
+    },
+    "presr/tree_Run3Summer23BPix_presr":{
+        "dump":"hist_Run3Summer23BPix_presr",
+        "campaign":"Run3Summer23BPix"
     }
 }
 
@@ -41,9 +65,9 @@ jobcount = 0
 processed = []
 
 for jobname, info in jobdict.items():
-    #if 'EE' not in jobname: continue
-    for channel in channels:
+    if 'Run3' not in jobname: continue
 
+    for channel in channels:
         #if channel != "ee" : continue
         
         jobcount += 1

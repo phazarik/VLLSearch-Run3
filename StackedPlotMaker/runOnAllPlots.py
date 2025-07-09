@@ -2,6 +2,7 @@ import os, sys
 import argparse
 import subprocess
 import time
+import json
 from datetime import timedelta
 from tqdm import tqdm
 from rich.console import Console
@@ -19,40 +20,11 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
-jobdict = {
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_mm":{
-        "campaign":"Run3Summer22",
-        "channel":"mm"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_me":{
-        "campaign":"Run3Summer22",
-        "channel":"me"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_em":{
-        "campaign":"Run3Summer22",
-        "channel":"em"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22_sr2_ee":{
-        "campaign":"Run3Summer22",
-        "channel":"ee"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_mm":{
-        "campaign":"Run3Summer22EE",
-        "channel":"mm"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_me":{
-        "campaign":"Run3Summer22EE",
-        "channel":"me"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_em":{
-        "campaign":"Run3Summer22EE",
-        "channel":"em"
-    },
-    "2025-07-03_sr2/hist_Run3Summer22EE_sr2_ee":{
-        "campaign":"Run3Summer22EE",
-        "channel":"ee"
-    }
-}
+tag      = "sr"
+text     = "SR"
+jobdict = {}
+with open('jobdicts/jobdict_run3.json') as f: jobdict = json.load(f)
+with open('jobdicts/jobdict_run2.json') as f: jobdict.update(json.load(f))
 
 variables = [
     ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
@@ -121,14 +93,10 @@ jobcount = 0
 plotcount = 0
 
 for jobname, info in jobdict.items():
-
-    #if not jobname.endswith("ee"): continue
     
     jobcount += 1
     campaign = info['campaign']
     channel  = info['channel']
-    tag      = "sr"
-    text     = "Signal region"
     
     print(f'\n({jobcount}/{len(list(jobdict.items()))}) Making plot for {jobname} ({channel}, {tag}, {text})')
 
@@ -158,6 +126,7 @@ for jobname, info in jobdict.items():
 
         ## For writing yields"
         #if var != "dilep_pt": continue
+        #if var != "LT": continue
         #command = f"root -q -b -l 'writeYields.C({arguments})'"
 
         if test: print(command, style="italic dim")
