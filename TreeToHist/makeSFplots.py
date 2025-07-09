@@ -67,7 +67,7 @@ def main():
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
+def plotGlobalCorrections(jsonfile, name, outfile, yrange=None, moretext=None):
     
     with open(jsonfile) as f: data = json.load(f)
     channels = [r'$\mu\mu$', r'$\mu e$', r'$e\mu$', r'$ee$']
@@ -104,7 +104,9 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
     ax.set_ylabel(name, fontsize=12)
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    #ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.text(0, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
+    if moretext: ax.text(1, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
     ax.set_xlim(-0.5, len(channels) + x_offset)
     #ax.set_ylim(0, 1)
     if yrange is not None: ax.set_ylim(yrange[0], yrange[1])
@@ -123,7 +125,7 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None):
 #____________________________________________________________________________________________________
 #____________________________________________________________________________________________________
 
-def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None):
+def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None, moretext=None):
 
     #if 'TTBar' not in jsonfile: return
     
@@ -212,9 +214,11 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None):
 
     handles, labels = ax.get_legend_handles_labels()
     ncol = 1 if len(labels) <= 4 else 2
-    ax.legend(handles, labels, fontsize=9, frameon=True, ncol=ncol, framealpha=1.0)
+    ax.legend(handles, labels, fontsize=9, frameon=False, ncol=ncol, framealpha=1.0)
     ax.tick_params(axis='both', which='both', top=True, right=True)
-    ax.text(0.015, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    #ax.text(0.015, 0.89, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
+    ax.text(0, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
+    if moretext: ax.text(1, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
 
     if not outfile.endswith('png'): outfile = f"{outfile}.png"
     fullname = os.path.join(outdir, outfile)

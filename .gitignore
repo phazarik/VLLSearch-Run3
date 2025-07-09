@@ -11,6 +11,7 @@
 *map.in
 *.ipynb_checkpoints
 *png
+*gif
 *pdf
 *svg
 *zip

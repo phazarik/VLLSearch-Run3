@@ -61,7 +61,7 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, bool bottom
   latex.SetTextSize(0.040);
   latex.DrawLatex(xpos, ypos - 0.05, "Asymptotic, stat only");
   latex.DrawLatex(xpos, ypos - 0.10, channel);
-  if      (campaign == "2016preVFP_UL")    latex.DrawLatex(0.59, 0.95, "19.7 fb^{-1} (2016-preVFP)");
+  if      (campaign == "2016preVFP_UL")    latex.DrawLatex(0.58, 0.95, "19.7 fb^{-1} (2016-preVFP)");
   else if (campaign == "2016postVFP_UL")   latex.DrawLatex(0.57, 0.95, "16.2 fb^{-1} (2016-postVFP)");
   else if (campaign == "2017_UL")          latex.DrawLatex(0.72, 0.95, "41.5 fb^{-1} (2017)");
   else if (campaign == "2018_UL")          latex.DrawLatex(0.72, 0.95, "59.8 fb^{-1} (2018)");

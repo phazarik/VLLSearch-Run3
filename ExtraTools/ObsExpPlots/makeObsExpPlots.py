@@ -61,6 +61,7 @@ def main():
         outfile  = "signal_significance.png",
         name     = r"$S/\sqrt{B}$",
         signal   = True,
+        moretext = "Signal region",
         yrange   = [0, 2]
     )
 
@@ -113,10 +114,8 @@ def plotObsExp(jsonfile, outfile, name="Obs/Exp", yrange=None, signal=False, mor
     ax.set_xlabel("Channel", fontsize=12)
     ax.tick_params(axis='both', which='both', top=True, right=True)
 
-    #ax.text(0.03, 0.86, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif')
-    #if moretext: ax.text(0.03, 0.78, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif')
-    ax.text(0.02, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
-    if moretext: ax.text(0.98, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
+    ax.text(0, 1.02, 'CMS', transform=ax.transAxes, fontsize=22, fontweight='bold', family='sans-serif', ha='left', va='bottom')
+    if moretext: ax.text(1, 1.02, moretext, transform=ax.transAxes, fontsize=10, family='sans-serif', ha='right', va='bottom')
 
     if not signal: ax.axhline(1.0, color='black', linestyle=':', linewidth=1)
     ax.set_xlim(-0.5, len(channels) + x_offset)
