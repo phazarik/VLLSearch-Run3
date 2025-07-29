@@ -106,8 +106,8 @@ public :
   TTreeReaderArray<Float_t> Jet_chEmEF = {fReader, "Jet_chEmEF"};
   TTreeReaderArray<Float_t> Jet_chHEF = {fReader, "Jet_chHEF"};
   TTreeReaderArray<Float_t> Jet_eta = {fReader, "Jet_eta"};
-  TTreeReaderArray<Float_t> Jet_hfsigmaEtaEta = {fReader, "Jet_hfsigmaEtaEta"};
-  TTreeReaderArray<Float_t> Jet_hfsigmaPhiPhi = {fReader, "Jet_hfsigmaPhiPhi"};
+  //TTreeReaderArray<Float_t> Jet_hfsigmaEtaEta = {fReader, "Jet_hfsigmaEtaEta"};
+  //TTreeReaderArray<Float_t> Jet_hfsigmaPhiPhi = {fReader, "Jet_hfsigmaPhiPhi"};
   TTreeReaderArray<Float_t> Jet_mass = {fReader, "Jet_mass"};
   TTreeReaderArray<Float_t> Jet_muEF = {fReader, "Jet_muEF"};
   TTreeReaderArray<Float_t> Jet_muonSubtrFactor = {fReader, "Jet_muonSubtrFactor"};
@@ -315,8 +315,8 @@ public :
   //TTreeReaderValue<Bool_t> HLT_SingleEle  = {fReader, "HLT_Ele35_WPTight_Gsf"};
   
   // For 2018 and 2022:
-  TTreeReaderValue<Bool_t> HLT_SingleMuon  = {fReader, "HLT_IsoMu24"};
-  TTreeReaderValue<Bool_t> HLT_SingleEle   = {fReader, "HLT_Ele32_WPTight_Gsf"};
+  //TTreeReaderValue<Bool_t> HLT_SingleMuon  = {fReader, "HLT_IsoMu24"};
+  //TTreeReaderValue<Bool_t> HLT_SingleEle   = {fReader, "HLT_Ele32_WPTight_Gsf"};
 
   //_____________________________________________________________________________________________________________
   // DONE READING BRANCHES
@@ -350,6 +350,11 @@ public :
     vector<TH2F *> bJets;
     vector<TH2F *> cJets;
     vector<TH2F *> lJets;
+    //signal study:
+    vector<TH1F *> vllep;
+    vector<TH1F *> vlnu;
+    vector<TH1F *> mode;
+    vector<TH1F *> gen, reco;
   };
   struct Particle {
     TLorentzVector v;
@@ -461,7 +466,8 @@ public :
 
   //For HistMaker:
   void MakebJetSFPlots();
-
+  void MakeSignalPlots();
+  
   //------------------------------------------------------------------------------------------------------------
   // GLOBAL VARIABLE DECLARATIONS
   //------------------------------------------------------------------------------------------------------------

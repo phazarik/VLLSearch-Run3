@@ -7,6 +7,7 @@
 #include "../includeHeaders.h"
 #include "BookHistograms.h"
 #include "make_bJetSFPlots.h"
+#include "make_signalPlots.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
 {
@@ -114,6 +115,7 @@ Bool_t AnaScript::Process(Long64_t entry)
     nEvtRan++;
 
     triggerRes         = true; //default, always true for MC
+    /*
     muon_trigger       = *HLT_SingleMuon;
     electron_trigger   = *HLT_SingleEle;
     overlapping_events = muon_trigger && electron_trigger;
@@ -132,63 +134,13 @@ Bool_t AnaScript::Process(Long64_t entry)
 	triggerRes = false;
       }
     }//Applying trigger on data
-
+    */
     if(triggerRes){
       nEvtTrigger++;
 
       //----------------------------------------------------------------------------------------------------------
       // OBJECT DEFINITIONS
       //----------------------------------------------------------------------------------------------------------
-
-      //----------------
-      // Gen-Particles
-      //----------------
-      genMuon.clear();  genElectron.clear();  genLightLepton.clear();
-      genJet.clear();   vllep.clear();        vlnu.clear();
-
-      //Handling bad events from signal:
-      bad_event = false;
-
-      if(_data==0){
-	createGenLightLeptons();
-	createGenJets();
-        SortGenObjects();
-	//SortPt(genMuon);
-	//SortPt(genElectron);
-	//SortPt(genLightLepton);
-	createSignalArrays();
-	SortVLL();
-
-	//Correcting the Doublet model (flagging out the invalid decays)
-	if(_flag=="doublet"){ //for VLLD files
-	  bad_event = false;
-	  //a) The neutral particle cannot decay to H,nu or Z,nu.
-	  // I am flagging out the events with Higgs(25) or the Z(23) as daughetrs of N
-	  //cout<<"----"<<endl;
-	  for(int i=0; i<(int)vlnu.size(); i++){
-	    for(int j=0; j<(int)vlnu.at(i).dauid.size(); j++){
-	      if(fabs(vlnu.at(i).dauid[j]) == 25)      bad_event = true;
-	      else if(fabs(vlnu.at(i).dauid[j]) == 23) bad_event = true;
-	      //cout<<fabs(vlnu.at(i).dauid[j])<<" ";
-	    }
-	    //cout<<""<<endl;
-	  }
-	  //if(bad_event) cout<<"bad"<<endl;
-	  //else cout<<"good"<<endl;
-	  //cout<<"----"<<endl;
-	  
-	  //b) The lepton cannot decay to a W,nu of the corresponding flavor (ele/mu):
-	  // I am flagging out the events with W(24) as daughetrs of L
-	  for(int i=0; i<(int)vllep.size(); i++){
-	    for(int j=0; j<(int)vllep.at(i).dauid.size(); j++){
-	      if(fabs(vllep.at(i).dauid[j]) == 24)     bad_event = true;
-	    }
-	  }
-	}
-	//Make gen-level plots here.
-      }
-      //Counting bad events:
-      if(bad_event) nEvtBad++;
 
       //----------------
       // Reco-Particles
@@ -221,11 +173,15 @@ Bool_t AnaScript::Process(Long64_t entry)
 	}
       }
 
+      //Gen-Particles block moved to make_signalPlots.h
+      if(_data == 0) MakeSignalPlots(); //nEvtBad is here
+
       //----------------------------------------------------------------------------------------------------------
-      // Writing to tree
+      // Analysis:
       //----------------------------------------------------------------------------------------------------------
 
-      if(_data == 0) MakebJetSFPlots(); //nEvtPass is here
+      //if(_data == 0) MakebJetSFPlots(); //nEvtPass is here
+      
       
     }//Triggered Events
   }//GoodEvt
