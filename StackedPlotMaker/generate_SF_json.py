@@ -44,10 +44,10 @@ campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
 channels = ["mm", "me", "em", "ee"]
 channel_idx = {c: str(i) for i, c in enumerate(channels)}
 
-jobdir = "2025-07-08_sr"
-tag = "sr"
+jobdir = "2025-07-08_val"
+tag = "val"
 text = ""
-lookatdata = False
+lookatdata = True
 
 # Initialize JSONs and tables
 macro = "makeStackedPlot.C"

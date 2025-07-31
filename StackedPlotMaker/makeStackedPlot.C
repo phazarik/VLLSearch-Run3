@@ -237,11 +237,11 @@ void makeStackedPlot(
     //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
-    GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
     
     //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
-    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
   }
   
   //______________________________________________________________

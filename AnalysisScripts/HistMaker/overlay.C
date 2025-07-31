@@ -15,6 +15,7 @@
 #include <algorithm>
 
 using namespace std;
+int nPlot = 0;
 
 struct plotdata{
   TString file;
@@ -68,11 +69,11 @@ void overlay(){
   overlay_one("genjet_pt", "p_{T}(gen jet)", 10);
   overlay_one("genjet_eta", "#eta(gen jet)", 10);
   overlay_one("genjet_phi", "#phi(gen jet)", 10);
-  overlay_one("genHT", "H_{T} (jets)", 10);
-  overlay_one("genLT", "L_{T} (leptons)", 10);
-  overlay_one("genST", "S_{T}=H_{T}+L_{T}+MET", 10);
-  overlay_one("genMET_pt", "p_{T}^{miss}", 10);
-  overlay_one("genMET_phi", "#phi^{miss}", 10);
+  overlay_one("genHT", "gen-H_{T} (GeV)", 10);
+  overlay_one("genLT", "gen-L_{T} (GeV)", 10);
+  overlay_one("genST", "gen-S_{T} (GeV)", 10);
+  overlay_one("genMET_pt", "gen-p_{T}^{miss}", 10);
+  overlay_one("genMET_phi", "gen-#phi^{miss}", 10);
   
   //Other reco-level plots
   overlay_one("nrecomu", "N_{reco #mu}");
@@ -95,29 +96,29 @@ void overlay(){
   overlay_one("bjet_pt", "p_{T}(b jet)", 10);
   overlay_one("bjet_eta", "#eta(b jet)", 10);
   overlay_one("bjet_phi", "#phi(b jet)", 10);
-  overlay_one("recoHT", "H_{T} (jets)", 10);
-  overlay_one("recoLT", "L_{T} (leptons)", 10);
-  overlay_one("recoST", "S_{T}=H_{T}+L_{T}+MET", 10);
+  overlay_one("recoHT", "H_{T} (GeV)", 10);
+  overlay_one("recoLT", "L_{T} (GeV)", 10);
+  overlay_one("recoST", "S_{T} (GeV)", 10);
   overlay_one("recoMET_pt", "p_{T}^{miss}", 10);
   overlay_one("recoMET_phi", "#phi^{miss}", 10);
 }
 
 void overlay_one(TString var, TString name, int rebin){
-  cout<<"\033[0;33mProcessing: "<<var<<"\033[0m"<<endl;
+  cout<<"\033[0;33m"<<nPlot+1<<". processing: "<<var<<"\033[0m"<<endl;
   bool toNorm = true;
 
   vector<plotdata> hists = {
     {"hst_VLLD_ele_M150.root",  "VLLD-e_{150}",  kAzure-4, 3},
     {"hst_VLLD_ele_M500.root",  "VLLD-e_{500}",  kAzure+2, 2},
-    {"hst_VLLD_ele_M1000.root", "VLLD-e_{1000}", kBlue,    1},
-    /*
+    {"hst_VLLD_ele_M1000.root", "VLLD-e_{1000}", kBlue+0,  1},
+    
     {"hst_VLLD_mu_M150.root",    "VLLD-#mu_{150}", kRed-4,   3},
-    {"hst_VLLD_mu_M500.root",    "VLLD-#mu_{500}", kRed+1,   2},
-    {"hst_VLLD_mu_M1000.root",   "VLLD-#mu_{1000}",kRed,     1},
+    {"hst_VLLD_mu_M500.root",    "VLLD-#mu_{500}", kRed+0,   2},
+    {"hst_VLLD_mu_M1000.root",   "VLLD-#mu_{1000}",kRed+1,   1},
 
     {"hst_VLLD_tau_M150.root",   "VLLD-#tau_{150}",kGreen-6, 3},
-    {"hst_VLLD_tau_M500.root",   "VLLD-#tau_{500}",kGreen+2, 2},
-    {"hst_VLLD_tau_M1000.root",  "VLLD-#tau_{1000}",kGreen+1,1},*/
+    {"hst_VLLD_tau_M500.root",   "VLLD-#tau_{500}",kGreen+1, 2},
+    {"hst_VLLD_tau_M1000.root",  "VLLD-#tau_{1000}",kGreen+2,1},
   };
 
   vector<TH1*> histObjs;
@@ -173,7 +174,8 @@ void overlay_one(TString var, TString name, int rebin){
   AddCMSLabel();
 
   //Done.
-  c1->SaveAs("signal_plots/overlay_"+var+".png");
+  c1->SaveAs("signal_plots/"+var+".png");
+  nPlot += 1;
 }
 
 void plothist(TH1* h, plotdata pd, float ymin, float ymax, bool first, TString xtitle) {
@@ -216,8 +218,8 @@ TCanvas* CreateCanvas(TString name) {
 }
 
 TLegend* CreateLegend() {
-  TLegend* leg = new TLegend(0.81, 0.70, 1.0, 0.95);
-  leg->SetTextSize(0.03);
+  TLegend* leg = new TLegend(0.81, 0.50, 0.99, 0.92);
+  leg->SetTextSize(0.04);
   leg->SetTextFont(42);
   leg->SetBorderSize(0);
   leg->SetFillStyle(0);
