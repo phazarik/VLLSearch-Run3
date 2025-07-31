@@ -38,19 +38,18 @@ public :
   TTree          *fChain = 0;
   
   //For NanoAODv12+ (example: Run3Summer22 MC)
-  /*
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;
-  using uint_or_int   = Int_t;*/
-  
+  using uint_or_int   = Int_t;
+  /*
   //For NanoAODv11-
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
-  using uint_or_int  = UInt_t;
+  using uint_or_int  = UInt_t;*/
 
   //Read only the important branches:
   TTreeReaderValue<UInt_t> run = {fReader, "run"};
@@ -87,7 +86,8 @@ public :
   TTreeReaderArray<Float_t> Electron_sieie = {fReader, "Electron_sieie"};
   TTreeReaderArray<Float_t> Electron_sip3d = {fReader, "Electron_sip3d"};
   TTreeReaderArray<int_or_short> Electron_jetIdx = {fReader, "Electron_jetIdx"};
-  //Jet
+
+  //Jets
   TTreeReaderValue<iterator> nJet = {fReader, "nJet"};
   TTreeReaderArray<int_or_char> Jet_jetId = {fReader, "Jet_jetId"};
   TTreeReaderArray<UChar_t> Jet_nConstituents = {fReader, "Jet_nConstituents"};
@@ -118,6 +118,15 @@ public :
   TTreeReaderArray<Float_t> Jet_phi = {fReader, "Jet_phi"};
   TTreeReaderArray<Float_t> Jet_pt = {fReader, "Jet_pt"};
   TTreeReaderArray<Float_t> Jet_rawFactor = {fReader, "Jet_rawFactor"};
+
+  //FatJets:
+  TTreeReaderValue<iterator> nFatJet = {fReader, "nFatJet"};
+  TTreeReaderArray<Float_t> FatJet_area = {fReader, "FatJet_area"};
+  TTreeReaderArray<Float_t> FatJet_eta = {fReader, "FatJet_eta"};
+  TTreeReaderArray<Float_t> FatJet_mass = {fReader, "FatJet_mass"};
+  TTreeReaderArray<Float_t> FatJet_phi = {fReader, "FatJet_phi"};
+  TTreeReaderArray<Float_t> FatJet_pt = {fReader, "FatJet_pt"};
+  TTreeReaderArray<int_or_char> FatJet_jetId = {fReader, "FatJet_jetId"};
 
   //MET
   TTreeReaderValue<Float_t> MET_MetUnclustEnUpDeltaX = {fReader, "MET_MetUnclustEnUpDeltaX"};
@@ -271,11 +280,12 @@ public :
 
   //Jetflavor:
   TTreeReaderArray<int_or_char> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+  TTreeReaderArray<int_or_char> FatJet_hadronFlavour = {fReader_MC, "FatJet_hadronFlavour"};
 
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-  /*
+  
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -283,8 +293,8 @@ public :
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralCalo = {fReader, "Rho_fixedGridRhoFastjetCentralCalo"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralChargedPileUp = {fReader, "Rho_fixedGridRhoFastjetCentralChargedPileUp"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralNeutral = {fReader, "Rho_fixedGridRhoFastjetCentralNeutral"};
-  TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;*/
-  
+  TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;
+  /*
   //Rho: Run2
   TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader_MC, "fixedGridRhoFastjetAll"};
   TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader_MC, "fixedGridRhoFastjetCentral"};
@@ -293,7 +303,7 @@ public :
   TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader_MC, "fixedGridRhoFastjetCentralNeutral"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_all = {fReader, "Photon_pfRelIso03_all"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_chg = {fReader, "Photon_pfRelIso03_chg"};
-  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;
+  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;*/
 
   /*
   //Comment out the following for QCD samples:
@@ -411,6 +421,7 @@ public :
   float transv_mass(float lepE, float lepphi, float met, float metphi);
   void createLightLeptons();
   void createJets();
+  void createFatJets();
   void createGenLightLeptons();
   void createGenJets();
   void createSignalArrays();
@@ -495,7 +506,7 @@ private:
   //Physics objects:
   vector<Particle> genMuon, genElectron, genLightLepton, genJet;
   vector<Particle> vllep, vlnu;
-  vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet, MediumbJet;
+  vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, FatJet, bJet, MediumbJet;
   vector<Particle> LooseLepton, LooseMuon, LooseElectron;
   vector<Particle> yash_llep, yash_looseMuon; //For 3L/4L veto
 

@@ -7,14 +7,18 @@
 #include <TH1F.h>
 using namespace std;
 
-extern Int_t channel, trigger, nlep, njet, nbjet;
+extern Int_t channel, trigger, nlep, njet, nbjet, nfatjet;
 extern Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
 extern Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 extern Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
+extern Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
+extern Float_t LTplusMET, HTplusMET, HTfatplusMET;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
 extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
 extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
+extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
+extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
 
 void setBranches(TTree *tree)
 {
@@ -22,6 +26,7 @@ void setBranches(TTree *tree)
   tree->SetBranchAddress("trigger", &trigger);
   tree->SetBranchAddress("nlep", &nlep);
   tree->SetBranchAddress("njet", &njet);
+  tree->SetBranchAddress("nfatjet", &nfatjet);
   tree->SetBranchAddress("nbjet", &nbjet);
   tree->SetBranchAddress("lep0_pt", &lep0_pt);
   tree->SetBranchAddress("lep0_eta", &lep0_eta);
@@ -44,11 +49,18 @@ void setBranches(TTree *tree)
   tree->SetBranchAddress("dilep_dphi", &dilep_dphi);
   tree->SetBranchAddress("dilep_dR", &dilep_dR);
   tree->SetBranchAddress("dilep_ptratio", &dilep_ptratio);
-  tree->SetBranchAddress("HT", &HT);
   tree->SetBranchAddress("LT", &LT);
+  tree->SetBranchAddress("LTplusMET", &LTplusMET);
+  tree->SetBranchAddress("HT", &HT);
+  tree->SetBranchAddress("HTfat", &HTfat);
+  tree->SetBranchAddress("HTplusMET", &HTplusMET);
+  tree->SetBranchAddress("HTfatplusMET", &HTfatplusMET);
   tree->SetBranchAddress("STvis", &STvis);
+  tree->SetBranchAddress("STvisfat", &STvisfat);
   tree->SetBranchAddress("ST", &ST);
+  tree->SetBranchAddress("STfat", &STfat);
   tree->SetBranchAddress("HTMETllpt", &HTMETllpt);
+  tree->SetBranchAddress("HTfatMETllpt", &HTfatMETllpt);
   tree->SetBranchAddress("STfrac", &STfrac);
   tree->SetBranchAddress("metpt", &metpt);
   tree->SetBranchAddress("metphi", &metphi);
@@ -57,17 +69,32 @@ void setBranches(TTree *tree)
   tree->SetBranchAddress("dphi_metdilep", &dphi_metdilep);
   tree->SetBranchAddress("dphi_metlep_max", &dphi_metlep_max);
   tree->SetBranchAddress("dphi_metlep_min", &dphi_metlep_min);
-  tree->SetBranchAddress("wt_leptonSF", &wt_leptonSF);
-  tree->SetBranchAddress("wt_trig", &wt_trig);
-  tree->SetBranchAddress("wt_pileup", &wt_pileup);
-  tree->SetBranchAddress("wt_bjet", &wt_bjet);
-  tree->SetBranchAddress("weight", &weight);
+  // Nominal weights
+  tree->SetBranchAddress("wt_leptonSF",   &wt_leptonSF);
+  tree->SetBranchAddress("wt_trig",       &wt_trig);
+  tree->SetBranchAddress("wt_pileup",     &wt_pileup);
+  tree->SetBranchAddress("wt_bjet",       &wt_bjet);
+  tree->SetBranchAddress("weight",        &weight);
+  // Up variations
+  tree->SetBranchAddress("wt_leptonSF_up",   &wt_leptonSF_up);
+  tree->SetBranchAddress("wt_trig_up",       &wt_trig_up);
+  tree->SetBranchAddress("wt_pileup_up",     &wt_pileup_up);
+  tree->SetBranchAddress("wt_bjet_up",       &wt_bjet_up);
+  tree->SetBranchAddress("weight_up",        &weight_up);
+  // Down variations
+  tree->SetBranchAddress("wt_leptonSF_down", &wt_leptonSF_down);
+  tree->SetBranchAddress("wt_trig_down",     &wt_trig_down);
+  tree->SetBranchAddress("wt_pileup_down",   &wt_pileup_down);
+  tree->SetBranchAddress("wt_bjet_down",     &wt_bjet_down);
+  tree->SetBranchAddress("weight_down",      &weight_down);
+  //nnscores
+  /*
   tree->SetBranchAddress("nnscore_Run2_vlld_qcd",   &nnscore1);
   tree->SetBranchAddress("nnscore_Run2_vlld_ttbar", &nnscore2);
   tree->SetBranchAddress("nnscore_Run2_vlld_wjets", &nnscore3);
   tree->SetBranchAddress("nnscore_Run3_vlld_qcd",   &nnscore4);
   tree->SetBranchAddress("nnscore_Run3_vlld_ttbar", &nnscore5);
-  tree->SetBranchAddress("nnscore_Run3_vlld_wjets", &nnscore6);
+  tree->SetBranchAddress("nnscore_Run3_vlld_wjets", &nnscore6);*/
 
 }
 

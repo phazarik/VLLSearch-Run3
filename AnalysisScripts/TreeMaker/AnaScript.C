@@ -213,14 +213,15 @@ Bool_t AnaScript::Process(Long64_t entry)
       metpt = *PuppiMET_pt;
       metphi = *PuppiMET_phi;
       
-      Muon.clear();    Electron.clear(); LightLepton.clear();
-      Photon.clear();  Tau.clear();      Jet.clear();
-      bJet.clear();    MediumbJet.clear();
+      Muon.clear();    Electron.clear();          LightLepton.clear();
+      Photon.clear();  Tau.clear();               Jet.clear();
+      bJet.clear();    MediumbJet.clear();        FatJet.clear();
       LooseLepton.clear(); LooseElectron.clear(); LooseMuon.clear();
       
       createLightLeptons();
       //createTaus();
       createJets();
+      createFatJets();
       SortRecoObjects();
 
       //-------------------------------------------------
