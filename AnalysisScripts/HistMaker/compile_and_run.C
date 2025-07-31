@@ -11,8 +11,8 @@
 using namespace std;
 
 void compile_and_run(
-		     TString infile  = "test_inputs/VLLD_tau_M1000_NANOAOD.root",
-		     TString outfile  = "test_outputs/hst_VLLD_tau_M1000.root",
+		     TString infile  = "test_inputs/VLLD_mu_M600_NANOAOD_Run2UL.root",
+		     TString outfile  = "test_outputs/hst_VLLD_mu_M600_run2.root",
 		     TString campaign = "2018_UL",
 		     TString sample = "VLLD_tau",
 		     TString flag = "doublet"

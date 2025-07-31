@@ -130,8 +130,6 @@ void AnaScript::MakeSignalPlots(){
     else cout<<"\033[93mValid decay.\033[0m"<<endl;
   }
   
-  if(bad_event) return;
-  
   //--------------------
   // Properties of VLLs
   //--------------------
@@ -231,7 +229,9 @@ void AnaScript::MakeSignalPlots(){
       }
     }
   }
-  if(bad_event) nEvtBad++;
+  if(bad_event){
+    nEvtBad++;
+  }
   
   //----------------------------------
   // Other gen-level plots

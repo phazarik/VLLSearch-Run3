@@ -86,6 +86,7 @@ public :
   TTreeReaderArray<Float_t> Electron_scEtOverPt = {fReader, "Electron_scEtOverPt"};
   TTreeReaderArray<Float_t> Electron_sieie = {fReader, "Electron_sieie"};
   TTreeReaderArray<Float_t> Electron_sip3d = {fReader, "Electron_sip3d"};
+  TTreeReaderArray<int_or_short> Electron_jetIdx = {fReader, "Electron_jetIdx"};
   //Jet
   TTreeReaderValue<iterator> nJet = {fReader, "nJet"};
   TTreeReaderArray<int_or_char> Jet_jetId = {fReader, "Jet_jetId"};
@@ -162,6 +163,7 @@ public :
   TTreeReaderArray<Float_t> Muon_pt = {fReader, "Muon_pt"};
   TTreeReaderArray<Float_t> Muon_ptErr = {fReader, "Muon_ptErr"};
   TTreeReaderArray<Float_t> Muon_sip3d = {fReader, "Muon_sip3d"};
+  TTreeReaderArray<int_or_short> Muon_jetIdx = {fReader, "Muon_jetIdx"};
 
   //PuppiMET
   TTreeReaderValue<Float_t> PuppiMET_phi = {fReader, "PuppiMET_phi"};
@@ -468,6 +470,11 @@ public :
   //For HistMaker:
   void MakebJetSFPlots();
   void MakeSignalPlots();
+
+  //For 3L/4L veto:
+  int electronCustomID(Int_t bitmap,int quality, int skipCut);
+  bool Veto3L4L();
+  bool VetoHEM(vector<Particle> jet);
   
   //------------------------------------------------------------------------------------------------------------
   // GLOBAL VARIABLE DECLARATIONS
@@ -490,6 +497,7 @@ private:
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet, MediumbJet;
   vector<Particle> LooseLepton, LooseMuon, LooseElectron;
+  vector<Particle> yash_llep, yash_looseMuon; //For 3L/4L veto
 
   //ScaleFactors from POG:
   vector<sftxt> muonIDSF, muonIsoSF, electronIDSF;
@@ -505,7 +513,7 @@ private:
   bool bad_event;
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown,nEvtVeto;
 
   //json:
   json jsondata;

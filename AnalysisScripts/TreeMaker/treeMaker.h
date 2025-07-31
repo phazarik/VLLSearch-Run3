@@ -119,6 +119,14 @@ void AnaScript::FillTree(TTree *tree){
 
   if(basic_evt_selection){
 
+    bool veto_3L4L_event = Veto3L4L();
+    bool veto_HEM_event  = VetoHEM(Jet);
+    bool veto_this_event = veto_3L4L_event || veto_HEM_event;
+    if(veto_this_event){
+      nEvtVeto++;
+      return;
+    }
+
     //Calculating event weights:
     double wt = 1.0;
     double lepIdIsoSF = 1.0;

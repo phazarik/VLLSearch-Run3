@@ -36,20 +36,20 @@ public :
   TTreeReader     fReader;
   TTreeReader     fReader_MC;
   TTree          *fChain = 0;
-
+  /*
   //For NanoAODv12+ (example: Run3Summer22 MC)
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
   using int_or_short = Short_t;
   using int_or_ushort = UShort_t;
-  using uint_or_int   = Int_t;
-  /*
+  using uint_or_int   = Int_t;*/
+  
   //For NanoAODv11-
   using iterator     = UInt_t; 
   using int_or_char  = Int_t;
   using int_or_short = Int_t;
   using int_or_ushort = Int_t;
-  using uint_or_int  = UInt_t;*/
+  using uint_or_int  = UInt_t;
   
   //Read only the important branches:
   TTreeReaderValue<UInt_t> run = {fReader, "run"};
@@ -85,6 +85,7 @@ public :
   TTreeReaderArray<Float_t> Electron_scEtOverPt = {fReader, "Electron_scEtOverPt"};
   TTreeReaderArray<Float_t> Electron_sieie = {fReader, "Electron_sieie"};
   TTreeReaderArray<Float_t> Electron_sip3d = {fReader, "Electron_sip3d"};
+  TTreeReaderArray<int_or_short> Electron_jetIdx = {fReader, "Electron_jetIdx"};
   //Jet
   TTreeReaderValue<iterator> nJet = {fReader, "nJet"};
   TTreeReaderArray<int_or_char> Jet_jetId = {fReader, "Jet_jetId"};
@@ -161,6 +162,7 @@ public :
   TTreeReaderArray<Float_t> Muon_pt = {fReader, "Muon_pt"};
   TTreeReaderArray<Float_t> Muon_ptErr = {fReader, "Muon_ptErr"};
   TTreeReaderArray<Float_t> Muon_sip3d = {fReader, "Muon_sip3d"};
+  TTreeReaderArray<int_or_short> Muon_jetIdx = {fReader, "Muon_jetIdx"};
 
   //PuppiMET
   TTreeReaderValue<Float_t> PuppiMET_phi = {fReader, "PuppiMET_phi"};
@@ -272,7 +274,7 @@ public :
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-  
+  /*
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -280,8 +282,8 @@ public :
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralCalo = {fReader, "Rho_fixedGridRhoFastjetCentralCalo"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralChargedPileUp = {fReader, "Rho_fixedGridRhoFastjetCentralChargedPileUp"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetCentralNeutral = {fReader, "Rho_fixedGridRhoFastjetCentralNeutral"};
-  TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;
-  /*
+  TTreeReaderValue<Float_t> rho = Rho_fixedGridRhoFastjetAll;*/
+  
   //Rho: Run2
   TTreeReaderValue<Float_t> fixedGridRhoFastjetAll =            {fReader_MC, "fixedGridRhoFastjetAll"};
   TTreeReaderValue<Float_t> fixedGridRhoFastjetCentral =        {fReader_MC, "fixedGridRhoFastjetCentral"};
@@ -290,7 +292,7 @@ public :
   TTreeReaderValue<Float_t> fixedGridRhoFastjetCentralNeutral = {fReader_MC, "fixedGridRhoFastjetCentralNeutral"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_all = {fReader, "Photon_pfRelIso03_all"};
   //TTreeReaderArray<Float_t> Photon_pfRelIso03_chg = {fReader, "Photon_pfRelIso03_chg"};
-  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;*/
+  TTreeReaderValue<Float_t> rho = fixedGridRhoFastjetAll;
 
   /*
   //Comment out the following for QCD samples:
@@ -456,6 +458,11 @@ public :
   void AddAndCompressBranch(TBranch *br);
   void InitializeBranches(TTree *tree);
 
+  //For 3L/4L veto:
+  int electronCustomID(Int_t bitmap,int quality, int skipCut);
+  bool Veto3L4L();
+  bool VetoHEM(vector<Particle> jet);
+
   //------------------------------------------------------------------------------------------------------------
   // GLOBAL VARIABLE DECLARATIONS
   //------------------------------------------------------------------------------------------------------------
@@ -477,6 +484,7 @@ private:
   vector<Particle> vllep, vlnu;
   vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet, MediumbJet;
   vector<Particle> LooseLepton, LooseMuon, LooseElectron;
+  vector<Particle> yash_llep, yash_looseMuon; //For 3L/4L veto
 
   //ScaleFactors from POG:
   vector<sftxt> muonIDSF, muonIsoSF, electronIDSF;
@@ -492,7 +500,7 @@ private:
   bool bad_event;
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown,nEvtVeto;
 
   //json:
   json jsondata;

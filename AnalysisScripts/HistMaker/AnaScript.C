@@ -5,6 +5,7 @@
 
 //Additional headers:
 #include "../includeHeaders.h"
+#include "../veto3L4L.h"
 #include "BookHistograms.h"
 #include "make_bJetSFPlots.h"
 #include "make_signalPlots.h"
@@ -43,7 +44,7 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
 
   //Initializing counters:
   nEvtTotal=0; nEvtRan=0;  nEvtTrigger=0;
-  nEvtPass=0;  nEvtBad=0;  nThrown=0;
+  nEvtPass=0;  nEvtBad=0;  nThrown=0; nEvtVeto=0;
 
   bad_event = false;
   evt_trigger = false;
@@ -71,6 +72,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtVeto = "<<nEvtVeto<<endl;
   if(_data!=0) cout<<"nEvents not in golden json = "<<nThrown<<" ("<<notgoldenevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
 
@@ -180,7 +182,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       // Analysis:
       //----------------------------------------------------------------------------------------------------------
 
-      //if(_data == 0) MakebJetSFPlots(); //nEvtPass is here
+      if(_data == 0) MakebJetSFPlots(); //nEvtPass is here
       
       
     }//Triggered Events
