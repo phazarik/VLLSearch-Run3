@@ -548,11 +548,11 @@ private:
   Float_t metphi_tree;
   Float_t jec;
   Float_t jer;
-  Double_t sf_lepIdIso;
-  Double_t sf_lepTrigEff;
-  Double_t wt_pileup;
-  Double_t sf_btagEff;
-  Double_t event_weight;
+  Double_t sf_lepIdIso,   sf_lepIdIso_up,   sf_lepIdIso_down;
+  Double_t sf_lepTrigEff, sf_lepTrigEff_up, sf_lepTrigEff_down;
+  Double_t wt_pileup,     wt_pileup_up,     wt_pileup_down;
+  Double_t sf_btagEff,    sf_btagEff_up,    sf_btagEff_down;
+  Double_t event_weight,  event_weight_up,  event_weight_down;
   
   ClassDef(AnaScript,0);
 

@@ -58,11 +58,19 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("wt_pileup",     &wt_pileup,     "wt_pileup/D",     32000);
   tree->Branch("wt_bjet",       &sf_btagEff,    "sf_btagEff/D",    32000);
   tree->Branch("weight",        &event_weight,  "event_weight/D",  32000);
-
-  //tree->Branch("HLT_IsoMu24",           &HLT_IsoMu24,           "HLT_IsoMu24/O");
-  //tree->Branch("HLT_IsoMu27",           &HLT_IsoMu27,           "HLT_IsoMu27/O" );
-  //tree->Branch("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, "HLT_Ele27_WPTight_Gsf/O");
-  //tree->Branch("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf, "HLT_Ele32_WPTight_Gsf/O");
+  // Up variations
+  tree->Branch("wt_leptonSF_up",   &sf_lepIdIso_up,   "sf_lepIdIso_up/D",     32000);
+  tree->Branch("wt_trig_up",       &sf_lepTrigEff_up, "sf_lepTrigEff_up/D",   32000);
+  tree->Branch("wt_pileup_up",     &wt_pileup_up,     "wt_pileup_up/D",       32000);
+  tree->Branch("wt_bjet_up",       &sf_btagEff_up,    "sf_btagEff_up/D",      32000);
+  tree->Branch("weight_up",        &event_weight_up,  "event_weight_up/D",    32000);
+  // Down variations
+  tree->Branch("wt_leptonSF_down", &sf_lepIdIso_down, "sf_lepIdIso_down/D",   32000);
+  tree->Branch("wt_trig_down",     &sf_lepTrigEff_down,"sf_lepTrigEff_down/D",32000);
+  tree->Branch("wt_pileup_down",   &wt_pileup_down,   "wt_pileup_down/D",     32000);
+  tree->Branch("wt_bjet_down",     &sf_btagEff_down,  "sf_btagEff_down/D",    32000);
+  tree->Branch("weight_down",      &event_weight_down,"event_weight_down/D",  32000);
+ 
 }
 
 void AnaScript::FillTree(TTree *tree){
@@ -129,13 +137,15 @@ void AnaScript::FillTree(TTree *tree){
 
     //Calculating event weights:
     double wt = 1.0;
-    double lepIdIsoSF = 1.0;
-    double triggerEff = 1.0;
-    double pileupwt = 1.0;
-    double bjetSF = 1.0;
+    double lepIdIsoSF = 1.0, lepIdIsoSF_up = 1.0, lepIdIsoSF_down = 1.0;
+    double triggerEff = 1.0, triggerEff_up = 1.0, triggerEff_down = 1.0;
+    double pileupwt = 1.0,   pileupwt_up = 1.0,   pileupwt_down = 1.0;
+    double bjetSF = 1.0,     bjetSF_up = 1.0,     bjetSF_down = 1.0;
 
     //Extracting SF from text files:
     if(_data==0){
+
+      //Nominal weights:
       double sf0 = 1.0; double sf1 = 1.0;
       sf0 = returnLeptonSF(LightLepton.at(0), "nom"); if(sf0<0) sf0=1.0;
       sf1 = returnLeptonSF(LightLepton.at(1), "nom"); if(sf1<0) sf1=1.0;
@@ -146,6 +156,21 @@ void AnaScript::FillTree(TTree *tree){
       triggerEff = 1-((1-ef0)*(1-ef1));
       bjetSF = returnbJetCorrection(Jet, "nom"); if(bjetSF<1.0) bjetSF=1.0;
       pileupwt = returnPileUpWt("nom"); if(pileupwt<0) pileupwt=1.0;
+
+      //SFup weights:
+      double sf0_up = returnLeptonSF(LightLepton.at(0), "systup"); if(sf0_up<0) sf0_up=1.0;
+      double sf1_up = returnLeptonSF(LightLepton.at(1), "systup"); if(sf1_up<0) sf1_up=1.0;
+      lepIdIsoSF_up = sf0_up * sf1_up;
+      bjetSF_up = returnbJetCorrection(Jet, "systup"); if(bjetSF_up<1.0) bjetSF_up=1.0;
+      pileupwt_up = returnPileUpWt("systup"); if(pileupwt_up<0) pileupwt_up=1.0;
+
+      //SF down weights:
+      double sf0_down = returnLeptonSF(LightLepton.at(0), "systdown"); if(sf0_down<0) sf0_down=1.0;
+      double sf1_down = returnLeptonSF(LightLepton.at(1), "systdown"); if(sf1_down<0) sf1_down=1.0;
+      lepIdIsoSF_down = sf0_down * sf1_down;
+      bjetSF_down = returnbJetCorrection(Jet, "systdown"); if(bjetSF_down<1.0) bjetSF_down=1.0;
+      pileupwt_down = returnPileUpWt("systdown"); if(pileupwt_down<0) pileupwt_down=1.0;
+      
     }
     
     //-------------------------
@@ -153,12 +178,26 @@ void AnaScript::FillTree(TTree *tree){
     // corrections, do it here
     //-------------------------
 
-    //Setting up the global variables:
+    // Nominal weights:
     sf_lepIdIso   = lepIdIsoSF;
     sf_lepTrigEff = triggerEff;
     wt_pileup     = pileupwt;
     sf_btagEff    = bjetSF;
     event_weight  = lepIdIsoSF*triggerEff*pileupwt;
+
+    // Up variations
+    sf_lepIdIso_up   = lepIdIsoSF_up;
+    sf_lepTrigEff_up = triggerEff_up;
+    wt_pileup_up     = pileupwt_up;
+    sf_btagEff_up    = bjetSF_up;
+    event_weight_up  = lepIdIsoSF_up * triggerEff_up * pileupwt_up;
+
+    // Down variations
+    sf_lepIdIso_down   = lepIdIsoSF_down;
+    sf_lepTrigEff_down = triggerEff_down;
+    wt_pileup_down     = pileupwt_down;
+    sf_btagEff_down    = bjetSF_down;
+    event_weight_down  = lepIdIsoSF_down * triggerEff_down * pileupwt_down;
     
     //Integers:
     nlep  = (UInt_t)LightLepton.size();
