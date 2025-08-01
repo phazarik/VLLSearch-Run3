@@ -5,6 +5,7 @@
 
 //Additional headers:
 #include "../includeHeaders.h"
+#include "../veto3L4L.h"
 #include "treeMaker.h"
 
 void AnaScript::Begin(TTree * /*tree*/)
@@ -38,7 +39,7 @@ void AnaScript::SlaveBegin(TTree *tree)
 
   //Initializing counters:
   nEvtTotal=0; nEvtRan=0;  nEvtTrigger=0;
-  nEvtPass=0;  nEvtBad=0;  nThrown=0;
+  nEvtPass=0;  nEvtBad=0;  nThrown=0; nEvtVeto=0;
 
   //For Skimmer:
   //tree->SetBranchStatus("*",0);
@@ -83,6 +84,7 @@ void AnaScript::SlaveTerminate()
   cout<<"nEvtTrigger = "<<nEvtTrigger<<" ("<<trigevtfrac*100<<" %)"<<endl;
   cout<<"nEvtPass = "<<nEvtPass<<" ("<<passevtfrac*100<<" %)"<<endl;
   cout<<"nEvtBad = "<<nEvtBad<<" ("<<badevtfrac*100<<" %)"<<endl;
+  cout<<"nEvtVeto = "<<nEvtVeto<<endl;
   if(_data!=0) cout<<"nEvents not in golden json = "<<nThrown<<" ("<<notgoldenevtfrac*100<<" %)"<<endl;
   cout<<"---------------------------------------------"<<endl;
 
@@ -211,14 +213,15 @@ Bool_t AnaScript::Process(Long64_t entry)
       metpt = *PuppiMET_pt;
       metphi = *PuppiMET_phi;
       
-      Muon.clear();    Electron.clear(); LightLepton.clear();
-      Photon.clear();  Tau.clear();      Jet.clear();
-      bJet.clear();    MediumbJet.clear();
+      Muon.clear();    Electron.clear();          LightLepton.clear();
+      Photon.clear();  Tau.clear();               Jet.clear();
+      bJet.clear();    MediumbJet.clear();        FatJet.clear();
       LooseLepton.clear(); LooseElectron.clear(); LooseMuon.clear();
       
       createLightLeptons();
       //createTaus();
       createJets();
+      createFatJets();
       SortRecoObjects();
 
       //-------------------------------------------------
@@ -238,9 +241,8 @@ Bool_t AnaScript::Process(Long64_t entry)
       //----------------------------------------------------------------------------------------------------------
       // Writing to tree
       //----------------------------------------------------------------------------------------------------------
-
-      FillTree(_mytree);
       
+      FillTree(_mytree);     
       
     }//Triggered Events
   }//GoodEvt

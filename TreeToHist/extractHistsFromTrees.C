@@ -17,14 +17,18 @@ using namespace std;
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 
-Int_t channel, trigger, nlep, njet, nbjet;
+Int_t channel, trigger, nlep, njet, nbjet, nfatjet;
 Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
 Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
+Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
+Float_t LTplusMET, HTplusMET, HTfatplusMET;
 Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
 Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
 Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
+Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
+Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
 
 json loadJson(const string &filename);
 string todays_date();

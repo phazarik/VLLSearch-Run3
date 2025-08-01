@@ -5,6 +5,7 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("trigger",   &trigger,   "ntrigger/I",  32000);
   tree->Branch("nlep",      &nlep,      "nlep/I",      32000);
   tree->Branch("njet",      &njet,      "njet/I",      32000);
+  tree->Branch("nfatjet",   &nfatjet,   "nfatjet/I",   32000);
   tree->Branch("nbjet",     &nbjet,     "nbjet/I",     32000);
 
   //Object-level (first lepton)
@@ -35,14 +36,21 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("dilep_ptratio",&dilep_ptratio,"dilep_ptratio/F",32000);
 
   //Event level:
-  tree->Branch("HT",        &HT,        "HT/F",        32000);
-  tree->Branch("LT",        &LT,        "LT/F",        32000);
-  tree->Branch("STvis",     &STvis,     "STvis/F",     32000);
-  tree->Branch("ST",        &ST,        "ST/F",        32000);
-  tree->Branch("HTMETllpt", &HTMETllpt, "HTMETllpt/F", 32000);
-  tree->Branch("STfrac",    &STfrac,    "STfrac/F",    32000);
-  tree->Branch("metpt",     &metpt_tree,     "metpt/F",     32000);
-  tree->Branch("metphi",    &metphi_tree,    "metphi/F",    32000);
+  tree->Branch("LT",           &LT,           "LT/F",           32000);
+  tree->Branch("LTplusMET",    &LTplusMET,    "LTplusMET/F",    32000);
+  tree->Branch("HT",           &HT,           "HT/F",           32000);
+  tree->Branch("HTfat",        &HTfat,        "HTfat/F",        32000);
+  tree->Branch("HTplusMET",    &HTplusMET,    "HTplusMET/F",    32000);
+  tree->Branch("HTfatplusMET", &HTfatplusMET, "HTfatplusMET/F", 32000);
+  tree->Branch("STvis",        &STvis,        "STvis/F",        32000);
+  tree->Branch("STvisfat",     &STvisfat,     "STvisfat/F",     32000);
+  tree->Branch("ST",           &ST,           "ST/F",           32000);
+  tree->Branch("STfat",        &STfat,        "STfat/F",        32000);
+  tree->Branch("HTMETllpt",    &HTMETllpt,    "HTMETllpt/F",    32000);
+  tree->Branch("HTfatMETllpt", &HTfatMETllpt, "HTfatMETllpt/F", 32000);
+  tree->Branch("STfrac",       &STfrac,       "STfrac/F",       32000);
+  tree->Branch("metpt",        &metpt_tree,   "metpt/F",        32000);
+  tree->Branch("metphi",       &metphi_tree,  "metphi/F",       32000);
 
   tree->Branch("dphi_metlep0",   &dphi_metlep0,   "dphi_metlep0/F",   32000);
   tree->Branch("dphi_metlep1",   &dphi_metlep1,   "dphi_metlep1/F",   32000);
@@ -58,11 +66,19 @@ void AnaScript::InitializeBranches(TTree *tree){
   tree->Branch("wt_pileup",     &wt_pileup,     "wt_pileup/D",     32000);
   tree->Branch("wt_bjet",       &sf_btagEff,    "sf_btagEff/D",    32000);
   tree->Branch("weight",        &event_weight,  "event_weight/D",  32000);
-
-  //tree->Branch("HLT_IsoMu24",           &HLT_IsoMu24,           "HLT_IsoMu24/O");
-  //tree->Branch("HLT_IsoMu27",           &HLT_IsoMu27,           "HLT_IsoMu27/O" );
-  //tree->Branch("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, "HLT_Ele27_WPTight_Gsf/O");
-  //tree->Branch("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf, "HLT_Ele32_WPTight_Gsf/O");
+  // Up variations
+  tree->Branch("wt_leptonSF_up",   &sf_lepIdIso_up,   "sf_lepIdIso_up/D",     32000);
+  tree->Branch("wt_trig_up",       &sf_lepTrigEff_up, "sf_lepTrigEff_up/D",   32000);
+  tree->Branch("wt_pileup_up",     &wt_pileup_up,     "wt_pileup_up/D",       32000);
+  tree->Branch("wt_bjet_up",       &sf_btagEff_up,    "sf_btagEff_up/D",      32000);
+  tree->Branch("weight_up",        &event_weight_up,  "event_weight_up/D",    32000);
+  // Down variations
+  tree->Branch("wt_leptonSF_down", &sf_lepIdIso_down, "sf_lepIdIso_down/D",   32000);
+  tree->Branch("wt_trig_down",     &sf_lepTrigEff_down,"sf_lepTrigEff_down/D",32000);
+  tree->Branch("wt_pileup_down",   &wt_pileup_down,   "wt_pileup_down/D",     32000);
+  tree->Branch("wt_bjet_down",     &sf_btagEff_down,  "sf_btagEff_down/D",    32000);
+  tree->Branch("weight_down",      &event_weight_down,"event_weight_down/D",  32000);
+ 
 }
 
 void AnaScript::FillTree(TTree *tree){
@@ -119,15 +135,25 @@ void AnaScript::FillTree(TTree *tree){
 
   if(basic_evt_selection){
 
+    bool veto_3L4L_event = Veto3L4L();
+    bool veto_HEM_event  = VetoHEM(Jet);
+    bool veto_this_event = veto_3L4L_event || veto_HEM_event;
+    if(veto_this_event){
+      nEvtVeto++;
+      return;
+    }
+
     //Calculating event weights:
     double wt = 1.0;
-    double lepIdIsoSF = 1.0;
-    double triggerEff = 1.0;
-    double pileupwt = 1.0;
-    double bjetSF = 1.0;
+    double lepIdIsoSF = 1.0, lepIdIsoSF_up = 1.0, lepIdIsoSF_down = 1.0;
+    double triggerEff = 1.0, triggerEff_up = 1.0, triggerEff_down = 1.0;
+    double pileupwt = 1.0,   pileupwt_up = 1.0,   pileupwt_down = 1.0;
+    double bjetSF = 1.0,     bjetSF_up = 1.0,     bjetSF_down = 1.0;
 
     //Extracting SF from text files:
     if(_data==0){
+
+      //Nominal weights:
       double sf0 = 1.0; double sf1 = 1.0;
       sf0 = returnLeptonSF(LightLepton.at(0), "nom"); if(sf0<0) sf0=1.0;
       sf1 = returnLeptonSF(LightLepton.at(1), "nom"); if(sf1<0) sf1=1.0;
@@ -138,6 +164,21 @@ void AnaScript::FillTree(TTree *tree){
       triggerEff = 1-((1-ef0)*(1-ef1));
       bjetSF = returnbJetCorrection(Jet, "nom"); if(bjetSF<1.0) bjetSF=1.0;
       pileupwt = returnPileUpWt("nom"); if(pileupwt<0) pileupwt=1.0;
+
+      //SFup weights:
+      double sf0_up = returnLeptonSF(LightLepton.at(0), "systup"); if(sf0_up<0) sf0_up=1.0;
+      double sf1_up = returnLeptonSF(LightLepton.at(1), "systup"); if(sf1_up<0) sf1_up=1.0;
+      lepIdIsoSF_up = sf0_up * sf1_up;
+      bjetSF_up = returnbJetCorrection(Jet, "systup"); if(bjetSF_up<1.0) bjetSF_up=1.0;
+      pileupwt_up = returnPileUpWt("systup"); if(pileupwt_up<0) pileupwt_up=1.0;
+
+      //SF down weights:
+      double sf0_down = returnLeptonSF(LightLepton.at(0), "systdown"); if(sf0_down<0) sf0_down=1.0;
+      double sf1_down = returnLeptonSF(LightLepton.at(1), "systdown"); if(sf1_down<0) sf1_down=1.0;
+      lepIdIsoSF_down = sf0_down * sf1_down;
+      bjetSF_down = returnbJetCorrection(Jet, "systdown"); if(bjetSF_down<1.0) bjetSF_down=1.0;
+      pileupwt_down = returnPileUpWt("systdown"); if(pileupwt_down<0) pileupwt_down=1.0;
+      
     }
     
     //-------------------------
@@ -145,17 +186,32 @@ void AnaScript::FillTree(TTree *tree){
     // corrections, do it here
     //-------------------------
 
-    //Setting up the global variables:
+    // Nominal weights:
     sf_lepIdIso   = lepIdIsoSF;
     sf_lepTrigEff = triggerEff;
     wt_pileup     = pileupwt;
     sf_btagEff    = bjetSF;
     event_weight  = lepIdIsoSF*triggerEff*pileupwt;
+
+    // Up variations
+    sf_lepIdIso_up   = lepIdIsoSF_up;
+    sf_lepTrigEff_up = triggerEff_up;
+    wt_pileup_up     = pileupwt_up;
+    sf_btagEff_up    = bjetSF_up;
+    event_weight_up  = lepIdIsoSF_up * triggerEff_up * pileupwt_up;
+
+    // Down variations
+    sf_lepIdIso_down   = lepIdIsoSF_down;
+    sf_lepTrigEff_down = triggerEff_down;
+    wt_pileup_down     = pileupwt_down;
+    sf_btagEff_down    = bjetSF_down;
+    event_weight_down  = lepIdIsoSF_down * triggerEff_down * pileupwt_down;
     
     //Integers:
-    nlep  = (UInt_t)LightLepton.size();
-    njet  = (UInt_t)Jet.size();
-    nbjet = (UInt_t)MediumbJet.size();
+    nlep    = (UInt_t)LightLepton.size();
+    njet    = (UInt_t)Jet.size();
+    nfatjet = (UInt_t)FatJet.size();
+    nbjet   = (UInt_t)MediumbJet.size();
     
     //Object-level variables:
     lep0_pt  = (Float_t)LightLepton.at(0).v.Pt();
@@ -184,15 +240,19 @@ void AnaScript::FillTree(TTree *tree){
     dilep_ptratio = (Float_t)lep1_pt/lep0_pt;
 
     //Event level:
-    HT=0; for(Int_t i=0; i<(Int_t)Jet.size(); i++) HT = HT + Jet.at(i).v.Pt();
     LT= LightLepton.at(0).v.Pt() + LightLepton.at(1).v.Pt();
-    STvis = HT + LT;
-    ST = HT + LT + metpt;
-    HTMETllpt = HT + metpt + dilep_pt;
+    LTplusMET = LT + metpt;
+
+    HT=0; for(Int_t i=0; i<(Int_t)Jet.size(); i++) HT = HT + Jet.at(i).v.Pt();
+    HTfat=0; for(Int_t i=0; i<(Int_t)FatJet.size(); i++) HTfat = HTfat + FatJet.at(i).v.Pt();
+    STvis = HT + LT;                   STvisfat = HTfat + LT;
+    ST = HT + LT + metpt;              STfat = HTfat + LT + metpt;
+    HTplusMET = HT + metpt;            HTfatplusMET = HTfat + metpt;
+    HTMETllpt = HT + metpt + dilep_pt; HTfatMETllpt = HTfat + metpt + dilep_pt;
     STfrac = 0; if(ST>0) STfrac = dilep_pt/ST;
-    dphi_metlep0 = (Float_t)delta_phi(LightLepton.at(0).v.Phi(), metphi);
-    dphi_metlep1 = (Float_t)delta_phi(LightLepton.at(1).v.Phi(), metphi);
-    dphi_metdilep = (Float_t)delta_phi(dilep.Phi(), metphi);
+    dphi_metlep0    = (Float_t)delta_phi(LightLepton.at(0).v.Phi(), metphi);
+    dphi_metlep1    = (Float_t)delta_phi(LightLepton.at(1).v.Phi(), metphi);
+    dphi_metdilep   = (Float_t)delta_phi(dilep.Phi(), metphi);
     dphi_metlep_max = (Float_t)max(dphi_metlep0, dphi_metlep1);
     dphi_metlep_min = (Float_t)min(dphi_metlep0, dphi_metlep1);
     metpt_tree = metpt;

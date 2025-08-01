@@ -12,14 +12,35 @@
 using json = nlohmann::json;
 using namespace std;
 
-extern Int_t channel, trigger, nlep, njet, nbjet;
+extern Int_t channel, trigger, nlep, njet, nbjet, nfatjet;
 extern Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
 extern Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
 extern Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
 extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
+extern Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
+extern Float_t LTplusMET, HTplusMET, HTfatplusMET;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
 extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
 extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
+extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
+extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
+/*
+// ------------------- TEST RUN -----------------------
+// 1. define all extern variables here
+// 2. Load the dependencies: .L eventProcessor.h
+// 3. Run the main macro: processTree()
+Int_t channel, trigger, nlep, njet, nbjet, nfatjet;
+Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
+Float_t lep1_pt, lep1_eta, lep1_phi, lep1_iso, lep1_sip3d, lep1_mt;
+Float_t dilep_pt, dilep_eta, dilep_phi, dilep_mass, dilep_mt, dilep_deta, dilep_dphi, dilep_dR, dilep_ptratio;
+Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
+Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
+Float_t LTplusMET, HTplusMET, HTfatplusMET;
+Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
+Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
+Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
+Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
+Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;*/
 
 struct hists{
   TString name;
@@ -42,12 +63,12 @@ bool find_key(const string& inputFilename, const string& key);
 
 
 void processTree(
-		 const char* inputFilename,
-		 const char* outputFilename,
-		 const char* campaign,
-		 int channelval,
-		 float lumisf,
-		 bool test
+		 const char* inputFilename = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts/TreeMaker/test_outputs/tree_testcompile.root",
+		 const char* outputFilename = "test.root",
+		 const char* campaign = "2018_UL",
+		 int channelval = 0,
+		 float lumisf = 1,
+		 bool test = true
 		 )
 { 
   // Load corrections from JSON:
@@ -73,6 +94,7 @@ void processTree(
     {"trigger", "trigger", 10, 0, 10, {}},
     {"nlep", "nlep", 10, 0, 10, {}},
     {"njet", "njet", 10, 0, 10, {}},
+    {"nfatjet", "nfatjet", 10, 0, 10, {}},
     {"nbjet", "nbjet", 10, 0, 10, {}},
     // leading lepton:
     {"lep0_pt", "lep0_pt", 50, 0, 500, {}},
@@ -99,11 +121,18 @@ void processTree(
     {"dilep_dR", "dilep_dR", 100, 0, 6, {}},
     {"dilep_ptratio", "dilep_ptratio", 100, 0, 1, {}},
     // event level variables:
-    {"HT",    "HT",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"LT",    "LT",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"STvis", "STvis", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"ST",    "ST",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HTMETllpt", "HTMETllpt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"LT",           "LT",           0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"LTplusMET",    "LTplusMET",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"HT",           "HT",           0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"HTfat",        "HTfat",        0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"HTplusMET",    "HTplusMET",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"HTfatplusMET", "HTfatplusMET", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"STvis",        "STvis",        0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"STvisfat",     "STvisfat",     0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"ST",           "ST",           0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"STfat",        "STfat",        0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"HTMETllpt",    "HTMETllpt",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"HTfatMETllpt", "HTfatMETllpt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
     {"STfrac", "STfrac", 100, 0, 1.1, {}},
     {"metpt", "metpt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
     {"metphi", "metphi", 100, -4, 4, {}},
@@ -113,11 +142,22 @@ void processTree(
     {"dphi_metdilep", "dphi_metdilep", 100, 0, 4, {}},
     {"dphi_metlep_max", "dphi_metlep_max", 100, 0, 4, {}},
     {"dphi_metlep_min", "dphi_metlep_min", 100, 0, 4, {}},
-    // weights:
+    // nominal weights:
     {"2LSS_wt_leptonSF", "wt_leptonSF", 200, 0, 2, {}},
     {"2LSS_wt_trig", "wt_trig", 200, 0, 2, {}},
     {"2LSS_wt_pileup", "wt_pileup", 200, 0, 2, {}},
     {"2LSS_wt_bjet", "wt_bjet", 200, 0, 2, {}},
+    // up weights:
+    {"2LSS_wt_leptonSF_up", "wt_leptonSF_up", 200, 0, 2, {}},
+    {"2LSS_wt_trig_up",     "wt_trig_up",     200, 0, 2, {}},
+    {"2LSS_wt_pileup_up",   "wt_pileup_up",   200, 0, 2, {}},
+    {"2LSS_wt_bjet_up",     "wt_bjet_up",     200, 0, 2, {}},
+    // down weights:
+    {"2LSS_wt_leptonSF_down", "wt_leptonSF_down", 200, 0, 2, {}},
+    {"2LSS_wt_trig_down",     "wt_trig_down",     200, 0, 2, {}},
+    {"2LSS_wt_pileup_down",   "wt_pileup_down",   200, 0, 2, {}},
+    {"2LSS_wt_bjet_down",     "wt_bjet_down",     200, 0, 2, {}},
+    // combined weight:
     {"2LSS_wt_evt", "weight", 200, 0, 2, {}},
     // nnscores:
     {"nnscore_Run2_vlld_qcd",   "nnscore_Run2_vlld_qcd",   200, 0, 1, {}},
@@ -126,7 +166,6 @@ void processTree(
     {"nnscore_Run3_vlld_qcd",   "nnscore_Run3_vlld_qcd",   200, 0, 1, {}},
     {"nnscore_Run3_vlld_ttbar", "nnscore_Run3_vlld_ttbar", 200, 0, 1, {}},
     {"nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_wjets", 200, 0, 1, {}}
-
   };
     
   //Booking histograms:
@@ -139,13 +178,12 @@ void processTree(
     hist->SetDirectory(0);
     hst_collection.push_back(hist);
   }
-  //cout<<"hst_collection size = "<<(int)hst_collection.size()<<"\033[0m"<<endl;
+  cout<<"hst_collection size = "<<(int)hst_collection.size()<<"\033[0m"<<endl;
 
   //________________________________________________________________________________________________
   //
   // Event loop:
   //________________________________________________________________________________________________
-
 
   // Opening the ROOT file
   TFile *file = TFile::Open(inputFilename);
@@ -243,69 +281,97 @@ void processTree(
     if(event_selection){
       Double_t fnwt = wt;
 
-      count = count+1;
-      if(test) cout<<count<<" Filling events with weight = "<<fnwt<<endl;
-      
+      count++;
+      if(test) cout << count << " Filling events with weight = " << fnwt << endl;
+
       // integers:
-      hst_collection[0] ->Fill(channel, 1.0);
-      hst_collection[1] ->Fill(trigger, 1.0);
-      hst_collection[2] ->Fill(nlep, fnwt);
-      hst_collection[3] ->Fill(njet, fnwt);
-      hst_collection[4] ->Fill(nbjet, fnwt);
+      hst_collection[0]->Fill(channel, 1.0);
+      hst_collection[1]->Fill(trigger, 1.0);
+      hst_collection[2]->Fill(nlep, fnwt);
+      hst_collection[3]->Fill(njet, fnwt);
+      hst_collection[4]->Fill(nfatjet, fnwt);
+      hst_collection[5]->Fill(nbjet, fnwt);
+
       // leading lepton:
-      hst_collection[5] ->Fill(lep0_pt, fnwt);
-      hst_collection[6] ->Fill(lep0_eta, fnwt);
-      hst_collection[7] ->Fill(lep0_phi, fnwt);
-      hst_collection[8] ->Fill(lep0_iso, fnwt);
-      hst_collection[9] ->Fill(lep0_sip3d, fnwt);
-      hst_collection[10]->Fill(lep0_mt, fnwt);
+      hst_collection[6]->Fill(lep0_pt, fnwt);
+      hst_collection[7]->Fill(lep0_eta, fnwt);
+      hst_collection[8]->Fill(lep0_phi, fnwt);
+      hst_collection[9]->Fill(lep0_iso, fnwt);
+      hst_collection[10]->Fill(lep0_sip3d, fnwt);
+      hst_collection[11]->Fill(lep0_mt, fnwt);
+
       // subleading lepton:
-      hst_collection[11]->Fill(lep1_pt, fnwt);
-      hst_collection[12]->Fill(lep1_eta, fnwt);
-      hst_collection[13]->Fill(lep1_phi, fnwt);
-      hst_collection[14]->Fill(lep1_iso, fnwt);
-      hst_collection[15]->Fill(lep1_sip3d, fnwt);
-      hst_collection[16]->Fill(lep1_mt, fnwt);
+      hst_collection[12]->Fill(lep1_pt, fnwt);
+      hst_collection[13]->Fill(lep1_eta, fnwt);
+      hst_collection[14]->Fill(lep1_phi, fnwt);
+      hst_collection[15]->Fill(lep1_iso, fnwt);
+      hst_collection[16]->Fill(lep1_sip3d, fnwt);
+      hst_collection[17]->Fill(lep1_mt, fnwt);
+
       // dilepton system:
-      hst_collection[17]->Fill(dilep_pt, fnwt);
-      hst_collection[18]->Fill(dilep_eta, fnwt);
-      hst_collection[19]->Fill(dilep_phi, fnwt);
-      hst_collection[20]->Fill(dilep_mass, fnwt);
-      hst_collection[21]->Fill(dilep_mt, fnwt);
-      hst_collection[22]->Fill(dilep_deta, fnwt);
-      hst_collection[23]->Fill(dilep_dphi, fnwt);
-      hst_collection[24]->Fill(dilep_dR, fnwt);
-      hst_collection[25]->Fill(dilep_ptratio, fnwt);
+      hst_collection[18]->Fill(dilep_pt, fnwt);
+      hst_collection[19]->Fill(dilep_eta, fnwt);
+      hst_collection[20]->Fill(dilep_phi, fnwt);
+      hst_collection[21]->Fill(dilep_mass, fnwt);
+      hst_collection[22]->Fill(dilep_mt, fnwt);
+      hst_collection[23]->Fill(dilep_deta, fnwt);
+      hst_collection[24]->Fill(dilep_dphi, fnwt);
+      hst_collection[25]->Fill(dilep_dR, fnwt);
+      hst_collection[26]->Fill(dilep_ptratio, fnwt);
+
       // event level variables:
-      hst_collection[26]->Fill(HT, fnwt);
       hst_collection[27]->Fill(LT, fnwt);
-      hst_collection[28]->Fill(STvis, fnwt);
-      hst_collection[29]->Fill(ST, fnwt);
-      hst_collection[30]->Fill(HTMETllpt, fnwt);
-      hst_collection[31]->Fill(STfrac, fnwt);
-      hst_collection[32]->Fill(metpt, fnwt);
-      hst_collection[33]->Fill(metphi, fnwt);
+      hst_collection[28]->Fill(LTplusMET, fnwt);
+      hst_collection[29]->Fill(HT, fnwt);
+      hst_collection[30]->Fill(HTfat, fnwt);
+      hst_collection[31]->Fill(HTplusMET, fnwt);
+      hst_collection[32]->Fill(HTfatplusMET, fnwt);
+      hst_collection[33]->Fill(STvis, fnwt);
+      hst_collection[34]->Fill(STvisfat, fnwt);
+      hst_collection[35]->Fill(ST, fnwt);
+      hst_collection[36]->Fill(STfat, fnwt);
+      hst_collection[37]->Fill(HTMETllpt, fnwt);
+      hst_collection[38]->Fill(HTfatMETllpt, fnwt);
+      hst_collection[39]->Fill(STfrac, fnwt);
+      hst_collection[40]->Fill(metpt, fnwt);
+      hst_collection[41]->Fill(metphi, fnwt);
+
       // dphis:
-      hst_collection[34]->Fill(dphi_metlep0, fnwt);
-      hst_collection[35]->Fill(dphi_metlep1, fnwt);
-      hst_collection[36]->Fill(dphi_metdilep, fnwt);
-      hst_collection[37]->Fill(dphi_metlep_max, fnwt);
-      hst_collection[38]->Fill(dphi_metlep_min, fnwt);
-      // weights:
-      hst_collection[39]->Fill(wt_leptonSF, 1.0);
-      hst_collection[40]->Fill(wt_trig, 1.0);
-      hst_collection[41]->Fill(wt_pileup, 1.0);
-      hst_collection[42]->Fill(wt_bjet, 1.0);
-      hst_collection[43]->Fill(wt, 1.0);
-      //NNScores:
-      hst_collection[44]->Fill(nnscore1, fnwt);
-      hst_collection[45]->Fill(nnscore2, fnwt);
-      hst_collection[46]->Fill(nnscore3, fnwt);
-      hst_collection[47]->Fill(nnscore4, fnwt);
-      hst_collection[48]->Fill(nnscore5, fnwt);
-      hst_collection[49]->Fill(nnscore6, fnwt);
-      //hst_collection[50]->Fill(nnscore7, fnwt);
-    }//Event selection
+      hst_collection[42]->Fill(dphi_metlep0, fnwt);
+      hst_collection[43]->Fill(dphi_metlep1, fnwt);
+      hst_collection[44]->Fill(dphi_metdilep, fnwt);
+      hst_collection[45]->Fill(dphi_metlep_max, fnwt);
+      hst_collection[46]->Fill(dphi_metlep_min, fnwt);
+
+      // nominal weights:
+      hst_collection[47]->Fill(wt_leptonSF, 1.0);
+      hst_collection[48]->Fill(wt_trig, 1.0);
+      hst_collection[49]->Fill(wt_pileup, 1.0);
+      hst_collection[50]->Fill(wt_bjet, 1.0);
+
+      // up weights:
+      hst_collection[51]->Fill(wt_leptonSF_up, 1.0);
+      hst_collection[52]->Fill(wt_trig_up, 1.0);
+      hst_collection[53]->Fill(wt_pileup_up, 1.0);
+      hst_collection[54]->Fill(wt_bjet_up, 1.0);
+
+      // down weights:
+      hst_collection[55]->Fill(wt_leptonSF_down, 1.0);
+      hst_collection[56]->Fill(wt_trig_down, 1.0);
+      hst_collection[57]->Fill(wt_pileup_down, 1.0);
+      hst_collection[58]->Fill(wt_bjet_down, 1.0);
+
+      // combined weight:
+      hst_collection[59]->Fill(fnwt, 1.0);
+      /*
+      // NN scores:
+      hst_collection[60]->Fill(nnscore_Run2_vlld_qcd, fnwt);
+      hst_collection[61]->Fill(nnscore_Run2_vlld_ttbar, fnwt);
+      hst_collection[62]->Fill(nnscore_Run2_vlld_wjets, fnwt);
+      hst_collection[63]->Fill(nnscore_Run3_vlld_qcd, fnwt);
+      hst_collection[64]->Fill(nnscore_Run3_vlld_ttbar, fnwt);
+      hst_collection[65]->Fill(nnscore_Run3_vlld_wjets, fnwt);*/
+    }
     //if(i>=100000) break;
   }//Event loop
     

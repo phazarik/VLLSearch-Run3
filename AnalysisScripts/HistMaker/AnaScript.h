@@ -36,7 +36,7 @@ public :
   TTreeReader     fReader;
   TTreeReader     fReader_MC;
   TTree          *fChain = 0;
-
+  
   //For NanoAODv12+ (example: Run3Summer22 MC)
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
@@ -85,7 +85,9 @@ public :
   TTreeReaderArray<Float_t> Electron_scEtOverPt = {fReader, "Electron_scEtOverPt"};
   TTreeReaderArray<Float_t> Electron_sieie = {fReader, "Electron_sieie"};
   TTreeReaderArray<Float_t> Electron_sip3d = {fReader, "Electron_sip3d"};
-  //Jet
+  TTreeReaderArray<int_or_short> Electron_jetIdx = {fReader, "Electron_jetIdx"};
+
+  //Jets
   TTreeReaderValue<iterator> nJet = {fReader, "nJet"};
   TTreeReaderArray<int_or_char> Jet_jetId = {fReader, "Jet_jetId"};
   TTreeReaderArray<UChar_t> Jet_nConstituents = {fReader, "Jet_nConstituents"};
@@ -116,6 +118,15 @@ public :
   TTreeReaderArray<Float_t> Jet_phi = {fReader, "Jet_phi"};
   TTreeReaderArray<Float_t> Jet_pt = {fReader, "Jet_pt"};
   TTreeReaderArray<Float_t> Jet_rawFactor = {fReader, "Jet_rawFactor"};
+
+  //FatJets:
+  TTreeReaderValue<iterator> nFatJet = {fReader, "nFatJet"};
+  TTreeReaderArray<Float_t> FatJet_area = {fReader, "FatJet_area"};
+  TTreeReaderArray<Float_t> FatJet_eta = {fReader, "FatJet_eta"};
+  TTreeReaderArray<Float_t> FatJet_mass = {fReader, "FatJet_mass"};
+  TTreeReaderArray<Float_t> FatJet_phi = {fReader, "FatJet_phi"};
+  TTreeReaderArray<Float_t> FatJet_pt = {fReader, "FatJet_pt"};
+  TTreeReaderArray<int_or_char> FatJet_jetId = {fReader, "FatJet_jetId"};
 
   //MET
   TTreeReaderValue<Float_t> MET_MetUnclustEnUpDeltaX = {fReader, "MET_MetUnclustEnUpDeltaX"};
@@ -161,6 +172,7 @@ public :
   TTreeReaderArray<Float_t> Muon_pt = {fReader, "Muon_pt"};
   TTreeReaderArray<Float_t> Muon_ptErr = {fReader, "Muon_ptErr"};
   TTreeReaderArray<Float_t> Muon_sip3d = {fReader, "Muon_sip3d"};
+  TTreeReaderArray<int_or_short> Muon_jetIdx = {fReader, "Muon_jetIdx"};
 
   //PuppiMET
   TTreeReaderValue<Float_t> PuppiMET_phi = {fReader, "PuppiMET_phi"};
@@ -268,11 +280,12 @@ public :
 
   //Jetflavor:
   TTreeReaderArray<int_or_char> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+  TTreeReaderArray<int_or_char> FatJet_hadronFlavour = {fReader_MC, "FatJet_hadronFlavour"};
 
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
   //-------------------------------------------------------------------------------------------------------------
-
+  
   //Rho: Run3
   TTreeReaderValue<Float_t> Rho_fixedGridRhoAll = {fReader, "Rho_fixedGridRhoAll"};
   TTreeReaderValue<Float_t> Rho_fixedGridRhoFastjetAll = {fReader, "Rho_fixedGridRhoFastjetAll"};
@@ -354,6 +367,7 @@ public :
     vector<TH1F *> vllep;
     vector<TH1F *> vlnu;
     vector<TH1F *> mode;
+    vector<TH1F *> gen, reco;
   };
   struct Particle {
     TLorentzVector v;
@@ -407,6 +421,7 @@ public :
   float transv_mass(float lepE, float lepphi, float met, float metphi);
   void createLightLeptons();
   void createJets();
+  void createFatJets();
   void createGenLightLeptons();
   void createGenJets();
   void createSignalArrays();
@@ -466,6 +481,11 @@ public :
   //For HistMaker:
   void MakebJetSFPlots();
   void MakeSignalPlots();
+
+  //For 3L/4L veto:
+  int electronCustomID(Int_t bitmap,int quality, int skipCut);
+  bool Veto3L4L();
+  bool VetoHEM(vector<Particle> jet);
   
   //------------------------------------------------------------------------------------------------------------
   // GLOBAL VARIABLE DECLARATIONS
@@ -486,8 +506,9 @@ private:
   //Physics objects:
   vector<Particle> genMuon, genElectron, genLightLepton, genJet;
   vector<Particle> vllep, vlnu;
-  vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet, MediumbJet;
+  vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, FatJet, bJet, MediumbJet;
   vector<Particle> LooseLepton, LooseMuon, LooseElectron;
+  vector<Particle> yash_llep, yash_looseMuon; //For 3L/4L veto
 
   //ScaleFactors from POG:
   vector<sftxt> muonIDSF, muonIsoSF, electronIDSF;
@@ -503,7 +524,7 @@ private:
   bool bad_event;
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown,nEvtVeto;
 
   //json:
   json jsondata;

@@ -42,6 +42,14 @@ void AnaScript::MakebJetSFPlots(){
   
   if(basic_evt_selection && _data==0){
 
+    bool veto_3L4L_event = Veto3L4L();
+    bool veto_HEM_event  = VetoHEM(Jet);
+    bool veto_this_event = veto_3L4L_event || veto_HEM_event;
+    if(veto_this_event){
+      nEvtVeto++;
+      return;
+    }
+
     nEvtPass++;
     
     //Plotting all the candidates:

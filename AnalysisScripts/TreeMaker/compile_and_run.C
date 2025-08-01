@@ -11,10 +11,10 @@
 using namespace std;
 
 void compile_and_run(
-		     TString infile  = "../../../../skimmed_2LSS_Run3Summer22/Muon/C/*.root",
+		     TString infile  = "test_inputs/Muon_Run2022C.root",
 		     TString outfile = "test_outputs/tree_testcompile.root",
 		     TString campaign = "Run3Summer22",
-		     TString sample = "Muon",
+		     TString sample = "muon",
 		     TString flag = "muon"
 		     )
 {

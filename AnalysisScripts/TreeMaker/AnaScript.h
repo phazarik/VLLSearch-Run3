@@ -36,7 +36,7 @@ public :
   TTreeReader     fReader;
   TTreeReader     fReader_MC;
   TTree          *fChain = 0;
-
+ 
   //For NanoAODv12+ (example: Run3Summer22 MC)
   using iterator     = Int_t;
   using int_or_char  = UChar_t;
@@ -55,6 +55,7 @@ public :
   TTreeReaderValue<UInt_t> run = {fReader, "run"};
   TTreeReaderValue<UInt_t> luminosityBlock = {fReader, "luminosityBlock"};
   TTreeReaderValue<ULong64_t> event = {fReader, "event"};
+
   //Electrons:
   TTreeReaderValue<iterator> nElectron = {fReader, "nElectron"};
   TTreeReaderArray<int_or_char> Electron_cutBased = {fReader, "Electron_cutBased"};
@@ -85,7 +86,9 @@ public :
   TTreeReaderArray<Float_t> Electron_scEtOverPt = {fReader, "Electron_scEtOverPt"};
   TTreeReaderArray<Float_t> Electron_sieie = {fReader, "Electron_sieie"};
   TTreeReaderArray<Float_t> Electron_sip3d = {fReader, "Electron_sip3d"};
-  //Jet
+  TTreeReaderArray<int_or_short> Electron_jetIdx = {fReader, "Electron_jetIdx"};
+  
+  //Jets:
   TTreeReaderValue<iterator> nJet = {fReader, "nJet"};
   TTreeReaderArray<int_or_char> Jet_jetId = {fReader, "Jet_jetId"};
   TTreeReaderArray<UChar_t> Jet_nConstituents = {fReader, "Jet_nConstituents"};
@@ -116,6 +119,15 @@ public :
   TTreeReaderArray<Float_t> Jet_phi = {fReader, "Jet_phi"};
   TTreeReaderArray<Float_t> Jet_pt = {fReader, "Jet_pt"};
   TTreeReaderArray<Float_t> Jet_rawFactor = {fReader, "Jet_rawFactor"};
+
+  //FatJets:
+  TTreeReaderValue<iterator> nFatJet = {fReader, "nFatJet"};
+  TTreeReaderArray<Float_t> FatJet_area = {fReader, "FatJet_area"};
+  TTreeReaderArray<Float_t> FatJet_eta = {fReader, "FatJet_eta"};
+  TTreeReaderArray<Float_t> FatJet_mass = {fReader, "FatJet_mass"};
+  TTreeReaderArray<Float_t> FatJet_phi = {fReader, "FatJet_phi"};
+  TTreeReaderArray<Float_t> FatJet_pt = {fReader, "FatJet_pt"};
+  TTreeReaderArray<int_or_char> FatJet_jetId = {fReader, "FatJet_jetId"};
 
   //MET
   TTreeReaderValue<Float_t> MET_MetUnclustEnUpDeltaX = {fReader, "MET_MetUnclustEnUpDeltaX"};
@@ -161,6 +173,7 @@ public :
   TTreeReaderArray<Float_t> Muon_pt = {fReader, "Muon_pt"};
   TTreeReaderArray<Float_t> Muon_ptErr = {fReader, "Muon_ptErr"};
   TTreeReaderArray<Float_t> Muon_sip3d = {fReader, "Muon_sip3d"};
+  TTreeReaderArray<int_or_short> Muon_jetIdx = {fReader, "Muon_jetIdx"};
 
   //PuppiMET
   TTreeReaderValue<Float_t> PuppiMET_phi = {fReader, "PuppiMET_phi"};
@@ -268,6 +281,7 @@ public :
 
   //Jetflavor:
   TTreeReaderArray<int_or_char> Jet_hadronFlavour = {fReader_MC, "Jet_hadronFlavour"};
+  TTreeReaderArray<int_or_char> FatJet_hadronFlavour = {fReader_MC, "FatJet_hadronFlavour"};
 
   //-------------------------------------------------------------------------------------------------------------
   // Special branches:
@@ -400,6 +414,7 @@ public :
   float transv_mass(float lepE, float lepphi, float met, float metphi);
   void createLightLeptons();
   void createJets();
+  void createFatJets();
   void createGenLightLeptons();
   void createGenJets();
   void createSignalArrays();
@@ -456,6 +471,11 @@ public :
   void AddAndCompressBranch(TBranch *br);
   void InitializeBranches(TTree *tree);
 
+  //For 3L/4L veto:
+  int electronCustomID(Int_t bitmap,int quality, int skipCut);
+  bool Veto3L4L();
+  bool VetoHEM(vector<Particle> jet);
+
   //------------------------------------------------------------------------------------------------------------
   // GLOBAL VARIABLE DECLARATIONS
   //------------------------------------------------------------------------------------------------------------
@@ -475,8 +495,9 @@ private:
   //Physics objects:
   vector<Particle> genMuon, genElectron, genLightLepton, genJet;
   vector<Particle> vllep, vlnu;
-  vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, bJet, MediumbJet;
+  vector<Particle> Muon, Electron, LightLepton, Photon, Tau, Jet, FatJet, bJet, MediumbJet;
   vector<Particle> LooseLepton, LooseMuon, LooseElectron;
+  vector<Particle> yash_llep, yash_looseMuon; //For 3L/4L veto
 
   //ScaleFactors from POG:
   vector<sftxt> muonIDSF, muonIsoSF, electronIDSF;
@@ -492,7 +513,7 @@ private:
   bool bad_event;
 
   //Counters:
-  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown;
+  int nEvtTotal,nEvtRan,nEvtTrigger,nEvtPass,nEvtBad,nThrown,nEvtVeto;
 
   //json:
   json jsondata;
@@ -503,6 +524,7 @@ private:
   UInt_t  trigger;
   UInt_t  nlep;
   UInt_t  njet;
+  UInt_t  nfatjet;
   UInt_t  nbjet;
   Float_t lep0_pt;
   Float_t lep0_eta;
@@ -525,11 +547,13 @@ private:
   Float_t dilep_dphi;
   Float_t dilep_dR;
   Float_t dilep_ptratio;
-  Float_t HT;
+  Float_t HT, HTfat;
   Float_t LT;
-  Float_t STvis;
-  Float_t ST;
-  Float_t HTMETllpt;
+  Float_t STvis, STvisfat;
+  Float_t ST, STfat;
+  Float_t LTplusMET;
+  Float_t HTplusMET, HTfatplusMET;
+  Float_t HTMETllpt, HTfatMETllpt;
   Float_t STfrac;
   Float_t dphi_metlep0;
   Float_t dphi_metlep1;
@@ -540,11 +564,11 @@ private:
   Float_t metphi_tree;
   Float_t jec;
   Float_t jer;
-  Double_t sf_lepIdIso;
-  Double_t sf_lepTrigEff;
-  Double_t wt_pileup;
-  Double_t sf_btagEff;
-  Double_t event_weight;
+  Double_t sf_lepIdIso,   sf_lepIdIso_up,   sf_lepIdIso_down;
+  Double_t sf_lepTrigEff, sf_lepTrigEff_up, sf_lepTrigEff_down;
+  Double_t wt_pileup,     wt_pileup_up,     wt_pileup_down;
+  Double_t sf_btagEff,    sf_btagEff_up,    sf_btagEff_down;
+  Double_t event_weight,  event_weight_up,  event_weight_down;
   
   ClassDef(AnaScript,0);
 
