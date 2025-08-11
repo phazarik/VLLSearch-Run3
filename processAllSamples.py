@@ -3,7 +3,7 @@
 # example usage: python3 processAllSamples.py --jobname test --dryrun --debug
 #-----------------------------------------------------------------------------------------------------
 
-import os, sys, argparse
+import os, sys, argparse, glob
 import json
 import time
 from datetime import timedelta
@@ -29,28 +29,28 @@ debug   = args.debug   ### For debug statements.
 #  SET GLOBAL PARAMETERS BEFORE RUNNING
 #---------------------------------------------
 
-campaign = "Run3Summer22EE"
+campaign = "2018_UL"
 ### Options for Run2: 2016preVFP_UL, 2016postVFP_UL, 2017_UL, 2018_UL
 ### Options for Run3: Run3Summer22, Run3Summer22EE, Run3Summer23, Run3Summer23BPix
 
 mode = "TreeMaker"
-nanoAODv = 12
+nanoAODv = 11
 
 samples_to_run = ["DYGToLLG", "DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
-#samples_to_run.extend(["Muon", "EGamma"])
-samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
+if "Summer23" in campaign: samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
+else: samples_to_run.extend(["Muon", "EGamma"])
+samples_to_run.extend(["VLLD-ele", "VLLD_mu"])
 
-if nanoAODv==11:
+#if nanoAODv==11:
     #samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
     #samples_to_run=["RareTop"]
-    samples_to_run=["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
+    #samples_to_run=["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
     #samples_to_run=["QCD_MuEnriched", "QCD_EMEnriched"] 
     
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
 if mode == "HistMaker": dumpdir = "ROOT_FILES/hists/"
-nanoAODpath = "/mnt/d/work/skimmed_2LSS_Run3Summer22EE"
-#nanoAODpath = "/mnt/d/work/skimmed_2LSS_Signal"
+nanoAODpath = f"/mnt/d/work/MC_samples_skimmed/skimmed_2LSS_{campaign}"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
 #---------------------------------------------
@@ -84,7 +84,7 @@ for item in samples_to_run:
     for sample, subs in samplelist.items():
         
         if sample != item: continue
-        if 'DYG' not in sample: continue
+        #if 'DYG' not in sample: continue
         #if sample not in ['QCDEM', 'QCDMu', 'VVSS', 'WGtoLNuG', 'WtoLNu', 'ZGamma']: continue
         #if 'VLL' not in sample: continue
         #if 'RareTop' not in sample: continue
@@ -94,7 +94,7 @@ for item in samples_to_run:
         print(f'Submitting jobs for {sample}', style='yellow bold')
         print('----------------------------------------------')
 
-        flag = 'flag'
+        flag = 'mc'
         if 'Muon' in sample:    flag='muon'
         if 'EGamma' in sample:  flag='egamma'
         if sample == 'QCDMu' :  flag='qcd'
@@ -127,9 +127,16 @@ for item in samples_to_run:
 
             inpath = os.path.join(nanoAODpath, sample, subsample)
             if not os.path.exists(inpath):
-                print(f'Error: Path does not exist: {inpath}', style='red')
-                list_failed.append(samplename)
-                continue
+                print(f"Warning: Path does not exist: {inpath}", style='yellow')
+                pattern = os.path.join(nanoAODpath, f"{sample}_{subsample}_*")
+                print(f"Searching for pattern: {pattern}")
+                matches = glob.glob(pattern)
+                if not matches:
+                    raise FileNotFoundError(f"No match found for {pattern}")
+                    list_failed.append(samplename)
+                    continue
+                print(f'Found: {matches[0]}')
+                inpath = matches[0]
 
             filelist = os.listdir(inpath)
             filelist = [f for f in os.listdir(inpath) if f.endswith('.root')]
