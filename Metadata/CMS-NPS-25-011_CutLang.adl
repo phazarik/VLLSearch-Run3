@@ -1,0 +1,139 @@
+#info analysis
+#  title "Search for vector-like leptons in events with exactly two same-sign leptons in proton-proton collisions at sqrts = 13 and 13.6 TeV"
+#  experiment CMS
+#  id NPS-XX-XXX
+#  publication NA
+#  sqrtS 13.0, 13.6
+#  lumi 140.0, 38.5
+#  arXiv NA
+#  hepdata NA
+#  doi NA
+
+# Object definitions
+
+object muons
+  take muons
+  select pt > 10
+  select abs(eta) < 2.4
+  select abs(dxy) < 0.05
+  select abs(dz) < 0.1
+  select mediumId == true
+  select relIso03 < 0.15
+
+object looseMuons
+  take muons
+  select pt > 10
+  select abs(eta) < 2.4
+  select abs(dxy) < 0.05
+  select abs(dz) < 0.1
+  select looseId == true
+  select relIso03 < 1.0
+
+object electrons
+  take electrons
+  select pt > 10
+  select abs(eta) < 2.4
+  select ((abs(eta) <= 1.479 and abs(dxy) < 0.05 and abs(dz) < 0.1) or
+          (abs(eta) > 1.479 and abs(dxy) < 0.1 and abs(dz) < 0.2))
+  select cutBased > 2
+  select relIso03 < 0.15
+  reject if dR(loosemuons) < 0.4
+
+object looseElectrons
+  take electrons
+  select pt > 10
+  select abs(eta) < 2.4
+  select ((abs(eta) <= 1.479 and abs(dxy) < 0.05 and abs(dz) < 0.1) or
+          (abs(eta) > 1.479 and abs(dxy) < 0.1 and abs(dz) < 0.2))
+  select cutBased > 1
+  select relIso03 < 1.0
+
+object leptons: Union(electrons, muons)
+
+object looseleptons: Union(looseElectrons, looseMuons)
+
+object jets
+  take ak4jets
+  select pt > 50
+  select abs(eta) < 2.4
+  select (year == 2016 ? jetId >= 1 : jetId >= 2)
+  reject if dR(looseleptons) < 0.4
+
+object bjets
+  take jets
+  select ((campaign == "2016preVFP_UL"    and Jet_btagDeepFlavB > 0.2598) or 
+          (campaign == "2016postVFP_UL"   and Jet_btagDeepFlavB > 0.2489) or 
+          (campaign == "2017_UL"          and Jet_btagDeepFlavB > 0.3040) or 
+          (campaign == "2018_UL"          and Jet_btagDeepFlavB > 0.2783) or 
+          (campaign == "Run3Summer22"     and Jet_btagDeepFlavB > 0.3086) or 
+          (campaign == "Run3Summer22EE"   and Jet_btagDeepFlavB > 0.3196) or 
+          (campaign == "Run3Summer23"     and Jet_btagDeepFlavB > 0.2431) or 
+          (campaign == "Run3Summer23BPix" and Jet_btagDeepFlavB > 0.2435))
+
+# Neural network scores
+define nnscore_qcd   = nnscore_Run3_vlld_qcd
+define nnscore_ttbar = nnscore_Run3_vlld_ttbar
+define nnscore_wjets = nnscore_Run3_vlld_wjets
+
+# Region definitions
+region baseline
+  select N(leptons) == 2
+  select M(leptons[0], leptons[1]) > 15
+  select (year == 2016 and ((N(electrons) > 0 and electrons[0].pt > 30) or (N(muons) > 0 and muons[0].pt > 26))) or
+         (year == 2017 and ((N(electrons) > 0 and electrons[0].pt > 37) or (N(muons) > 0 and muons[0].pt > 29))) or
+	 (year == 2018 and ((N(electrons) > 0 and electrons[0].pt > 35) or (N(muons) > 0 and muons[0].pt > 26))) or
+ 	 (year == 2022 and ((N(electrons) > 0 and electrons[0].pt > 35) or (N(muons) > 0 and muons[0].pt > 26)))
+
+region dy_cr
+  select baseline
+  select 76 < M(leptons[0], leptons[1]) < 106
+  select leptons[1].pt / leptons[0].pt > 0.7
+
+region dy_veto
+  select baseline
+  select not (size(electrons) == 2 and 76 < M(leptons[0], leptons[1]) < 106)
+  
+region qcd_cr
+  select dy_veto
+  select nnscore_qcd < 0.30
+  select 0.02 < leptons[0].relIso03 < 0.15
+  select leptons[0].sip3d > 5
+
+region qcd_vr
+  select dy_veto
+  select nnscore_qcd < 0.30
+  select 0.02 < leptons[0].relIso03 < 0.15
+  select leptons[0].sip3d < 5
+
+region qcd_veto
+  select dy_veto
+  select leptons[0].sip3d < 5
+  select leptons[1].sip3d < 10
+  select nnscore_qcd > 0.30
+  select sum(jets.pt) > 50
+
+region wjets_cr
+  select qcd_veto
+  select nnscore_wjets < 0.50
+  select size(bjets) == 0
+  
+region wjets_veto
+  select qcd_veto
+  select nnscore_wjets > 0.50
+
+region top_cr
+  select wjets_veto
+  select size(bjets) > 0
+
+region val_region
+  select dy_veto
+  select leptons[0].sip3d < 5
+  select leptons[1].sip3d < 10
+  select sum(jets.pt) > 50
+  select 0.50 < nnscore_qcd < 0.70
+  select nnscore_wjets > 0.50
+  select HT > 50
+
+region signal
+  select wjets_veto
+  select size(bjets) == 0

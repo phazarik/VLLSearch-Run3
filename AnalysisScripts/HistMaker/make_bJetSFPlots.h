@@ -17,12 +17,16 @@ void AnaScript::MakebJetSFPlots(){
 
       int flav0 = fabs(LightLepton.at(0).id);
       int flav1 = fabs(LightLepton.at(1).id);
+
       //At least one of these two leptons must satisfy the offline trigger cut.
       bool offline_trigger = false;
       if(      flav0 == 13 && LightLepton.at(0).v.Pt() > ptcut_mu)  offline_trigger = true;
       else if (flav0 == 11 && LightLepton.at(0).v.Pt() > ptcut_ele) offline_trigger = true;
       if(      flav1 == 13 && LightLepton.at(1).v.Pt() > ptcut_mu)  offline_trigger = true;
       else if (flav1 == 11 && LightLepton.at(1).v.Pt() > ptcut_ele) offline_trigger = true;
+
+      //Veto additional loose leptons:
+      if(LooseLepton.size() > 2) offline_trigger = false;
       
       if(offline_trigger){
 	if(     flav0 == 13 && flav1 == 13) mm = true;

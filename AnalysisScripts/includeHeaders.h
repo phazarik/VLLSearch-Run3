@@ -14,4 +14,5 @@ using namespace std;
 #include "Setup/ProduceRecoCollection.h"
 #include "Setup/json_setup.h"
 #include "Corrections/calculateCorrections.h"
-#include "Corrections/TriggerEfficiency.h"
+//#include "Corrections/TriggerEfficiency.h"
+#include "Corrections/TriggerEfficiency_updated.h"

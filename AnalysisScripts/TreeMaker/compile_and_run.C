@@ -11,7 +11,7 @@
 using namespace std;
 
 void compile_and_run(
-		     TString infile  = "/home/phazarik/work/Run2UL_oldSignalSamples/VLLD_ele_M1000_TuneCP5_13TeV-madgraph-pythia8/4B9983DE-0893-2F48-A0D8-B39C4A9EA2C2.root",
+		     TString infile  = "test_inputs/VLLD_mu_M600_NANOAOD_Run2UL.root",
 		     TString outfile = "test_outputs/tree_testcompile.root",
 		     TString campaign = "2018_UL",
 		     TString sample = "vll",

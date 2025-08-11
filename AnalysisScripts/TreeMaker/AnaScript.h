@@ -452,11 +452,15 @@ public :
   double returnbJetCorrection(vector<Particle> Jet, TString mode);
 
   //Trigger corrections:
+  /*
   double GetLeptonTriggerEfficiency(Particle lepton);
   double TrigEFF_allCampaign_Isomu24_MC(Particle muon);
   double TrigEFF_allCampaign_Isomu24_Data(Particle muon);
   double TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(Particle electron);
-  double TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron);
+  double TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron);*/
+  double GetLeptonTriggerEfficiency(Particle lepton, TString mode);
+  double TrigEff_HLT_IsoMuXX(Particle lepton, TString mode);
+  double TrigEff_HLT_EleXX_WPTight_Gsf(Particle lepton, TString mode);
 
   //Pileup correction:
   double returnPileUpWt(TString mode);

@@ -12,12 +12,12 @@ using namespace std;
 
 void compile_and_run(
 		     TString mode = "TreeMaker",
-		     TString infile = "nanoaod_test.root",
-		     //TString infile = "/mnt/d/work/skimmed_2LSS_Run3Summer23/TT/TTtoLNu2Q/*.root",
-		     TString outfile = "tree_test2.root",
-		     TString campaign = "Run3Summer23",
-		     TString sample = "TT_TTtoLNu2Q",
-		     TString flag = "ttbar"
+		     //TString infile = "nanoaod_test.root",
+		     TString infile = "/mnt/d/work/MC_samples_skimmed/skimmed_2LSS_2018_UL/DYto2L/50toInf/*.root",
+		     TString outfile = "tree_test.root",
+		     TString campaign = "2018_UL",
+		     TString sample = "dy",
+		     TString flag = "dy"
 		     )
 {
 

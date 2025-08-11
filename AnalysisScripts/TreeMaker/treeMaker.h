@@ -99,12 +99,16 @@ void AnaScript::FillTree(TTree *tree){
       
       int flav0 = fabs(LightLepton.at(0).id);
       int flav1 = fabs(LightLepton.at(1).id);
+
       //At least one of these two leptons must satisfy the offline trigger cut.
       bool offline_trigger = false;
       if(      flav0 == 13 && LightLepton.at(0).v.Pt() > ptcut_mu)  offline_trigger = true;
       else if (flav0 == 11 && LightLepton.at(0).v.Pt() > ptcut_ele) offline_trigger = true;
       if(      flav1 == 13 && LightLepton.at(1).v.Pt() > ptcut_mu)  offline_trigger = true;
       else if (flav1 == 11 && LightLepton.at(1).v.Pt() > ptcut_ele) offline_trigger = true;
+
+      //Veto additional loose leptons:
+      if(LooseLepton.size() > 2) offline_trigger = false;
       
       if(offline_trigger){
 	if(     flav0 == 13 && flav1 == 13){ mm = true; }
@@ -154,28 +158,32 @@ void AnaScript::FillTree(TTree *tree){
     if(_data==0){
 
       //Nominal weights:
-      double sf0 = 1.0; double sf1 = 1.0;
-      sf0 = returnLeptonSF(LightLepton.at(0), "nom"); if(sf0<0) sf0=1.0;
-      sf1 = returnLeptonSF(LightLepton.at(1), "nom"); if(sf1<0) sf1=1.0;
+      double sf0 = returnLeptonSF(LightLepton.at(0), "nom"); if(sf0<0) sf0=1.0;
+      double sf1 = returnLeptonSF(LightLepton.at(1), "nom"); if(sf1<0) sf1=1.0;
       lepIdIsoSF = sf0*sf1;
-      double ef0 = 1.0; double ef1 = 1.0;
-      ef0 = GetLeptonTriggerEfficiency(LightLepton.at(0)); 
-      ef1 = GetLeptonTriggerEfficiency(LightLepton.at(1));
+      double ef0 = GetLeptonTriggerEfficiency(LightLepton.at(0), "nom"); 
+      double ef1 = GetLeptonTriggerEfficiency(LightLepton.at(1), "nom");
       triggerEff = 1-((1-ef0)*(1-ef1));
       bjetSF = returnbJetCorrection(Jet, "nom"); if(bjetSF<1.0) bjetSF=1.0;
       pileupwt = returnPileUpWt("nom"); if(pileupwt<0) pileupwt=1.0;
 
-      //SFup weights:
+      //Systematic up variations:
       double sf0_up = returnLeptonSF(LightLepton.at(0), "systup"); if(sf0_up<0) sf0_up=1.0;
       double sf1_up = returnLeptonSF(LightLepton.at(1), "systup"); if(sf1_up<0) sf1_up=1.0;
       lepIdIsoSF_up = sf0_up * sf1_up;
+      double ef0_up = GetLeptonTriggerEfficiency(LightLepton.at(0), "systup"); 
+      double ef1_up = GetLeptonTriggerEfficiency(LightLepton.at(1), "systup");
+      triggerEff_up = 1-((1-ef0_up)*(1-ef1_up));
       bjetSF_up = returnbJetCorrection(Jet, "systup"); if(bjetSF_up<1.0) bjetSF_up=1.0;
       pileupwt_up = returnPileUpWt("systup"); if(pileupwt_up<0) pileupwt_up=1.0;
-
-      //SF down weights:
+      
+      //Systematic down variations:
       double sf0_down = returnLeptonSF(LightLepton.at(0), "systdown"); if(sf0_down<0) sf0_down=1.0;
       double sf1_down = returnLeptonSF(LightLepton.at(1), "systdown"); if(sf1_down<0) sf1_down=1.0;
       lepIdIsoSF_down = sf0_down * sf1_down;
+      double ef0_down = GetLeptonTriggerEfficiency(LightLepton.at(0), "systdown"); 
+      double ef1_down = GetLeptonTriggerEfficiency(LightLepton.at(1), "systdown");
+      triggerEff_down = 1-((1-ef0_down)*(1-ef1_down));
       bjetSF_down = returnbJetCorrection(Jet, "systdown"); if(bjetSF_down<1.0) bjetSF_down=1.0;
       pileupwt_down = returnPileUpWt("systdown"); if(pileupwt_down<0) pileupwt_down=1.0;
       
