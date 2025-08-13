@@ -1,0 +1,28 @@
+Model Name: Top-vs-VLLD Run2 (Aug13)
+Signal and Background before filtering: 56907, 100000
+Signal in training: 39835
+Signal in testing: 17072
+Background in training: 69999
+Background in testing: 30001
+Training Variables: ['nbjet', 'dilep_ptratio', 'LTplusMET', 'ST', 'STfrac', 'dphi_metlep0']
+Number of Epochs: 50
+Batch Size: 256
+
+Model Summary:
+
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense (Dense)                   │ (None, 64)             │           448 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 32)             │         2,080 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 1)              │            33 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 7,685 (30.02 KB)
+ Trainable params: 2,561 (10.00 KB)
+ Non-trainable params: 0 (0.00 B)
+ Optimizer params: 5,124 (20.02 KB)
+
+
