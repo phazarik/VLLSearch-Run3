@@ -22,36 +22,36 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "presr/tree_2016preVFP_UL_presr":{
-        "dump":"hist_2016preVFP_UL_presr",
+    "baseline/tree_baseline_2016preVFP_UL":{
+        "dump":"hist_baseline_2016preVFP_UL",
         "campaign":"2016preVFP_UL"
     },
-    "presr/tree_2016postVFP_UL_presr":{
-        "dump":"hist_2016postVFP_UL_presr",
+    "baseline/tree_baseline_2016postVFP_UL":{
+        "dump":"hist_baseline_2016postVFP_UL",
         "campaign":"2016postVFP_UL"
     },
-    "presr/tree_2017_UL_presr":{
-        "dump":"hist_2017_UL_presr",
+    "baseline/tree_baseline_2017_UL":{
+        "dump":"hist_baseline_2017_UL",
         "campaign":"2017_UL"
     },
-    "presr/tree_2018_UL_presr":{
-        "dump":"hist_2018_UL_presr",
+    "baseline/tree_baseline_2018_UL":{
+        "dump":"hist_baseline_2018_UL",
         "campaign":"2018_UL"
     },
-    "presr/tree_Run3Summer22_presr":{
-        "dump":"hist_Run3Summer22_presr",
+    "baseline/tree_baseline_Run3Summer22":{
+        "dump":"hist_baseline_Run3Summer22",
         "campaign":"Run3Summer22"
     },
-    "presr/tree_Run3Summer22EE_presr":{
-        "dump":"hist_Run3Summer22EE_presr",
+    "baseline/tree_baseline_Run3Summer22EE":{
+        "dump":"hist_baseline_Run3Summer22EE",
         "campaign":"Run3Summer22EE"
     },
-    "presr/tree_Run3Summer23_presr":{
-        "dump":"hist_Run3Summer23_presr",
+    "baseline/tree_baseline_Run3Summer23":{
+        "dump":"hist_baseline_Run3Summer23",
         "campaign":"Run3Summer23"
     },
-    "presr/tree_Run3Summer23BPix_presr":{
-        "dump":"hist_Run3Summer23BPix_presr",
+    "baseline/tree_baseline_Run3Summer23BPix":{
+        "dump":"hist_baseline_Run3Summer23BPix",
         "campaign":"Run3Summer23BPix"
     }
 }
@@ -65,7 +65,7 @@ jobcount = 0
 processed = []
 
 for jobname, info in jobdict.items():
-    if 'Run3' not in jobname: continue
+    if 'Run3' in jobname: continue
 
     for channel in channels:
         #if channel != "ee" : continue

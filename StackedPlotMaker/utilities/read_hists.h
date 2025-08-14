@@ -46,9 +46,8 @@ TH1D *get_hist(
   TString filename = input_path+"/"+"hst_"+sample+"_"+subsample+".root";
 
   //Skip samples here:
-  if (sample.Contains("ZGamma"))   return nullptr; //For Run-3 only
-  //if (sample.Contains("VVSS"))     return nullptr;
-  if (sample.Contains("WJetsNLO")) return nullptr;
+  //if (sample.Contains("ZGamma"))   return nullptr; //For Run-3 only
+  if ((sample.Contains("WtoLNu")) && !sample.Contains("Inclusive")) return nullptr;
   
   if(!file_exists(filename)){
     DisplayText("Not found: "+filename, 31);
@@ -67,10 +66,8 @@ TH1D *get_hist(
 
   //--------------------------------------
   //Rebinning:
-  vector<TString> rebin_keys = {"nnscore", "STfrac", "sip3d", "iso", "eta", "phi", "dR", "ptratio"};
-  for (auto& key : rebin_keys){
-    if (var.Contains(key)){rebin = 5; break;}
-  }
+  vector<TString> rebin_keys = {"nnscore", "STfrac", "sip3d", "eta", "phi", "dR", "ptratio"};
+  for (auto& key : rebin_keys){if (var.Contains(key)){rebin = 5; break;}}
   hst->Rebin(rebin);
   //Force rebin here.
   //--------------------------------------
@@ -196,21 +193,11 @@ vector<TH1D *> return_hist_collection(
   
   vector<TH1D *> hist_collection;
 
-  //Looping over samples:
+  //Apply config by looping over samples:
   for (auto& [sample_str, subsamples] : sample_info.items()) {
-    TString sample = sample_str.c_str();
-
-    //if (sample == "WJetsNLO") continue;
-    //if (sample == "TTZ") continue; //For DY CR
-    
-    if (sample.Contains("VLLS") || sample.Contains("VLLD")) {
-      //DisplayText("Skipping signal sample: " + sample, 33);
-      continue;
-    }
-    if (sample.Contains("Muon") || sample.Contains("EGamma")) {
-      //DisplayText("Skipping data: " + sample, 33);
-      continue;
-    }
+    TString sample = sample_str.c_str();    
+    if (sample.Contains("VLLS") || sample.Contains("VLLD"))   continue;
+    if (sample.Contains("Muon") || sample.Contains("EGamma")) continue;
     
     SampleConfig* scfg = nullptr;
     for (auto& c : config) {

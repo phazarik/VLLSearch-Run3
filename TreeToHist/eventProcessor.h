@@ -20,7 +20,7 @@ extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 extern Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
 extern Float_t LTplusMET, HTplusMET, HTfatplusMET;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
+extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7, nnscore8;
 extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
 extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
 extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
@@ -49,6 +49,19 @@ struct hists{
   Double_t xmin;
   Double_t xmax;
   std::vector<float> binning;  // For custom binning
+};
+
+struct hists2D {
+    TString name;
+    TString title;
+    Int_t nbinsX;
+    Double_t xmin;
+    Double_t xmax;
+    Int_t nbinsY;
+    Double_t ymin;
+    Double_t ymax;
+    std::vector<float> binningX;
+    std::vector<float> binningY;
 };
 
 double getScaleFactorInBins(const char* campaign_cstr, int channelval, double var, const json& scale_factors, TString mode="nom");
@@ -86,8 +99,12 @@ void processTree(
   cout << "Corrections loaded from JSON." << endl;
   
   vector<TH1D*> hst_collection;
+  vector<TH2D*> hst2D_collection;
   //hst_collection->clear();
 
+  vector<float> ptbins500 = {0, 25, 50, 100, 200, 300, 400, 500};
+  vector<float> isobinslog = {0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256};
+  
   vector<hists> hdef = {
     // integers:
     {"channel", "channel", 10, 0, 10, {}},
@@ -100,41 +117,42 @@ void processTree(
     {"lep0_pt", "lep0_pt", 50, 0, 500, {}},
     {"lep0_eta", "lep0_eta", 100, -4, 4, {}},
     {"lep0_phi", "lep0_phi", 100, -4, 4, {}},
-    {"lep0_iso", "lep0_iso", 200, 0, 0.2, {}},
+    //{"lep0_iso", "lep0_iso", 200, 0, 0.2, {}},
+    {"lep0_iso", "lep0_iso", 0, 0, 0, isobinslog},
     {"lep0_sip3d", "lep0_sip3d", 200, 0, 50, {}},
     {"lep0_mt", "lep0_mt", 50, 0, 500, {}},
     // subleading lepton:
     {"lep1_pt", "lep1_pt", 50, 0, 500, {}},
     {"lep1_eta", "lep1_eta", 100, -4, 4, {}},
     {"lep1_phi", "lep1_phi", 100, -4, 4, {}},
-    {"lep1_iso", "lep1_iso", 200, 0, 0.2, {}},
+    {"lep1_iso", "lep1_iso", 0, 0, 0, isobinslog},
     {"lep1_sip3d", "lep1_sip3d", 200, 0, 50, {}},
     {"lep1_mt", "lep1_mt", 50, 0, 500, {}},
     // dilepton system:
-    {"dilep_pt", "dilep_pt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"dilep_pt", "dilep_pt", 0, 0, 0, ptbins500}, //variable binning
     {"dilep_eta", "dilep_eta", 100, -10, 10, {}},
     {"dilep_phi", "dilep_phi", 100, -4, 4, {}},
     {"dilep_mass", "dilep_mass", 50, 0, 500, {}},
-    {"dilep_mt", "dilep_mt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"dilep_mt", "dilep_mt", 0, 0, 0, ptbins500}, //variable binning
     {"dilep_deta", "dilep_deta", 100, 0, 6, {}},
     {"dilep_dphi", "dilep_dphi", 100, 0, 6, {}},
     {"dilep_dR", "dilep_dR", 100, 0, 6, {}},
     {"dilep_ptratio", "dilep_ptratio", 100, 0, 1, {}},
     // event level variables:
-    {"LT",           "LT",           0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"LTplusMET",    "LTplusMET",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HT",           "HT",           0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HTfat",        "HTfat",        0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HTplusMET",    "HTplusMET",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HTfatplusMET", "HTfatplusMET", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"STvis",        "STvis",        0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"STvisfat",     "STvisfat",     0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"ST",           "ST",           0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"STfat",        "STfat",        0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HTMETllpt",    "HTMETllpt",    0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
-    {"HTfatMETllpt", "HTfatMETllpt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"LT",           "LT",           0, 0, 0, ptbins500}, //variable binning
+    {"LTplusMET",    "LTplusMET",    0, 0, 0, ptbins500}, //variable binning
+    {"HT",           "HT",           0, 0, 0, ptbins500}, //variable binning
+    {"HTfat",        "HTfat",        0, 0, 0, ptbins500}, //variable binning
+    {"HTplusMET",    "HTplusMET",    0, 0, 0, ptbins500}, //variable binning
+    {"HTfatplusMET", "HTfatplusMET", 0, 0, 0, ptbins500}, //variable binning
+    {"STvis",        "STvis",        0, 0, 0, ptbins500}, //variable binning
+    {"STvisfat",     "STvisfat",     0, 0, 0, ptbins500}, //variable binning
+    {"ST",           "ST",           0, 0, 0, ptbins500}, //variable binning
+    {"STfat",        "STfat",        0, 0, 0, ptbins500}, //variable binning
+    {"HTMETllpt",    "HTMETllpt",    0, 0, 0, ptbins500}, //variable binning
+    {"HTfatMETllpt", "HTfatMETllpt", 0, 0, 0, ptbins500}, //variable binning
     {"STfrac", "STfrac", 100, 0, 1.1, {}},
-    {"metpt", "metpt", 0, 0, 0, {0, 25, 50, 100, 200, 300, 400, 500}}, //variable binning
+    {"metpt", "metpt", 0, 0, 0, ptbins500}, //variable binning
     {"metphi", "metphi", 100, -4, 4, {}},
     // dphis:
     {"dphi_metlep0", "dphi_metlep0", 100, 0, 4, {}},
@@ -163,12 +181,18 @@ void processTree(
     {"nnscore_Run2_vlld_qcd",   "nnscore_Run2_vlld_qcd",   200, 0, 1, {}},
     {"nnscore_Run2_vlld_ttbar", "nnscore_Run2_vlld_ttbar", 200, 0, 1, {}},
     {"nnscore_Run2_vlld_wjets", "nnscore_Run2_vlld_wjets", 200, 0, 1, {}},
+    {"nnscore_Run2_vlld_dy",    "nnscore_Run2_vlld_dy",    200, 0, 1, {}},
     {"nnscore_Run3_vlld_qcd",   "nnscore_Run3_vlld_qcd",   200, 0, 1, {}},
     {"nnscore_Run3_vlld_ttbar", "nnscore_Run3_vlld_ttbar", 200, 0, 1, {}},
-    {"nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_wjets", 200, 0, 1, {}}
+    {"nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_wjets", 200, 0, 1, {}},
+    {"nnscore_Run3_vlld_dy",    "nnscore_Run3_vlld_dy",    200, 0, 1, {}},
+  };
+  vector<hists2D> h2Ddef = {
+     {"nnscore_Run2_vlld_1v3", "nnscore_Run2_vlld_1v3", 200, 0, 1, 200, 0, 1, {}},
+     {"nnscore_Run3_vlld_1v3", "nnscore_Run3_vlld_1v3", 200, 0, 1, 200, 0, 1, {}},
   };
     
-  //Booking histograms:
+  //Booking 1D histograms:
   for (int i=0; i<(int)hdef.size(); i++) {
     TH1D* hist;
     //cout<<hdef[i].name <<"\t"<< hdef[i].title <<"\t"<< hdef[i].nbins <<"\t"<< hdef[i].xmin <<"\t"<< hdef[i].xmax<<endl;
@@ -179,6 +203,22 @@ void processTree(
     hst_collection.push_back(hist);
   }
   cout<<"hst_collection size = "<<(int)hst_collection.size()<<"\033[0m"<<endl;
+
+  // Booking 2D histograms:
+  for (int i = 0; i < (int)h2Ddef.size(); i++) {
+    TH2D* hist2D;
+    if ((int)h2Ddef[i].binningX.size() != 0 && (int)h2Ddef[i].binningY.size() != 0)
+      hist2D = new TH2D(h2Ddef[i].name, h2Ddef[i].title,
+			h2Ddef[i].binningX.size() - 1, &h2Ddef[i].binningX[0],
+			h2Ddef[i].binningY.size() - 1, &h2Ddef[i].binningY[0]);
+    else
+      hist2D = new TH2D(h2Ddef[i].name, h2Ddef[i].title,
+			h2Ddef[i].nbinsX, h2Ddef[i].xmin, h2Ddef[i].xmax,
+			h2Ddef[i].nbinsY, h2Ddef[i].ymin, h2Ddef[i].ymax);
+    hist2D->Sumw2();
+    hist2D->SetDirectory(0);
+    hst2D_collection.push_back(hist2D);
+  }
 
   //________________________________________________________________________________________________
   //
@@ -194,11 +234,10 @@ void processTree(
 
   //-------------------------------------------------------------------------
   //Flagging specific files for corrections:
-  bool flag_dy = (channelval == 3) && (find_key(inputFilename, "DYto2L")||find_key(inputFilename, "DYJets"));
-  bool flag_qcd = find_key(inputFilename, "QCD") && (find_key(inputFilename, "Mu") || (find_key(inputFilename, "EM")));
-  bool flag_ttbar = find_key(inputFilename, "TTBar_") || find_key(inputFilename, "TT_") || find_key(inputFilename, "TTV_") || find_key(inputFilename, "TTZ_") || find_key(inputFilename, "TTW_");
-  bool flag_wjets = find_key(inputFilename, "WGtoLNuG") || find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
-  //bool flag_wjets = find_key(inputFilename, "WtoLNu") || find_key(inputFilename, "HTbinnedWJets");
+  bool flag_dy    = (channelval == 3) && find_key(inputFilename, "_DYto2L_");
+  bool flag_qcd   = find_key(inputFilename, "_QCDEM_") || find_key(inputFilename, "_QCDMu_");
+  bool flag_ttbar = find_key(inputFilename, "_TT_") || find_key(inputFilename, "_TTV_");
+  bool flag_wjets = find_key(inputFilename, "_WtoLNu_") || find_key(inputFilename, "_WGtoLNuG_");
   if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
   if(flag_qcd)   cout<<"\033[35;1m==> Correcting QCD globally.\033[0m"<<endl;
   if(flag_ttbar) cout<<"\033[35;1m==> Correcting tt+X in HT bins.\033[0m"<<endl;
@@ -235,12 +274,12 @@ void processTree(
     if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL")   wt_pileup = 1.0;
 
     wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    wt = wt*wt_bjet;                       //Adding b-tagging corrections
+    //wt = wt*wt_bjet;                       //Adding b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-
+    /*
     //1) DY correction for the ee channel:
     if(flag_dy){
       Double_t scale_dy = 1.0;
@@ -267,7 +306,7 @@ void processTree(
       scale_wjets = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_wjets, "nom");
       if(channelval==0) scale_wjets = 1.0;
       wt = wt * scale_wjets;
-    }
+      }*/
     
     //--------------------------------
     // Filling up the histograms:
@@ -275,7 +314,7 @@ void processTree(
     //--------------------------------
     
     event_selection = channel_selection && (lep0_iso<0.15 && lep1_iso<0.15);
-    //if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106);
+    if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106);
 
     int count = 0;
     if(event_selection){
@@ -363,14 +402,20 @@ void processTree(
 
       // combined weight:
       hst_collection[59]->Fill(fnwt, 1.0);
-      /*
+      
       // NN scores:
-      hst_collection[60]->Fill(nnscore_Run2_vlld_qcd, fnwt);
-      hst_collection[61]->Fill(nnscore_Run2_vlld_ttbar, fnwt);
-      hst_collection[62]->Fill(nnscore_Run2_vlld_wjets, fnwt);
-      hst_collection[63]->Fill(nnscore_Run3_vlld_qcd, fnwt);
-      hst_collection[64]->Fill(nnscore_Run3_vlld_ttbar, fnwt);
-      hst_collection[65]->Fill(nnscore_Run3_vlld_wjets, fnwt);*/
+      hst_collection[60]->Fill(nnscore1, fnwt); //Run-2 QCD
+      hst_collection[61]->Fill(nnscore2, fnwt); //Run-2 Top
+      hst_collection[62]->Fill(nnscore3, fnwt); //Run-2 Wjets
+      hst_collection[63]->Fill(nnscore4, fnwt); //Run-2 DY
+      hst_collection[64]->Fill(nnscore5, fnwt); //Run-3 QCD
+      hst_collection[65]->Fill(nnscore6, fnwt); //Run-3 Top
+      hst_collection[66]->Fill(nnscore7, fnwt); //Run-3 Wjets
+      hst_collection[67]->Fill(nnscore8, fnwt); //Run-3 DY
+
+      //2D plots
+      hst2D_collection[0]->Fill(nnscore1, nnscore3, fnwt); // DNN: QCD-vs-Wjets Run2
+      hst2D_collection[1]->Fill(nnscore5, nnscore7, fnwt); // DNN: QCD-vs-Wjets Run3
     }
     //if(i>=100000) break;
   }//Event loop
@@ -384,14 +429,19 @@ void processTree(
     if (hst_collection[i]->GetEntries() > 0) SetLastBinAsOverflow(hst_collection[i]);
     hst_collection[i]->Scale(lumisf);
   }
+  for(int i = 0; i < (int)hst2D_collection.size(); i++){
+    hst2D_collection[i]->Scale(lumisf);
+  }
   if(test) cout << "After SetLastBinAsOverflow: channel entries = " << hst_collection[0]->GetEntries() << endl;
   
   // Save histograms to a new ROOT file
   TFile *outputFile = new TFile(outputFilename, "RECREATE");
-  for(int i=0; i<(int)hst_collection.size(); i++) hst_collection[i]->Write();
+  for(int i=0; i<(int)hst_collection.size();   i++) hst_collection[i]->Write();
+  for(int i=0; i<(int)hst2D_collection.size(); i++) hst2D_collection[i]->Write();
 
   // Close files
-  for(int i=0; i<(int)hst_collection.size(); i++) delete hst_collection[i];
+  for(int i=0; i<(int)hst_collection.size();   i++) delete hst_collection[i];
+  for(int i=0; i<(int)hst2D_collection.size(); i++) delete hst2D_collection[i];
   outputFile->Close();
   file->Close();
 

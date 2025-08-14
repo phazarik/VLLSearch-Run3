@@ -20,56 +20,63 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 default = True
 
-tag      = "sr"
-text     = "SR"
+tag      = "baseline"
+text     = "baseline"
 jobdict = {}
-with open('jobdicts/jobdict_run3.json') as f: jobdict = json.load(f)
+#with open('jobdicts/jobdict_run3.json') as f: jobdict = json.load(f)
 with open('jobdicts/jobdict_run2.json') as f: jobdict.update(json.load(f))
 
 variables = [
     ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
     ("nnscore_Run2_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-2)"),
     ("nnscore_Run2_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-2)"),
+    ("nnscore_Run2_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-2)"),
     ("nnscore_Run3_vlld_qcd",   "NNScore: QCD vs VLLD (Run-3)"),
     ("nnscore_Run3_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-3)"),
     ("nnscore_Run3_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-3)"),
+    ("nnscore_Run3_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-3)"),
     
     ("nlep",  "N_{L}"),
-    ("njet",  "N_{J}"),
+    ("njet",  "N_{J} (AK4)"),
+    ("nfatjet", "N_{J} (AK8)"),
     ("nbjet", "N_{bJ}"),
-    
-    ("dilep_mass", "M_{LL} (GeV)"),
-    ("HT",         "H_{ T} (GeV)"),
-    ("LT",         "L_{T} (GeV)"),
-    ("STvis",      "H_{ T} + L_{T} (GeV)"),
-    ("ST",         "S_{T} (GeV)"),
-    ("STfrac",     "L_{T}/S_{T}"),
-    ("HTMETllpt",  "H_{ T} + p_{T}^{miss} + p_{T}^{LL} (GeV)"),
-    ("metpt",      "p_{T}^{miss} (GeV)"),
-    ("metphi",     "#phi^{miss}"),
-    
+
     ("lep0_pt",    "p_{T}(L_{0}) (GeV)"),
     ("lep0_eta",   "#eta(L_{0})"),
     ("lep0_phi",   "#phi(L_{0})"),
-    ("lep0_mt",    "m_{ T}(L_{0}) (GeV)"),
     ("lep0_iso",   "reliso03 (L_{0})"),
     ("lep0_sip3d", "sip3d (L_{0})"),
+    ("lep0_mt",    "m_{ T}(L_{0}) (GeV)"),
     
     ("lep1_pt",    "p_{T}(L_{1}) (GeV)"),
     ("lep1_eta",   "#eta(L_{1})"),
     ("lep1_phi",   "#phi(L_{1})"),
-    ("lep1_mt",    "m_{ T}(L_{1}) (GeV)"),
     ("lep1_iso",   "reliso03 (L_{1})"),
     ("lep1_sip3d", "sip3d (L_{1})"),
-    
+    ("lep1_mt",    "m_{ T}(L_{1}) (GeV)"),
+
     ("dilep_pt",      "p_{T}^{LL} (GeV)"),
     ("dilep_eta",     "#eta_{LL}"),
     ("dilep_phi",     "#phi_{LL}"),
+    ("dilep_mass",    "M_{LL} (GeV)"),
     ("dilep_mt",      "m_{ T}^{LL} (GeV)"),
     ("dilep_deta",    "|#Delta#eta(L_{0}, L_{1})|"),
     ("dilep_dphi",    "#Delta#phi(L_{0}, L_{1})"),
     ("dilep_dR",      "#Delta R(L_{0}, L_{1})"),
     ("dilep_ptratio", "p_{T1} / p_{T0}"),
+
+    ("LTplusMET",    "L_{T}+p_{T}^{miss} (GeV)"),
+    ("HT",           "H_{ T} (GeV)"),
+    ("HTfat",        "H_{ T}(AK8) (GeV)"),
+    ("STvis",        "H_{ T}+L_{T} (GeV)"),
+    ("STvisfat",     "H_{ T}(AK8)+L_{T} (GeV)"),
+    ("ST",           "H_{ T}+L_{T}+p_{T}^{miss} (GeV)"),
+    ("STfat",        "H_{ T}(AK8)+L_{T}+p_{T}^{miss} (GeV)"),
+    ("STfrac",       "L_{T}/(H_{ T}+L_{T}+p_{T}^{miss})"),
+    ("HTMETllpt",    "H_{ T}+p_{T}^{miss}+p_{T}^{LL} (GeV)"),
+    ("HTfatMETllpt", "H_{ T}(AK8)+p_{T}^{miss}+p_{T}^{LL} (GeV)"),
+    ("metpt",        "p_{T}^{miss} (GeV)"),
+    ("metphi",       "#phi^{miss}"),
     
     ("dphi_metlep0",    "#Delta#phi(L_{0}, p_{T}^{miss})"),
     ("dphi_metlep1",    "#Delta#phi(L_{1}, p_{T}^{miss})"),

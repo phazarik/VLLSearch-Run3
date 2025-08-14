@@ -126,12 +126,14 @@ void put_text(TString text, float x, float y, int style, float size){
   t->Draw();
 }
 
-void put_latex_text(TString text, float x, float y, int style, float size){
-  TLatex* latex = new TLatex(); 
-  latex->SetTextFont(style);
-  latex->SetTextSize(size);
-  latex->SetNDC();
-  latex->DrawLatex(x, y, text);  
+void put_latex_text(TString text, float x, float y, int style, float size, bool rightAlign=false){
+    TLatex* latex = new TLatex(); 
+    latex->SetTextFont(style);
+    latex->SetTextSize(size);
+    latex->SetNDC();
+    if(rightAlign) latex->SetTextAlign(31);  // Right-aligned (x,y)
+    else          latex->SetTextAlign(11);  // Left-aligned (x,y)
+    latex->DrawLatex(x, y, text);  
 }
 
 void draw_veto_region(TPad *pad, double xmin, double xmax){
@@ -141,6 +143,12 @@ void draw_veto_region(TPad *pad, double xmin, double xmax){
   veto->SetFillColor(kRed);
   veto->SetFillStyle(3001);
   veto->Draw();
+}
+
+void showMoreLabels(TH1D* hist) {
+  hist->GetXaxis()->SetNoExponent();
+  hist->GetXaxis()->SetMoreLogLabels();
+  hist->GetXaxis()->SetNdivisions(3030);
 }
 
 #endif // DECORATIONS_H

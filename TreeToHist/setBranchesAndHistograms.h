@@ -15,7 +15,7 @@ extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 extern Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
 extern Float_t LTplusMET, HTplusMET, HTfatplusMET;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7;
+extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7, nnscore8;
 extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
 extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
 extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
@@ -88,14 +88,14 @@ void setBranches(TTree *tree)
   tree->SetBranchAddress("wt_bjet_down",     &wt_bjet_down);
   tree->SetBranchAddress("weight_down",      &weight_down);
   //nnscores
-  /*
   tree->SetBranchAddress("nnscore_Run2_vlld_qcd",   &nnscore1);
   tree->SetBranchAddress("nnscore_Run2_vlld_ttbar", &nnscore2);
   tree->SetBranchAddress("nnscore_Run2_vlld_wjets", &nnscore3);
-  tree->SetBranchAddress("nnscore_Run3_vlld_qcd",   &nnscore4);
-  tree->SetBranchAddress("nnscore_Run3_vlld_ttbar", &nnscore5);
-  tree->SetBranchAddress("nnscore_Run3_vlld_wjets", &nnscore6);*/
-
+  tree->SetBranchAddress("nnscore_Run2_vlld_dy",    &nnscore4);
+  tree->SetBranchAddress("nnscore_Run3_vlld_qcd",   &nnscore5);
+  tree->SetBranchAddress("nnscore_Run3_vlld_ttbar", &nnscore6);
+  tree->SetBranchAddress("nnscore_Run3_vlld_wjets", &nnscore7);
+  tree->SetBranchAddress("nnscore_Run3_vlld_dy",    &nnscore8);
 }
 
 void SetLastBinAsOverflow(TH1D *hst){
