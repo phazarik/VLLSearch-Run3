@@ -120,11 +120,11 @@ list_failed  = []
 
 for f in list_of_files:
 
-    #if "DY" not in f: continue 
+    #if "FHIPM" not in f: continue 
 
     #Step1: Prepare the dataframe
     filepath = os.path.join(indir, jobname, f)
-    print(f'\nLoading file: {os.path.abspath(filepath)}')
+    print(f'\nLoading file: {os.path.abspath(filepath)}')    
     sample = filepath.split("_")[1]
     subsample = "_".join(filepath.split("_")[2:])
     outfile = os.path.join(outdir, f)

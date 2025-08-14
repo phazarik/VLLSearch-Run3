@@ -66,7 +66,7 @@ def write_lumidata_into_json(df, campaign):
         sample = row['sample']
         subsample = row['subsample']
         lumi = row['lumi']
-        if sample in ["Muon", "EGamma"] and campaign in data_lumi: lumi = data_lumi[campaign]
+        if (sample.startswith("Muon") or sample.startswith("EGamma")) and campaign in data_lumi: lumi = data_lumi[campaign]
         if sample not in lumi_dict: lumi_dict[sample] = {}
         lumi_dict[sample][subsample] = lumi
 
