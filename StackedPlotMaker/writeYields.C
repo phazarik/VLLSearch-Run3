@@ -3,112 +3,88 @@
 #include "utilities/functions.h"
 #include "utilities/read_hists.h"
 
+#include <sstream>
+string fmt_val_err(double val, double err, int prec=3) {
+    ostringstream ss;
+    ss << fixed << setprecision(prec) << val << " ± " << fixed << setprecision(prec) << err;
+    return ss.str();
+}
+string fmt_val(double val, int prec=3) {
+    ostringstream ss;
+    ss << fixed << setprecision(prec) << val;
+    return ss.str();
+}
+
+void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
+			    TString _campaign, TString _channel, TString _tag, TString _displaytext,
+			    bool _data, bool _save);
+
 //Global parameters:
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void writeYields(
 		 TString _var = "dilep_pt",
-		 TString _name = "p_{T}^{LL} (GeV)",
-		 TString _jobname = "2025-07-08_sr/hist_Run3Summer22EE_sr_mm/",
-		 TString _campaign = "Run3Summer22EE",
-		 TString _channel = "mm",
-		 TString _tag = "sr",
-		 TString _displaytext = "Signal region"
-		 )
-{
-  TString date_stamp  = todays_date();
-  bool toOverlayData=false; //Careful!
+		 TString _name = "dilep_pt",
+		 TString _jobname = "2025-08-17_dycr",
+		 TString _tag = "dycr",
+		 TString _displaytext = "DY CR",
+		 bool _data = false, //careful!
+		 bool _save = true
+		 ){
+  
+  cout << "Processing the following jobs:" << endl;
+  vector<TString> campaigns = {
+    "2016preVFP_UL", "2016postVFP_UL", "2017_UL",      "2018_UL",
+    "Run3Summer22",  "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"
+  };
+  vector<TString> channels = {"mm", "me", "em", "ee"};
+  vector<tuple<TString, TString, TString>> metadata;
+  for (auto &campaign : campaigns) {
+    for (auto &channel : channels) {
+      TString path = _jobname + "/hist_" + _tag + "_" + campaign + "_" + channel;
+      if (!gSystem->AccessPathName("../ROOT_FILES/hists/"+path)) {
+	metadata.push_back(make_tuple(path, campaign, channel));
+	cout << " - " << path << endl;
+      }
+      else cout << " Not found: " << path << endl;
+    }
+  }
+ 
+  for(auto &entry : metadata){
+    TString jobname  = get<0>(entry);
+    TString campaign = get<1>(entry);
+    TString channel  = get<2>(entry);
+    //if(channel != "ee") continue; //For DY control region
+    //if(campaign == "Run3Summer22EE" && channel == "mm")
+    writeYieldsOneCampaign(_var, _name, jobname, campaign, channel, _tag, _displaytext, _data, _save);
+    
+  }
+  
+}
 
-  TString dump_folder = "signalyields/"+date_stamp+"/yields_"+_campaign+"_"+_channel;
+void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
+			    TString _campaign, TString _channel, TString _tag, TString _displaytext,
+			    bool _data, bool _save){
+  TString date_stamp  = todays_date();
+  bool toOverlayData=_data;
+  bool toSave=_save;
+
+  TString dump_folder ="yields/"+date_stamp+"_"+_tag;
   TString input_path = "../ROOT_FILES/hists/"+_jobname;
   
-  //--------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------------------
   vector<TH1D *> hist_collection = return_hist_collection(_var, input_path, _campaign);
   combine_hists(hist_collection, {"WWW", "WWZ", "WZZ", "ZZZ"},   "VVV", kGreen+3);
   combine_hists(hist_collection, {"WW", "WZ", "ZZ"},             "VV", kGreen+1);
   combine_hists(hist_collection, {"QCD (#mu)", "QCD (e#gamma)"}, "QCD", kYellow);
   combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
-  //combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V"},      "t#bar{t}+x", kAzure+1);
   combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
   combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
   cout<<"Histogram collection read."<<endl;
 
-  //______________________________________________________________
-  
-  //                           DATA
-  //______________________________________________________________
-  
-  vector<TH1D*> data_collection; data_collection.clear();
-  if(_campaign == "2016preVFP_UL"){
-    vector<string> eras = {"B", "C", "D", "E", "F"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
-  }
-  if(_campaign == "2016postVFP_UL"){
-    vector<string> eras = {"F", "G", "H"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
-  }
-  if(_campaign == "2017_UL"){
-    vector<string> eras = {"B", "C", "D", "E", "F"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
-  }
-  if(_campaign == "2018_UL"){
-    vector<string> eras = {"A", "B", "C", "D"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
-  }
-  if(_campaign == "Run3Summer22"){
-    vector<string> eras = {"C", "D"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
-  }
-  if(_campaign == "Run3Summer22EE"){
-    vector<string> eras = {"E", "F", "G"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
-  }
-  if(_campaign == "Run3Summer23"){
-    vector<string> eras = {"C1", "C2", "C3", "C4"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
-  }
-  if(_campaign == "Run3Summer23BPix"){
-    vector<string> eras = {"D1", "D2"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
-  }
-  
-  TH1D* hst_data  = nullptr;
-  TH1D* hst_smuon = nullptr;
-  TH1D* hst_egamma = nullptr;
-  for (auto* h : data_collection) {
-    if (!h) continue;
-    SetLastBinAsOverflow(h);
-    SetHistoStyle(h, kBlack);
-    TString name = h->GetName();
-    if (name.Contains("EGamma")) {
-      if (!hst_egamma) hst_egamma = (TH1D*)h->Clone("EGamma");
-      else hst_egamma->Add(h);
-    }
-    else if (name.Contains("Muon")) {
-      if (!hst_smuon) hst_smuon = (TH1D*)h->Clone("Muon");
-      else hst_smuon->Add(h);
-    }
-    if (!hst_data) hst_data = (TH1D*)h->Clone("Data");
-    else hst_data->Add(h);
-  }
-  cout << "Data ready!" << endl;
-
-  //______________________________________________________________
-
-  //        BACKGROUNDS: Sorting, addding and stacking
-  //______________________________________________________________
+  //----------------------------------------------------------
+  //    Preparing backgrounds: Sorting, addding and stacking
+  //----------------------------------------------------------
   //Extract backgrounds from the collection:
   vector<TH1D*> bkg; bkg.clear();
   for (auto* h : hist_collection) {
@@ -129,105 +105,159 @@ void writeYields(
   hst_bkg->SetName("bkg");
   cout<<"Backgrounds ready!"<<endl;
 
+  //-------------------------------
+  //       Preparing data
+  //-------------------------------
+
+  TH1D* hst_data  = nullptr;
+  TH1D* hst_smuon = nullptr;
+  TH1D* hst_egamma = nullptr;
+  vector<TH1D*> data_collection; data_collection.clear();
+
+  if(_data){
+    if(_campaign == "2016preVFP_UL"){
+      vector<string> eras = {"B2", "C", "D", "E", "FHIPM"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+    }
+    if(_campaign == "2016postVFP_UL"){
+      vector<string> eras = {"F", "G", "H"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+    }
+    if(_campaign == "2017_UL"){
+      vector<string> eras = {"B", "C", "D", "E", "F"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+    }
+    if(_campaign == "2018_UL"){
+      vector<string> eras = {"A", "B", "C", "D"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+    }
+    if(_campaign == "Run3Summer22"){
+      vector<string> eras = {"C", "D"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+    }
+    if(_campaign == "Run3Summer22EE"){
+      vector<string> eras = {"E", "F", "G"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
+    }
+    if(_campaign == "Run3Summer23"){
+      vector<string> eras = {"C1", "C2", "C3", "C4"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
+    }
+    if(_campaign == "Run3Summer23BPix"){
+      vector<string> eras = {"D1", "D2"};
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
+      for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
+    }
+    for (auto* h : data_collection) {
+      if (!h) continue;
+      SetLastBinAsOverflow(h);
+      SetHistoStyle(h, kBlack);
+      TString name = h->GetName();
+      if (name.Contains("EGamma")) {
+	if (!hst_egamma) hst_egamma = (TH1D*)h->Clone("EGamma");
+	else hst_egamma->Add(h);
+      }
+      else if (name.Contains("Muon")) {
+	if (!hst_smuon) hst_smuon = (TH1D*)h->Clone("Muon");
+	else hst_smuon->Add(h);
+      }
+      if (!hst_data) hst_data = (TH1D*)h->Clone("Data");
+      else hst_data->Add(h);
+    }
+  }
+  else hst_data = hst_bkg; //For expected limits.
+  cout << "Data ready!" << endl;
+
+  //--------------------
+  // Preparing signal
+  //--------------------
+  
+  vector<pair<TString, TString>> vlld = {
+    {"VLLD-mu", "100"},
+    {"VLLD-mu", "200"},
+    {"VLLD-mu", "300"},
+    {"VLLD-mu", "400"},
+    {"VLLD-mu", "600"},
+    {"VLLD-mu", "800"},
+    {"VLLD-mu", "1000"},
+    {"VLLD-ele", "100"},
+    {"VLLD-ele", "200"},
+    {"VLLD-ele", "300"},
+    {"VLLD-ele", "400"},
+    {"VLLD-ele", "600"},
+    {"VLLD-ele", "800"},
+    {"VLLD-ele", "1000"}
+  };
+  vector<TH1D*> sig_hists;
+  for (auto& entry : vlld) {
+    TH1D* h = get_hist(_var, input_path, entry.first, entry.second);
+    if(!h) continue;
+    h->SetName(entry.first+"_"+entry.second);
+    if (h) sig_hists.push_back(h);
+  }
+  cout << "Signal ready!" << endl;
+  
   createFolder(dump_folder);
   cout<<"\nFolder created: "+dump_folder<<endl;
 
-  //______________________________________________________________
-  
-  //                    Iterating over signal
-  //______________________________________________________________
-  
-  vector<pair<TString, TString>> vlld = {
-    {"VLLD_mu", "M100"},
-    {"VLLD_mu", "M200"},
-    {"VLLD_mu", "M300"},
-    {"VLLD_mu", "M400"},
-    {"VLLD_mu", "M600"},
-    {"VLLD_mu", "M800"},
-    {"VLLD_ele", "M100"},
-    {"VLLD_ele", "M200"},
-    {"VLLD_ele", "M300"},
-    {"VLLD_ele", "M400"},
-    {"VLLD_ele", "M600"},
-    {"VLLD_ele", "M800"},
-    {"VLLD_ele", "M1000"}
-  };
+  //-------------------------
+  //  Writing yields as TSV
+  //-------------------------
+  TString csvfile = dump_folder + "/yields_"+_tag+"_"+_campaign+"_"+_channel+".csv";
+  ofstream out(csvfile.Data());
 
-  int count = 0;
-  for (const auto& entry : vlld){
-    TString sample = entry.first;
-    TString subsample = entry.second;
-    TString filename = dump_folder+"/yield_"+sample+"_"+subsample+".txt";
+  // header
+  out << "nbin,nData,TotalBkg";
+  for (auto it = bkg.rbegin(); it != bkg.rend(); ++it) out << "," << (*it)->GetName();
+  for (size_t i=0; i<sig_hists.size(); i++) out << "," << sig_hists[i]->GetName();
+  out << "\n";
 
-    TH1D* hist = get_hist(_var, input_path, sample, subsample);
-    if (!hist) {cerr<<"Failed to retrieve histogram for "<<sample<< ", " <<subsample<<endl; continue;}
-
-    count = count+1;
-    int nbins = hist->GetNbinsX();
-    cout <<"Yields for "<<sample<<" "<<subsample<<" : \033[93m"<<filename<<"\033[0m"<<endl;
-
-    //Test output:
-    if(count == 1){
-      cout <<"\n"<< string(80, '-') << endl;
-      cout << setw(8) << "Bin" 
-	   << setw(12) << "Nsig" 
-	   << setw(12) << "Ndata" 
-	   << setw(12) << "Nbkg" 
-	   << setw(12) << "NbkgErr" 
-	   << setw(12) << "S/B"
-	   << setw(12) << "dbkg"
-	   << endl;
-      cout << string(80, '-') << endl;
+  // bins
+  int nbins = hst_bkg->GetNbinsX();
+  for (int bin=1; bin<=nbins; ++bin) {
+    out << bin;
+    out << "," << (int)hst_data->GetBinContent(bin);
+    out << "," << fmt_val_err(hst_bkg->GetBinContent(bin), hst_bkg->GetBinError(bin), 3);
+    for (auto it = bkg.rbegin(); it != bkg.rend(); ++it) {
+      TH1* h = *it;
+      out << "," << fmt_val_err(h->GetBinContent(bin), h->GetBinError(bin), 3);
     }
+    for (auto* s : sig_hists) {
+      out << "," << fmt_val(s->GetBinContent(bin), 3);
+    }
+    out << "\n";
+  }
 
-    //Create a text file for each sample
-    ofstream outfile(filename.Data());
-    if (!outfile.is_open()) {cerr << "Failed to open file: " << filename << endl; continue;}
+  // totals
+  out << "Total";
+  out << "," << fmt_val(hst_data->Integral(1, hst_data->GetNbinsX()), 3);
+  {
+    double err = 0;
+    double val = hst_bkg->IntegralAndError(1, hst_bkg->GetNbinsX(), err);
+    out << "," << fmt_val_err(val, err, 3);
+  }
+  for (auto it = bkg.rbegin(); it != bkg.rend(); ++it) {
+    double err = 0;
+    double val = (*it)->IntegralAndError(1, (*it)->GetNbinsX(), err);
+    out << "," << fmt_val_err(val, err, 3);
+  }
+  for (auto* s : sig_hists) {
+    double val = s->Integral(1, s->GetNbinsX());
+    out << "," << fmt_val(val, 3);
+  }
+  out << "\n";
 
-    //Iterating over bins:
-    for (int bin = 1; bin <= nbins; ++bin) {
-      float nsig = hist->GetBinContent(bin);
-      float nsigerr = hist->GetBinError(bin);
-      float nbkg = hst_bkg->GetBinContent(bin);
-      float nbkgerr = hst_bkg->GetBinError(bin);
-      int ndata = 0;
-      if(toOverlayData) ndata = (int)hst_data->GetBinContent(bin); //Careful!
-      else              ndata = (int)hst_bkg->GetBinContent(bin);
-      float sbyb = 0;
-      float relative_bkgerr = 0;
-      float dbkg = 0;
-      if(nbkg!=0){
-	sbyb = nsig / sqrt(nbkg);
-	relative_bkgerr = nbkgerr/nbkg;
-	dbkg = 1+relative_bkgerr;
-      }
-      //Test output:
-      if(count == 1){
-	cout << setw(8) << bin
-	     << setw(12) << nsig
-	     << setw(12) << ndata
-	     << setw(12) << nbkg
-	     << setw(12) << nbkgerr
-	     << setw(12) << sbyb
-	     << setw(12) << dbkg
-	     << endl;
-      }
-      // Write to file:
-      outfile << setw(8) << bin
-	      << setw(12) << nsig
-	      << setw(12) << ndata
-	      << setw(12) << nbkg
-	      << setw(12) << nbkgerr
-	      << setw(12) << sbyb
-	      << setw(12) << dbkg
-	      << endl;
-    }//bin loop
-
-    if(count == 1) cout<<""<<endl;
-    outfile.close();
-    //break; //sample
-    
-  }//signal loop
-
-  cout<<"\nDone! Files saved to: "<<dump_folder<<endl;
+  cout<<"\nDone! File created: \033[1;33m"<<csvfile<<"\033[0m"<<endl;
+ 
 }

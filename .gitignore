@@ -5,6 +5,7 @@
 *.root
 *.d
 *backup.h
+*backup
 *dict*
 *pyc
 *linkdef.h
