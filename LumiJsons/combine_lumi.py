@@ -2,9 +2,9 @@ import json
 import os
 
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
-#campaigns = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+campaigns.extend(["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"])
 indir = "."
-outfile = "lumidata_Run2.json"
+outfile = "lumidata_FullDataset.json"
 
 combined = {}
 

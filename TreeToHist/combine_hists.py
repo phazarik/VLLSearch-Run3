@@ -5,8 +5,8 @@ from tqdm import tqdm
 
 #---------------- CONFIG ------------------#
 basedir = "../ROOT_FILES/hists/"
-jobname = "2025-09-01_val"
-tag = "val"
+jobname = "2025-08-14_baseline"
+tag = "baseline"
 campaigns_all = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"
@@ -14,47 +14,55 @@ campaigns_all = [
 channels = ["ee", "em", "me", "mm"]
 #------------------------------------------#
 
-
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--option", type=str, default="channels", choices=["channels", "run2", "run3"])
+    parser.add_argument("--by", type=str, default="channels",
+                        choices=["channels", "campaigns", "run2", "run3", "all"])
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--dryrun", action="store_true")
     return parser.parse_args()
 
-
-def define_outdirs(option):
+def define_outdirs(by):
     outdirs = {}
-    if option == "channels":
+    if by == "channels":
         for camp in campaigns_all:
             dump = f"hist_{tag}_{camp}_combined"
             outdirs[camp] = os.path.join(basedir, jobname, dump)
 
-    elif option == "run2":
+    elif by == "run2":
         dump = f"hist_{tag}_Run2_combined"
         outdirs["Run2"] = os.path.join(basedir, jobname, dump)
 
-    elif option == "run3":
+    elif by == "run3":
         dump = f"hist_{tag}_Run3_combined"
         outdirs["Run3"] = os.path.join(basedir, jobname, dump)
 
+    elif by == "campaigns":
+        for ch in channels:
+            dump = f"hist_{tag}_FullDataset_{ch}"
+            outdirs[ch] = os.path.join(basedir, jobname, dump)
+
+    elif by == "all":
+        dump = f"hist_{tag}_FullDataset_combined"
+        outdirs["all"] = os.path.join(basedir, jobname, dump)
+
     return outdirs
 
-
-def collect_folders(option, outdirs):
+def collect_folders(by, outdirs):
     folders_by_key = {k: [] for k in outdirs}
 
-    if option == "channels": camps = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
-                                      "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
-    elif option == "run2":   camps = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
-    elif option == "run3":   camps = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+    camps = campaigns_all
+    if by == "run2":      camps = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
+    elif by == "run3":    camps = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 
     for camp in camps:
         for ch in channels:
             folder = f"hist_{tag}_{camp}_{ch}"
             fullpath = os.path.join(basedir, jobname, folder)
             if os.path.isdir(fullpath):
-                key = camp if option == "channels" else list(outdirs.keys())[0]
+                if by == "channels":    key = camp
+                elif by == "campaigns": key = ch
+                else: key = list(outdirs.keys())[0]  ## In cases where there is only one outdir
                 folders_by_key[key].append(fullpath)
 
     return folders_by_key
@@ -114,12 +122,12 @@ def combine_files(key, folders, outdir, all_files, dryrun=False, test=False):
 def main():
     args = parse_args()
 
-    outdirs = define_outdirs(args.option)
+    outdirs = define_outdirs(args.by)
     if not args.dryrun:
         for od in outdirs.values():
             os.makedirs(od, exist_ok=True)
 
-    folders_by_key = collect_folders(args.option, outdirs)
+    folders_by_key = collect_folders(args.by, outdirs)
 
     jobcount = 0
     global_start_time = time.time()

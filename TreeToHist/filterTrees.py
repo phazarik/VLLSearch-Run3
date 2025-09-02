@@ -19,15 +19,14 @@ dryrun = args.dryrun
 
 if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
-#default = True
 
 #----------------------------------- config ----------------------------------------
 basedir   = '../ROOT_FILES/treesWithNN/'
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 basename  = "baseline/tree_baseline"
-dumpdir   = "val2"
-tag       = "val2"
+dumpdir   = "val_cleaned2"
+tag       = "val"
 #-----------------------------------------------------------------------------------
 
 jobdict = {}
@@ -74,7 +73,6 @@ for injob, info in jobdict.items():
 
     outjob = info["outjob"]
     campaign = info["campaign"]
-    #if '2018' not in outjob: continue
 
     jobcount += 1
     
@@ -120,7 +118,7 @@ for injob, info in jobdict.items():
         ####################################
 
         ## cleaning
-        clean = f'dilep_deta < 2.5 and lep0_pt > 15'
+        clean = f'dilep_deta < 2.5 and dilep_dR > 1'
 
         ## Step1: Controlling Drell-Yan:
         dy_cr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
