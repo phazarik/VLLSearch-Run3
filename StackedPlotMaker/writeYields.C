@@ -25,19 +25,20 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "LTplusMET",
 		 TString _name = "LT+MET",
-		 TString _jobname = "2025-09-02_val_cleaned",
-		 TString _tag = "val",
-		 TString _displaytext = "val",
-		 bool _data = true, //careful!
+		 TString _jobname = "2025-08-14_baseline",
+		 TString _tag = "baseline",
+		 TString _displaytext = "baseline",
+		 bool _data = false, //careful!
 		 bool _save = true
 		 ){
   
   cout << "Processing the following jobs:" << endl;
   vector<TString> campaigns = {
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL",      "2018_UL",
-    "Run3Summer22",  "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"
+    "Run3Summer22",  "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix",
+    "Run2", "Run3", "FullDataset"
   };
-  vector<TString> channels = {"mm", "me", "em", "ee"};
+  vector<TString> channels = {"mm", "me", "em", "ee", "combined"};
   vector<tuple<TString, TString, TString>> metadata;
   for (auto &campaign : campaigns) {
     for (auto &channel : channels) {
@@ -54,8 +55,10 @@ void writeYields(
     TString jobname  = get<0>(entry);
     TString campaign = get<1>(entry);
     TString channel  = get<2>(entry);
-    //if(channel != "ee") continue; //For DY control region
-    //if(campaign == "Run3Summer22EE" && channel == "mm")
+
+    //Exceptions:
+    //if((campaign == "Run2" || campaign == "Run3") && channel != "combined") continue;
+    
     writeYieldsOneCampaign(_var, _name, jobname, campaign, channel, _tag, _displaytext, _data, _save);
     
   }
@@ -158,6 +161,27 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
       for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
       for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
       for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
+    }
+    if (_campaign == "Run2" || _campaign == "FullDataset") {
+      vector<string> eras = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
+      for (auto& era : eras) {
+	data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+	data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
+      }
+    }
+    if (_campaign == "Run3" || _campaign == "FullDataset") {
+      vector<string> eras_2022 = {"C","D","E","F","G"};
+      vector<string> eras_2023 = {"C1","C2","C3","C4","D1","D2"};
+      for (auto& era : eras_2022) {
+	data_collection.push_back(get_hist(_var, input_path, "EGamma",  era));
+	data_collection.push_back(get_hist(_var, input_path, "Muon",    era));
+      }
+      for (auto& era : eras_2023){
+	data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+	data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+	data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));
+	data_collection.push_back(get_hist(_var, input_path, "Muon1",   era));
+      }
     }
     for (auto* h : data_collection) {
       if (!h) continue;

@@ -4,10 +4,10 @@ from datetime import timedelta
 import subprocess, json, os, re
 
 # ================================ GLOBAL PARAMETERS =========================================
-jobdir = "2025-09-02_val_cleaned" ## hist folder
-tag = "val" ## event tag
+jobdir = "2025-08-14_baseline" ## hist folder
+tag = "baseline" ## event tag
 var = "HT" ## bins
-lookatdata = True
+lookatdata = False
 
 debug = False
 test_camp = "Run3Summer22"
@@ -17,6 +17,7 @@ test_chan = "mm"
 ## internal parameters
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels = ["mm", "me", "em", "ee", "combined"] ## order is important for index
 channel_idx = {c: str(i) for i, c in enumerate(channels)}
 
@@ -58,6 +59,13 @@ os.makedirs(outdir, exist_ok=True)
 scale_json, obs_exp_json, ssqrtb_json, global_sf_json = {}, {}, {}, {}
 obs_exp_table, ssqrtb_table, global_sf_table = [], [], []
 
+## Exception handling:
+def is_valid(camp, ch):
+    if camp in ["Run2", "Run3"] and ch != "combined": return False
+    return True
+
+valid_pairs = [(camp, ch) for camp in campaigns for ch in channels if is_valid(camp, ch)]
+total_runs  = len(valid_pairs)
 count = 0
 start_time = time.time()
 
@@ -74,12 +82,15 @@ for camp in campaigns:
         if debug:
             if camp != test_camp: continue
             if ch   != test_chan: continue
+
+        ## Exception:
+        if not is_valid(camp, ch): continue
         
         count += 1
         jobname = os.path.join(jobdir, f"hist_{tag}_{camp}_{ch}")
         cmd = ["root", "-l", "-b", "-q",
                f'{macro}("{var}","name","{jobname}","{camp}","{ch}","{tag}","text", {str(lookatdata).lower()}, false)']
-        print(f'{count}/{len(channels)*len(campaigns)} Running ==> {" ".join(cmd)}...', flush=True)
+        print(f'({count}/{total_runs}) Running ==> {" ".join(cmd)}...', flush=True)
 
         ## Run ROOT command
         run = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

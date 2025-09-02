@@ -12,12 +12,12 @@ void makeStackedPlot(
 		     //TString _var = "lep0_iso",
 		     //TString _var = "dilep_pt",
 		     TString _name = "test",
-		     TString _jobname = "2025-09-02_val_cleaned/hist_val_Run3_combined",
-		     TString _campaign = "Run3",
+		     TString _jobname = "2025-08-14_baseline/hist_baseline_FullDataset_combined",
+		     TString _campaign = "FullDataset",
 		     TString _channel = "combined",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
-		     bool _data = true,
+		     bool _data = false,
 		     bool _save = false
 		     )
 {
@@ -33,8 +33,10 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
-  Double_t ymin = 0.1; Double_t ymax_base = 10E5; Double_t ymax = ymax_base;
-  if(_channel=="combined") ymax = ymax_base*10; if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
+  Double_t ymin = 0.1; Double_t ymax_base = 10E8; Double_t ymax = ymax_base;
+  if(_channel=="combined")                   ymax = ymax_base*10;
+  if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
+  if(_campaign=="FullDataset")               ymax = ymax_base*1000; 
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
@@ -126,18 +128,21 @@ void makeStackedPlot(
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
-  if (_campaign == "Run2") {
+  if (_campaign == "Run2" || _campaign == "FullDataset") {
     vector<string> eras = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
     for (auto& era : eras) {
       data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
       data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
     }
   }
-  if (_campaign == "Run3") {
-    vector<string> eras = {"C","D","E","F","G","C1","C2","D1","D2"};
-    for (auto& era : eras) {
+  if (_campaign == "Run3" || _campaign == "FullDataset") {
+    vector<string> eras_2022 = {"C","D","E","F","G"};
+    vector<string> eras_2023 = {"C1","C2","C3","C4","D1","D2"};
+    for (auto& era : eras_2022) {
       data_collection.push_back(get_hist(_var, input_path, "EGamma",  era));
       data_collection.push_back(get_hist(_var, input_path, "Muon",    era));
+    }
+    for (auto& era : eras_2023){
       data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
       data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
       data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));
@@ -145,8 +150,8 @@ void makeStackedPlot(
     }
   }
   
-  TH1D* hst_data  = nullptr;
-  TH1D* hst_smuon = nullptr;
+  TH1D* hst_data   = nullptr;
+  TH1D* hst_smuon  = nullptr;
   TH1D* hst_egamma = nullptr;
   for (auto* h : data_collection) {
     if (!h) continue;
@@ -408,6 +413,7 @@ void makeStackedPlot(
   if(_campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)",  xright, yup, 42, 0.05, true);
   if(_campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", xright, yup, 42, 0.05, true);
   if(_campaign == "Run3")             put_latex_text("61.9 fb^{-1} (2022+2023)",     xright, yup, 42, 0.05, true);
+  if(_campaign == "FullDataset")      put_latex_text("199.1 fb^{-1} (Run-2+2022+2023)", xright, yup, 42, 0.05, true);
   put_latex_text(info1, 0.17, 0.78, 42, 0.04);     //Additional information
   put_latex_text(info2, 0.17, 0.73, 42, 0.04);     //Additional information
 

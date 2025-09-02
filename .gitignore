@@ -20,6 +20,7 @@
 **/*backup*/**
 StackedPlotMaker/signalyields/
 StackedPlotMaker/yields/
+StackedPlotMaker/auto_generated_jsons/
 LimitCalculation/datacards/*/*/*.txt
 LimitCalculation/fromCMScombine/*/*.txt
 LimitCalculation/sigmaBlimits/*/*txt
