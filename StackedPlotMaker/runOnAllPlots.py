@@ -18,13 +18,31 @@ dryrun = args.dryrun
 
 if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
-default = True
+#default = True
 
-tag      = "baseline"
-text     = "baseline"
+#----------------------------------- config ----------------------------------------
+campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
+             "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix",
+             "Run2", "Run3"]
+channels  = ["mm", "me", "em", "ee", "combined"]
+basename  = "2025-09-02_val_cleaned"
+tag       = "val"
+text      = "validation region"
+tousedata = True
+tosave    = True
 jobdict = {}
-#with open('jobdicts/jobdict_run3.json') as f: jobdict = json.load(f)
-with open('jobdicts/jobdict_run2.json') as f: jobdict.update(json.load(f))
+#------------------------------------------------------------------------------------
+
+jobdict = {}
+for camp in campaigns:
+    if "Run3" in camp: continue
+    for ch in channels:
+        if not (ch == "combined" or ch == "ee"): continue
+        key = f"{basename}/hist_{tag}_{camp}_{ch}"
+        jobdict[key] = {"campaign": camp, "channel": ch}
+
+print("Processing the following jobs:")
+for job, val in jobdict.items(): print(f' - {job}')
 
 variables = [
     ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
@@ -126,7 +144,9 @@ for jobname, info in jobdict.items():
             f'"{campaign}", '
             f'"{channel}", '
             f'"{tag}", '
-            f'"{text}"'
+            f'"{text}", '
+            f'{str(tousedata).lower()}, '
+            f'{str(tosave).lower()}'
         )
         ## For plotmaker:
         command = f"root -q -b -l 'makeStackedPlot.C({arguments})'"

@@ -3,10 +3,12 @@ import ctypes
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import os, ROOT
+channelnames = {"mm": r"$\mu\mu$", "me": r"$\mu e$", "em": r"$e\mu$", "ee": r"$ee$"}
 
 def main():
-    region = "DY control region"
-    jobname = "2025-08-18_dycr"
+    region = "validation"
+    jobname = "2025-09-02_val"
+    tag = "val"
     campaigndict = {
         "2016preVFP_UL":"2016-preVFP",
         "2016postVFP_UL":"2016-postVFP",
@@ -20,7 +22,7 @@ def main():
     channels = ["mm", "me", "em", "ee"]
     for campaign, name in campaigndict.items():
         for ch in channels:
-            csvfile = f"yields/{jobname}/yields_dycr_{campaign}_{ch}.csv"
+            csvfile = f"yields/{jobname}/yields_{tag}_{campaign}_{ch}.csv"
             if not os.path.exists(csvfile):
                 print(f"\033[31mWarning: Missing file {csvfile}\033[0m")
                 continue
@@ -29,8 +31,7 @@ def main():
 
 def get_rgb(ci):
     color = ROOT.gROOT.GetColor(ci)
-    if not color:
-        return (0.5, 0.5, 0.5)
+    if not color: return (0.5, 0.5, 0.5)
     r, g, b = ctypes.c_float(), ctypes.c_float(), ctypes.c_float()
     color.GetRGB(r, g, b)
     return (r.value, g.value, b.value)
@@ -134,11 +135,11 @@ def plot_background_pie(csv_file, campaign, channel):
         at.set_color("black")
 
     # Lower the title slightly using y parameter
-    plt.title(f"{campaign} ({channel} channel)", fontsize=14, fontweight="semibold", y=1.03)
+    plt.title(f"{campaign} ({channelnames[channel]} channel)", fontsize=14, y=1.03)
     plt.tight_layout()
 
     figname = f"{outdir}/{campaign}_{channel}.png"
-    plt.savefig(figname, bbox_inches="tight", dpi=150)
+    plt.savefig(figname, bbox_inches="tight", dpi=150, transparent=True)
     plt.close()
     print(f"\033[0;33mFile created: {figname}\033[0m")
 

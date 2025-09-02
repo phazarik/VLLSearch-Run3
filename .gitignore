@@ -19,6 +19,7 @@
 *gz
 **/*backup*/**
 StackedPlotMaker/signalyields/
+StackedPlotMaker/yields/
 LimitCalculation/datacards/*/*/*.txt
 LimitCalculation/fromCMScombine/*/*.txt
 LimitCalculation/sigmaBlimits/*/*txt

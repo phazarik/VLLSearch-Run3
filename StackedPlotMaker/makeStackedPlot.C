@@ -7,18 +7,18 @@
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     //TString _var = "HT",
-		     TString _var = "nnscore_Run2_vlld_qcd",
+		     TString _var = "HT",
+		     //TString _var = "nnscore_Run2_vlld_qcd",
 		     //TString _var = "lep0_iso",
 		     //TString _var = "dilep_pt",
 		     TString _name = "test",
-		     TString _jobname = "2025-08-14_baseline/hist_baseline_2018_UL_mm",
-		     TString _campaign = "2018_UL",
-		     TString _channel = "mm",
+		     TString _jobname = "2025-09-02_val_cleaned/hist_val_Run3_combined",
+		     TString _campaign = "Run3",
+		     TString _channel = "combined",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
-		     bool _data = false,
-		     bool _save = true
+		     bool _data = true,
+		     bool _save = false
 		     )
 {
   TString date_stamp  = todays_date();
@@ -33,15 +33,17 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
-  Double_t ymin = 0.1; Double_t ymax = 10E8;
+  Double_t ymin = 0.1; Double_t ymax_base = 10E5; Double_t ymax = ymax_base;
+  if(_channel=="combined") ymax = ymax_base*10; if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
+  if(_channel == "combined") info2 = "combined";
   
   //--------------------------------------------------------------------------
   TString dump_folder = "plots/"+date_stamp+"/"+output_tag+"_"+_campaign+"_"+_channel;  
   TString filename = dump_folder+"/"+_var;
-  TString input_path = "../ROOT_FILES/hists/"+_jobname;;
+  TString input_path = "../ROOT_FILES/hists/"+_jobname;
   vector<TH1D *> hist_collection = return_hist_collection(_var, input_path, _campaign);
   /*
   double total;
@@ -124,17 +126,24 @@ void makeStackedPlot(
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
-  /*
-  if(_campaign == "Run3"){
-    vector<string> era_2022 = {"C", "D", "E", "F", "G"};
-    vector<string> era_2023 = {"C1", "C2", "D1", "D2"};
-    for(auto& era : era_2022) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
-    for(auto& era : era_2022) data_collection.push_back(get_hist(_var, input_path, "Muon", era));   
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
-    }*/
+  if (_campaign == "Run2") {
+    vector<string> eras = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
+    for (auto& era : eras) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
+    }
+  }
+  if (_campaign == "Run3") {
+    vector<string> eras = {"C","D","E","F","G","C1","C2","D1","D2"};
+    for (auto& era : eras) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma",  era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon",    era));
+      data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+      data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon1",   era));
+    }
+  }
   
   TH1D* hst_data  = nullptr;
   TH1D* hst_smuon = nullptr;
@@ -193,37 +202,31 @@ void makeStackedPlot(
 
   TH1D *sig1, *sig2, *sig3;
   if(_channel == "ee"){
-    sig1 = get_hist(_var, input_path, "VLLD-ele", "400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-ele", "200");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD-ele", "600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-ele", "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD-ele", "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
   }
   else if (_channel == "em"){
-    sig1 = get_hist(_var, input_path, "VLLD-ele", "400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-mu",  "400");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-ele", "600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD-ele", "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
   }
   else if (_channel == "me"){
-    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-ele", "400");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
   else if (_channel == "mm"){
-    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-mu",  "200");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
+  else if (_channel=="combined"){
+    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{200}");}
+  }
+  else cout<<"\033[31m[ERROR:] all signal are null!"<<endl;
   //sig2 = nullptr;
   //sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
@@ -237,11 +240,11 @@ void makeStackedPlot(
   if(toOverlayData){
     //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-    //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
     
     //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
     //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
   }
   

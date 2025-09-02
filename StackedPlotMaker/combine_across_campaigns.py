@@ -15,10 +15,10 @@ search_key = args.find
 plotname   = args.plotname
 
 #campaigns = ["2018_UL", "2017_UL", "2016postVFP_UL", "2016preVFP_UL"]
-campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
+#campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
 #campaigns.extend(["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23EE"])
 #campaigns = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23EE"]
-#campaigns = ["Run3Summer22EE"]
+campaigns = ["Run3Summer22EE"]
 channels  = ["mm", "me", "em", "ee"]
 #channels = ["mm"]
 

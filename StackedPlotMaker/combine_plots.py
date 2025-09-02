@@ -22,17 +22,56 @@ set7 = ["dilep_mass", "dilep_pt", "dilep_mt", "dilep_dR",
         "lep0_pt", "lep0_phi", "njet", "nbjet"
         ]
 set8 = ["lep0_pt", "dilep_dR", "dilep_mt", "njet"]
+dnn1 = [
+    'njet',
+    'dilep_dR',
+    'dilep_ptratio',
+    'LTplusMET',
+    'ST',
+    'STfrac',
+    'metpt',
+    'dphi_metdilep',
+    'dphi_metlep_min'
+]
+dnn2 = [
+    'njet',
+    'dilep_mt',
+    'dilep_ptratio',
+    'dilep_dR',
+    'LTplusMET',
+    'STfrac'
+]
+dnn3 = [
+    'nbjet',
+    'dilep_ptratio',
+    'LTplusMET',
+    'ST',
+    'STfrac',
+    'dphi_metlep0',
+]
+dnn4 = [
+    'njet',
+    'lep0_eta',
+    'lep1_eta',
+    'dilep_mt',
+    'LTplusMET',
+    'metpt',
+]
 
 plotdict = {
-    "event_level":set0,
+    "event_level": set0,
     "nnscores": set1,
     "lep0": set2,
     "lep1": set3,
     "dilep": set4,
     "dphis": set5,
     "weights": set6,
-    "mixed":set7,
-    "slides":set8
+    "mixed": set7,
+    "slides": set8,
+    "dnn-qcd": dnn1,
+    "dnn-wjets": dnn2,
+    "dnn-top": dnn3,
+    "dnn-dy": dnn4
 }
 
 for plotname, plotset in plotdict.items():

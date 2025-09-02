@@ -23,12 +23,12 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void writeYields(
-		 TString _var = "dilep_pt",
-		 TString _name = "dilep_pt",
-		 TString _jobname = "2025-08-17_dycr",
-		 TString _tag = "dycr",
-		 TString _displaytext = "DY CR",
-		 bool _data = false, //careful!
+		 TString _var = "LTplusMET",
+		 TString _name = "LT+MET",
+		 TString _jobname = "2025-09-02_val_cleaned",
+		 TString _tag = "val",
+		 TString _displaytext = "val",
+		 bool _data = true, //careful!
 		 bool _save = true
 		 ){
   
