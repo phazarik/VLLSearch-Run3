@@ -36,10 +36,32 @@ campaign_dict = {
 def main():
 
     plotCorrectionsBinned(
-        jsonfile = "corrections/TTBar_HTbinned_corrections.json",
+        jsonfile = "corrections/TTBar_HTbinned_corrections_raw.json",
         name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
-        outfile  = "TTBar_HTbinned_corrections.png",
-        yrange   = [0, 2]
+        moretext = "raw",
+        outfile  = "TTBar_HTbinned_corrections_raw.png",
+        yrange   = [-1, 3]
+    )
+    plotCorrectionsBinned(
+        jsonfile = "corrections/TTBar_HTbinned_corrections_pileupwt.json",
+        name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
+        outfile  = "TTBar_HTbinned_corrections_pileupwt.png",
+        moretext = "pileupwt",
+        yrange   = [-1, 3]
+    )
+    plotCorrectionsBinned(
+        jsonfile = "corrections/TTBar_HTbinned_corrections_bwt.json",
+        name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
+        outfile  = "TTBar_HTbinned_corrections_bwt.png",
+        moretext = "bwt",
+        yrange   = [-1, 3]
+    )
+    plotCorrectionsBinned(
+        jsonfile = "corrections/TTBar_HTbinned_corrections_allwt.json",
+        name     = r"$\mathrm{t\bar{t}{+}X\ SF\ (H_T\text{-}binned)}$",
+        outfile  = "TTBar_HTbinned_corrections_allwt.png",
+        moretext = "pileupwt+bwt applied",
+        yrange   = [-1, 3]
     )
     plotCorrectionsBinned(
         jsonfile = "corrections/DY_Zptbinned_chargemisID_corrections.json",
@@ -87,7 +109,11 @@ def plotGlobalCorrections(jsonfile, name, outfile, yrange=None, moretext=None):
         x_offset_values, y, yerr = [], [], []
         for i in range(len(channels)):
             val = values.get(str(i))
+
+            # handling exceptions
             if val is None: continue
+            if (val[0], val[1]) in [(0,0), (1,1)]: continue
+
             x_offset_values.append(x[i] + x_offset * index)
             y.append(val[0])
             yerr.append(val[1])
@@ -168,10 +194,13 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None, more
                 xerr = (high - low) / 2
                 scale, err = b["scale"]
 
+                # exception handling
+                if (scale, err) in [(0,0), (1,1)]: continue
+
                 x = offset + center
                 xvals.append(x)
                 yvals.append(scale)
-                yerrs.append(err)
+                yerrs.append(abs(err))
                 xerrs.append(xerr)
 
                 xticks.append(offset + low)
@@ -182,9 +211,16 @@ def plotCorrectionsBinned(jsonfile, name, outfile, maxval=500, yrange=None, more
                         fmt=props["style"], color=props["color"], label=label)
             added_label = True
 
-            if xvals:
-                xmid = (min(xvals) + max(xvals)) / 2
-                ax.text(xmid, 1.05, channels[i], ha='center', va='bottom', fontsize=10, transform=ax.get_xaxis_transform())
+            #if xvals:
+            #    xmid = (min(xvals) + max(xvals)) / 2
+            #    ax.text(xmid, 1.05, channels[i], ha='center', va='bottom', fontsize=10, transform=ax.get_xaxis_transform())
+
+    # Draw channel label:
+    for i in range(nch):
+        offset = i * spacing
+        if offset in active_offsets:
+            xmid = offset + maxval/2
+            ax.text(xmid, 1.05, channels[i], ha='center', va='bottom', fontsize=10, transform=ax.get_xaxis_transform())
 
     xticks = sorted(set(xticks))
     xticklabels = [str(int(x % spacing)) if x % spacing != maxval else '∞' for x in xticks]

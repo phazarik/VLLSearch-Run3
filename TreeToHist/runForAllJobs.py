@@ -22,36 +22,36 @@ print()
 channels = ["mm", "me", "em", "ee"]
 
 jobdict = {
-    "baseline/tree_baseline_2016preVFP_UL":{
-        "dump":"hist_baseline_2016preVFP_UL",
+    "val/tree_val_2016preVFP_UL":{
+        "dump":"hist_val_2016preVFP_UL",
         "campaign":"2016preVFP_UL"
     },
-    "baseline/tree_baseline_2016postVFP_UL":{
-        "dump":"hist_baseline_2016postVFP_UL",
+    "val/tree_val_2016postVFP_UL":{
+        "dump":"hist_val_2016postVFP_UL",
         "campaign":"2016postVFP_UL"
     },
-    "baseline/tree_baseline_2017_UL":{
-        "dump":"hist_baseline_2017_UL",
+    "val/tree_val_2017_UL":{
+        "dump":"hist_val_2017_UL",
         "campaign":"2017_UL"
     },
-    "baseline/tree_baseline_2018_UL":{
-        "dump":"hist_baseline_2018_UL",
+    "val/tree_val_2018_UL":{
+        "dump":"hist_val_2018_UL",
         "campaign":"2018_UL"
     },
-    "baseline/tree_baseline_Run3Summer22":{
-        "dump":"hist_baseline_Run3Summer22",
+    "val/tree_val_Run3Summer22":{
+        "dump":"hist_val_Run3Summer22",
         "campaign":"Run3Summer22"
     },
-    "baseline/tree_baseline_Run3Summer22EE":{
-        "dump":"hist_baseline_Run3Summer22EE",
+    "val/tree_val_Run3Summer22EE":{
+        "dump":"hist_val_Run3Summer22EE",
         "campaign":"Run3Summer22EE"
     },
-    "baseline/tree_baseline_Run3Summer23":{
-        "dump":"hist_baseline_Run3Summer23",
+    "val/tree_val_Run3Summer23":{
+        "dump":"hist_val_Run3Summer23",
         "campaign":"Run3Summer23"
     },
-    "baseline/tree_baseline_Run3Summer23BPix":{
-        "dump":"hist_baseline_Run3Summer23BPix",
+    "val/tree_val_Run3Summer23BPix":{
+        "dump":"hist_val_Run3Summer23BPix",
         "campaign":"Run3Summer23BPix"
     }
 }
