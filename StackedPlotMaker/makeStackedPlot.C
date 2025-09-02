@@ -12,12 +12,12 @@ void makeStackedPlot(
 		     //TString _var = "lep0_iso",
 		     //TString _var = "dilep_pt",
 		     TString _name = "test",
-		     TString _jobname = "2025-08-14_baseline/hist_baseline_FullDataset_combined",
+		     TString _jobname = "2025-09-02_val/hist_val_FullDataset_combined",
 		     TString _campaign = "FullDataset",
 		     TString _channel = "combined",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
-		     bool _data = false,
+		     bool _data = true,
 		     bool _save = false
 		     )
 {
@@ -33,7 +33,7 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
-  Double_t ymin = 0.1; Double_t ymax_base = 10E8; Double_t ymax = ymax_base;
+  Double_t ymin = 0.1; Double_t ymax_base = 10E5; Double_t ymax = ymax_base;
   if(_channel=="combined")                   ymax = ymax_base*10;
   if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
   if(_campaign=="FullDataset")               ymax = ymax_base*1000; 
@@ -128,14 +128,14 @@ void makeStackedPlot(
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
-  if (_campaign == "Run2" || _campaign == "FullDataset") {
+  if (_campaign == "Run2") {
     vector<string> eras = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
     for (auto& era : eras) {
       data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
       data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
     }
   }
-  if (_campaign == "Run3" || _campaign == "FullDataset") {
+  if (_campaign == "Run3") {
     vector<string> eras_2022 = {"C","D","E","F","G"};
     vector<string> eras_2023 = {"C1","C2","C3","C4","D1","D2"};
     for (auto& era : eras_2022) {
@@ -143,6 +143,20 @@ void makeStackedPlot(
       data_collection.push_back(get_hist(_var, input_path, "Muon",    era));
     }
     for (auto& era : eras_2023){
+      data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+      data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon1",   era));
+    }
+  }
+  if (_campaign == "FullDataset") {
+    vector<string> eras_Run2and2022 = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
+    vector<string> eras_2023  = {"C1","C2","C3","C4","D1","D2"};
+    for (auto& era : eras_Run2and2022) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
+    }
+    for (auto& era : eras_2023) {
       data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
       data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
       data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));

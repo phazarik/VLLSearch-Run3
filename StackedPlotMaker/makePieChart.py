@@ -6,15 +6,15 @@ import os, ROOT
 channelnames = {"mm": r"$\mu\mu$", "me": r"$\mu e$", "em": r"$e\mu$", "ee": r"$ee$", "combined": "combined"}
 
 def main():
-    region = "baseline"
-    jobname = "2025-09-02_baseline"
-    tag = "baseline"
+    region = "validation region"
+    jobname = "2025-09-02_val"
+    tag = "val"
     campaigndict = {
         "2016preVFP_UL":"2016-preVFP",
         "2016postVFP_UL":"2016-postVFP",
         "2017_UL":"2017",
         "2018_UL":"2018",
-        "Run2":"Run2",
+        "Run2":"Run-2",
         "Run3Summer22":"2022-preEE",
         "Run3Summer22EE":"2022-postEE",
         "Run3Summer23":"2023-preBPix",

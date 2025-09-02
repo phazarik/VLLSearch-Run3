@@ -45,6 +45,9 @@ TH1D *get_hist(
 	       ){
   TString filename = input_path+"/"+"hst_"+sample+"_"+subsample+".root";
 
+  //Overlap check for data:
+  //if ((sample.Contains("Muon")) || (sample.Contains("EGamma"))) cout<<"Reading data file: "<<filename<<endl;
+  
   //Skip samples here:
   //if (sample.Contains("ZGamma"))   return nullptr; //For Run-3 only
   if ((sample.Contains("WtoLNu")) && !sample.Contains("Inclusive")) return nullptr;

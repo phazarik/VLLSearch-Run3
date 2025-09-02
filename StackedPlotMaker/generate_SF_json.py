@@ -4,10 +4,10 @@ from datetime import timedelta
 import subprocess, json, os, re
 
 # ================================ GLOBAL PARAMETERS =========================================
-jobdir = "2025-08-14_baseline" ## hist folder
-tag = "baseline" ## event tag
+jobdir = "2025-09-02_val" ## hist folder
+tag = "val" ## event tag
 var = "HT" ## bins
-lookatdata = False
+lookatdata = True
 
 debug = False
 test_camp = "Run3Summer22"
