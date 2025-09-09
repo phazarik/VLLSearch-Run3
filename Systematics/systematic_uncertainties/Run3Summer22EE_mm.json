@@ -1,0 +1,38 @@
+{
+  "lep": {
+    "1": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "2": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "3": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "4": {"systup": 1.006289,"systdown": 1.003145,"average": 1.004717},
+    "5": {"systup": 1.006546,"systdown": 1.006481,"average": 1.006514},
+    "6": {"systup": 1.008878,"systdown": 1.008878,"average": 1.008878},
+    "7": {"systup": 1.010032,"systdown": 1.009907,"average": 1.009969}
+  },
+  "trig": {
+    "1": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "2": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "3": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "4": {"systup": 1.000000,"systdown": 1.000000,"average": 1.000000},
+    "5": {"systup": 1.000065,"systdown": 1.000065,"average": 1.000065},
+    "6": {"systup": 1.000157,"systdown": 1.000157,"average": 1.000157},
+    "7": {"systup": 1.000187,"systdown": 1.000125,"average": 1.000156}
+  },
+  "lumi": {
+    "1": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "2": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "3": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "4": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "5": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "6": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "7": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000}
+  },
+  "combined": {
+    "1": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "2": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "3": {"systup": 1.025000,"systdown": 1.025000,"average": 1.025000},
+    "4": {"systup": 1.025779,"systdown": 1.025197,"average": 1.025488},
+    "5": {"systup": 1.025843,"systdown": 1.025827,"average": 1.025835},
+    "6": {"systup": 1.026530,"systdown": 1.026530,"average": 1.026530},
+    "7": {"systup": 1.026938,"systdown": 1.026892,"average": 1.026915}
+  }
+}
