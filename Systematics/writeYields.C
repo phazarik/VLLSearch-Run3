@@ -29,8 +29,8 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "LTplusMET",
 		 TString _name = "LT+MET",
-		 TString _jobname = "2025-09-09_sr_trig-systdown",
-		 TString _tag = "sr_trig-systdown",
+		 TString _jobname = "2025-09-10_sr_ttbar-systdown",
+		 TString _tag = "sr_ttbar-systdown",
 		 TString _displaytext = "val",
 		 bool _data = false, //careful!
 		 bool _save = true

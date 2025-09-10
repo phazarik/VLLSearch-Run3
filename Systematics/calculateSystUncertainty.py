@@ -11,7 +11,7 @@ campaigns = [
 ]
 
 channels  = ["mm", "me", "em", "ee", "combined"]
-basedir = "yields/2025-09-09/"
+basedir = "yields/2025-09-10/" ## Assuming everything to be in the same directory
 tag = "sr"
 # ------------------------------------------
 
@@ -28,36 +28,57 @@ def extract_central(df):
     df_central = df.copy()
     for col in df_central.columns:
         if df_central[col].dtype == object:
-            # split at ± and take the first piece
+            ## split at ± and take the first piece
             df_central[col] = df_central[col].str.split("±").str[0].str.strip()
-            # convert only if it's numeric
+            ## convert only if it's numeric
             df_central[col] = pd.to_numeric(df_central[col], errors="coerce")
     return df_central
 
-def add_global_systematic(systematics, df_nom, name, value):
-    systematics[name] = {}
-    for nbin in df_nom["nbin"]:
-        if str(nbin).lower() == "total": continue
-        systematics[name][int(nbin)] = {
+def add_global_systematic(systematics, name, value):
+    """Add a global systematic that applies the same value to all bins"""
+    systematics[name] = {
+        "global": {
             "systup": value,
-            "systdown": value,
-            "average": value
+            "systdown": value
         }
+    }
 
 def combine_syst(systematics):
-    # get the bins from any existing systematic (e.g., the first one)
-    first_key = next(k for k in systematics if k != "combined")
-    bins = systematics[first_key].keys()
-
+    # Find first bin-by-bin systematic
+    first_key = None
+    for k in systematics:
+        if k != "combined" and any(str(b).isdigit() for b in systematics[k].keys()):
+            first_key = k
+            break
+    if first_key is None: return
+    
+    bins = [b for b in systematics[first_key].keys() if str(b).isdigit()]
     systematics["combined"] = {}
+    
     for b in bins:
-        # sum only over existing keys excluding "combined"
-        up_sq   = sum((systematics[s][b]["systup"] - 1)**2 for s in systematics if s != "combined")
-        down_sq = sum((systematics[s][b]["systdown"] - 1)**2 for s in systematics if s != "combined")
+        up_sq = 0
+        down_sq = 0
+        for s in systematics:
+            if s == "combined": continue
+            # Global systematics
+            if "global" in systematics[s]:
+                syst_val_up = systematics[s]["global"]["systup"] - 1
+                syst_val_down = 1 - systematics[s]["global"]["systdown"]
+                up_sq += syst_val_up ** 2
+                down_sq += syst_val_down ** 2
+            # Bin-by-bin systematics
+            elif b in systematics[s]:
+                syst_val_up = systematics[s][b]["systup"] - 1
+                syst_val_down = 1 - systematics[s][b]["systdown"]
+                up_sq += syst_val_up ** 2
+                down_sq += syst_val_down ** 2
+        
+        # Ensure combined factors are >0 and percentages are positive
+        systup_comb = 1 + math.sqrt(up_sq)
+        systdown_comb = 1 - math.sqrt(down_sq)
         systematics["combined"][b] = {
-            "systup": 1 + math.sqrt(up_sq),
-            "systdown": 1 + math.sqrt(down_sq),
-            "average": 1 + 0.5 * (math.sqrt(up_sq) + math.sqrt(down_sq))
+            "systup": systup_comb,
+            "systdown": systdown_comb
         }
 
 def format_floats(obj, precision=6):
@@ -72,9 +93,16 @@ def format_json(obj, precision=6):
         lines.append(f'  "{syst}": {{')
         bin_lines = []
         for b, vals in bins.items():
-            bin_lines.append(
-                f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f},"average": {vals["average"]:.{precision}f}}}'
-            )
+            if "nomYield" in vals:
+                # Bin-by-bin systematics with nominal yield
+                bin_lines.append(
+                    f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f},"nomYield": {vals["nomYield"]:.{precision}f}}}'
+                )
+            else:
+                # Global systematics or combined (without nominal yield)
+                bin_lines.append(
+                    f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f}}}'
+                )
         lines.append(",\n".join(bin_lines))
         lines.append("  }" + ("," if i < len(obj) - 1 else ""))
     lines.append("}")
@@ -85,8 +113,17 @@ def process(campaign, channel):
     df_nom = csv_into_df(csvfile_nom)
     if df_nom is None: return
 
-    systematics = {"lep": {}, "trig": {}}
+    ## Initializing the dictionary
+    systematics = {"lep":{}, "trig":{}, "pileup":{}, "bjet":{}, "dy":{}, "qcd":{}, "ttbar":{}}
+
+    # Extract nominal yields for each bin
+    nom_central = extract_central(df_nom).get("TotalBkg", pd.Series([0]*len(df_nom)))
+    nominal_yields = {}
     
+    for idx, nbin in enumerate(df_nom["nbin"]):
+        if str(nbin).lower() == "total": continue
+        nominal_yields[int(nbin)] = float(nom_central.iloc[idx])
+
     for syst in systematics.keys():
         tagup = f"{tag}_{syst}-systup"
         csvfile_up = os.path.join(basedir, tagup, f"yields_{tagup}_{campaign}_{channel}.csv")
@@ -98,35 +135,36 @@ def process(campaign, channel):
         df_down = csv_into_df(csvfile_down)
         if df_down is None: continue
 
-        nom_central   = extract_central(df_nom)["TotalBkg"]
-        up_central    = extract_central(df_up)["TotalBkg"]
-        down_central  = extract_central(df_down)["TotalBkg"]
+        up_central    = extract_central(df_up).get("TotalBkg", pd.Series([0]*len(df_nom)))
+        down_central  = extract_central(df_down).get("TotalBkg", pd.Series([0]*len(df_nom)))
 
-        syst_up_fac   = 1 + (up_central - nom_central) / nom_central.replace(0, float("inf"))
-        syst_down_fac = 1 + (nom_central - down_central) / nom_central.replace(0, float("inf"))
+        ## safe fractions
+        den = nom_central.replace(0, float("inf"))
+        syst_up_fac   = 1 + (up_central - nom_central) / den
+        syst_down_fac = 1 + (nom_central - down_central) / den
 
-        ## Fix NaNs with default value 1
-        syst_up_fac   = syst_up_fac.where(nom_central != 0, 1).fillna(1)  
-        syst_down_fac = syst_down_fac.where(nom_central != 0, 1).fillna(1)
+        ## Handle bins with zero nominal separately
+        syst_up_fac   = syst_up_fac.where(nom_central != 0, 1 + up_central)
+        syst_down_fac = syst_down_fac.where(nom_central != 0, 1 + down_central)
+
+        ## Clean NaNs just in case
+        syst_up_fac   = syst_up_fac.fillna(1)
+        syst_down_fac = syst_down_fac.fillna(1)
 
         for idx, nbin in enumerate(df_nom["nbin"]):
             if str(nbin).lower() == "total": continue
+            bin_num = int(nbin)
             up_val = float(syst_up_fac.iloc[idx])
             down_val = float(syst_down_fac.iloc[idx])
-            avg_val = (up_val + down_val) / 2.0
-            # ensure zeros become 1
-            #if up_val == 0.0: up_val = 1.0
-            #if down_val == 0.0: down_val = 1.0
-            avg_val = (up_val + down_val) / 2.0
-            systematics[syst][int(nbin)] = {
+            nom_val = nominal_yields[bin_num]
+            systematics[syst][bin_num] = {
                 "systup": up_val,
                 "systdown": down_val,
-                "average": avg_val
+                "nomYield": nom_val
             }
 
-
-    ## Adding global systematics and add a "total" key.
-    add_global_systematic(systematics, df_nom, "lumi", 1.025)
+    ## Adding global luminosity systematic
+    add_global_systematic(systematics, "lumi", 1.025)
     combine_syst(systematics)
     systematics = format_floats(systematics, 6)
 
@@ -135,7 +173,15 @@ def process(campaign, channel):
     print(f"Systematics (+up-down) for {campaign}, {channel}:")
     for syst, bins in systematics.items():
         parts = []
-        for b, vals in bins.items(): parts.append(f"+{vals['systup']:.6f}-{vals['systdown']:.6f}")
+        if "global" in bins:
+            # Handle global systematics
+            vals = bins["global"]
+            parts.append(f"+{vals['systup']:.6f}-{vals['systdown']:.6f} (global)")
+        else:
+            # Handle bin-by-bin systematics
+            for b, vals in bins.items():
+                if str(b).isdigit():  # Only numeric bins
+                    parts.append(f"+{vals['systup']:.6f}-{vals['systdown']:.6f}")
         print(f"\033[33m{syst.ljust(name_length)}\033[0m: " + ", ".join(parts))
     
     outdir = "systematic_uncertainties"
@@ -145,14 +191,13 @@ def process(campaign, channel):
     json_str = format_json(systematics)
     outfile  = os.path.join(outdir, f"{campaign}_{channel}.json")
     with open(outfile, "w") as f: f.write(json_str)
-    #with open(outfile_json, "w") as f: json.dump(systematics, f, separators=(",", ": "))
     print(f"\033[1;33m\nSaved JSON:\033[0m {outfile}")
     
 def main():
     count = 0
     for camp in campaigns:
         for ch in channels:
-            #Excpetion:
+            ## Exception:
             if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
             count +=1
             print("\n"+"-"*50+f"\n\033[33m[{count}] processing {camp}, {ch} channel\033[0m\n"+"-"*50)
