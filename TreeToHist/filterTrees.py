@@ -25,8 +25,8 @@ basedir   = '../ROOT_FILES/treesWithNN/'
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 basename  = "baseline/tree_baseline"
-dumpdir   = "val_cleaned2"
-tag       = "val"
+dumpdir   = "sr"
+tag       = "sr"
 #-----------------------------------------------------------------------------------
 
 jobdict = {}
@@ -145,12 +145,13 @@ for injob, info in jobdict.items():
         val_region = val_region+f'and {tight_iso} and {tight_sip3d} and {clean}'
         
         ## Step6: Signal regions:
-        presr = f'HT>50 and {wjets_veto} and {nnscore_qcd}>0.70 and nbjet==0'
-        sr = f'{presr} and ST>300'
+        presr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet==0 and {clean}'
+        presrval = f'{presr} and {nnscore_ttbar}<0.70'
+        sr = f'{presr} and {nnscore_ttbar}>0.70'
         
         #------------------------------
         # Final event selection:
-        event_selection = val_region
+        event_selection = sr
         #------------------------------
 
         filecount += 1

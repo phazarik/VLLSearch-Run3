@@ -7,14 +7,14 @@
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     TString _var = "HT",
-		     //TString _var = "nnscore_Run2_vlld_qcd",
+		     //TString _var = "HT",
+		     //TString _var = "nnscore_Run2_vlld_ttbar",
 		     //TString _var = "lep0_iso",
-		     //TString _var = "dilep_pt",
+		     TString _var = "dilep_dR",
 		     TString _name = "test",
-		     TString _jobname = "2025-09-02_val/hist_val_FullDataset_combined",
-		     TString _campaign = "FullDataset",
-		     TString _channel = "combined",
+		     TString _jobname = "2025-09-07_presr/hist_presr_2017_UL_mm",
+		     TString _campaign = "2017_UL",
+		     TString _channel = "mm",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
 		     bool _data = true,
@@ -33,7 +33,7 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
-  Double_t ymin = 0.1; Double_t ymax_base = 10E5; Double_t ymax = ymax_base;
+  Double_t ymin = 0.1; Double_t ymax_base = 10E4; Double_t ymax = ymax_base;
   if(_channel=="combined")                   ymax = ymax_base*10;
   if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
   if(_campaign=="FullDataset")               ymax = ymax_base*1000; 

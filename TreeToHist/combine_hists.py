@@ -5,8 +5,8 @@ from tqdm import tqdm
 
 #---------------- CONFIG ------------------#
 basedir = "../ROOT_FILES/hists/"
-jobname = "2025-09-02_val"
-tag = "val"
+jobname = "2025-09-10"
+tag = "sr_ttbar-systdown"
 campaigns_all = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"

@@ -4,8 +4,8 @@ from datetime import timedelta
 import subprocess, json, os, re
 
 # ================================ GLOBAL PARAMETERS =========================================
-jobdir = "2025-09-02_val" ## hist folder
-tag = "val" ## event tag
+jobdir = "2025-09-08_presrval" ## hist folder
+tag = "presrval" ## event tag
 var = "HT" ## bins
 lookatdata = True
 
