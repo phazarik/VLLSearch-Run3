@@ -274,21 +274,21 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
   int nbins = hst_bkg->GetNbinsX();
   for (int bin=1; bin<=nbins; ++bin) {
     out << bin;
-    out << "," << (int)hst_data->GetBinContent(bin);
+    out << "," << (int)round(hst_data->GetBinContent(bin));
     out << "," << fmt_val_err(hst_bkg->GetBinContent(bin), hst_bkg->GetBinError(bin), 3);
     for (auto it = bkg.rbegin(); it != bkg.rend(); ++it) {
       TH1* h = *it;
       out << "," << fmt_val_err(h->GetBinContent(bin), h->GetBinError(bin), 3);
     }
     for (auto* s : sig_hists) {
-      out << "," << fmt_val(s->GetBinContent(bin), 3);
+      out << "," << fmt_val_err(s->GetBinContent(bin), s->GetBinError(bin), 3);
     }
     out << "\n";
   }
 
   // totals
   out << "Total";
-  out << "," << fmt_val(hst_data->Integral(1, hst_data->GetNbinsX()), 3);
+  out << "," << (int)round(hst_data->Integral(1, hst_data->GetNbinsX()));
   {
     double err = 0;
     double val = hst_bkg->IntegralAndError(1, hst_bkg->GetNbinsX(), err);
@@ -300,8 +300,9 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
     out << "," << fmt_val_err(val, err, 3);
   }
   for (auto* s : sig_hists) {
-    double val = s->Integral(1, s->GetNbinsX());
-    out << "," << fmt_val(val, 3);
+    double err = 0;
+    double val = s->IntegralAndError(1, s->GetNbinsX(), err);
+    out << "," << fmt_val_err(val, 3);
   }
   out << "\n";
 
