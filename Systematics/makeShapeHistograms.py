@@ -50,6 +50,7 @@ def main():
             count += 1
             print(f"\n[yellow bold][{count}] processing {camp}, {ch} channel[/yellow bold]")
             make_shapes(camp, ch)
+        #break
     
 def make_shapes(campaign, channel):
 
@@ -57,7 +58,7 @@ def make_shapes(campaign, channel):
     path_nom = os.path.join(basedir, tag)
     file_nom = os.path.join(path_nom, f"yields_{tag}_{campaign}_{channel}.csv")
     df_nom = csv_into_df(file_nom)
-    print(df_nom)
+    #print(df_nom)
 
     ## Systematics
     dfs_syst = {}
@@ -81,7 +82,7 @@ def make_shapes(campaign, channel):
                 dump_subdir = f"{dump}/{campaign}_{channel}"
                 outfile = os.path.join(dump_subdir, outname)
                 os.makedirs(dump_subdir, exist_ok=True)
-                make_root_file(df_nom, dfs_syst, signal_name, outfile=outfile)
+                make_root_file(df_nom, dfs_syst, signal_name, campaign, channel, outfile)
                 print(f"Histograms written to \033[33m{outfile}\033[0m")
 
 # ----------------- utilities --------------------
@@ -93,6 +94,7 @@ rootname = {
     "multi-top": "MultiTop",
     "W+jets/#gamma": "WJetsGamma",
     "Z#gamma": "ZGamma",
+    "Single t":"ST",
     "VLLD-mu_100": "VLLD_mu_100",
     "VLLD-mu_200": "VLLD_mu_200",
     "VLLD-mu_300": "VLLD_mu_300",
@@ -100,13 +102,13 @@ rootname = {
     "VLLD-mu_600": "VLLD_mu_600",
     "VLLD-mu_800": "VLLD_mu_800",
     "VLLD-mu_1000": "VLLD_mu_1000",
-    "VLLD-ele_100": "VLL_ele_100",
-    "VLLD-ele_200": "VLL_ele_200",
-    "VLLD-ele_300": "VLL_ele_300",
-    "VLLD-ele_400": "VLL_ele_400",
-    "VLLD-ele_600": "VLL_ele_600",
-    "VLLD-ele_800": "VLL_ele_800",
-    "VLLD-ele_1000": "VLL_ele_1000",
+    "VLLD-ele_100": "VLLD_ele_100",
+    "VLLD-ele_200": "VLLD_ele_200",
+    "VLLD-ele_300": "VLLD_ele_300",
+    "VLLD-ele_400": "VLLD_ele_400",
+    "VLLD-ele_600": "VLLD_ele_600",
+    "VLLD-ele_800": "VLLD_ele_800",
+    "VLLD-ele_1000": "VLLD_ele_1000",
 }
 
 def csv_into_df(csvfile):
@@ -115,7 +117,7 @@ def csv_into_df(csvfile):
         return None
     df = pd.read_csv(csvfile)
     df.rename(columns=rootname, inplace=True)
-    print("df loaded :"+csvfile)
+    #print("df loaded :"+csvfile)
     return df
 
 def parse_valerr(entry):
@@ -128,37 +130,55 @@ def parse_valerr(entry):
         err = math.sqrt(val) if val > 0 else 0.0
         return val, err
 
-def make_root_file(df_nom, dfs_syst, signal_name, outfile="shapes.root"):
+def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfile="shapes.root"):
 
-    ## Build bin edges from the dictionary
     bins = variable["bins"]
     edges = [low for (_, (low, high)) in sorted(bins.items(), key=lambda x: int(x[0]))]
-    edges.append(list(bins.values())[-1][1])  # add the last high edge
+    edges.append(list(bins.values())[-1][1])
     nbins = len(edges) - 1
     edges_arr = array('d', edges)
 
     fout = ROOT.TFile(outfile, "RECREATE")
 
+    chname = f"{campaign}{channel}"  # e.g., 2018ULmm
+
     processes = []
     for c in df_nom.columns:
         if c == "nbin": continue
-        if "VLL" in c and c != signal_name: continue  # skip other signals
+        if "VLL" in c and c != signal_name: continue
         processes.append(c)
-        
+
+    if signal_name not in processes:
+        print(f"\033[31m[ERROR] Expected signal '{signal_name}' not found in dataframe for {outfile}\033[0m")
+        fout.Close()
+        return
+
     for proc in processes:
-        ## Nominal histograms
-        h_nom = ROOT.TH1F(f"{variable['name']}_{proc}_nom", proc, nbins, edges_arr)
+
+        if "Bkg" in proc: continue 
+        
+        ## Nominal histogram
+        h_nom_name = f"{variable['name']}_{chname}_{proc.replace('_','')}" ## remove any extra '_' histnames
+        h_nom = ROOT.TH1F(h_nom_name, proc, nbins, edges_arr)
         for i in range(1, nbins + 1):
             val, err = parse_valerr(df_nom.iloc[i - 1][proc])
             h_nom.SetBinContent(i, val)
             h_nom.SetBinError(i, err)
         h_nom.Write()
 
-        ## Systematic variations
+        # Skip signal/data for systematics
+        if "VLL" in proc or proc == "Data": continue
+        
+        ## Systematics
         for syst, direction in dfs_syst.keys():
             df = dfs_syst[(syst, direction)]
-            h_name = f"{variable['name']}_{proc}_{syst}_sys{direction}"
-            h_syst = ROOT.TH1F(h_name, proc, nbins, edges_arr)
+            if proc not in df.columns:
+                print(f"\033[31m[ERROR] Missing process '{proc}' in systematic '{syst}_{direction}' for {outfile}\033[0m")
+                fout.Close()
+                return
+
+            h_syst_name = f"{variable['name']}_{chname}_{proc}_{syst}{direction}"
+            h_syst = ROOT.TH1F(h_syst_name, proc, nbins, edges_arr)
             for i in range(1, nbins + 1):
                 val, err = parse_valerr(df.iloc[i - 1][proc])
                 h_syst.SetBinContent(i, val)
