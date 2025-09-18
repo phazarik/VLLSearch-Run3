@@ -11,6 +11,7 @@ from tqdm  import tqdm
 from datetime import timedelta
 #from keras import Sequential
 #from tensorflow.keras.layers import Dense
+from rich.progress import Progress, BarColumn, TaskProgressColumn
 
 import argparse
 
@@ -24,8 +25,8 @@ args = parser.parse_args()
 #Global parameters:
 campaign = args.campaign
 indir = '../ROOT_FILES/trees/'
-jobname = f'tree_baseline_{campaign}'
-outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_{campaign}_baseline'
+jobname = f'tree_baseline-JERdown_{campaign}'
+outdir = f'../ROOT_FILES/treesWithNN/baseline-JERdown/tree_baseline_{campaign}'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
@@ -41,10 +42,9 @@ modeldict = {
 
 #-------------------------------------------
 # DON'T TOUCH BELOW:
-
 #-------------------------------------------
 # Define functions:
-#Given a TFile, read its branches into a dataframe.
+# Given a TFile, read its branches into a dataframe.
 
 def read_file_into_df(filepath, step_size=100000):
     with uproot.open(filepath) as tfile:
@@ -62,15 +62,14 @@ def read_file_into_df(filepath, step_size=100000):
         total_batches = (total_entries + step_size - 1) // step_size
         dfs = []
 
-        with tqdm(total=total_batches, unit="batch",
-                  bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
-                  leave=True, ncols=100, desc="Reading", colour='green') as pbar:
+        with Progress("[progress.description]{task.description}", BarColumn(), TaskProgressColumn()) as progress:
+            task = progress.add_task("Reading", total=total_batches)
             for batch in ttree.iterate(ttree.keys(), step_size=step_size, library="pd"):
                 dfs.append(batch)
-                pbar.update(1)
+                progress.update(task, advance=1)
 
-    return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
-
+        return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+    
 def write_df_into_file(df, filepath, step_size=100000):
     if df.empty:
         print(f"Warning: Attempting to write empty DataFrame to {filepath}. Skipping.")
@@ -81,7 +80,7 @@ def write_df_into_file(df, filepath, step_size=100000):
 
     with tqdm(total=total_batches, unit="batch",
               bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
-              leave=True, ncols=100, desc="Writing", colour='green') as pbar:
+              leave=True, ncols=100, desc="Writing", colour='yellow') as pbar:
         
         with uproot.recreate(filepath) as file:
             for start in range(0, total_entries, step_size):
@@ -124,7 +123,8 @@ for f in list_of_files:
 
     #Step1: Prepare the dataframe
     filepath = os.path.join(indir, jobname, f)
-    print(f'\nLoading file: {os.path.abspath(filepath)}')    
+    print(f"\n\n\033[33m==> {f.split('tree_')[1].split('.root')[0]} {'-'*90}\033[0m")
+    print(f'Input file: {os.path.abspath(filepath)}')    
     sample = filepath.split("_")[1]
     subsample = "_".join(filepath.split("_")[2:])
     outfile = os.path.join(outdir, f)
