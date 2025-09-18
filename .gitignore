@@ -5,6 +5,7 @@
 *.root
 *.d
 *backup.h
+*backup
 *dict*
 *pyc
 *linkdef.h
@@ -18,6 +19,8 @@
 *gz
 **/*backup*/**
 StackedPlotMaker/signalyields/
+StackedPlotMaker/yields/
+StackedPlotMaker/auto_generated_jsons/
 LimitCalculation/datacards/*/*/*.txt
 LimitCalculation/fromCMScombine/*/*.txt
 LimitCalculation/sigmaBlimits/*/*txt
@@ -25,3 +28,5 @@ LimitCalculation/sigmaBlimits/*/*txt
 !LocalScripts/NNTrainer/trained_models/*/*.png
 !LocalScripts/NNTrainer/trained_models/*/before_training/*.png
 NNTrainer/trained_models/backup_*/
+Systematics/yields/
+Systematics/datacards

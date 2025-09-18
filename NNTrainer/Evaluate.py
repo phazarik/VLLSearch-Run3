@@ -11,28 +11,40 @@ from tqdm  import tqdm
 from datetime import timedelta
 #from keras import Sequential
 #from tensorflow.keras.layers import Dense
+from rich.progress import Progress, BarColumn, TaskProgressColumn
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--campaign', type=str, help='Specify the campaign!', required=True)
+parser.add_argument('--dryrun', action='store_true', help='dry-run mode')  # False by default
+parser.add_argument('--test', action='store_true', help='test mode')       # False by default
+
+args = parser.parse_args()
 
 #Global parameters:
+campaign = args.campaign
 indir = '../ROOT_FILES/trees/'
-jobname = 'tree_Run3Summer23_baseline_Jun25'
-outdir = f'../ROOT_FILES/treesWithNN/baseline/tree_Run3Summer23_baseline'
+jobname = f'tree_baseline-JERdown_{campaign}'
+outdir = f'../ROOT_FILES/treesWithNN/baseline-JERdown/tree_baseline_{campaign}'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    'qcd-vs-vlld-comb-Run2-mar12'  : 'nnscore_Run2_vlld_qcd',
-    'ttbar-vs-vlld-comb-Run2-mar12': 'nnscore_Run2_vlld_ttbar',
-    'wjets-vs-vlld-comb-Run2-mar12': 'nnscore_Run2_vlld_wjets',
-    'qcd-vs-vlld-comb-Run3-mar12'  : 'nnscore_Run3_vlld_qcd',
-    'ttbar-vs-vlld-comb-Run3-mar12': 'nnscore_Run3_vlld_ttbar',
-    'wjets-vs-vlld-comb-Run3-mar12': 'nnscore_Run3_vlld_wjets',
+    'QCD-vs-VLLD Run2 (Aug13)'    : 'nnscore_Run2_vlld_qcd',
+    'Top-vs-VLLD Run2 (Aug13)'    : 'nnscore_Run2_vlld_ttbar',
+    'Wjets-vs-VLLD Run2 (Aug13)'  : 'nnscore_Run2_vlld_wjets',
+    'DYjets-vs-VLLD Run2 (Aug13)' : 'nnscore_Run2_vlld_dy',
+    'QCD-vs-VLLD Run3 (Aug13)'    : 'nnscore_Run3_vlld_qcd',
+    'Top-vs-VLLD Run3 (Aug13)'    : 'nnscore_Run3_vlld_ttbar',
+    'Wjets-vs-VLLD Run3 (Aug13)'  : 'nnscore_Run3_vlld_wjets',
+    'DYjets-vs-VLLD Run3 (Aug13)' : 'nnscore_Run3_vlld_dy'
 }
 
 #-------------------------------------------
 # DON'T TOUCH BELOW:
-
 #-------------------------------------------
 # Define functions:
-#Given a TFile, read its branches into a dataframe.
+# Given a TFile, read its branches into a dataframe.
 
 def read_file_into_df(filepath, step_size=100000):
     with uproot.open(filepath) as tfile:
@@ -50,15 +62,14 @@ def read_file_into_df(filepath, step_size=100000):
         total_batches = (total_entries + step_size - 1) // step_size
         dfs = []
 
-        with tqdm(total=total_batches, unit="batch",
-                  bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
-                  leave=True, ncols=100, desc="Reading", colour='green') as pbar:
+        with Progress("[progress.description]{task.description}", BarColumn(), TaskProgressColumn()) as progress:
+            task = progress.add_task("Reading", total=total_batches)
             for batch in ttree.iterate(ttree.keys(), step_size=step_size, library="pd"):
                 dfs.append(batch)
-                pbar.update(1)
+                progress.update(task, advance=1)
 
-    return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
-
+        return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+    
 def write_df_into_file(df, filepath, step_size=100000):
     if df.empty:
         print(f"Warning: Attempting to write empty DataFrame to {filepath}. Skipping.")
@@ -69,7 +80,7 @@ def write_df_into_file(df, filepath, step_size=100000):
 
     with tqdm(total=total_batches, unit="batch",
               bar_format="{l_bar}{bar}| {percentage:3.0f}% [{elapsed} < {remaining}, {n_fmt}/{total_fmt}]",
-              leave=True, ncols=100, desc="Writing", colour='green') as pbar:
+              leave=True, ncols=100, desc="Writing", colour='yellow') as pbar:
         
         with uproot.recreate(filepath) as file:
             for start in range(0, total_entries, step_size):
@@ -108,11 +119,12 @@ list_failed  = []
 
 for f in list_of_files:
 
-    #if "DY" not in f: continue 
+    #if "Muon" not in f: continue 
 
     #Step1: Prepare the dataframe
-    print(f'\nLoading file: {f}')
     filepath = os.path.join(indir, jobname, f)
+    print(f"\n\n\033[33m==> {f.split('tree_')[1].split('.root')[0]} {'-'*90}\033[0m")
+    print(f'Input file: {os.path.abspath(filepath)}')    
     sample = filepath.split("_")[1]
     subsample = "_".join(filepath.split("_")[2:])
     outfile = os.path.join(outdir, f)
@@ -128,43 +140,46 @@ for f in list_of_files:
 
         #Step 2.1: pick which variables to read, and turn those into a numpy array: 
         train_var = []
-        if 'qcd' in modelname:
+        if 'QCD' in modelname:
             train_var = [
                 'njet',
                 'dilep_dR',
                 'dilep_ptratio',
-                'HT',
-                'LT',
+                'LTplusMET',
+                'ST',
                 'STfrac',
                 'metpt',
-                'dphi_metlep0',
-                'dphi_metdilep'
+                'dphi_metdilep',
+                'dphi_metlep_min'
             ]
-        elif 'ttbar' in modelname:
-            train_var = [
-                'dilep_pt',
+        elif 'Wjets' in modelname:
+            train_var =[
+                'njet',
                 'dilep_mt',
-                'dilep_dphi',
                 'dilep_ptratio',
-                'LT',
+                'dilep_dR',
+                'LTplusMET',
+                'STfrac'
+            ]
+        elif 'Top' in modelname:
+            train_var = [
+                'nbjet',
+                'dilep_ptratio',
+                'LTplusMET',
                 'ST',
                 'STfrac',
                 'dphi_metlep0',
-                'dphi_metlep1'
             ]
-        elif 'wjets' in modelname:
-            train_var =[
-                'dilep_pt',
-                'dilep_dR',
-                'LT',
-                'STfrac',
+        elif 'DY' in modelname:
+            train_var = [
+                'njet',
                 'lep0_eta',
                 'lep1_eta',
-                'lep0_mt',
-                'lep1_mt',
-                'dphi_metlep_min'
-            ]            
-        else: print('Error: Pick correct training variables!')
+                'dilep_mt',
+                'LTplusMET',
+                'metpt',
+            ]
+        else: print('Error: Pick training variables first!')
 
         model_filename = f'trained_models/{modelname}/model_{modelname}.keras'
         model = tf.keras.models.load_model(model_filename)
@@ -179,20 +194,21 @@ for f in list_of_files:
             batch_df = df.iloc[start:start+BATCH_SIZE]
             X = batch_df[train_var].values.astype(np.float32)
             X_scaled = ApplyMinMax(X, modelname)
-            y = model.predict(X_scaled, batch_size=BATCH_SIZE)
-            scores.append(y)
+            if not args.dryrun:
+                y = model.predict(X_scaled, batch_size=BATCH_SIZE)
+                scores.append(y)
 
-        df[scorename] = np.vstack(scores)
+        if not args.dryrun: df[scorename] = np.vstack(scores)
         
         del model
         tf.keras.backend.clear_session() 
         #break #model
 
-    write_df_into_file(df, os.path.join(outdir, f))
+    if not args.dryrun: write_df_into_file(df, os.path.join(outdir, f))
     list_success.append(f)
     
-    print(f'\033[1;33mFile written: {outfile}\033[0m')
-    #break #file
+    if not args.dryrun: print(f'\033[1;33mFile written: {os.path.abspath(outfile)}\033[0m')
+    if args.test: break
     
 end_time = time.time()
 time_taken = str(timedelta(seconds=int(end_time-start_time)))

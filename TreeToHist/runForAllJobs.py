@@ -19,45 +19,20 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 print()
 
-channels = ["mm", "me", "em", "ee"]
-
-jobdict = {
-    "presr/tree_2016preVFP_UL_presr":{
-        "dump":"hist_2016preVFP_UL_presr",
-        "campaign":"2016preVFP_UL"
-    },
-    "presr/tree_2016postVFP_UL_presr":{
-        "dump":"hist_2016postVFP_UL_presr",
-        "campaign":"2016postVFP_UL"
-    },
-    "presr/tree_2017_UL_presr":{
-        "dump":"hist_2017_UL_presr",
-        "campaign":"2017_UL"
-    },
-    "presr/tree_2018_UL_presr":{
-        "dump":"hist_2018_UL_presr",
-        "campaign":"2018_UL"
-    },
-    "presr/tree_Run3Summer22_presr":{
-        "dump":"hist_Run3Summer22_presr",
-        "campaign":"Run3Summer22"
-    },
-    "presr/tree_Run3Summer22EE_presr":{
-        "dump":"hist_Run3Summer22EE_presr",
-        "campaign":"Run3Summer22EE"
-    },
-    "presr/tree_Run3Summer23_presr":{
-        "dump":"hist_Run3Summer23_presr",
-        "campaign":"Run3Summer23"
-    },
-    "presr/tree_Run3Summer23BPix_presr":{
-        "dump":"hist_Run3Summer23BPix_presr",
-        "campaign":"Run3Summer23BPix"
-    }
-}
-
-#____________________________________________________________________________________________________
-#____________________________________________________________________________________________________
+#----------------------------------- config ----------------------------------------
+campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
+             "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+channels  = ["mm", "me", "em", "ee"]
+basedir   = "sr-JERdown"
+tag       = "sr-JERdown"
+tagout    = "sr_jer-systdown" ## Shows up in hist directory names
+jobdict = {}
+for camp in campaigns:
+    #if 'Run3' not in camp: continue
+    key = f"{basedir}/tree_{tag}_{camp}"
+    #jobdict[key] = {"dump": f"hist_{tag}_{camp}", "campaign": camp}
+    jobdict[key] = {"dump": f"hist_{tagout}_{camp}", "campaign": camp}
+#-----------------------------------------------------------------------------------
 
 today = date.today().strftime('%Y-%m-%d')
 start_time = time.time()
@@ -65,10 +40,7 @@ jobcount = 0
 processed = []
 
 for jobname, info in jobdict.items():
-    if 'Run3' not in jobname: continue
-
     for channel in channels:
-        #if channel != "ee" : continue
         
         jobcount += 1
         campaign = info["campaign"]

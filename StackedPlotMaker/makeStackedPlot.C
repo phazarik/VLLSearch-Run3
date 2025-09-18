@@ -7,16 +7,18 @@
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     TString _var = "HT",
-		     //TString _var = "dilep_pt",
-		     TString _name = "HT (GeV)",
-		     TString _jobname = "2025-07-08_val/hist_Run3Summer23_val_mm",
-		     TString _campaign = "Run3Summer23",
-		     TString _channel = "mm",
-		     TString _tag = "val",
-		     TString _displaytext = "val",
-		     bool _data = false,
-		     bool _save = true
+		     //TString _var = "HT",
+		     //TString _var = "nnscore_Run2_vlld_ttbar",
+		     //TString _var = "lep0_iso",
+		     TString _var = "dilep_dR",
+		     TString _name = "test",
+		     TString _jobname = "2025-09-02_val_cleaned/hist_val_Run2_combined",
+		     TString _campaign = "Run2",
+		     TString _channel = "combined",
+		     TString _tag = "test",
+		     TString _displaytext = "test",
+		     bool _data = true,
+		     bool _save = false
 		     )
 {
   TString date_stamp  = todays_date();
@@ -31,15 +33,19 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
-  Double_t ymin = 0.1; Double_t ymax = 10E5;
+  Double_t ymin = 0.1; Double_t ymax_base = 10E4; Double_t ymax = ymax_base;
+  if(_channel=="combined")                   ymax = ymax_base*10;
+  if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
+  if(_campaign=="FullDataset")               ymax = ymax_base*1000; 
   TString output_tag = _tag;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
+  if(_channel == "combined") info2 = "combined";
   
   //--------------------------------------------------------------------------
   TString dump_folder = "plots/"+date_stamp+"/"+output_tag+"_"+_campaign+"_"+_channel;  
   TString filename = dump_folder+"/"+_var;
-  TString input_path = "../ROOT_FILES/hists/"+_jobname;;
+  TString input_path = "../ROOT_FILES/hists/"+_jobname;
   vector<TH1D *> hist_collection = return_hist_collection(_var, input_path, _campaign);
   /*
   double total;
@@ -58,7 +64,6 @@ void makeStackedPlot(
   combine_hists(hist_collection, {"WW", "WZ", "ZZ"},             "VV", kGreen+1);
   combine_hists(hist_collection, {"QCD (#mu)", "QCD (e#gamma)"}, "QCD", kYellow);
   combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
-  //combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V"},      "t#bar{t}+x", kAzure+1);
   combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
   combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
   /*
@@ -80,24 +85,24 @@ void makeStackedPlot(
   //______________________________________________________________
   vector<TH1D*> data_collection; data_collection.clear();
   if(_campaign == "2016preVFP_UL"){
-    vector<string> eras = {"B", "C", "D", "E", "F"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+    vector<string> eras = {"B2", "C", "D", "E", "FHIPM"};
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }
   if(_campaign == "2016postVFP_UL"){
     vector<string> eras = {"F", "G", "H"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }
   if(_campaign == "2017_UL"){
     vector<string> eras = {"B", "C", "D", "E", "F"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }
   if(_campaign == "2018_UL"){
     vector<string> eras = {"A", "B", "C", "D"};
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", "EGamma_" + era));
-    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "SingleMuon", "SingleMuon_" + era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+    for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon", era));
   }
   if(_campaign == "Run3Summer22"){
     vector<string> eras = {"C", "D"};
@@ -123,20 +128,44 @@ void makeStackedPlot(
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
     for(auto& era : eras) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
   }
-  /*
-  if(_campaign == "Run3"){
-    vector<string> era_2022 = {"C", "D", "E", "F", "G"};
-    vector<string> era_2023 = {"C1", "C2", "D1", "D2"};
-    for(auto& era : era_2022) data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
-    for(auto& era : era_2022) data_collection.push_back(get_hist(_var, input_path, "Muon", era));   
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "Muon0", era));
-    for(auto& era : era_2023) data_collection.push_back(get_hist(_var, input_path, "Muon1", era));
-    }*/
+  if (_campaign == "Run2") {
+    vector<string> eras = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
+    for (auto& era : eras) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
+    }
+  }
+  if (_campaign == "Run3") {
+    vector<string> eras_2022 = {"C","D","E","F","G"};
+    vector<string> eras_2023 = {"C1","C2","C3","C4","D1","D2"};
+    for (auto& era : eras_2022) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma",  era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon",    era));
+    }
+    for (auto& era : eras_2023){
+      data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+      data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon1",   era));
+    }
+  }
+  if (_campaign == "FullDataset") {
+    vector<string> eras_Run2and2022 = {"A","B","B2","C","D","E","F","FHIPM","G","H"};
+    vector<string> eras_2023  = {"C1","C2","C3","C4","D1","D2"};
+    for (auto& era : eras_Run2and2022) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon",   era));
+    }
+    for (auto& era : eras_2023) {
+      data_collection.push_back(get_hist(_var, input_path, "EGamma0", era));
+      data_collection.push_back(get_hist(_var, input_path, "EGamma1", era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon0",   era));
+      data_collection.push_back(get_hist(_var, input_path, "Muon1",   era));
+    }
+  }
   
-  TH1D* hst_data  = nullptr;
-  TH1D* hst_smuon = nullptr;
+  TH1D* hst_data   = nullptr;
+  TH1D* hst_smuon  = nullptr;
   TH1D* hst_egamma = nullptr;
   for (auto* h : data_collection) {
     if (!h) continue;
@@ -192,37 +221,31 @@ void makeStackedPlot(
 
   TH1D *sig1, *sig2, *sig3;
   if(_channel == "ee"){
-    sig1 = get_hist(_var, input_path, "VLLD_ele", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD_ele", "M200");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD_ele", "M600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-ele", "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD-ele", "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
   }
   else if (_channel == "em"){
-    sig1 = get_hist(_var, input_path, "VLLD_ele", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD_mu", "M400");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD_ele", "M600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD-ele", "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
   }
   else if (_channel == "me"){
-    sig1 = get_hist(_var, input_path, "VLLD_mu", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD_ele", "M400");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD_mu", "M600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
   else if (_channel == "mm"){
-    sig1 = get_hist(_var, input_path, "VLLD_mu", "M400");
-    if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD_mu", "M200");
-    if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD_mu", "M600");
-    if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
+    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
   }
+  else if (_channel=="combined"){
+    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
+    sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{200}");}
+  }
+  else cout<<"\033[31m[ERROR:] all signal are null!"<<endl;
   //sig2 = nullptr;
   //sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
@@ -236,11 +259,11 @@ void makeStackedPlot(
   if(toOverlayData){
     //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-    //GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
     
     //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
     //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
   }
   
@@ -253,7 +276,8 @@ void makeStackedPlot(
   TPad *mainPad   = create_mainPad(0.0, 0.3, 1.0, 1.0);
   TPad *ratioPad  = create_ratioPad(0.0, 0.0, 1.0, 0.3);
   mainPad->Draw(); ratioPad->Draw();
-
+  if (_var.Contains("iso")) mainPad->SetLogx();
+  if (_var.Contains("iso")) ratioPad->SetLogx();
   //-------------------------------------------------------------
   //                     Drawing on mainpad
   //-------------------------------------------------------------
@@ -298,6 +322,7 @@ void makeStackedPlot(
   // 1) Calculation of S/sqrtB and plotting:
   globalSbyB = 0;
   TH1D *sbyrb = nullptr;
+  vector<float> isobinslog = {0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256};
   
   if     (sig1) sbyrb = GetSbyRootB(sig1, bkg);
   else if(sig2) sbyrb = GetSbyRootB(sig2, bkg);
@@ -310,6 +335,7 @@ void makeStackedPlot(
     sbyrb->GetYaxis()->SetTitleSize(0.15);
     sbyrb->GetYaxis()->SetTitleOffset(0.43);
     sbyrb->GetYaxis()->SetLabelSize(0.13);
+    if(_var.Contains("iso")) showMoreLabels(sbyrb);
     if(!toOverlayData) sbyrb->Draw("ep");
     canvas->Update();
     //cout<<"S/sqrtB bin contents:"<<endl;
@@ -369,7 +395,8 @@ void makeStackedPlot(
     ratiohist->GetYaxis()->SetLabelSize(0.13);
     ratiohist->GetYaxis()->SetRangeUser(0, 2.2);
     //if(toZoom) ratiohist->GetXaxis()->SetRangeUser(xmin, xmax);
-
+    if(_var.Contains("iso")) showMoreLabels(ratiohist);
+    
     ratiohist->Draw("ep"); //Inheriting the settings from the ratio hist.
     err->Draw("SAME P E2");
     line->Draw("same");
@@ -385,19 +412,22 @@ void makeStackedPlot(
   //-------------------------------------------------------------
 
   mainPad->cd();
-
+  
+  float xright = 0.95;  // right edge
+  float yup = 0.94;
   put_text("CMS", 0.17, 0.83, 62, 0.07);          // Larger, bold CMS label
   put_text("Preliminary", 0.27, 0.83, 52, 0.05);  // Smaller preliminary label
-  if(_campaign == "2016preVFP_UL")    put_latex_text("19.7 fb^{-1} (2016-preVFP)", 0.62, 0.94, 42, 0.05);
-  if(_campaign == "2016postVFP_UL")   put_latex_text("16.2 fb^{-1} (2016-postVFP)", 0.60, 0.94, 42, 0.05);
-  if(_campaign == "2017_UL")          put_latex_text("41.5 fb^{-1} (2017)", 0.74, 0.94, 42, 0.05);
-  if(_campaign == "2018_UL")          put_latex_text("59.8 fb^{-1} (2018)", 0.74, 0.94, 42, 0.05);
-  if(_campaign == "Run2")             put_latex_text("137.2 fb^{-1} (Run-2)", 0.63, 0.94, 42, 0.05);
-  if(_campaign == "Run3Summer22")     put_latex_text("7.98 fb^{-1} (2022-preEE)", 0.64, 0.94, 42, 0.05);
-  if(_campaign == "Run3Summer22EE")   put_latex_text("26.7 fb^{-1} (2022-postEE)", 0.63, 0.94, 42, 0.05);
-  if(_campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)", 0.62, 0.94, 42, 0.05);
-  if(_campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", 0.61, 0.94, 42, 0.05);
-  if(_campaign == "Run3")             put_latex_text("61.9 fb^{-1} (2022+2023)", 0.61, 0.94, 42, 0.05);
+  if(_campaign == "2016preVFP_UL")    put_latex_text("19.7 fb^{-1} (2016-preVFP)",   xright, yup, 42, 0.05, true);
+  if(_campaign == "2016postVFP_UL")   put_latex_text("16.2 fb^{-1} (2016-postVFP)",  xright, yup, 42, 0.05, true);
+  if(_campaign == "2017_UL")          put_latex_text("41.5 fb^{-1} (2017)",          xright, yup, 42, 0.05, true);
+  if(_campaign == "2018_UL")          put_latex_text("59.8 fb^{-1} (2018)",          xright, yup, 42, 0.05, true);
+  if(_campaign == "Run2")             put_latex_text("137.2 fb^{-1} (Run-2)",        xright, yup, 42, 0.05, true);
+  if(_campaign == "Run3Summer22")     put_latex_text("7.98 fb^{-1} (2022-preEE)",    xright, yup, 42, 0.05, true);
+  if(_campaign == "Run3Summer22EE")   put_latex_text("26.7 fb^{-1} (2022-postEE)",   xright, yup, 42, 0.05, true);
+  if(_campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)",  xright, yup, 42, 0.05, true);
+  if(_campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", xright, yup, 42, 0.05, true);
+  if(_campaign == "Run3")             put_latex_text("61.9 fb^{-1} (2022+2023)",     xright, yup, 42, 0.05, true);
+  if(_campaign == "FullDataset")      put_latex_text("199.1 fb^{-1} (Run-2+2022+2023)", xright, yup, 42, 0.05, true);
   put_latex_text(info1, 0.17, 0.78, 42, 0.04);     //Additional information
   put_latex_text(info2, 0.17, 0.73, 42, 0.04);     //Additional information
 

@@ -19,44 +19,20 @@ dryrun = args.dryrun
 
 if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
-#default = True
 
-basedir = '../ROOT_FILES/treesWithNN/'
+#----------------------------------- config ----------------------------------------
+basedir   = '../ROOT_FILES/treesWithNN/'
+campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
+             "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+basename  = "baseline-JERdown/tree_baseline"
+dumpdir   = "sr-JERdown"
+tag       = "sr-JERdown"
+#-----------------------------------------------------------------------------------
 
-jobdict = {
-    "baseline/tree_2016preVFP_UL_baseline":{
-        "outjob":"topcr/tree_2016preVFP_UL_topcr",
-        "campaign":"2016preVFP_UL"
-    },
-    "baseline/tree_2016postVFP_UL_baseline":{
-        "outjob":"topcr/tree_2016postVFP_UL_topcr",
-        "campaign":"2016postVFP_UL"
-    },
-    "baseline/tree_2017_UL_baseline":{
-        "outjob":"topcr/tree_2017_UL_topcr",
-        "campaign":"2017_UL"
-    },
-    "baseline/tree_2018_UL_baseline":{
-        "outjob":"topcr/tree_2018_UL_topcr",
-        "campaign":"2018_UL"
-    },
-    "baseline/tree_Run3Summer22_baseline":{
-        "outjob":"topcr/tree_Run3Summer22_topcr",
-        "campaign":"Run3Summer22"
-    },
-    "baseline/tree_Run3Summer22EE_baseline":{
-        "outjob":"topcr/tree_Run3Summer22EE_topcr",
-        "campaign":"Run3Summer22EE"
-    },
-    "baseline/tree_Run3Summer23_baseline":{
-        "outjob":"topcr/tree_Run3Summer23_topcr",
-        "campaign":"Run3Summer23"
-    },
-    "baseline/tree_Run3Summer23BPix_baseline":{
-        "outjob":"topcr/tree_Run3Summer23BPix_topcr",
-        "campaign":"Run3Summer23BPix"
-    },
-}
+jobdict = {}
+for camp in campaigns:
+    key = f"{basename}_{camp}"
+    jobdict[key] = {"outjob": f"{dumpdir}/tree_{tag}_{camp}", "campaign": camp}
 
 def read_file_into_df(filepath, step_size=100000, test=False):
     with uproot.open(filepath) as tfile:
@@ -95,18 +71,21 @@ filecount = 0
 
 for injob, info in jobdict.items():
 
-    jobcount += 1
     outjob = info["outjob"]
     campaign = info["campaign"]
 
+    jobcount += 1
+    
     ### Picking the right DNN score for event selection:
     nnscore_qcd   = "nnscore_Run3_vlld_qcd"
-    nnscore_ttbar = "nnscore_Run3_vlld_ttbar"
     nnscore_wjets = "nnscore_Run3_vlld_wjets"
+    nnscore_ttbar = "nnscore_Run3_vlld_ttbar"
+    nnscore_dy    = "nnscore_Run3_vlld_dy"
     if 'Run3' not in campaign:
         nnscore_qcd   = "nnscore_Run2_vlld_qcd"
-        nnscore_ttbar = "nnscore_Run2_vlld_ttbar"
         nnscore_wjets = "nnscore_Run2_vlld_wjets"
+        nnscore_ttbar = "nnscore_Run2_vlld_ttbar"
+        nnscore_dy    = "nnscore_Run2_vlld_dy"
 
     print(f"\n({jobcount}/{len(list(jobdict.items()))}) injob = {injob}, outjob = {outjob}, campaign = {campaign}", style="yellow")
     
@@ -138,35 +117,41 @@ for injob, info in jobdict.items():
         #         EVENT SELECTION          #
         ####################################
 
+        ## cleaning
+        clean = f'dilep_deta < 2.5 and dilep_dR > 1'
+
+        ## Step1: Controlling Drell-Yan:
+        dy_cr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
         dy_veto = 'not (channel == 3 and 76 < dilep_mass < 106)'
         
-        ## Step1: Controlling QCD:
-        qcd_cr = f'{dy_veto} and {nnscore_qcd}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d>5'
-        qcd_vr = f'{dy_veto} and {nnscore_qcd}<0.30 and 0.02<lep0_iso<0.15 and lep0_sip3d<5'
+        ## Step2: Controlling QCD:
+        qcd_enhanced = f'{dy_veto} and {nnscore_qcd}<0.20 and 0.01<lep0_iso<0.15'
+        qcd_cr = f'{qcd_enhanced} and abs(dilep_phi) < 1.5'
+        qcd_vr = f'{qcd_enhanced} and abs(dilep_phi) > 1.5'
+        tight_iso   = 'lep0_iso<0.05 and lep1_iso<0.2'
         tight_sip3d = 'lep0_sip3d<5 and lep1_sip3d<10'
-        qcd_veto    = f'{tight_sip3d} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50'
-        
-        ## Step2: Controlling Drell-Yan:
-        dy_cr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
+        qcd_veto    = f'{tight_sip3d} and {tight_iso} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50'
 
-        ## Step3: Controlling WJets:
+        ## Step3: Controlling WJets: WORK IN PROGRESS
         wjets_cr    = f'{qcd_veto} and {nnscore_wjets}<0.50 and nbjet==0'
-        wjets_veto  = f'{qcd_veto} and {nnscore_wjets}>0.50' 
+        wjets_veto  = f'{qcd_veto} and {nnscore_wjets}>0.70' 
         
         ## Step4: Controlling TTbar:
+        #top_cr = f'{wjets_veto} and {nnscore_qcd}>0.70 and {nnscore_ttbar}<0.30'
         top_cr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet>0'
         
         ## Step5: Validation:
-        val_region = f'{dy_veto} and 0.50<{nnscore_qcd}<0.70 and {nnscore_wjets}>0.50'
-        val_region = val_region+f'and HT>50 and {tight_sip3d}'
+        val_region = f'{wjets_veto} and 0.30<{nnscore_qcd}<0.70'
+        val_region = val_region+f'and {tight_iso} and {tight_sip3d} and {clean}'
         
         ## Step6: Signal regions:
-        presr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet==0'
-        sr = f'{presr} and ST>300'
+        presr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet==0 and {clean}'
+        presrval = f'{presr} and {nnscore_ttbar}<0.70'
+        sr = f'{presr} and {nnscore_ttbar}>0.70'
         
         #------------------------------
         # Final event selection:
-        event_selection = top_cr
+        event_selection = sr
         #------------------------------
 
         filecount += 1
