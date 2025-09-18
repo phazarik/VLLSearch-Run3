@@ -34,23 +34,21 @@ campaign = "2018_UL"
 ### Options for Run3: Run3Summer22, Run3Summer22EE, Run3Summer23, Run3Summer23BPix
 
 mode = "TreeMaker"
-nanoAODv = 11
 
 samples_to_run = ["DYGToLLG", "DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
-if "Summer23" in campaign: samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
-else: samples_to_run.extend(["Muon", "EGamma"])
-samples_to_run.extend(["VLLD-ele", "VLLD_mu"])
+#samples_to_run = ["QCDEM", "QCDMu"]
+#if "Summer23" in campaign: samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
+#else: samples_to_run.extend(["Muon", "EGamma"])
+#samples_to_run.extend(["VLLD-ele", "VLLD-mu"])
 
-#if nanoAODv==11:
-    #samples_to_run=["Muon", "EGamma", "RareTop", "VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
-    #samples_to_run=["RareTop"]
-    #samples_to_run=["VLLS_ele", "VLLS_mu", "VLLD_ele", "VLLD_mu"]
-    #samples_to_run=["QCD_MuEnriched", "QCD_EMEnriched"] 
-    
+#samples_to_run = ["Muon", "EGamma"]
+#if "Summer23" in campaign: samples_to_run = ["Muon0", "Muon1", "EGamma0", "EGamma1"]
+
+
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
 if mode == "HistMaker": dumpdir = "ROOT_FILES/hists/"
-nanoAODpath = f"/mnt/d/work/MC_samples_skimmed/skimmed_2LSS_{campaign}"
+nanoAODpath = f"/mnt/d/work/SkimmedSamples/skimmed_2LSS_{campaign}"
 codedir = "/mnt/d/work/GitHub/VLLSearch-Run3/AnalysisScripts"
 
 #---------------------------------------------
@@ -106,20 +104,10 @@ for item in samples_to_run:
         sample_time_start = time.time()
         for subsample, val in subs.items():
 
+            #if "300" not in subsample: continue
             samplename = f'{sample}_{subsample}'
             print(f'\nProcessing {samplename} ... ', style='cyan')
             
-            ### Exception for nanoAOD version in Run3Summer22:
-            if campaign == "Run3Summer22":
-                if nanoAODv==12:
-                    if 'RareTop' in sample and 'TTWZ' in subsample:
-                        print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', style='red')
-                        continue
-                if nanoAODv==11:
-                    if 'RareTop' in sample and 'TTWZ' not in subsample:
-                        print(f'Skipping {samplename} because of nanoAOD version-{nanoAODv}', style='red')
-                        continue
-
             #------------------------------------------
             # Find directories and files in input_path.
             # If not found, skip.
@@ -128,6 +116,8 @@ for item in samples_to_run:
             inpath = os.path.join(nanoAODpath, sample, subsample)
             if not os.path.exists(inpath):
                 print(f"Warning: Path does not exist: {inpath}", style='yellow')
+                list_failed.append(samplename)
+                continue
                 pattern = os.path.join(nanoAODpath, f"{sample}_{subsample}_*")
                 print(f"Searching for pattern: {pattern}")
                 matches = glob.glob(pattern)
