@@ -28,13 +28,15 @@ channels = {
 basedir = "systematic_uncertainties"
 binedges = [0, 25, 50, 100, 200, 300, 400, 500]
 plotdict = {
-    "lep":      {"color": "xkcd:green",            "label": "Lepton SF"},
-    "trig":     {"color": "xkcd:red",              "label": "Trigger eff"},
-    "bjet":     {"color": "xkcd:blue",         "label": "b-tagging eff"},
+    "lep":      {"color": "xkcd:green",              "label": "Lepton SF"},
+    "trig":     {"color": "xkcd:red",                "label": "Trigger eff"},
+    "bjet":     {"color": "xkcd:blue",               "label": "b-tagging eff"},
     "pileup":   {"color": "xkcd:hot pink",           "label": "PileUp weight"},
     "dy":       {"color": root_color(ROOT.kRed-7),   "label": "DY norm"},
     "qcd":      {"color": root_color(ROOT.kOrange-3),"label": "QCD norm"},
     "ttbar":    {"color": root_color(ROOT.kAzure+1), "label": r"$t\bar{t}+x$ norm"},
+    "jec":      {"color": "xkcd:purple",             "label": "JEC"},
+    "jer":      {"color": "xkcd:light purple",       "label": "JER"},
     "lumi":     {"color": "xkcd:burnt orange",       "label": "Luminosity"},
 }
 campaign_dict = {
@@ -53,6 +55,16 @@ campaign_dict = {
 xtitle = r"$L_{T}+p_{T}^{\text{  miss}}$ (GeV)"
 # ------------------------------------------
 
+def main():
+    count = 0
+    for camp in campaigns:
+        for ch, chname in channels.items():
+            if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
+            count += 1
+            print(f"\n[yellow][{count}] processing {camp}, {ch} channel[/yellow]")
+            make_plot(camp, ch)
+
+# ------- Retrieve systematic uncertainty arrays --------
 def get_syst_arrays(data, syst, nbins):
     d = data.get(syst)
     if not d: return None, None
@@ -79,6 +91,7 @@ def get_syst_arrays(data, syst, nbins):
             down[i] = d[first_key]["systdown"]
     return up, down
 
+# ------- Calculate the total systematic uncertainty envelope --------
 def get_envelope_arrays(data, nbins):
     """Compute the per-bin envelope as raw deviations from y=1"""
     up_sq = np.zeros(nbins)
@@ -104,6 +117,7 @@ def get_envelope_arrays(data, nbins):
     down = np.sqrt(down_sq)
     return up, down
 
+# ------- Generate systematic uncertainty plot --------
 def make_plot(campaign, channel):
     jsonfile = os.path.join(basedir, f"{campaign}_{channel}.json")
     if not os.path.exists(jsonfile):
@@ -159,13 +173,5 @@ def make_plot(campaign, channel):
     print(f"Created: {outfile}")
     plt.close(fig)
 
-def main():
-    count = 0
-    for camp in campaigns:
-        for ch, chname in channels.items():
-            if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
-            count += 1
-            print(f"\n[yellow][{count}] processing {camp}, {ch} channel[/yellow]")
-            make_plot(camp, ch)
-
+# ------- EXECUTION --------
 if __name__ == "__main__": main()

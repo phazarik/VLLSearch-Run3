@@ -18,6 +18,8 @@ namedict = {
     "dy":  "DY norm",
     "qcd":  "QCD norm",
     "ttbar": "tt+x norm",
+    "jec": "JEC",
+    "jer": "JER",
     "lumi": "Luminosity"
 }
 
@@ -66,7 +68,7 @@ totals["envelope"] = {
 
 # Print results
 print("\n"+"-"*32)
-print(f"Systematic uncertainties (CMS quadrature)")
+print(f"Systematic uncertainties")
 print(f"{campaign}, {channel} (up/down):")
 print("-"*32)
 for syst, values in totals.items():

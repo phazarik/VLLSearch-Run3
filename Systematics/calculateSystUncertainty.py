@@ -11,40 +11,26 @@ campaigns = [
 ]
 
 channels  = ["mm", "me", "em", "ee", "combined"]
-basedir = "yields/2025-09-10/" ## Assuming everything to be in the same directory
+basedir = "yields/2025-09-18/" ## Assuming everything to be in the same directory
 tag = "sr"
 # ------------------------------------------
 
-def csv_into_df(csvfile):
-    if not os.path.exists(csvfile):
-        print(f"\033[31mFile not found:\033[0m {csvfile}, skipping ...")
-        return None
-    df = pd.read_csv(csvfile)
-    df = df[[c for c in df.columns if "VLL" not in c and "Data" not in c]]
-    #print(df)
-    return df
+def main():
+    count = 0
+    for camp in campaigns:
+        for ch in channels:
+            ## Exception:
+            if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
+            count +=1
+            print("\n"+"-"*50+f"\n\033[33m[{count}] processing {camp}, {ch} channel\033[0m\n"+"-"*50)
+            process(camp, ch)
+            #break #channel
+        #break#campaign
+    print("\nDone!")
 
-def extract_central(df):
-    df_central = df.copy()
-    for col in df_central.columns:
-        if df_central[col].dtype == object:
-            ## split at ± and take the first piece
-            df_central[col] = df_central[col].str.split("±").str[0].str.strip()
-            ## convert only if it's numeric
-            df_central[col] = pd.to_numeric(df_central[col], errors="coerce")
-    return df_central
-
-def add_global_systematic(systematics, name, value):
-    """Add a global systematic that applies the same value to all bins"""
-    systematics[name] = {
-        "global": {
-            "systup": value,
-            "systdown": value
-        }
-    }
-
+# ------------------ combining logic ---------------------
 def combine_syst(systematics):
-    # Find first bin-by-bin systematic
+    ## Find first bin-by-bin systematic
     first_key = None
     for k in systematics:
         if k != "combined" and any(str(b).isdigit() for b in systematics[k].keys()):
@@ -60,20 +46,20 @@ def combine_syst(systematics):
         down_sq = 0
         for s in systematics:
             if s == "combined": continue
-            # Global systematics
+            ## Global systematics
             if "global" in systematics[s]:
                 syst_val_up = systematics[s]["global"]["systup"] - 1
                 syst_val_down = 1 - systematics[s]["global"]["systdown"]
                 up_sq += syst_val_up ** 2
                 down_sq += syst_val_down ** 2
-            # Bin-by-bin systematics
+            ## Bin-by-bin systematics
             elif b in systematics[s]:
                 syst_val_up = systematics[s][b]["systup"] - 1
                 syst_val_down = 1 - systematics[s][b]["systdown"]
                 up_sq += syst_val_up ** 2
                 down_sq += syst_val_down ** 2
         
-        # Ensure combined factors are >0 and percentages are positive
+        ## Ensure combined factors are >0 and percentages are positive
         systup_comb = 1 + math.sqrt(up_sq)
         systdown_comb = 1 - math.sqrt(down_sq)
         systematics["combined"][b] = {
@@ -81,42 +67,17 @@ def combine_syst(systematics):
             "systdown": systdown_comb
         }
 
-def format_floats(obj, precision=6):
-    if isinstance(obj, float): return float(f"{obj:.{precision}f}")
-    if isinstance(obj, dict):  return {k: format_floats(v, precision) for k, v in obj.items()}
-    if isinstance(obj, list):  return [format_floats(v, precision) for v in obj]
-    return obj
-
-def format_json(obj, precision=6):
-    lines = ["{"]
-    for i, (syst, bins) in enumerate(obj.items()):
-        lines.append(f'  "{syst}": {{')
-        bin_lines = []
-        for b, vals in bins.items():
-            if "nomYield" in vals:
-                # Bin-by-bin systematics with nominal yield
-                bin_lines.append(
-                    f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f},"nomYield": {vals["nomYield"]:.{precision}f}}}'
-                )
-            else:
-                # Global systematics or combined (without nominal yield)
-                bin_lines.append(
-                    f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f}}}'
-                )
-        lines.append(",\n".join(bin_lines))
-        lines.append("  }" + ("," if i < len(obj) - 1 else ""))
-    lines.append("}")
-    return "\n".join(lines)
-
+# ------------------ syst calculation --------------------
 def process(campaign, channel):
     csvfile_nom = os.path.join(basedir, tag, f"yields_{tag}_{campaign}_{channel}.csv")
     df_nom = csv_into_df(csvfile_nom)
     if df_nom is None: return
 
     ## Initializing the dictionary
-    systematics = {"lep":{}, "trig":{}, "pileup":{}, "bjet":{}, "dy":{}, "qcd":{}, "ttbar":{}}
+    systematics = {"lep":{}, "trig":{}, "pileup":{}, "bjet":{},
+                   "dy":{}, "qcd":{}, "ttbar":{}, "jec":{}, "jer":{}} ## Sensitive to naming conventions
 
-    # Extract nominal yields for each bin
+    ## Extract nominal yields for each bin
     nom_central = extract_central(df_nom).get("TotalBkg", pd.Series([0]*len(df_nom)))
     nominal_yields = {}
     
@@ -192,18 +153,63 @@ def process(campaign, channel):
     outfile  = os.path.join(outdir, f"{campaign}_{channel}.json")
     with open(outfile, "w") as f: f.write(json_str)
     print(f"\033[1;33m\nSaved JSON:\033[0m {outfile}")
-    
-def main():
-    count = 0
-    for camp in campaigns:
-        for ch in channels:
-            ## Exception:
-            if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
-            count +=1
-            print("\n"+"-"*50+f"\n\033[33m[{count}] processing {camp}, {ch} channel\033[0m\n"+"-"*50)
-            process(camp, ch)
-            #break #channel
-        #break#campaign
-    print("\nDone!")
 
+# ------------------ utility functions --------------------
+
+def csv_into_df(csvfile):
+    if not os.path.exists(csvfile):
+        print(f"\033[31mFile not found:\033[0m {csvfile}, skipping ...")
+        return None
+    df = pd.read_csv(csvfile)
+    df = df[[c for c in df.columns if "VLL" not in c and "Data" not in c]]
+    #print(df)
+    return df
+
+def extract_central(df):
+    df_central = df.copy()
+    for col in df_central.columns:
+        if df_central[col].dtype == object:
+            ## split at ± and take the first piece
+            df_central[col] = df_central[col].str.split("±").str[0].str.strip()
+            ## convert only if it's numeric
+            df_central[col] = pd.to_numeric(df_central[col], errors="coerce")
+    return df_central
+
+def add_global_systematic(systematics, name, value):
+    """Add a global systematic that applies the same value to all bins"""
+    systematics[name] = {
+        "global": {
+            "systup": value,
+            "systdown": value
+        }
+    }
+
+def format_floats(obj, precision=6):
+    if isinstance(obj, float): return float(f"{obj:.{precision}f}")
+    if isinstance(obj, dict):  return {k: format_floats(v, precision) for k, v in obj.items()}
+    if isinstance(obj, list):  return [format_floats(v, precision) for v in obj]
+    return obj
+
+def format_json(obj, precision=6):
+    lines = ["{"]
+    for i, (syst, bins) in enumerate(obj.items()):
+        lines.append(f'  "{syst}": {{')
+        bin_lines = []
+        for b, vals in bins.items():
+            if "nomYield" in vals:
+                ## Bin-by-bin systematics with nominal yield
+                bin_lines.append(
+                    f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f},"nomYield": {vals["nomYield"]:.{precision}f}}}'
+                )
+            else:
+                ## Global systematics or combined (without nominal yield)
+                bin_lines.append(
+                    f'    "{b}": {{"systup": {vals["systup"]:.{precision}f},"systdown": {vals["systdown"]:.{precision}f}}}'
+                )
+        lines.append(",\n".join(bin_lines))
+        lines.append("  }" + ("," if i < len(obj) - 1 else ""))
+    lines.append("}")
+    return "\n".join(lines)
+
+# -------- EXECUTION ---------
 if __name__ == "__main__": main()

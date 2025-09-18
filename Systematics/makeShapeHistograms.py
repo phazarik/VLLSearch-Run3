@@ -8,8 +8,8 @@ console = Console(highlight=False)
 print = console.print
 
 # ------------------- config ---------------------
-systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar"]
-basedir = "yields/2025-09-14" ## Assuming all yields to be in the same directory.
+systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar", "jec", "jer"] ## non-global ones
+basedir = "yields/2025-09-18" ## Assuming all yields to be in the same directory.
 dump = "shapes"
 campaigns = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
@@ -166,7 +166,7 @@ def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfi
             h_nom.SetBinError(i, err)
         h_nom.Write()
 
-        # Skip signal/data for systematics
+        ## Skip signal/data for systematics
         if "VLL" in proc or proc == "Data": continue
         
         ## Systematics
@@ -187,7 +187,7 @@ def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfi
 
     fout.Close()
 
-# ------------- EXECUTION ---------------
+# --------- EXECUTION -----------
 if __name__ == "__main__": main()
 
 

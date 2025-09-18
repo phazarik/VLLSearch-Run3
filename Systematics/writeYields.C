@@ -29,9 +29,9 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "LTplusMET",
 		 TString _name = "LT+MET",
-		 TString _jobname = "2025-09-10_sr_ttbar-systdown",
-		 TString _tag = "sr_ttbar-systdown",
-		 TString _displaytext = "val",
+		 TString _jobname = "2025-09-17_sr_jer-systup",
+		 TString _tag = "sr_jer-systup",
+		 TString _displaytext = "sr",
 		 bool _data = false, //careful!
 		 bool _save = true
 		 ){
@@ -47,12 +47,12 @@ void writeYields(
   for (auto &campaign : campaigns) {
     for (auto &channel : channels) {
       if((campaign == "Run2" || campaign=="Run3") && channel != "combined") continue;
-      TString path = _jobname + "/hist_" + _tag + "_" + campaign + "_" + channel;
+      TString path = _jobname + "/hist_" + _tag + "_" + campaign + "_" + channel; //Don't change it
       if (!gSystem->AccessPathName("../ROOT_FILES/hists/"+path)) {
 	metadata.push_back(make_tuple(path, campaign, channel));
 	cout << " - " << path << endl;
       }
-      else cout << " Not found: " << path << endl;
+      else cout << " Not found: " << "../ROOT_FILES/hists/"+path << endl;
     }
   }
  
