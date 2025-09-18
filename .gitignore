@@ -30,3 +30,4 @@ LimitCalculation/sigmaBlimits/*/*txt
 NNTrainer/trained_models/backup_*/
 Systematics/yields/
 Systematics/datacards
+ROOT_FILES/
