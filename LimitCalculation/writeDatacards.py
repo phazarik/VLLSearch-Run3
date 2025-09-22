@@ -10,7 +10,9 @@ campaigns = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix",
 ]
+campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
+channels.extend(["combined"])
 #-------------------------------------------------
 
 def main():
