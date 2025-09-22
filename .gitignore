@@ -24,6 +24,7 @@ StackedPlotMaker/auto_generated_jsons/
 LimitCalculation/datacards/*/*/*.txt
 LimitCalculation/fromCMScombine/*/*.txt
 LimitCalculation/sigmaBlimits/*/*txt
+LimitCalculation/shapes/
 !NNTrainer/
 !LocalScripts/NNTrainer/trained_models/*/*.png
 !LocalScripts/NNTrainer/trained_models/*/before_training/*.png
