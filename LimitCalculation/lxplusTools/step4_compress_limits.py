@@ -1,7 +1,7 @@
 import os, sys
 
-limits_dir = "limits/"
-archive_name = "limits.tar.gz"
+limits_dir = "limits_rvalue/"
+archive_name = "limits_rvalue.tar.gz"
 
 if not os.path.exists(limits_dir):
     print("Error: limits don't exist.")

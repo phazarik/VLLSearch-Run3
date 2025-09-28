@@ -11,8 +11,9 @@ from datetime import timedelta
 
 # ------------------- config ---------------------
 systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar", "jec", "jer"] ## non-global ones
-basedir = "../Systematics/yields/2025-09-18/" ## Assuming all yields to be in the same directory.
+basedir = "../Systematics/yields/2025-09-26/" ## Assuming all yields to be in the same directory.
 dump = "shapes"
+os.system(f"rm -rf {dump}/*")
 #-------------------------------------------------
 
 campaigns = [
@@ -78,6 +79,7 @@ def make_shapes(campaign, channel):
             path_sys = os.path.join(basedir, subtag)
             file_sys = os.path.join(path_sys, f"yields_{subtag}_{campaign}_{channel}.csv")
             if os.path.exists(file_sys):
+                print(f"Opening {file_sys}")
                 dfs_syst[(syst, direction)] = csv_into_df(file_sys)
                 #print(f"{syst}_{direction}", dfs_syst[(syst, direction)].shape)
                 #print(dfs_syst[(syst, direction)])
@@ -90,8 +92,9 @@ def make_shapes(campaign, channel):
                 signal_name = f"{sigtype}_{flav}_{m}"
                 outname = f"shapes_{campaign}_{channel}_{signal_name}.root"
                 dump_subdir = f"{dump}/{campaign}_{channel}"
-                outfile = os.path.join(dump_subdir, outname)
+                if os.path.exists(dump_subdir) and not os.path.isdir(dump_subdir): os.remove(dump_subdir)
                 os.makedirs(dump_subdir, exist_ok=True)
+                outfile = os.path.join(dump_subdir, outname)
                 make_root_file(df_nom, dfs_syst, signal_name, campaign, channel, outfile)
                 print(f"Histograms written to \033[33m{outfile}\033[0m")
 
@@ -210,10 +213,19 @@ def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfi
             val, err = parse_valerr(df_nom.iloc[i - 1][proc])
             h_nom.SetBinContent(i, val)
             h_nom.SetBinError(i, err)
+        # --- bypass for empty signal histograms, or negative integrals ---
+        if h_nom.Integral() == 0 and "VLL" in proc:
+            h_nom.SetBinContent(nbins, 1e-6)
+            h_nom.SetBinError(nbins, 1e-6)
+        if h_nom.Integral() < 0:
+            print(f"\033[31m[Warning] Negative integral {h_nom.Integral():.3f} for {h_nom.GetName()} in {outfile}, setting to 0\033[0m")
+            h_nom.Reset()  # clear bins
+            h_nom.SetBinContent(nbins, 1e-6)
+            h_nom.SetBinError(nbins, 1e-6)
         h_nom.Write()
 
-        ## Skip signal/data for systematics
-        if "VLL" in proc: continue
+        ## Skip data for systematics
+        #if "VLL" in proc: continue
         if proc == "data_obs": continue
         
         ## Systematics
@@ -224,12 +236,21 @@ def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfi
                 fout.Close()
                 return
 
-            h_syst_name = f"{variable['name']}_{chname}_{proc}_{syst}{direction}"
+            h_syst_name = f"{variable['name']}_{chname}_{proc.replace('_','')}_{syst}{direction}" ## remove extra '_'
             h_syst = ROOT.TH1F(h_syst_name, proc, nbins, edges_arr)
             for i in range(1, nbins + 1):
                 val, err = parse_valerr(df.iloc[i - 1][proc])
                 h_syst.SetBinContent(i, val)
                 h_syst.SetBinError(i, err)
+            # --- bypass for empty systematics, or negative integrals ---
+            if h_syst.Integral() == 0 and "VLL" in proc:
+                h_syst.SetBinContent(nbins, 1e-6)
+                h_syst.SetBinError(nbins, 1e-6)
+            if h_syst.Integral() < 0:
+                print(f"\033[31m[Warning] Negative integral {h_syst.Integral():.3f} for {h_syst.GetName()} in {outfile}, setting to 0\033[0m")
+                h_syst.Reset()
+                h_syst.SetBinContent(nbins, 1e-6)
+                h_syst.SetBinError(nbins, 1e-6)
             h_syst.Write()
 
     fout.Close()

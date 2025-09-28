@@ -19,7 +19,7 @@ sigdict = {
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--by", choices=["channels","campaigns","run2","run3","all"], required=True)
+    parser.add_argument("--by", choices=["channels","campaigns","run2","run3","all"], default="channels")
     parser.add_argument("--shapes_dir", default="shapes")
     parser.add_argument("--out_dir", default="shapes")
     parser.add_argument("--dryrun", action="store_true")

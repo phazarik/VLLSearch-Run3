@@ -3,16 +3,16 @@ import shutil
 
 remote_user = "phazarik"
 remote_host = "lxplus.cern.ch"
-remote_archive = "/afs/cern.ch/user/p/phazarik/work/Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/CombinedLimit/data/tutorials/longexercise/limits.tar.gz"
-archive_name = "limits.tar.gz"
-local_dir = "limits/"
+remote_archive = "/afs/cern.ch/user/p/phazarik/work/Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/CombinedLimit/data/tutorials/longexercise/limits_rvalue.tar.gz"
+archive_name = "limits_rvalue.tar.gz"
+local_dir = "limits_rvalue/"
 
 hline = "-"*40
-print(f"\n{newline}")
+print(f"\n{hline}")
 print(f"Starting download process")
 print(f"Remote archive : {remote_user}@{remote_host}:{remote_archive}")
 print(f"Local target dir : {local_dir}")
-print(newline)
+print(hline)
 
 start = time.time()
 
@@ -25,7 +25,7 @@ if os.path.exists(local_dir):
     shutil.rmtree(local_dir)
 
 print(f"\nDownloading archive from remote server...")
-subprocess.run(["scp", f"{remote_user}@{remote_host}:{remote_archive}", archive_name], check=True)
+subprocess.run(["scp", f"{remote_user}@{remote_host}:{remote_archive}", "."], check=True)
 
 print(f"\nUnpacking archive locally...")
 subprocess.run(["tar", "-xzvf", archive_name], check=True)

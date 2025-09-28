@@ -13,6 +13,7 @@ campaigns = [
 campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
 channels.extend(["combined"])
+bkgs = ['DY', 'Higgs', 'MultiTop', 'QCD', 'ST', 'TTX', 'VV', 'VVV', 'WJetsGamma', 'WWss', 'ZGamma']
 #-------------------------------------------------
 
 def main():
@@ -47,9 +48,13 @@ def main():
     elapsed = timedelta(seconds=int(time_end - time_start))
     print(f"\nDone!.\nTime taken: {elapsed}")
 
-def safe_integral(h): return h.Integral() if h else 0
+def safe_integral(h, is_signal=False):
+    if not h: return 0
+    val = h.Integral()
+    if val==0 and is_signal: val = 1e-6
+    return val
 
-def write_datacard_from_keys(outdir, rfile, campaign, channel):
+def write_datacard_from_keys(outdir, rfile, campaign, channel, useSyst=True):
 
     outdir = os.path.join(outdir, f"{campaign}_{channel}")
     os.makedirs(outdir, exist_ok=True)
@@ -97,10 +102,14 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel):
     data_name = next((p for p in processes if "data" in p.lower()), None)
     if data_name is None:
         print(f"\033[31m[Warning] Data not found.\033[0m")
-    
-    backgrounds = [p for p in processes if p != signal_name and p != data_name]
-    bundles = [signal_name] + backgrounds
 
+    ## Missing sample check
+    all_bkgs = [p for p in processes if p != signal_name and p != data_name]
+    missing = [b for b in all_bkgs if b not in bkgs]
+    if missing: print(f"\033[31m[Warning] Missing in bkgs: {missing}\033[0m")
+
+    samples = [signal_name] + bkgs
+    
     # ----- debug statements -----
     #print("Found processes:")
     #print(f"Signal = {signal_name}")
@@ -115,7 +124,7 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel):
 
         ### HEADER
         dc.write(f"imax {len(bins)}\n")
-        dc.write(f"jmax {len(backgrounds)}\n")
+        dc.write(f"jmax {len(bkgs)}\n")
         dc.write("kmax *\n\n")
 
         ### HEADER FOR HISTOGRAM KEYS
@@ -132,46 +141,67 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel):
 
         ### DEFINING PROCESS COLUMNS (INCLUDING SIGNAL)
         repeated_bins = []
-        for bin_ in bins: repeated_bins.extend([bin_] * len(bundles))
+        for bin_ in bins: repeated_bins.extend([bin_] * len(samples))
         dc.write("bin      " + "  ".join(repeated_bins) + "\n")
 
         proc_names = []
-        for bin_ in bins: proc_names.extend([p.replace("_", "") for p in bundles])
+        for bin_ in bins: proc_names.extend([p.replace("_", "") for p in samples])
         dc.write("process  " + "  ".join(proc_names) + "\n")
 
         proc_indices = []
-        for _ in bins: proc_indices.extend(str(i) for i in range(len(bundles)))
+        for _ in bins: proc_indices.extend(str(i) for i in range(len(samples)))
         dc.write("process  " + "  ".join(proc_indices) + "\n")
 
-        ### RATES (INTEGRAL OF EACH SHAPE IN EACH BIN)
+        ### RATES (INTEGRAL OF EACH SHAPE IN EACH BIN)              
         rates = []
         for bin_ in bins:
-            for p in bundles:
+            for p in samples:
                 h = nominal.get((bin_, p), None)
-                rates.append(f"{safe_integral(h):.3f}")
+                is_signal = (p == signal_name)
+                rate = f"{safe_integral(h, is_signal):.6f}"
+                if is_signal and rate == "0.000000": rate = "0.000001"
+                rates.append(rate)
+                #rates.append(f"{safe_integral(h):.3f}")
         dc.write("rate     " + "  ".join(rates) + "\n")
         dc.write("-" * 80 + "\n")
 
+        #-------------------------------------------------------------------------
         ### EXTRACTING SYSTEMATIC UNCERTAINTIES
-
-        ## Systematic uncertainty keys (sensititve to keys in shape-files)
-        syst_map = {
-            "lep": {"procs": bundles, "n": 1},
-            "trig": {"procs": bundles, "n": 1},
-            "bjet": {"procs": bundles, "n": 1},
-            "pileup": {"procs": bundles, "n": 1},
-            "dy": {"procs": ["DY"], "n": 1},
-            "qcd": {"procs": ["QCD"], "n": 1},
-            "ttbar": {"procs": ["TTX"], "n": 1},
-        }
-
-        for syst, info in syst_map.items():
-            row = [syst, "shape"]
-            for bin_ in bins:
-                for p in bundles:
-                    if p == signal_name: row.append("-") ## Skipping systematics for signal
-                    else: row.append(str(info["n"]) if p in info["procs"] else "-")
-            dc.write(" ".join(row) + "\n")
+        if useSyst:
+            ## Systematic uncertainty keys (sensititve to keys in shape-files)
+            shape_syst_map = {
+                "lep": {"procs": samples, "n": 1},
+                "trig": {"procs": samples, "n": 1},
+                "bjet": {"procs": samples, "n": 1},
+                "pileup": {"procs": samples, "n": 1},
+                "dy": {"procs": ["DY"], "n": 1},
+                "qcd": {"procs": ["QCD"], "n": 1},
+                "ttbar": {"procs": ["TTX"], "n": 1},
+            }
+            
+            ## Global lnN systematics
+            global_syst_map = {
+                "lumi": {"procs": samples, "val": 1.025, "type": "lnN"},
+                "xsec": {"procs": samples, "val": 1.050, "type": "lnN"},
+            }
+            
+            ## Shape systematics:
+            for syst, info in shape_syst_map.items():
+                row = [syst, "shape"]
+                for bin_ in bins:
+                    for p in samples:
+                        #if p == signal_name: row.append("-") ## Skipping systematics for signal
+                        #else: row.append(str(info["n"]) if p in info["procs"] else "-")
+                        row.append(str(info["n"]) if p in info["procs"] else "-")
+                dc.write(" ".join(row) + "\n")
+            ## Global systematics:
+            for syst, info in global_syst_map.items():
+                row = [syst, info["type"]]
+                for bin_ in bins:
+                    for p in samples:
+                        row.append(str(info["val"]) if p in info["procs"] else "-")
+                dc.write(" ".join(row) + "\n")
+        #-------------------------------------------------------------------------
 
         dc.write("\n* autoMCStats 0 0 1\n")
     #-------------------------------------------------------------------------------

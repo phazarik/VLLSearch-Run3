@@ -28,6 +28,7 @@ sigdict = {
     "VLLS": {}
 }
 variable = "LTplusMET"
+outdir = "limits_rvalue"
 
 # ------------ main ------------
 def main():
@@ -80,9 +81,9 @@ def main():
     print_limits_tables(sigdict)
 
     ##Save as JSON
-    if not args.dryrun: os.makedirs("limits", exist_ok=True)
+    if not args.dryrun: os.makedirs(outdir, exist_ok=True)
     jsonfile = f"limits_{args.campaign}_{args.channel}.json"
-    jsonpath = os.path.join("limits", jsonfile)
+    jsonpath = os.path.join(outdir, jsonfile)
     formatted_sigdict = format_sigdict_for_json(sigdict)
     with open(jsonpath, "w") as f: json.dump(formatted_sigdict, f, indent=2)
     print(f"\nFile created: \033[93m{jsonpath}\033[0m\n")

@@ -21,10 +21,10 @@
 StackedPlotMaker/signalyields/
 StackedPlotMaker/yields/
 StackedPlotMaker/auto_generated_jsons/
-LimitCalculation/datacards/*/*/*.txt
-LimitCalculation/fromCMScombine/*/*.txt
-LimitCalculation/sigmaBlimits/*/*txt
 LimitCalculation/shapes/
+LimitCalculation/limits_rvalue/
+LimitCalculation/limits_sigmaB_13TeV/
+LimitCalculation/limits_sigmaB_13p6TeV/
 !NNTrainer/
 !LocalScripts/NNTrainer/trained_models/*/*.png
 !LocalScripts/NNTrainer/trained_models/*/before_training/*.png
