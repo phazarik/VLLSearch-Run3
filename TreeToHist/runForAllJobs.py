@@ -23,12 +23,12 @@ print()
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 channels  = ["mm", "me", "em", "ee"]
-basedir   = "sr-JERdown"
-tag       = "sr-JERdown"
-tagout    = "sr_jer-systdown" ## Shows up in hist directory names
+basedir   = "sr"
+tag       = "sr"
+tagout    = "sr" ## Shows up in hist directory names
 jobdict = {}
 for camp in campaigns:
-    #if 'Run3' not in camp: continue
+    #if 'Run3' in camp: continue
     key = f"{basedir}/tree_{tag}_{camp}"
     #jobdict[key] = {"dump": f"hist_{tag}_{camp}", "campaign": camp}
     jobdict[key] = {"dump": f"hist_{tagout}_{camp}", "campaign": camp}

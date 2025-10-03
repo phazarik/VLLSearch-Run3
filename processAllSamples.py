@@ -35,15 +35,15 @@ campaign = "2018_UL"
 
 mode = "TreeMaker"
 
-samples_to_run = ["DYGToLLG", "DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
+samples_to_run = []
+#samples_to_run = ["DYGToLLG", "DYto2L", "Higgs", "QCDEM", "QCDMu", "RareTop", "ST", "TT", "TTV", "TW", "VV", "VVSS", "VVV", "WGtoLNuG", "WtoLNu", "ZGamma"]
 #samples_to_run = ["QCDEM", "QCDMu"]
 #if "Summer23" in campaign: samples_to_run.extend(["Muon0", "Muon1", "EGamma0", "EGamma1"])
 #else: samples_to_run.extend(["Muon", "EGamma"])
-#samples_to_run.extend(["VLLD-ele", "VLLD-mu"])
+samples_to_run.extend(["VLLD-ele", "VLLD-mu"])
 
 #samples_to_run = ["Muon", "EGamma"]
 #if "Summer23" in campaign: samples_to_run = ["Muon0", "Muon1", "EGamma0", "EGamma1"]
-
 
 ### Absolute paths:
 dumpdir = "ROOT_FILES/trees/"
@@ -99,7 +99,7 @@ for item in samples_to_run:
         if sample == 'QCDEle' : flag='qcdele'
         if sample == 'DYto2L':  flag='dy'
         if sample == 'TT':      flag='ttbar'
-        if sample == 'VLLD':    flag='doublet'
+        if 'VLLD' in sample:    flag='doublet'
 
         sample_time_start = time.time()
         for subsample, val in subs.items():

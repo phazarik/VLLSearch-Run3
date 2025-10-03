@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 #---------------- CONFIG ------------------#
 basedir = "../ROOT_FILES/hists/"
-jobname = "2025-09-17_sr_jer-systdown"
+jobname = "2025-09-25_sr_jer-systdown"
 tag = "sr_jer-systdown"
 campaigns_all = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",

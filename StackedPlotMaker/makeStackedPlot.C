@@ -12,12 +12,12 @@ void makeStackedPlot(
 		     //TString _var = "lep0_iso",
 		     TString _var = "dilep_dR",
 		     TString _name = "test",
-		     TString _jobname = "2025-09-02_val_cleaned/hist_val_Run2_combined",
-		     TString _campaign = "Run2",
-		     TString _channel = "combined",
+		     TString _jobname = "2025-09-24_baseline/hist_baseline_2018_UL_mm",
+		     TString _campaign = "2018_UL",
+		     TString _channel = "mm",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
-		     bool _data = true,
+		     bool _data = false,
 		     bool _save = false
 		     )
 {
@@ -33,6 +33,7 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
+  // ymax_base = 10e9 for baseline
   Double_t ymin = 0.1; Double_t ymax_base = 10E4; Double_t ymax = ymax_base;
   if(_channel=="combined")                   ymax = ymax_base*10;
   if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
@@ -223,27 +224,27 @@ void makeStackedPlot(
   if(_channel == "ee"){
     sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD-ele", "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD-ele", "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
+    sig3 = get_hist(_var, input_path, "VLLD-ele", "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{300}");}
   }
   else if (_channel == "em"){
     sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-ele", "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{600}");}
+    sig3 = get_hist(_var, input_path, "VLLD-ele", "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{300}");}
   }
   else if (_channel == "me"){
     sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{300}");}
   }
   else if (_channel == "mm"){
     sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "600"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{600}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{300}");}
   }
   else if (_channel=="combined"){
     sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
     sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{200}");}
+    sig3 = get_hist(_var, input_path, "VLLD-mu",  "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{300}");}
   }
   else cout<<"\033[31m[ERROR:] all signal are null!"<<endl;
   //sig2 = nullptr;

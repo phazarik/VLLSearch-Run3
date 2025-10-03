@@ -23,28 +23,21 @@ struct LimitData {
 };
 struct plotinfo {TString filename; TString modelname; TString campaign; TString channel;};
 vector<LimitData> ReadDataFromFile(const TString& filename);
-void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TString campaign, TString channel, TString energy, float ymin, float ymax,  bool systematics, bool bottomleft);
 TGraph* ReadTheoryGraph(const TString& infile, const TString &modelname);
 string todays_date();
 
-void step7_makeBrazilianPlots(){
-
-  makeOneLimitPlot(
-		   "limits_sigmaB_13TeV/sigmaB_VLLD_mu_2018_UL_mm.txt",
-		   "test.png",
-		   "VLLD-#mu",
-		   "2018_UL",
-		   "#mu#mu channel",
-		   "13TeV",
-		   10e-4,
-		   10e2,
-		   true,
-		   false
-		   );
-  
-}
-
-void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TString campaign, TString channel, TString energy, float ymin, float ymax,  bool systematics, bool bottomleft)
+void makeOneLimitPlot(
+		      TString infile   = "limits_sigmaB_13TeV/sigmaB_VLLD_mu_Run3_combined.txt",
+		      TString outfile  = "test_run3_vlldmu",
+		      TString modelname= "VLLD-#mu",
+		      TString campaign = "Run3",
+		      TString channel  = "combined",
+		      TString energy   = "13p6TeV",
+		      float ymin       = 1e-3,
+		      float ymax       = 1e3,
+		      bool systematics = true,
+		      bool bottomleft  = false
+		      )
 {
   ind += 1;
   TString cname = Form("c_%d", ind);
@@ -110,8 +103,11 @@ void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TStrin
   }
 
   //Get theory graphs:
-  TGraph* theory_vlld = ReadTheoryGraph("xsec/sigmaB_VLLD_13TeV.txt", "VLLD");
-  TGraph* theory_vlls = ReadTheoryGraph("xsec/sigmaB_VLLS_13TeV.txt", "VLLS");  
+  TString modelname_doublet = modelname;
+  TString modelname_singlet = modelname;
+  modelname_singlet.ReplaceAll("VLLD", "VLLS");
+  TGraph* theory_vlld = ReadTheoryGraph("xsec/sigmaB_VLLD_" + energy + ".txt", modelname_doublet);
+  TGraph* theory_vlls = ReadTheoryGraph("xsec/sigmaB_VLLS_" + energy + ".txt", modelname_singlet);
 
   // Drawing one canvas
   SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1000); theory_vlld->Draw("AL"); //This decides the decorations
@@ -130,8 +126,8 @@ void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TStrin
   legend->AddEntry(exp,    "Expected", "l");
   legend->AddEntry(yellow, "68% Expected", "f");
   legend->AddEntry(green,  "95% Expected", "f");
-  legend->AddEntry(theory_vlld, "VLLD", "l");
-  legend->AddEntry(theory_vlls, "VLLS", "l");
+  legend->AddEntry(theory_vlld, modelname_doublet, "l");
+  legend->AddEntry(theory_vlls, modelname_singlet, "l");
   legend->Draw();
 
   // Add CMS label
@@ -144,6 +140,12 @@ void makeOneLimitPlot(TString infile, TString outfile, TString modelname, TStrin
   }
   //delete c1;
   indplt += 1;
+}
+
+void step7_makeBrazilianPlots(){
+
+  makeOneLimitPlot();
+  
 }
 
 //_____________________________________________________________________________________

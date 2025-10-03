@@ -24,9 +24,9 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 basedir   = '../ROOT_FILES/treesWithNN/'
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
-basename  = "baseline-JERdown/tree_baseline"
-dumpdir   = "sr-JERdown"
-tag       = "sr-JERdown"
+basename  = "baseline/tree_baseline"
+dumpdir   = "sr"
+tag       = "sr"
 #-----------------------------------------------------------------------------------
 
 jobdict = {}

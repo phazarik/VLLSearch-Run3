@@ -8,12 +8,12 @@ This script is borrowed from StackedPlotMaker
 #include "../StackedPlotMaker/utilities/read_hists.h"
 
 #include <sstream>
-string fmt_val_err(double val, double err, int prec=3) {
+string fmt_val_err(double val, double err, int prec=6) {
     ostringstream ss;
     ss << fixed << setprecision(prec) << val << " ± " << fixed << setprecision(prec) << err;
     return ss.str();
 }
-string fmt_val(double val, int prec=3) {
+string fmt_val(double val, int prec=6) {
     ostringstream ss;
     ss << fixed << setprecision(prec) << val;
     return ss.str();
@@ -29,8 +29,8 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "LTplusMET",
 		 TString _name = "LT+MET",
-		 TString _jobname = "2025-09-17_sr_jer-systup",
-		 TString _tag = "sr_jer-systup",
+		 TString _jobname = "2025-09-25_sr_jer-systdown",
+		 TString _tag = "sr_jer-systdown",
 		 TString _displaytext = "sr",
 		 bool _data = false, //careful!
 		 bool _save = true
@@ -238,13 +238,15 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
     {"VLLD-mu", "600"},
     {"VLLD-mu", "800"},
     {"VLLD-mu", "1000"},
+    {"VLLD-mu", "1200"},
     {"VLLD-ele", "100"},
     {"VLLD-ele", "200"},
     {"VLLD-ele", "300"},
     {"VLLD-ele", "400"},
     {"VLLD-ele", "600"},
     {"VLLD-ele", "800"},
-    {"VLLD-ele", "1000"}
+    {"VLLD-ele", "1000"},
+    {"VLLD-ele", "1200"}
   };
   vector<TH1D*> sig_hists;
   for (auto& entry : vlld) {
@@ -259,7 +261,7 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
   cout<<"\nFolder created: "+dump_folder<<endl;
 
   //-------------------------
-  //  Writing yields as TSV
+  //  Writing yields as CSV
   //-------------------------
   TString csvfile = dump_folder + "/yields_"+_tag+"_"+_campaign+"_"+_channel+".csv";
   ofstream out(csvfile.Data());
@@ -275,13 +277,13 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
   for (int bin=1; bin<=nbins; ++bin) {
     out << bin;
     out << "," << (int)round(hst_data->GetBinContent(bin));
-    out << "," << fmt_val_err(hst_bkg->GetBinContent(bin), hst_bkg->GetBinError(bin), 3);
+    out << "," << fmt_val_err(hst_bkg->GetBinContent(bin), hst_bkg->GetBinError(bin));
     for (auto it = bkg.rbegin(); it != bkg.rend(); ++it) {
       TH1* h = *it;
-      out << "," << fmt_val_err(h->GetBinContent(bin), h->GetBinError(bin), 3);
+      out << "," << fmt_val_err(h->GetBinContent(bin), h->GetBinError(bin));
     }
     for (auto* s : sig_hists) {
-      out << "," << fmt_val_err(s->GetBinContent(bin), s->GetBinError(bin), 3);
+      out << "," << fmt_val_err(s->GetBinContent(bin), s->GetBinError(bin));
     }
     out << "\n";
   }
@@ -292,17 +294,17 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
   {
     double err = 0;
     double val = hst_bkg->IntegralAndError(1, hst_bkg->GetNbinsX(), err);
-    out << "," << fmt_val_err(val, err, 3);
+    out << "," << fmt_val_err(val, err);
   }
   for (auto it = bkg.rbegin(); it != bkg.rend(); ++it) {
     double err = 0;
     double val = (*it)->IntegralAndError(1, (*it)->GetNbinsX(), err);
-    out << "," << fmt_val_err(val, err, 3);
+    out << "," << fmt_val_err(val, err);
   }
   for (auto* s : sig_hists) {
     double err = 0;
     double val = s->IntegralAndError(1, s->GetNbinsX(), err);
-    out << "," << fmt_val_err(val, 3);
+    out << "," << fmt_val_err(val, err);
   }
   out << "\n";
 

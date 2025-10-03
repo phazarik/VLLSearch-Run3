@@ -11,7 +11,7 @@ campaigns = [
 ]
 
 channels  = ["mm", "me", "em", "ee", "combined"]
-basedir = "yields/2025-09-18/" ## Assuming everything to be in the same directory
+basedir = "yields/2025-09-25/" ## Assuming everything to be in the same directory
 tag = "sr"
 # ------------------------------------------
 
@@ -126,6 +126,7 @@ def process(campaign, channel):
 
     ## Adding global luminosity systematic
     add_global_systematic(systematics, "lumi", 1.025)
+    #add_global_systematic(systematics, "xsec", 1.005)
     combine_syst(systematics)
     systematics = format_floats(systematics, 6)
 

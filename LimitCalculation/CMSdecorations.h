@@ -72,7 +72,7 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString ene
   if (systematics) methodname = "Asymptotic, stat+syst";
 
   put_text("CMS", 0.15, 0.85, 62, 0.07);            // Larger, bold CMS label
-  put_text("Preliminary", 0.28, 0.85, 52, 0.05);    // Smaller preliminary label
+  put_text("Preliminary", 0.30, 0.85, 52, 0.05);    // Smaller preliminary label
   put_latex_text(methodname, 0.15, 0.80, 42, 0.04); // Additional information
 
   float xright = 0.95; float yup = 0.94;

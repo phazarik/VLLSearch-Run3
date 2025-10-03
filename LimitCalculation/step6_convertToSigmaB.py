@@ -58,7 +58,7 @@ def process_once(campaign="2018_UL", channel="mm", energy="13TeV"):
             if not masspoints: continue
             
             if test: print(f"Processing {model}, {flavor}-type.")
-            outfile = os.path.join(outdir, f"sigmaB_{model}_{flavor}_2018_UL_mm.txt")
+            outfile = os.path.join(outdir, f"sigmaB_{model}_{flavor}_{campaign}_{channel}.txt")
 
             with open(outfile, "w") as fout:
                 fout.write("Mass\tObserved\tExp_2sigDn\tExp_1sigDn\tExp_nominal\tExp_1sigUp\tExp_2sigUp\ttheory\n")
