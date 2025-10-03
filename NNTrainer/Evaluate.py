@@ -25,8 +25,9 @@ args = parser.parse_args()
 #Global parameters:
 campaign = args.campaign
 indir = '../ROOT_FILES/trees/'
-jobname = f'tree_baseline-JERdown_{campaign}'
-outdir = f'../ROOT_FILES/treesWithNN/baseline-JERdown/tree_baseline_{campaign}'
+jobname = "tree_signal_baseline_2018_UL"
+#jobname = f'tree_baseline-JERdown_{campaign}'
+outdir = f'../ROOT_FILES/treesWithNN/baseline_signal/tree_baseline_{campaign}'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
@@ -123,7 +124,8 @@ for f in list_of_files:
 
     #Step1: Prepare the dataframe
     filepath = os.path.join(indir, jobname, f)
-    print(f"\n\n\033[33m==> {f.split('tree_')[1].split('.root')[0]} {'-'*90}\033[0m")
+    newline = "-"*30
+    print(f"\n\n\033[33m{newline}\n{f.split('tree_')[1].split('.root')[0]}\n{newline}\033[0m")
     print(f'Input file: {os.path.abspath(filepath)}')    
     sample = filepath.split("_")[1]
     subsample = "_".join(filepath.split("_")[2:])

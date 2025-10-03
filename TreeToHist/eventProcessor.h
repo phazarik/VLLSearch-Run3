@@ -278,7 +278,7 @@ void processTree(
 
     //--------------------------------
     // Corrections to the histograms:
-    //--------------------------------    
+    //--------------------------------
     //1) DY correction for the ee channel:
     if(flag_dy){
       Double_t scale_dy = 1.0; Double_t scale_dy1 = 1.0; Double_t scale_dy2 = 1.0;
@@ -298,7 +298,8 @@ void processTree(
       Double_t scale_ttbar = 1.0;
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-    }/*
+    }
+    /*
     //4)WJets+WGamma global correction
     if(flag_wjets){
       Double_t scale_wjets = 1.0;

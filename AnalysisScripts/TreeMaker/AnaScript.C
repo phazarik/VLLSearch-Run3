@@ -232,7 +232,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       if(_data == 0){
 	for(int i=0; i<(int)Jet.size(); i++){
 	  jec =  returnJetJECSF(Jet.at(i), "nom");
-	  jer =  returnJetResolutionCorrection(Jet.at(i), "systdown");
+	  jer =  returnJetResolutionCorrection(Jet.at(i), "nom");
 	  Jet.at(i).v = Jet.at(i).v * jec;
 	  Jet.at(i).v = Jet.at(i).v * jer;
 	}
@@ -242,7 +242,7 @@ Bool_t AnaScript::Process(Long64_t entry)
       // Writing to tree
       //----------------------------------------------------------------------------------------------------------
       
-      FillTree(_mytree);     
+      if(!bad_event) FillTree(_mytree);     
       
     }//Triggered Events
   }//GoodEvt

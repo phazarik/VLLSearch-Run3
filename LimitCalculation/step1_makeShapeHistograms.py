@@ -6,17 +6,23 @@ from array import array
 from rich.console import Console
 console = Console(highlight=False)
 print = console.print
+import time
+from datetime import timedelta
 
 # ------------------- config ---------------------
 systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar", "jec", "jer"] ## non-global ones
-basedir = "yields/2025-09-18" ## Assuming all yields to be in the same directory.
+basedir = "../Systematics/yields/2025-09-26/" ## Assuming all yields to be in the same directory.
 dump = "shapes"
+os.system(f"rm -rf {dump}/*")
+#-------------------------------------------------
+
 campaigns = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix",
-    "Run2", "Run3", "FullDataset"
 ]
-channels  = ["mm", "me", "em", "ee", "combined"]
+#campaigns.extend(["Run2", "Run3", "FullDataset"])
+channels  = ["mm", "me", "em", "ee"]
+#channels.extend(["combined"])
 tag = "sr"
 sigdict = {
     "VLLD": {
@@ -41,8 +47,8 @@ variable = {
 }
 
 #-------------------------------------------------
-
 def main():
+    time_start = time.time()
     count = 0
     for camp in campaigns:
         for ch in channels:
@@ -50,8 +56,13 @@ def main():
             count += 1
             print(f"\n[yellow bold][{count}] processing {camp}, {ch} channel[/yellow bold]")
             make_shapes(camp, ch)
-        #break
-    
+            #break ## channel
+        #break ## campaign
+
+    time_end = time.time()
+    elapsed = timedelta(seconds=int(time_end - time_start))
+    print(f"\nDone!.\nTime taken: {elapsed}")
+        
 def make_shapes(campaign, channel):
 
     ## Nominal
@@ -63,11 +74,12 @@ def make_shapes(campaign, channel):
     ## Systematics
     dfs_syst = {}
     for syst in systematics:
-        for direction in ["up", "down"]:
+        for direction in ["Up", "Down"]:
             subtag = f"{tag}_{syst}-syst{direction}"
             path_sys = os.path.join(basedir, subtag)
             file_sys = os.path.join(path_sys, f"yields_{subtag}_{campaign}_{channel}.csv")
             if os.path.exists(file_sys):
+                print(f"Opening {file_sys}")
                 dfs_syst[(syst, direction)] = csv_into_df(file_sys)
                 #print(f"{syst}_{direction}", dfs_syst[(syst, direction)].shape)
                 #print(dfs_syst[(syst, direction)])
@@ -80,15 +92,16 @@ def make_shapes(campaign, channel):
                 signal_name = f"{sigtype}_{flav}_{m}"
                 outname = f"shapes_{campaign}_{channel}_{signal_name}.root"
                 dump_subdir = f"{dump}/{campaign}_{channel}"
-                outfile = os.path.join(dump_subdir, outname)
+                if os.path.exists(dump_subdir) and not os.path.isdir(dump_subdir): os.remove(dump_subdir)
                 os.makedirs(dump_subdir, exist_ok=True)
+                outfile = os.path.join(dump_subdir, outname)
                 make_root_file(df_nom, dfs_syst, signal_name, campaign, channel, outfile)
                 print(f"Histograms written to \033[33m{outfile}\033[0m")
 
 # ----------------- utilities --------------------
 
 rootname = {
-    "nData": "Data",
+    "nData": "data_obs",
     "TotalBkg": "Bkg",
     "t#bar{t}+x": "TTX",
     "multi-top": "MultiTop",
@@ -109,6 +122,41 @@ rootname = {
     "VLLD-ele_600": "VLLD_ele_600",
     "VLLD-ele_800": "VLLD_ele_800",
     "VLLD-ele_1000": "VLLD_ele_1000",
+}
+
+bin_alias = {
+    ("2016preVFP_UL","mm") : "sr16premm",
+    ("2016preVFP_UL","me") : "sr16preme",
+    ("2016preVFP_UL","em") : "sr16preem",
+    ("2016preVFP_UL","ee") : "sr16preee",
+    ("2016postVFP_UL","mm"): "sr16postmm",
+    ("2016postVFP_UL","me"): "sr16postme",
+    ("2016postVFP_UL","em"): "sr16postem",
+    ("2016postVFP_UL","ee"): "sr16postee",
+    ("2017_UL","mm")       : "sr17mm",
+    ("2017_UL","me")       : "sr17me",
+    ("2017_UL","em")       : "sr17em",
+    ("2017_UL","ee")       : "sr17ee",
+    ("2018_UL","mm")       : "sr18mm",
+    ("2018_UL","me")       : "sr18me",
+    ("2018_UL","em")       : "sr18em",
+    ("2018_UL","ee")       : "sr18ee",
+    ("Run3Summer22","mm")  : "sr22mm",
+    ("Run3Summer22","me")  : "sr22me",
+    ("Run3Summer22","em")  : "sr22em",
+    ("Run3Summer22","ee")  : "sr22ee",
+    ("Run3Summer22EE","mm"): "sr22EEmm",
+    ("Run3Summer22EE","me"): "sr22EEme",
+    ("Run3Summer22EE","em"): "sr22EEem",
+    ("Run3Summer22EE","ee"): "sr22EEee",
+    ("Run3Summer23","mm")  : "sr23mm",
+    ("Run3Summer23","me")  : "sr23me",
+    ("Run3Summer23","em")  : "sr23em",
+    ("Run3Summer23","ee")  : "sr23ee",
+    ("Run3Summer23BPix","mm") : "sr23BPixmm",
+    ("Run3Summer23BPix","me") : "sr23BPixme",
+    ("Run3Summer23BPix","em") : "sr23BPixem",
+    ("Run3Summer23BPix","ee") : "sr23BPixee"
 }
 
 def csv_into_df(csvfile):
@@ -139,8 +187,8 @@ def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfi
     edges_arr = array('d', edges)
 
     fout = ROOT.TFile(outfile, "RECREATE")
-
-    chname = f"{campaign}{channel}"  # e.g., 2018ULmm
+    
+    chname = bin_alias.get((campaign, channel))  # e.g., sr18mm; cannot start with a digit
 
     processes = []
     for c in df_nom.columns:
@@ -155,34 +203,54 @@ def make_root_file(df_nom, dfs_syst, signal_name, campaign="", channel="", outfi
 
     for proc in processes:
 
-        if "Bkg" in proc: continue 
+        if "Bkg" in proc: continue
         
         ## Nominal histogram
-        h_nom_name = f"{variable['name']}_{chname}_{proc.replace('_','')}" ## remove any extra '_' histnames
+        h_nom_name = f"{variable['name']}_{chname}_{proc.replace('_','')}" ## remove extra '_'
+        if proc == "data_obs": h_nom_name = f"{variable['name']}_{chname}_{proc}" 
         h_nom = ROOT.TH1F(h_nom_name, proc, nbins, edges_arr)
         for i in range(1, nbins + 1):
             val, err = parse_valerr(df_nom.iloc[i - 1][proc])
             h_nom.SetBinContent(i, val)
             h_nom.SetBinError(i, err)
+        # --- bypass for empty signal histograms, or negative integrals ---
+        if h_nom.Integral() == 0 and "VLL" in proc:
+            h_nom.SetBinContent(nbins, 1e-6)
+            h_nom.SetBinError(nbins, 1e-6)
+        if h_nom.Integral() < 0:
+            print(f"\033[31m[Warning] Negative integral {h_nom.Integral():.3f} for {h_nom.GetName()} in {outfile}, setting to 0\033[0m")
+            h_nom.Reset()  # clear bins
+            h_nom.SetBinContent(nbins, 1e-6)
+            h_nom.SetBinError(nbins, 1e-6)
         h_nom.Write()
 
-        ## Skip signal/data for systematics
-        if "VLL" in proc or proc == "Data": continue
+        ## Skip data for systematics
+        #if "VLL" in proc: continue
+        if proc == "data_obs": continue
         
         ## Systematics
         for syst, direction in dfs_syst.keys():
             df = dfs_syst[(syst, direction)]
             if proc not in df.columns:
-                print(f"\033[31m[ERROR] Missing process '{proc}' in systematic '{syst}_{direction}' for {outfile}\033[0m")
+                print(f"\033[31m[ERROR] Missing process '{proc}' in systematic '{syst}{direction}' for {outfile}\033[0m")
                 fout.Close()
                 return
 
-            h_syst_name = f"{variable['name']}_{chname}_{proc}_{syst}{direction}"
+            h_syst_name = f"{variable['name']}_{chname}_{proc.replace('_','')}_{syst}{direction}" ## remove extra '_'
             h_syst = ROOT.TH1F(h_syst_name, proc, nbins, edges_arr)
             for i in range(1, nbins + 1):
                 val, err = parse_valerr(df.iloc[i - 1][proc])
                 h_syst.SetBinContent(i, val)
                 h_syst.SetBinError(i, err)
+            # --- bypass for empty systematics, or negative integrals ---
+            if h_syst.Integral() == 0 and "VLL" in proc:
+                h_syst.SetBinContent(nbins, 1e-6)
+                h_syst.SetBinError(nbins, 1e-6)
+            if h_syst.Integral() < 0:
+                print(f"\033[31m[Warning] Negative integral {h_syst.Integral():.3f} for {h_syst.GetName()} in {outfile}, setting to 0\033[0m")
+                h_syst.Reset()
+                h_syst.SetBinContent(nbins, 1e-6)
+                h_syst.SetBinError(nbins, 1e-6)
             h_syst.Write()
 
     fout.Close()

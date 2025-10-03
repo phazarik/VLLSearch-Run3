@@ -1,10 +1,17 @@
 import json
 import os
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--mode", choices=["Run2", "Run3", "FullDataset"], required=True)
+args = parser.parse_args()
+mode = args.mode
 
-campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
-campaigns.extend(["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"])
+campaigns=[]
+if mode in ["Run2", "FullDataset"]: campaigns.extend(["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"])
+if mode in ["Run3", "FullDataset"]: campaigns.extend(["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"])
+    
 indir = "."
-outfile = "lumidata_FullDataset.json"
+outfile = f"lumidata_{mode}.json"
 
 combined = {}
 

@@ -26,7 +26,7 @@ void StyleUncertaintyBand(TGraph* graph, int color) {
   graph->SetLineWidth(1);
 }
 
-void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax) {
+void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax, double xmin, double xmax) {
   graph->SetTitle("");
   //Y-axis:
   graph->GetYaxis()->SetTitle("95% CL limit on #sigmaB [pb]");
@@ -44,36 +44,49 @@ void SetAxisTitlesAndRange(TGraph* graph, double ymin, double ymax) {
   graph->GetXaxis()->SetLabelSize(0.04);
   graph->GetXaxis()->SetTitleOffset(0.98);
   graph->GetXaxis()->SetTickSize(0.02);
+  graph->GetXaxis()->SetRangeUser(xmin, xmax);
   gStyle->SetCanvasPreferGL(true);  // Enabling anti-aliasing
 }
 
-void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, bool bottomleft = false) {
-  TLatex latex;
-  latex.SetNDC();
-  latex.SetTextFont(61);
-  latex.SetTextSize(0.06);
-  float xpos = 0.15; float ypos = bottomleft ? 0.26 : 0.86;
-  latex.DrawLatex(xpos, ypos, "CMS");
-  latex.SetTextFont(52);
-  latex.SetTextSize(0.05);
-  latex.DrawLatex(xpos + 0.12, ypos, "Preliminary");
-  latex.SetTextFont(42);
-  latex.SetTextSize(0.040);
-  latex.DrawLatex(xpos, ypos - 0.05, "Asymptotic, stat only");
-  latex.DrawLatex(xpos, ypos - 0.10, channel);
-  if      (campaign == "2016preVFP_UL")    latex.DrawLatex(0.58, 0.95, "19.7 fb^{-1} (2016-preVFP)");
-  else if (campaign == "2016postVFP_UL")   latex.DrawLatex(0.57, 0.95, "16.2 fb^{-1} (2016-postVFP)");
-  else if (campaign == "2017_UL")          latex.DrawLatex(0.72, 0.95, "41.5 fb^{-1} (2017)");
-  else if (campaign == "2018_UL")          latex.DrawLatex(0.72, 0.95, "59.8 fb^{-1} (2018)");
-  else if (campaign == "2017+2018")        latex.DrawLatex(0.59, 0.95, "101.3 fb^{-1} (2017+2018)");
-  else if (campaign == "Run2_UL")          latex.DrawLatex(0.69, 0.95, "137 fb^{-1} (13 TeV)");
-  else if (campaign == "Run3Summer22")     latex.DrawLatex(0.61, 0.95, "7.98 fb^{-1} (2022-preEE)");
-  else if (campaign == "Run3Summer22EE")   latex.DrawLatex(0.57, 0.95, "26.67 fb^{-1} (2022-postEE)");
-  else if (campaign == "Run3Summer23")     latex.DrawLatex(0.56, 0.95, "17.79 fb^{-1} (2023-preBPix)");
-  else if (campaign == "Run3Summer23BPix") latex.DrawLatex(0.57, 0.95, "9.45 fb^{-1} (2023-postBPix)");
-  else if (campaign == "Run3")             latex.DrawLatex(0.69, 0.95, "62 fb^{-1} (13.6 TeV)");
-  else if (campaign == "2022")             latex.DrawLatex(0.71, 0.95, "34.65 fb^{-1} (2022)");
-  else if (campaign == "All")              latex.DrawLatex(0.42, 0.95, "199.13 fb^{-1} (Run-2 + 2022 + 2023)");
+void put_text(TString text, float x, float y, int style, float size){
+  TText* t = new TText(x, y, text);
+  t->SetTextSize(size);
+  t->SetNDC();
+  t->SetTextFont(style); // Bold
+  t->Draw();
+}
+
+void put_latex_text(TString text, float x, float y, int style, float size, bool rightAlign=false){
+    TLatex* latex = new TLatex();
+    latex->SetTextFont(style);
+    latex->SetTextSize(size);
+    latex->SetNDC();
+    if(rightAlign) latex->SetTextAlign(31);  // Right-aligned (x,y)
+    else           latex->SetTextAlign(11);  // Left-aligned (x,y)
+    latex->DrawLatex(x, y, text);
+}
+
+void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString energy, bool bottomleft = false, bool systematics=true) {
+
+  TString methodname = "Asymptotic, stat only";
+  if (systematics) methodname = "Asymptotic, stat+syst";
+
+  put_text("CMS", 0.15, 0.85, 62, 0.07);            // Larger, bold CMS label
+  put_text("Preliminary", 0.30, 0.85, 52, 0.05);    // Smaller preliminary label
+  put_latex_text(methodname, 0.15, 0.80, 42, 0.04); // Additional information
+
+  float xright = 0.95; float yup = 0.94;
+  if(campaign == "2016preVFP_UL")    put_latex_text("19.7 fb^{-1} (2016-preVFP)",   xright, yup, 42, 0.05, true);
+  if(campaign == "2016postVFP_UL")   put_latex_text("16.2 fb^{-1} (2016-postVFP)",  xright, yup, 42, 0.05, true);
+  if(campaign == "2017_UL")          put_latex_text("41.5 fb^{-1} (2017)",          xright, yup, 42, 0.05, true);
+  if(campaign == "2018_UL")          put_latex_text("59.8 fb^{-1} (2018)",          xright, yup, 42, 0.05, true);
+  if(campaign == "Run2")             put_latex_text("137.2 fb^{-1} (Run-2)",        xright, yup, 42, 0.05, true);
+  if(campaign == "Run3Summer22")     put_latex_text("7.98 fb^{-1} (2022-preEE)",    xright, yup, 42, 0.05, true);
+  if(campaign == "Run3Summer22EE")   put_latex_text("26.7 fb^{-1} (2022-postEE)",   xright, yup, 42, 0.05, true);
+  if(campaign == "Run3Summer23")     put_latex_text("17.8 fb^{-1} (2023-preBPix)",  xright, yup, 42, 0.05, true);
+  if(campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", xright, yup, 42, 0.05, true);
+  if(campaign == "Run3")             put_latex_text("61.9 fb^{-1} (2022+2023)",     xright, yup, 42, 0.05, true);
+  if(campaign == "FullDataset")   put_latex_text("199.1 fb^{-1} (Run-2+2022+2023)", xright, yup, 42, 0.05, true);
   else std::cout << "Put correct campaign name!" << std::endl;
 }
 
