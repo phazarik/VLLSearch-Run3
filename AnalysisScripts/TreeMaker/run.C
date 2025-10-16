@@ -13,12 +13,11 @@
 #include <string>
 
 void run(
-	 //TString ifname = "/mnt/d/work/skimmed_2LSS_Run3Summer22/DYto2L/50toInf/*.root",
-	 TString ifname = "/mnt/d/work/skimmed_2LSS_Run3Summer22/Muon/C/*.root",
+	 TString ifname = "test_inputs/skim_DYto2L_50toInf_2022EE.root",
 	 TString ofname = "test_outputs/tree_testrun.root",
-	 TString campaign = "Run3Summer22",
+	 TString campaign = "Run3Summer22EE",
 	 TString samplename = "DYto2L_50toInf",
-	 TString flag = "muon"
+	 TString flag = "dy"
 	 )
 {
   //Description of the parameters:

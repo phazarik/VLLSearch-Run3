@@ -11,11 +11,11 @@
 using namespace std;
 
 void compile_and_run(
-		     TString infile  = "test_inputs/VLLD_mu_M600_NANOAOD_Run2UL.root",
+		     TString infile  = "test_inputs/2018_UL_DYJetsToLL_M-50.root",
 		     TString outfile = "test_outputs/tree_testcompile.root",
 		     TString campaign = "2018_UL",
-		     TString sample = "vll",
-		     TString flag = "doublet"
+		     TString sample = "dy",
+		     TString flag = "mc"
 		     )
 {
 

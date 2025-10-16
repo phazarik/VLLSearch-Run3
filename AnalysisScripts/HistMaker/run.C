@@ -13,11 +13,11 @@
 #include <string>
 
 void run(
-	 TString ifname     = "test_inputs/VLLD_ele_M600_NANOAOD.root",
+	 TString ifname     = "test_inputs/DYto2L-2Jets_MLL-50_Run3.root",
 	 TString ofname     = "test_outputs/tree_testcompile.root",
 	 TString campaign   = "Run3Summer22",
-	 TString samplename = "VLLD_ele_M600",
-	 TString flag       = "vlld"
+	 TString samplename = "DYto2L_50toInf",
+	 TString flag       = "dy"
 	 )
 {
   //Description of the parameters:

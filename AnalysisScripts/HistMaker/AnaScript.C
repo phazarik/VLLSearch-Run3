@@ -14,7 +14,7 @@ void AnaScript::Begin(TTree * /*tree*/)
 {
   TString option = GetOption();
 }
-void AnaScript::SlaveBegin(TTree * /*tree*/)
+void AnaScript::SlaveBegin(TTree *tree)
 {
   TString option = GetOption();
   time(&start);
@@ -39,12 +39,16 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   cout<<"btagWP = "  << _btagWP <<endl;
   cout<<"Data   = "  << _data <<"\n"<<endl;
 
-  jsondata = loadJson();
-  LoadCorrectionsFromPOG();
-
   //Initializing counters:
+  nEvtGen=tree->GetEntries();
   nEvtTotal=0; nEvtRan=0;  nEvtTrigger=0;
   nEvtPass=0;  nEvtBad=0;  nThrown=0; nEvtVeto=0;
+  
+  //Loading offline data (json, text):
+  jsondata = loadJson();
+  LoadCorrectionsFromPOG();
+  avggenweight =  LoadAvgGenWeights(_campaign, _samplename);
+  lumiweight = LoadLumiWeights(_campaign, _samplename);
 
   bad_event = false;
   evt_trigger = false;
@@ -52,7 +56,10 @@ void AnaScript::SlaveBegin(TTree * /*tree*/)
   _HstFile = new TFile(_HstFileName,"recreate");
   BookHistograms();
 
-  cout<<"\nn-events time(sec)"<<endl;
+  cout << "\n"
+     << right << setw(8) << "Progress"
+     << right << setw(12) << "nEvents"
+     << right << setw(8) << "Time" << endl;
 }
 void AnaScript::SlaveTerminate()
 {
@@ -78,7 +85,7 @@ void AnaScript::SlaveTerminate()
 
   time(&end);
   double time_taken = double(end-start);
-  cout<<"\nTime taken by the programe is= "<<fixed<<time_taken<<setprecision(5);
+  cout<<"\033[34m\nTime taken to process = " << (int)time_taken << " seconds.\033[0m"<< endl;
   cout<<" sec \n"<<endl;
 }
 void AnaScript::Terminate()
@@ -92,12 +99,21 @@ Bool_t AnaScript::Process(Long64_t entry)
 
   //Initializing fReaders:
   fReader                .SetLocalEntry(entry);
-  if(_data==0) fReader_MC.SetLocalEntry(entry);
+  if (_data == 0){
+    fReader_MC.SetLocalEntry(entry);
+    if (_flag!="qcd") fReader_nonQCD.SetLocalEntry(entry);
+  }
 
   //Setting verbosity:
-  time(&buffer);
-  double time_buff = double(buffer-start);
-  if (nEvtTotal % 10000 == 0) cout << setw(10) << left << nEvtTotal << " " << time_buff << endl;
+  if (nEvtTotal % 10000 == 0) {
+    time(&buffer);
+    double time_buff = double(buffer-start);
+    double frac = (double)nEvtTotal / nEvtGen * 100.0;
+    string progress = (ostringstream() << fixed << setprecision(2) << frac << "%").str();
+    cout << right << setw(8) << progress
+	 << right << setw(12) << nEvtTotal
+	 << right << setw(8) << fixed << setprecision(0) << time_buff <<endl;
+  }
 
   //Filtering bad events:
   bool common  = *Flag_goodVertices && *Flag_globalSuperTightHalo2016Filter && *Flag_HBHENoiseFilter &&
