@@ -5,8 +5,9 @@ from tqdm import tqdm
 
 #---------------- CONFIG ------------------#
 basedir = "../ROOT_FILES/hists/"
-jobname = "2025-09-25_sr_jer-systdown"
-tag = "sr_jer-systdown"
+final_states = ["2LSS", "2LOS"]
+jobname = "2025-10-13_baseline"
+tag = "baseline"
 campaigns_all = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"
@@ -16,8 +17,7 @@ channels = ["ee", "em", "me", "mm"]
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--by", type=str, default="channels",
-                        choices=["channels", "campaigns", "run2", "run3", "all"])
+    parser.add_argument("--by", type=str, default="channels", help="Grouping mode: channels, campaigns, run2, run3, all, or run2_X / run3_X for specific channels.")
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--dryrun", action="store_true")
     return parser.parse_args()
@@ -48,26 +48,36 @@ def main():
 # ----------- find which folders to combine ------------
 def define_outdirs(by):
     outdirs = {}
+    combined_key = "2L" if len(final_states) > 1 else final_states[0]
+
     if by == "channels":
         for camp in campaigns_all:
-            dump = f"hist_{tag}_{camp}_combined"
+            dump = f"hist_{combined_key}_{tag}_{camp}_combined"
             outdirs[camp] = os.path.join(basedir, jobname, dump)
 
+    elif by.startswith("run2_") or by.startswith("run3_"):
+        ch = by.split("_", 1)[1]
+        run = "Run2" if "run2" in by else "Run3"
+        dump = f"hist_{combined_key}_{tag}_{run}_{ch}"
+        if run == "Run2": camps = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
+        else:             camps = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+        for camp in camps: outdirs[camp] = os.path.join(basedir, jobname, dump)
+
     elif by == "run2":
-        dump = f"hist_{tag}_Run2_combined"
+        dump = f"hist_{combined_key}_{tag}_Run2_combined"
         outdirs["Run2"] = os.path.join(basedir, jobname, dump)
 
     elif by == "run3":
-        dump = f"hist_{tag}_Run3_combined"
+        dump = f"hist_{combined_key}_{tag}_Run3_combined"
         outdirs["Run3"] = os.path.join(basedir, jobname, dump)
 
     elif by == "campaigns":
         for ch in channels:
-            dump = f"hist_{tag}_FullDataset_{ch}"
+            dump = f"hist_{combined_key}_{tag}_FullDataset_{ch}"
             outdirs[ch] = os.path.join(basedir, jobname, dump)
 
     elif by == "all":
-        dump = f"hist_{tag}_FullDataset_combined"
+        dump = f"hist_{combined_key}_{tag}_FullDataset_combined"
         outdirs["all"] = os.path.join(basedir, jobname, dump)
 
     return outdirs
@@ -77,22 +87,34 @@ def collect_folders(by, outdirs):
     folders_by_key = {k: [] for k in outdirs}
 
     camps = campaigns_all
-    if by == "run2":      camps = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
-    elif by == "run3":    camps = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+    if "run2" in by:   camps = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL"]
+    elif "run3" in by: camps = ["Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+
+    if by.startswith("run2_") or by.startswith("run3_"): 
+        channels_to_check = [by.split("_", 1)[1]]
+        combined_key = list(outdirs.keys())[0]  ## single key for the whole run/channel
+    else:
+        channels_to_check = channels
+        combined_key = None
 
     for camp in camps:
-        for ch in channels:
-            folder = f"hist_{tag}_{camp}_{ch}"
-            fullpath = os.path.join(basedir, jobname, folder)
-            print(f"\033[2;3mSearching: {fullpath} ... \033[0m", end="")
-            if os.path.isdir(fullpath):
-                if by == "channels":    key = camp
-                elif by == "campaigns": key = ch
-                else: key = list(outdirs.keys())[0]  ## In cases where there is only one outdir
-                folders_by_key[key].append(fullpath)
-                print("\033[2;3mFound.\033[0m")
-            else: print("\033[2;31mNot found, skipping.\033[0m")
-                
+        for fs in final_states:
+            for ch in channels_to_check:
+                folder = f"hist_{fs}_{tag}_{camp}_{ch}"
+                fullpath = os.path.join(basedir, jobname, folder)
+                print(f"\033[2;3mSearching: {fullpath} ... \033[0m", end="")
+                if os.path.isdir(fullpath):
+                    if combined_key:         key = combined_key  ## use single job key
+                    elif by == "channels":   key = camp
+                    elif by == "campaigns":  key = ch
+                    else:                    key = list(outdirs.keys())[0]
+                    folders_by_key[key].append(fullpath)
+                    print("\033[2;3mFound.\033[0m")
+                else:
+                    print("\033[2;31mNot found, skipping.\033[0m")
+
+    ## remove empty entries
+    folders_by_key = {k: v for k, v in folders_by_key.items() if v}
     return folders_by_key
 
 # ----------- find identical files from the folders ------------
@@ -113,8 +135,7 @@ def combine_files(key, folders, outdir, all_files, dryrun=False, test=False):
         print(f"\033[31m[Error] files not found for {key}.\033[0m")
         return
 
-    print(f"Output folder for {key}: \033[0;33m{outdir}\033[0m")
-    #print(f"\033[0;33mInput folders for {key}:\033[0m")
+    print(f"Output folder: \033[0;33m{outdir}\033[0m")
     for f in folders: print(f"- {f}")
 
     start_time = time.time()

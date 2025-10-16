@@ -6,6 +6,8 @@
 #include <TTree.h>
 #include <TH1F.h>
 using namespace std;
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 extern Int_t channel, trigger, nlep, njet, nbjet, nfatjet;
 extern Float_t lep0_pt, lep0_eta, lep0_phi, lep0_iso, lep0_sip3d, lep0_mt;
@@ -15,10 +17,12 @@ extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 extern Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
 extern Float_t LTplusMET, HTplusMET, HTfatplusMET;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7, nnscore8;
-extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
-extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
-extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
+extern Float_t nnscore11, nnscore12, nnscore13, nnscore14, nnscore15, nnscore16, nnscore17, nnscore18;
+extern Float_t nnscore21, nnscore22, nnscore23, nnscore24;
+extern Double_t gen_weight_evt, lumi_weight_evt;
+extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, wt_pdf, wt_qcdscale;
+extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, wt_pdf_up, wt_qcdscale_up;
+extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, wt_pdf_down, wt_qcdscale_down;
 
 void setBranches(TTree *tree)
 {
@@ -69,33 +73,43 @@ void setBranches(TTree *tree)
   tree->SetBranchAddress("dphi_metdilep", &dphi_metdilep);
   tree->SetBranchAddress("dphi_metlep_max", &dphi_metlep_max);
   tree->SetBranchAddress("dphi_metlep_min", &dphi_metlep_min);
-  // Nominal weights
+  // Event weights
+  tree->SetBranchAddress("gen_weight_evt",   &gen_weight_evt);
+  tree->SetBranchAddress("lumi_weight_evt",  &lumi_weight_evt);
+  // Corrections: Nominal
   tree->SetBranchAddress("wt_leptonSF",   &wt_leptonSF);
   tree->SetBranchAddress("wt_trig",       &wt_trig);
   tree->SetBranchAddress("wt_pileup",     &wt_pileup);
   tree->SetBranchAddress("wt_bjet",       &wt_bjet);
-  tree->SetBranchAddress("weight",        &weight);
+  tree->SetBranchAddress("wt_pdf",        &wt_pdf);
+  tree->SetBranchAddress("wt_qcdscale",   &wt_qcdscale);
   // Up variations
   tree->SetBranchAddress("wt_leptonSF_up",   &wt_leptonSF_up);
   tree->SetBranchAddress("wt_trig_up",       &wt_trig_up);
   tree->SetBranchAddress("wt_pileup_up",     &wt_pileup_up);
   tree->SetBranchAddress("wt_bjet_up",       &wt_bjet_up);
-  tree->SetBranchAddress("weight_up",        &weight_up);
+  tree->SetBranchAddress("wt_pdf_up",        &wt_pdf_up);
+  tree->SetBranchAddress("wt_qcdscale_up",   &wt_qcdscale_up);
   // Down variations
   tree->SetBranchAddress("wt_leptonSF_down", &wt_leptonSF_down);
   tree->SetBranchAddress("wt_trig_down",     &wt_trig_down);
   tree->SetBranchAddress("wt_pileup_down",   &wt_pileup_down);
   tree->SetBranchAddress("wt_bjet_down",     &wt_bjet_down);
-  tree->SetBranchAddress("weight_down",      &weight_down);
+  tree->SetBranchAddress("wt_pdf_down",      &wt_pdf_down);
+  tree->SetBranchAddress("wt_qcdscale_down", &wt_qcdscale_down);
   //nnscores
-  tree->SetBranchAddress("nnscore_Run2_vlld_qcd",   &nnscore1);
-  tree->SetBranchAddress("nnscore_Run2_vlld_ttbar", &nnscore2);
-  tree->SetBranchAddress("nnscore_Run2_vlld_wjets", &nnscore3);
-  tree->SetBranchAddress("nnscore_Run2_vlld_dy",    &nnscore4);
-  tree->SetBranchAddress("nnscore_Run3_vlld_qcd",   &nnscore5);
-  tree->SetBranchAddress("nnscore_Run3_vlld_ttbar", &nnscore6);
-  tree->SetBranchAddress("nnscore_Run3_vlld_wjets", &nnscore7);
-  tree->SetBranchAddress("nnscore_Run3_vlld_dy",    &nnscore8);
+  tree->SetBranchAddress("nnscore_2LSS_Run2_vlld_qcd",   &nnscore11);
+  tree->SetBranchAddress("nnscore_2LSS_Run2_vlld_ttbar", &nnscore12);
+  tree->SetBranchAddress("nnscore_2LSS_Run2_vlld_wjets", &nnscore13);
+  tree->SetBranchAddress("nnscore_2LSS_Run2_vlld_dy",    &nnscore14);
+  tree->SetBranchAddress("nnscore_2LSS_Run3_vlld_qcd",   &nnscore15);
+  tree->SetBranchAddress("nnscore_2LSS_Run3_vlld_ttbar", &nnscore16);
+  tree->SetBranchAddress("nnscore_2LSS_Run3_vlld_wjets", &nnscore17);
+  tree->SetBranchAddress("nnscore_2LSS_Run3_vlld_dy",    &nnscore18);
+  tree->SetBranchAddress("nnscore_2LOS_Run2_vlld_ttbar", &nnscore21);
+  tree->SetBranchAddress("nnscore_2LOS_Run2_vlld_dy",    &nnscore22);
+  tree->SetBranchAddress("nnscore_2LOS_Run3_vlld_ttbar", &nnscore23);
+  tree->SetBranchAddress("nnscore_2LOS_Run3_vlld_dy",    &nnscore24);
 }
 
 void SetLastBinAsOverflow(TH1D *hst){
@@ -127,6 +141,35 @@ void SetLastBinAsOverflow(TH1D *hst){
   hst->SetBinContent(0, 0);
   hst->SetBinError(0, 0);
   
+}
+
+//--------------------------------------------------------------------------------------------
+// Additional functions:
+json loadJson(const string &filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "\033[31mError: could not open file " << filename << "\033[0m" << endl;
+        return nullptr;  // return null JSON
+    }
+    json j;
+    try { file >> j; }
+    catch (const std::exception &e) {
+        cerr << "\033[31mError parsing JSON: " << e.what() << "\033[0m" << endl;
+        return nullptr;
+    }
+    cout<<"Loaded json file: "<<filename<<endl;
+    return j;
+}
+
+string todays_date(){
+  string processline = "date +%Y-%m-%d";
+  array<char, 128> buffer;
+  string result;
+  unique_ptr<FILE, decltype(&pclose)> pipe(popen(processline.c_str(), "r"), pclose);
+  if(!pipe) throw runtime_error("Failed to run Bash script.");
+  while(fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) result += buffer.data();
+  while(!result.empty() && (result.back() == '\n' || result.back() == '\r')) result.pop_back();
+  return result;
 }
 
 #endif //SETBRANCHESANDHISTOGRAMS_H

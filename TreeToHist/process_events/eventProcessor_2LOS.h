@@ -20,10 +20,12 @@ extern Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 extern Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
 extern Float_t LTplusMET, HTplusMET, HTfatplusMET;
 extern Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-extern Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7, nnscore8;
-extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
-extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
-extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
+extern Float_t nnscore11, nnscore12, nnscore13, nnscore14, nnscore15, nnscore16, nnscore17, nnscore18;
+extern Float_t nnscore21, nnscore22, nnscore23, nnscore24;
+extern Double_t gen_weight_evt, lumi_weight_evt;
+extern Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, wt_pdf, wt_qcdscale;
+extern Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, wt_pdf_up, wt_qcdscale_up;
+extern Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, wt_pdf_down, wt_qcdscale_down;
 /*
 // ------------------- TEST RUN -----------------------
 // 1. define all extern variables here
@@ -83,19 +85,11 @@ void processTree(
 		 float lumisf = 1,
 		 bool test = true
 		 )
-{ 
-  // Load corrections from JSON:
-  std::ifstream json_chargemisID("corrections/DY_Zptbinned_chargemisID_corrections.json");
-  std::ifstream json_dy("corrections/DY_Zptbinned_corrections.json");
-  std::ifstream json_qcd("corrections/QCD_global_corrections.json");
-  std::ifstream json_ttbar("corrections/TTBar_HTbinned_corrections.json");
-  std::ifstream json_wjets("corrections/Wjets_global_corrections.json");
-  json sf_chargemisID, sf_dy, sf_qcd, sf_ttbar, sf_wjets;
-  json_chargemisID >> sf_chargemisID;
-  json_dy >> sf_dy;
-  json_qcd >> sf_qcd;
-  json_ttbar >> sf_ttbar;
-  json_wjets >> sf_wjets;
+{
+  // Load corrections from JSON: (use path from the main macro)
+  json sf_qcd   = loadJson("corrections/QCD_global_corrections.json");
+  json sf_dy    = loadJson("corrections/2LOS_DY_Zptbinned_corrections.json");
+  json sf_ttbar = loadJson("corrections/2LOS_TTBar_HTbinned_corrections.json");
   cout << "Corrections loaded from JSON." << endl;
   
   vector<TH1D*> hst_collection;
@@ -103,7 +97,10 @@ void processTree(
   //hst_collection->clear();
 
   vector<float> ptbins500 = {0, 25, 50, 100, 200, 300, 400, 500};
+  vector<float> ptbins300 = {0, 25, 50, 100, 200, 300};
   vector<float> isobinslog = {0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256};
+  //vector<float> searchbins = {200, 300, 350, 400, 450, 500, 550};
+  vector<float> searchbins = {400, 450, 500, 550, 600, 650, 800, 1000};
   
   vector<hists> hdef = {
     // integers:
@@ -129,7 +126,7 @@ void processTree(
     {"lep1_sip3d", "lep1_sip3d", 200, 0, 50, {}},
     {"lep1_mt", "lep1_mt", 50, 0, 500, {}},
     // dilepton system:
-    {"dilep_pt", "dilep_pt", 0, 0, 0, ptbins500}, //variable binning
+    {"dilep_pt", "dilep_pt", 0, 0, 0, ptbins300}, //variable binning
     {"dilep_eta", "dilep_eta", 100, -10, 10, {}},
     {"dilep_phi", "dilep_phi", 100, -4, 4, {}},
     {"dilep_mass", "dilep_mass", 50, 0, 500, {}},
@@ -140,7 +137,7 @@ void processTree(
     {"dilep_ptratio", "dilep_ptratio", 100, 0, 1, {}},
     // event level variables:
     {"LT",           "LT",           0, 0, 0, ptbins500}, //variable binning
-    {"LTplusMET",    "LTplusMET",    0, 0, 0, ptbins500}, //variable binning
+    {"LTplusMET",    "LTplusMET",    0, 0, 0, searchbins}, //variable binning
     {"HT",           "HT",           0, 0, 0, ptbins500}, //variable binning
     {"HTfat",        "HTfat",        0, 0, 0, ptbins500}, //variable binning
     {"HTplusMET",    "HTplusMET",    0, 0, 0, ptbins500}, //variable binning
@@ -160,36 +157,51 @@ void processTree(
     {"dphi_metdilep", "dphi_metdilep", 100, 0, 4, {}},
     {"dphi_metlep_max", "dphi_metlep_max", 100, 0, 4, {}},
     {"dphi_metlep_min", "dphi_metlep_min", 100, 0, 4, {}},
-    // nominal weights:
-    {"2LSS_wt_leptonSF", "wt_leptonSF", 200, 0, 2, {}},
-    {"2LSS_wt_trig", "wt_trig", 200, 0, 2, {}},
-    {"2LSS_wt_pileup", "wt_pileup", 200, 0, 2, {}},
-    {"2LSS_wt_bjet", "wt_bjet", 200, 0, 2, {}},
-    // up weights:
-    {"2LSS_wt_leptonSF_up", "wt_leptonSF_up", 200, 0, 2, {}},
-    {"2LSS_wt_trig_up",     "wt_trig_up",     200, 0, 2, {}},
-    {"2LSS_wt_pileup_up",   "wt_pileup_up",   200, 0, 2, {}},
-    {"2LSS_wt_bjet_up",     "wt_bjet_up",     200, 0, 2, {}},
-    // down weights:
-    {"2LSS_wt_leptonSF_down", "wt_leptonSF_down", 200, 0, 2, {}},
-    {"2LSS_wt_trig_down",     "wt_trig_down",     200, 0, 2, {}},
-    {"2LSS_wt_pileup_down",   "wt_pileup_down",   200, 0, 2, {}},
-    {"2LSS_wt_bjet_down",     "wt_bjet_down",     200, 0, 2, {}},
-    // combined weight:
-    {"2LSS_wt_evt", "weight", 200, 0, 2, {}},
+    // Event weights:
+    {"gen_weight_evt",  "gen_weight_evt",  1000, -5, 5, {}},
+    {"lumi_weight_evt", "lumi_weight_evt", 1000, -5, 5, {}},
+    // Corrections: nominal:
+    {"wt_leptonSF", "wt_leptonSF", 200, 0, 2, {}},
+    {"wt_trig",     "wt_trig",     200, 0, 2, {}},
+    {"wt_pileup",   "wt_pileup",   200, 0, 2, {}},
+    {"wt_bjet",     "wt_bjet",     200, 0, 2, {}},
+    {"wt_pdf",      "wt_pdf",      200, 0, 2, {}},
+    {"wt_qcdscale", "wt_qcdscale", 200, 0, 2, {}},
+    // up variations:
+    {"wt_leptonSF_up", "wt_leptonSF_up", 200, 0, 2, {}},
+    {"wt_trig_up",     "wt_trig_up",     200, 0, 2, {}},
+    {"wt_pileup_up",   "wt_pileup_up",   200, 0, 2, {}},
+    {"wt_bjet_up",     "wt_bjet_up",     200, 0, 2, {}},
+    {"wt_pdf_up",      "wt_pdf_up",      200, 0, 2, {}},
+    {"wt_qcdscale_up", "wt_qcdscale_up", 200, 0, 2, {}},
+    // down variations:
+    {"wt_leptonSF_down", "wt_leptonSF_down", 200, 0, 2, {}},
+    {"wt_trig_down",     "wt_trig_down",     200, 0, 2, {}},
+    {"wt_pileup_down",   "wt_pileup_down",   200, 0, 2, {}},
+    {"wt_bjet_down",     "wt_bjet_down",     200, 0, 2, {}},
+    {"wt_pdf_down",      "wt_pdf_down",      200, 0, 2, {}},
+    {"wt_qcdscale_down", "wt_qcdscale_down", 200, 0, 2, {}},
+    //Final weight:
+    {"wt_evt", "weight", 200, 0, 2, {}},
     // nnscores:
-    {"nnscore_Run2_vlld_qcd",   "nnscore_Run2_vlld_qcd",   200, 0, 1, {}},
-    {"nnscore_Run2_vlld_ttbar", "nnscore_Run2_vlld_ttbar", 200, 0, 1, {}},
-    {"nnscore_Run2_vlld_wjets", "nnscore_Run2_vlld_wjets", 200, 0, 1, {}},
-    {"nnscore_Run2_vlld_dy",    "nnscore_Run2_vlld_dy",    200, 0, 1, {}},
-    {"nnscore_Run3_vlld_qcd",   "nnscore_Run3_vlld_qcd",   200, 0, 1, {}},
-    {"nnscore_Run3_vlld_ttbar", "nnscore_Run3_vlld_ttbar", 200, 0, 1, {}},
-    {"nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_wjets", 200, 0, 1, {}},
-    {"nnscore_Run3_vlld_dy",    "nnscore_Run3_vlld_dy",    200, 0, 1, {}},
+    {"nnscore_2LSS_Run2_vlld_qcd",   "nnscore_2LSS_Run2_vlld_qcd",   200, 0, 1, {}},
+    {"nnscore_2LSS_Run2_vlld_ttbar", "nnscore_2LSS_Run2_vlld_ttbar", 200, 0, 1, {}},
+    {"nnscore_2LSS_Run2_vlld_wjets", "nnscore_2LSS_Run2_vlld_wjets", 200, 0, 1, {}},
+    {"nnscore_2LSS_Run2_vlld_dy",    "nnscore_2LSS_Run2_vlld_dy",    200, 0, 1, {}},
+    {"nnscore_2LSS_Run3_vlld_qcd",   "nnscore_2LSS_Run3_vlld_qcd",   200, 0, 1, {}},
+    {"nnscore_2LSS_Run3_vlld_ttbar", "nnscore_2LSS_Run3_vlld_ttbar", 200, 0, 1, {}},
+    {"nnscore_2LSS_Run3_vlld_wjets", "nnscore_2LSS_Run3_vlld_wjets", 200, 0, 1, {}},
+    {"nnscore_2LSS_Run3_vlld_dy",    "nnscore_2LSS_Run3_vlld_dy",    200, 0, 1, {}},
+    {"nnscore_2LOS_Run2_vlld_ttbar", "nnscore_2LOS_Run2_vlld_ttbar", 200, 0, 1, {}},
+    {"nnscore_2LOS_Run2_vlld_dy",    "nnscore_2LSS_Run2_vlld_dy",    200, 0, 1, {}},
+    {"nnscore_2LOS_Run3_vlld_ttbar", "nnscore_2LOS_Run3_vlld_ttbar", 200, 0, 1, {}},
+    {"nnscore_2LOS_Run3_vlld_dy",    "nnscore_2LSS_Run3_vlld_dy",    200, 0, 1, {}},
   };
   vector<hists2D> h2Ddef = {
-     {"nnscore_Run2_vlld_1v3", "nnscore_Run2_vlld_1v3", 200, 0, 1, 200, 0, 1, {}},
-     {"nnscore_Run3_vlld_1v3", "nnscore_Run3_vlld_1v3", 200, 0, 1, 200, 0, 1, {}},
+    {"nnscore_2LSS_Run2_vlld_1v3", "nnscore_2LSS_Run2_vlld_1v3", 200, 0, 1, 200, 0, 1, {}},
+    {"nnscore_2LSS_Run3_vlld_1v3", "nnscore_2LSS_Run3_vlld_1v3", 200, 0, 1, 200, 0, 1, {}},
+    {"nnscore_2LOS_Run2_vlld_1v2", "nnscore_2LOS_Run2_vlld_1v2", 200, 0, 1, 200, 0, 1, {}},
+    {"nnscore_2LOS_Run3_vlld_1v2", "nnscore_2LOS_Run3_vlld_1v2", 200, 0, 1, 200, 0, 1, {}},
   };
     
   //Booking 1D histograms:
@@ -234,14 +246,12 @@ void processTree(
 
   //-------------------------------------------------------------------------
   //Flagging specific files for corrections:
-  bool flag_dy    = (channelval == 3) && find_key(inputFilename, "_DYto2L_");
   bool flag_qcd   = find_key(inputFilename, "_QCDEM_") || find_key(inputFilename, "_QCDMu_");
+  bool flag_dy    = (channelval==0 || channelval==3) && find_key(inputFilename, "_DYto2L_");
   bool flag_ttbar = find_key(inputFilename, "_TT_") || find_key(inputFilename, "_TTV_");
-  bool flag_wjets = find_key(inputFilename, "_WtoLNu_") || find_key(inputFilename, "_WGtoLNuG_");
-  if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
   if(flag_qcd)   cout<<"\033[35;1m==> Correcting QCD globally.\033[0m"<<endl;
+  if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
   if(flag_ttbar) cout<<"\033[35;1m==> Correcting tt+X in HT bins.\033[0m"<<endl;
-  if(flag_wjets) cout<<"\033[35;1m==> Correcting W+jets/gamma globally.\033[0m"<<endl;
   //-------------------------------------------------------------------------
   
   TTree* tree = (TTree*)file->Get("myEvents");
@@ -268,44 +278,31 @@ void processTree(
     bool channel_selection = channel == channelval;
 	
     Double_t wt = 1.0;
-    /*
-    if((string)campaign == "Run3Summer22"  || (string)campaign == "Run3Summer22EE")   wt_pileup = 1.0;
-    if((string)campaign == "Run3Summer23"  || (string)campaign == "Run3Summer23BPix") wt_pileup = 1.0;
-    if((string)campaign == "2016preVFP_UL" || (string)campaign == "2016postVFP_UL")   wt_pileup = 1.0;*/
-
-    wt = wt*wt_leptonSF*wt_trig*wt_pileup; //Object corrections
-    wt = wt*wt_bjet;                       //Adding b-tagging corrections
+    wt = wt*wt_pdf*wt_qcdscale;            // Event-level corrections
+    wt = wt*wt_leptonSF*wt_trig*wt_pileup; // Object-level corrections
+    //wt = wt*wt_bjet;                       // b-tagging corrections
 
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-    //1) DY correction for the ee channel:
-    if(flag_dy){
-      Double_t scale_dy = 1.0; Double_t scale_dy1 = 1.0; Double_t scale_dy2 = 1.0;
-      //scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
-      scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
-      scale_dy = scale_dy1*scale_dy2;
-      wt = wt * scale_dy;
-    }
-    //2) QCD global correction:
+    /*    
+    //1) QCD global correction (same as 2LSS):
     if(flag_qcd){
       Double_t scale_qcd = 1.0;
       scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd, "nom");
       wt = wt * scale_qcd;
+    }
+    //2) DY correction for the ee/mm channel:
+    if(flag_dy){
+      Double_t scale_dy = 1.0;
+      scale_dy = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
+      wt = wt * scale_dy;
     }
     //3) TTBar+TTV HT binned correction
     if(flag_ttbar){
       Double_t scale_ttbar = 1.0;
       scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-    }
-    /*
-    //4)WJets+WGamma global correction
-    if(flag_wjets){
-      Double_t scale_wjets = 1.0;
-      scale_wjets = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_wjets, "nom");
-      if(channelval==0) scale_wjets = 1.0;
-      wt = wt * scale_wjets;
       }*/
     
     //--------------------------------
@@ -321,7 +318,7 @@ void processTree(
       Double_t fnwt = wt;
 
       count++;
-      if(test) cout << count << " Filling events with weight = " << fnwt << endl;
+      //if(test) cout << count << " Filling events with weight = " << fnwt << endl;
 
       // integers:
       hst_collection[0]->Fill(channel, 1.0);
@@ -382,40 +379,56 @@ void processTree(
       hst_collection[45]->Fill(dphi_metlep_max, fnwt);
       hst_collection[46]->Fill(dphi_metlep_min, fnwt);
 
-      // nominal weights:
-      hst_collection[47]->Fill(wt_leptonSF, 1.0);
-      hst_collection[48]->Fill(wt_trig, 1.0);
-      hst_collection[49]->Fill(wt_pileup, 1.0);
-      hst_collection[50]->Fill(wt_bjet, 1.0);
+      // Event weights
+      hst_collection[47]->Fill(gen_weight_evt, 1.0);
+      hst_collection[48]->Fill(lumi_weight_evt, 1.0);
+      
+      // Corrections: nominal:
+      hst_collection[49]->Fill(wt_leptonSF, 1.0);
+      hst_collection[50]->Fill(wt_trig, 1.0);
+      hst_collection[51]->Fill(wt_pileup, 1.0);
+      hst_collection[52]->Fill(wt_bjet, 1.0);
+      hst_collection[53]->Fill(wt_pdf, 1.0);
+      hst_collection[54]->Fill(wt_qcdscale, 1.0);
 
       // up weights:
-      hst_collection[51]->Fill(wt_leptonSF_up, 1.0);
-      hst_collection[52]->Fill(wt_trig_up, 1.0);
-      hst_collection[53]->Fill(wt_pileup_up, 1.0);
-      hst_collection[54]->Fill(wt_bjet_up, 1.0);
+      hst_collection[55]->Fill(wt_leptonSF_up, 1.0);
+      hst_collection[56]->Fill(wt_trig_up, 1.0);
+      hst_collection[57]->Fill(wt_pileup_up, 1.0);
+      hst_collection[58]->Fill(wt_bjet_up, 1.0);
+      hst_collection[59]->Fill(wt_pdf_up, 1.0);
+      hst_collection[60]->Fill(wt_qcdscale_up, 1.0);
 
       // down weights:
-      hst_collection[55]->Fill(wt_leptonSF_down, 1.0);
-      hst_collection[56]->Fill(wt_trig_down, 1.0);
-      hst_collection[57]->Fill(wt_pileup_down, 1.0);
-      hst_collection[58]->Fill(wt_bjet_down, 1.0);
+      hst_collection[61]->Fill(wt_leptonSF_down, 1.0);
+      hst_collection[62]->Fill(wt_trig_down, 1.0);
+      hst_collection[63]->Fill(wt_pileup_down, 1.0);
+      hst_collection[64]->Fill(wt_bjet_down, 1.0);
+      hst_collection[65]->Fill(wt_pdf_down, 1.0);
+      hst_collection[66]->Fill(wt_qcdscale_down, 1.0);
 
       // combined weight:
-      hst_collection[59]->Fill(fnwt, 1.0);
+      hst_collection[67]->Fill(fnwt, 1.0);
       
       // NN scores:
-      hst_collection[60]->Fill(nnscore1, fnwt); //Run-2 QCD
-      hst_collection[61]->Fill(nnscore2, fnwt); //Run-2 Top
-      hst_collection[62]->Fill(nnscore3, fnwt); //Run-2 Wjets
-      hst_collection[63]->Fill(nnscore4, fnwt); //Run-2 DY
-      hst_collection[64]->Fill(nnscore5, fnwt); //Run-3 QCD
-      hst_collection[65]->Fill(nnscore6, fnwt); //Run-3 Top
-      hst_collection[66]->Fill(nnscore7, fnwt); //Run-3 Wjets
-      hst_collection[67]->Fill(nnscore8, fnwt); //Run-3 DY
+      hst_collection[68]->Fill(nnscore11, fnwt); //Run-2 SS QCD
+      hst_collection[69]->Fill(nnscore12, fnwt); //Run-2 SS Top
+      hst_collection[70]->Fill(nnscore13, fnwt); //Run-2 SS Wjets
+      hst_collection[71]->Fill(nnscore14, fnwt); //Run-2 SS DY
+      hst_collection[72]->Fill(nnscore15, fnwt); //Run-3 SS QCD
+      hst_collection[73]->Fill(nnscore16, fnwt); //Run-3 SS Top
+      hst_collection[74]->Fill(nnscore17, fnwt); //Run-3 SS Wjets
+      hst_collection[75]->Fill(nnscore18, fnwt); //Run-3 SS DY
+      hst_collection[76]->Fill(nnscore21, fnwt); //Run-2 OS ttbar
+      hst_collection[77]->Fill(nnscore22, fnwt); //Run-2 0S DY
+      hst_collection[78]->Fill(nnscore23, fnwt); //Run-3 OS ttbar
+      hst_collection[79]->Fill(nnscore24, fnwt); //Run-3 0S DY
 
       //2D plots
-      hst2D_collection[0]->Fill(nnscore1, nnscore3, fnwt); // DNN: QCD-vs-Wjets Run2
-      hst2D_collection[1]->Fill(nnscore5, nnscore7, fnwt); // DNN: QCD-vs-Wjets Run3
+      hst2D_collection[0]->Fill(nnscore11, nnscore13, fnwt); // 2LSS DNN: QCD-vs-Wjets Run2
+      hst2D_collection[1]->Fill(nnscore15, nnscore17, fnwt); // 2LSS DNN: QCD-vs-Wjets Run3
+      hst2D_collection[2]->Fill(nnscore21, nnscore22, fnwt); // 2LOS DNN: ttbar-vs-DY  Run2
+      hst2D_collection[3]->Fill(nnscore23, nnscore24, fnwt); // 2LOS DNN: ttbar-vs-DY  Run3
     }
     //if(i>=100000) break;
   }//Event loop
