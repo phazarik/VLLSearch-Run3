@@ -4,7 +4,7 @@ double AnaScript::LoadAvgGenWeights(TString campaign, TString fullsamplename) {
 
   string thisdir = filesystem::canonical(filesystem::path(__FILE__)).parent_path().string();
   string jsonfilename = "genwtdata_" + string(campaign.Data()) + ".json";
-  string jsonfilepath = (filesystem::path(thisdir) / ".." / ".." / "GenWtJsons" / jsonfilename).string();
+  string jsonfilepath = (filesystem::path(thisdir) / ".." / ".." / "sample_weights_JSON" / jsonfilename).string();
   string full = fullsamplename.Data();
   size_t divider = full.find('_');
 
@@ -32,7 +32,7 @@ double AnaScript::LoadLumiWeights(TString campaign, TString fullsamplename) {
 
   string thisdir = filesystem::canonical(filesystem::path(__FILE__)).parent_path().string();
   string jsonfilename = "lumidata_" + string(campaign.Data()) + ".json";
-  string jsonfilepath = (filesystem::path(thisdir) / ".." / ".." / "LumiJsons" / jsonfilename).string();
+  string jsonfilepath = (filesystem::path(thisdir) / ".." / ".." / "sample_weights_JSON" / jsonfilename).string();
   string full = fullsamplename.Data();
   size_t divider = full.find('_');
 
