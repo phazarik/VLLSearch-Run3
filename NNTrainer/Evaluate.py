@@ -31,19 +31,22 @@ outdir = f'../ROOT_FILES/treesWithNN/{final_state}_baseline/tree_{final_state}_b
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    #2LSS Run2
+    ## 2LSS Run2
     'QCD-vs-VLLD Run2 (Aug13)'    : 'nnscore_2LSS_Run2_vlld_qcd',
     'Top-vs-VLLD Run2 (Aug13)'    : 'nnscore_2LSS_Run2_vlld_ttbar',
     'Wjets-vs-VLLD Run2 (Aug13)'  : 'nnscore_2LSS_Run2_vlld_wjets',
     'DYjets-vs-VLLD Run2 (Aug13)' : 'nnscore_2LSS_Run2_vlld_dy',
-    #2LSS Run3
+    ## 2LSS Run3
     'QCD-vs-VLLD Run3 (Aug13)'    : 'nnscore_2LSS_Run3_vlld_qcd',
     'Top-vs-VLLD Run3 (Aug13)'    : 'nnscore_2LSS_Run3_vlld_ttbar',
     'Wjets-vs-VLLD Run3 (Aug13)'  : 'nnscore_2LSS_Run3_vlld_wjets',
     'DYjets-vs-VLLD Run3 (Aug13)' : 'nnscore_2LSS_Run3_vlld_dy',
-    #2LOS Run2
+    ## 2LOS Run2
     'Top-vs-VLLD Run2 2LOS (Oct09)'    : 'nnscore_2LOS_Run2_vlld_ttbar',
     'DYjets-vs-VLLD Run2 2LOS (Oct09)' : 'nnscore_2LOS_Run2_vlld_dy',
+    ## 2LOS Run3
+    'Top-vs-VLLD Run3 2LOS (Oct16)'    : 'nnscore_2LOS_Run3_vlld_ttbar',
+    'DYjets-vs-VLLD Run3 2LOS (Oct16)' : 'nnscore_2LOS_Run3_vlld_dy',
 }
 
 #-------------------------------------------
