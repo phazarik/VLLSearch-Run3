@@ -88,6 +88,7 @@ def write_lumidata_into_json(df, campaign):
         subsample = row['subsample']
         lumi = row['lumi']
         if (sample.startswith("Muon") or sample.startswith("EGamma")) and campaign in data_lumi:
+            print("Setting datalumi = ", data_lumi[campaign])
             lumi = data_lumi[campaign]
         if sample not in lumi_dict: lumi_dict[sample] = {}
         lumi_dict[sample][subsample] = lumi
@@ -99,7 +100,7 @@ def write_lumidata_into_json(df, campaign):
 def write_genwtdata_into_json(df, campaign):
     os.makedirs('extracted_avgGenWt_jsons', exist_ok=True)
     df["avgGenWt"] = df["avgGenWt"].apply(lambda x: x if pd.notna(x) and x != 0 else 1)
-    df = df[~df["sample"].isin(["Muon", "EGamma"])]
+    df = df[~df["sample"].isin(["Muon", "Muon0", "Muon1", "EGamma", "EGamma0", "EGamma1"])]
     df = df[["sample", "subsample", "avgGenWt"]].reset_index(drop=True)
 
     genwt_dict = {}

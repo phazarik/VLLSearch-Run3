@@ -10,7 +10,7 @@
         "G": 26671.7
     },
     "WtoLNu": {
-        "Inclusive": 4320.901
+        "Inclusive": 4366.263
     },
     "WGtoLNuG": {
         "10to100": 260458.673,
@@ -36,7 +36,7 @@
     },
     "TT": {
         "TTto2L2Nu": 868519.756,
-        "TTtoLNu2Q": 681982.143
+        "TTtoLNu2Q": 679887.71
     },
     "ST": {
         "TBbarQ": 70023.676,
@@ -47,7 +47,7 @@
     "TW": {
         "TWminusto2L2Nu": 1742531.236,
         "TWminustoLNu2Q": 863321.315,
-        "TbarWplusto2L2Nu": 1722935.09,
+        "TbarWplusto2L2Nu": 1754161.21,
         "TbarWplustoLNu2Q": 853986.205
     },
     "TTV": {
@@ -56,8 +56,8 @@
         "TTZtoLL50toInf": 15543222.299
     },
     "RareTop": {
-        "THQ": 18619551.152,
-        "THW": 52076801.802,
+        "THQ": 18611656.557,
+        "THW": 51719166.667,
         "TTTT": 890509298.701,
         "TTWH": 2234636871.508,
         "TTWW": 188235294.118,
