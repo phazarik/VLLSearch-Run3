@@ -1,247 +1,273 @@
-//###################################################################################
-//                        Trigger Efficiency scale factors
-//###################################################################################
+//-------------------------------------------------------------------------------------------
+// SingleLepton trigger efficiency, as measured in August, 2025
+// Method: https://github.com/phazarik/VLLSearch-Run3/tree/main/ExtraTools/triggerEfficiency
+//-------------------------------------------------------------------------------------------
 
-double AnaScript::GetLeptonTriggerEfficiency(Particle lepton){
-  
-  //This is the main function which is called in the analysis script
-
+double AnaScript::GetLeptonTriggerEfficiency(Particle lepton, TString mode){
   double sf = 1.0; 
-  int flav = fabs(lepton.id);
-
-  // Method 1:
-  // Directly applying the trigger efficiency measured in data on MC (The HLT flags are not used in MC) 
-  
-  if(flav == 13)      sf = TrigEFF_allCampaign_Isomu24_Data(lepton);
-  else if(flav == 11) sf = TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(lepton);
-
-  /*
-  //Method 2:
-  //Using the HLT flags in both data and MC, and then calculating a scale factor from the trigger efficiency ratio
-  if(flav == 13)      sf = TrigEFF_allCampaign_Isomu24_Data(lepton) / TrigEFF_allCampaign_Isomu24_MC(lepton);
-  else if(flav == 11) sf = TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(lepton) / TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(lepton);*/
-  
+  int flav = fabs(lepton.id);  
+  if(flav == 13)      sf = TrigEff_HLT_IsoMuXX(lepton, mode);
+  else if(flav == 11) sf = TrigEff_HLT_EleXX_WPTight_Gsf(lepton, mode);
   else cout<<"Warning: Provide correct lepton while calculating trigger sf."<<endl;
-
   return sf;
-  
 }
 
 //--------------------
 // SingleMuon trigger
-//--------------------
-//__________________________________________
+//---------------------
+double AnaScript::TrigEff_HLT_IsoMuXX(Particle lepton, TString mode){
 
-double AnaScript::TrigEFF_allCampaign_Isomu24_MC(Particle muon){
+  double eff = 1.0;
+  float pT  = lepton.v.Pt();
+  float eta = fabs(lepton.v.Eta());
+  if( pT<10 || eta>2.4 ) return 0.0;
 
-  double eff = 0.0;
+  bool barrel = eta<=1.479;
+  bool endcap = eta >1.479;
   
-  float pt  = muon.v.Pt();
-  float eta = fabs(muon.v.Eta());
-
   if(_campaign == "2016preVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.971934*(1.0+TMath::Erf((pt-23.4424)/(2.0*0.178376))); //barrel
-    else if(eta>1.479)  eff = 0.5*0.966306*(1.0+TMath::Erf((pt-23.9592)/(2.0*0.487943))); //endcap
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.954653 * (1 + TMath::Erf((pT - 23.837283) / (2 * 0.669658)));
+      else if(mode=="nom")      eff = 0.5 * 0.954040 * (1 + TMath::Erf((pT - 23.804548) / (2 * 0.681984)));
+      else if(mode=="systdown") eff = 0.5 * 0.953427 * (1 + TMath::Erf((pT - 23.771813) / (2 * 0.694310)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.961241 * (1 + TMath::Erf((pT - 23.885174) / (2 * 0.852528)));
+      else if(mode=="nom")      eff = 0.5 * 0.959888 * (1 + TMath::Erf((pT - 23.825226) / (2 * 0.881169)));
+      else if(mode=="systdown") eff = 0.5 * 0.958534 * (1 + TMath::Erf((pT - 23.765279) / (2 * 0.909809)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "2016postVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.974532*(1.0+TMath::Erf((pt-23.3954)/(2.0*0.151737)));
-    else if(eta>1.479)  eff = 0.5*0.970343*(1.0+TMath::Erf((pt-23.977)/(2.0*0.445236)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.963560 * (1 + TMath::Erf((pT - 23.969376) / (2 * 0.356460)));
+      else if(mode=="nom")      eff = 0.5 * 0.962936 * (1 + TMath::Erf((pT - 23.952643) / (2 * 0.362815)));
+      else if(mode=="systdown") eff = 0.5 * 0.962311 * (1 + TMath::Erf((pT - 23.935909) / (2 * 0.369170)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.962746 * (1 + TMath::Erf((pT - 24.009664) / (2 * 0.446861)));
+      else if(mode=="nom")      eff = 0.5 * 0.961382 * (1 + TMath::Erf((pT - 23.971009) / (2 * 0.465321)));
+      else if(mode=="systdown") eff = 0.5 * 0.960017 * (1 + TMath::Erf((pT - 23.932354) / (2 * 0.483782)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "2017_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.960212*(1.0+TMath::Erf((pt-26.9652)/(2.0*0.597564))); 
-    else if(eta>1.479)  eff = 0.5*0.94303*(1.0+TMath::Erf((pt-26.9123)/(2.0*0.747516)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.929310 * (1 + TMath::Erf((pT - 26.945585) / (2 * 0.597724)));
+      else if(mode=="nom")      eff = 0.5 * 0.928835 * (1 + TMath::Erf((pT - 26.942436) / (2 * 0.599793)));
+      else if(mode=="systdown") eff = 0.5 * 0.928360 * (1 + TMath::Erf((pT - 26.939287) / (2 * 0.601863)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.937179 * (1 + TMath::Erf((pT - 26.918278) / (2 * 0.780193)));
+      else if(mode=="nom")      eff = 0.5 * 0.936175 * (1 + TMath::Erf((pT - 26.902735) / (2 * 0.790323)));
+      else if(mode=="systdown") eff = 0.5 * 0.935171 * (1 + TMath::Erf((pT - 26.887193) / (2 * 0.800453)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "2018_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.971878*(1.0+TMath::Erf((pt-23.9589)/(2.0*0.356627)));
-    else if(eta>1.479)  eff = 0.5*0.958908*(1.0+TMath::Erf((pt-23.9493)/(2.0*0.408312)));
-    return eff;
-  }
-  else if(_campaign.Contains("Run3")){
-    return 1.0;
-  }
-  else{
-    cout<<"Warning: TrigEFF_allCampaign_Isomu24_MC: Give proper campaign name."<<endl;
-    return 1.0;
-  }
-}
-
-double AnaScript::TrigEFF_allCampaign_Isomu24_Data(Particle muon){
-
-  double eff = 0.0;
-  
-  float pt  = muon.v.Pt();
-  float eta = fabs(muon.v.Eta());
-
-  if(_campaign == "2016preVFP_UL"){
-    float eff = 0.0; //default value
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.952501*(1.0+TMath::Erf((pt-23.9491)/(2.0*0.405232))); //barrel
-    else if(eta>1.479){
-      if(pt<=100)             eff = 0.5*0.951936*(1.0+TMath::Erf((pt-23.9399)/(2.0*0.533316)));
-      else                    eff = 0.774;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.947488 * (1 + TMath::Erf((pT - 23.951495) / (2 * 0.366571)));
+      else if(mode=="nom")      eff = 0.5 * 0.947144 * (1 + TMath::Erf((pT - 23.942346) / (2 * 0.370153)));
+      else if(mode=="systdown") eff = 0.5 * 0.946800 * (1 + TMath::Erf((pT - 23.933198) / (2 * 0.373735)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
     }
-    return eff;
-  }
-  else if(_campaign == "2016postVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.963135*(1.0+TMath::Erf((pt-23.9546)/(2.0*0.363316)));
-    else if(eta>1.479)  eff = 0.5*0.96043*(1.0+TMath::Erf((pt-23.9677)/(2.0*0.463984)));
-    return eff;
-  }
-  else if(_campaign == "2017_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479){
-      if(pt<=100)            eff = 0.5*0.929318*(1.0+TMath::Erf((pt-26.9424)/(2.0*0.612448)));
-      else                   eff = 0.958305;
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.955539 * (1 + TMath::Erf((pT - 23.972886) / (2 * 0.449100)));
+      else if(mode=="nom")      eff = 0.5 * 0.954804 * (1 + TMath::Erf((pT - 23.951084) / (2 * 0.459585)));
+      else if(mode=="systdown") eff = 0.5 * 0.954068 * (1 + TMath::Erf((pT - 23.929283) / (2 * 0.470070)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
     }
-    else if(eta>1.479) eff = 0.5*0.94163*(1.0+TMath::Erf((pt-26.9092)/(2.0*0.844543)));
-    return eff;
-  }
-  else if(_campaign == "2018_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.950463*(1.0+TMath::Erf((pt-23.9593)/(2.0*0.375996)));
-    else if(eta>1.479)  eff = 0.5*0.953162*(1.0+TMath::Erf((pt-23.9459)/(2.0*0.457351)));
-    return eff;
   }
   else if(_campaign == "Run3Summer22"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.955504*(1.0+TMath::Erf((pt-24.7165)/(2.0*0.371029)));
-    else if(eta>1.479)  eff = 0.5*0.931413*(1.0+TMath::Erf((pt-23.4266)/(2.0*0.200128)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.953740 * (1 + TMath::Erf((pT - 23.846912) / (2 * 0.580634)));
+      else if(mode=="nom")      eff = 0.5 * 0.952872 * (1 + TMath::Erf((pT - 23.757106) / (2 * 0.611859)));
+      else if(mode=="systdown") eff = 0.5 * 0.952003 * (1 + TMath::Erf((pT - 23.667301) / (2 * 0.643085)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.931814 * (1 + TMath::Erf((pT - 23.941327) / (2 * 0.676495)));
+      else if(mode=="nom")      eff = 0.5 * 0.930018 * (1 + TMath::Erf((pT - 23.804970) / (2 * 0.731551)));
+      else if(mode=="systdown") eff = 0.5 * 0.928221 * (1 + TMath::Erf((pT - 23.668612) / (2 * 0.786608)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer22EE"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.950136*(1.0+TMath::Erf((pt-24.2686)/(2.0*0.00194796)));
-    else if(eta>1.479)  eff = 0.5*0.940207*(1.0+TMath::Erf((pt-23.8785)/(2.0*0.378177)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.948703 * (1 + TMath::Erf((pT - 24.309129) / (2 * 0.424750)));
+      else if(mode=="nom")      eff = 0.5 * 0.948106 * (1 + TMath::Erf((pT - 24.238438) / (2 * 0.450435)));
+      else if(mode=="systdown") eff = 0.5 * 0.947509 * (1 + TMath::Erf((pT - 24.167748) / (2 * 0.476119)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.940144 * (1 + TMath::Erf((pT - 24.352545) / (2 * 0.515589)));
+      else if(mode=="nom")      eff = 0.5 * 0.938971 * (1 + TMath::Erf((pT - 24.274768) / (2 * 0.548969)));
+      else if(mode=="systdown") eff = 0.5 * 0.937799 * (1 + TMath::Erf((pT - 24.196991) / (2 * 0.582350)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer23"){
-    if(pt<10 || eta>2.4) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.952283*(1.0+TMath::Erf((pt-25.3956)/(2.0*0.167536)));
-    else if(eta>1.479)  eff = 0.5*0.955237*(1.0+TMath::Erf((pt-24.1104)/(2.0*0.0992034)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.949485 * (1 + TMath::Erf((pT - 24.876439) / (2 * 0.088150)));
+      else if(mode=="nom")      eff = 0.5 * 0.948750 * (1 + TMath::Erf((pT - 24.063071) / (2 * 0.375222)));
+      else if(mode=="systdown") eff = 0.5 * 0.948015 * (1 + TMath::Erf((pT - 23.249704) / (2 * 0.662293)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.956061 * (1 + TMath::Erf((pT - 24.394306) / (2 * 0.512138)));
+      else if(mode=="nom")      eff = 0.5 * 0.954457 * (1 + TMath::Erf((pT - 24.297656) / (2 * 0.553183)));
+      else if(mode=="systdown") eff = 0.5 * 0.952852 * (1 + TMath::Erf((pT - 24.201006) / (2 * 0.594228)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer23BPix"){
-    if(pt<10 || eta>2.4) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.949014*(1.0+TMath::Erf((pt-24.9446)/(2.0*0.0456965)));
-    else if(eta>1.479)  eff = 0.5*0.955304*(1.0+TMath::Erf((pt-25.1877)/(2.0*0.0328055)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.948752 * (1 + TMath::Erf((pT - 24.496356) / (2 * 0.363099)));
+      else if(mode=="nom")      eff = 0.5 * 0.946835 * (1 + TMath::Erf((pT - 24.275500) / (2 * 0.439041)));
+      else if(mode=="systdown") eff = 0.5 * 0.944919 * (1 + TMath::Erf((pT - 24.054643) / (2 * 0.514983)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.957771 * (1 + TMath::Erf((pT - 24.643990) / (2 * 0.346971)));
+      else if(mode=="nom")      eff = 0.5 * 0.953730 * (1 + TMath::Erf((pT - 24.248174) / (2 * 0.507612)));
+      else if(mode=="systdown") eff = 0.5 * 0.949689 * (1 + TMath::Erf((pT - 23.852359) / (2 * 0.668253)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
-  else{
-    cout<<"Warning: TrigEFF Mu Data: Give proper campaign name; not "<<_campaign<<endl;
-    return 1.0;
-  }
+  else cout<<"\033[31mTrigEff: invalid campaign!\033[0m"<<endl;
+  
+  return eff;
 }
-
 
 //------------------------
 // SingleElectron trigger
 //------------------------
+double AnaScript::TrigEff_HLT_EleXX_WPTight_Gsf(Particle lepton, TString mode){
 
-double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_MC(Particle electron){
+  double eff = 1.0;
+  float pT  = lepton.v.Pt();
+  float eta = fabs(lepton.v.Eta());
+  if( pT<10 || eta>2.4 ) return 0.0;
 
-  double eff = 0.0;
+  bool barrel = eta<=1.479;
+  bool endcap = eta >1.479;
   
-  float pt  = electron.v.Pt();
-  float eta = fabs(electron.v.Eta());
-
   if(_campaign == "2016preVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.984513*(1.0+TMath::Erf((pt-27.5914)/(2.0*1.0585)));
-    else if(eta>1.479)  eff = 0.5*0.989446*(1.0+TMath::Erf((pt-26.0586)/(2.0*1.85888)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.981292 * (1 + TMath::Erf((pT - 26.708391) / (2 * 1.090365)));
+      else if(mode=="nom")      eff = 0.5 * 0.980446 * (1 + TMath::Erf((pT - 26.698758) / (2 * 1.103185)));
+      else if(mode=="systdown") eff = 0.5 * 0.979601 * (1 + TMath::Erf((pT - 26.689126) / (2 * 1.116006)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.988878 * (1 + TMath::Erf((pT - 27.616406) / (2 * 1.364634)));
+      else if(mode=="nom")      eff = 0.5 * 0.986765 * (1 + TMath::Erf((pT - 27.574657) / (2 * 1.405632)));
+      else if(mode=="systdown") eff = 0.5 * 0.984652 * (1 + TMath::Erf((pT - 27.532909) / (2 * 1.446630)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "2016postVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.983934*(1.0+TMath::Erf((pt-27.5947)/(2.0*1.06344)));
-    else if(eta>1.479)  eff = 0.5*0.988555*(1.0+TMath::Erf((pt-26.0556)/(2.0*1.85987)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.970315 * (1 + TMath::Erf((pT - 26.616418) / (2 * 0.010000)));
+      else if(mode=="nom")      eff = 0.5 * 0.969239 * (1 + TMath::Erf((pT - 26.207685) / (2 * 0.332775)));
+      else if(mode=="systdown") eff = 0.5 * 0.968164 * (1 + TMath::Erf((pT - 25.798951) / (2 * 0.987692)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.985168 * (1 + TMath::Erf((pT - 27.847962) / (2 * 1.466818)));
+      else if(mode=="nom")      eff = 0.5 * 0.982294 * (1 + TMath::Erf((pT - 27.792238) / (2 * 1.519693)));
+      else if(mode=="systdown") eff = 0.5 * 0.979420 * (1 + TMath::Erf((pT - 27.736514) / (2 * 1.572567)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "2017_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.96683*(1.0+TMath::Erf((pt-31.6521)/(2.0*1.16952)));
-    else if(eta>1.479)  eff = 0.5*0.977357*(1.0+TMath::Erf((pt-32.7302)/(2.0*1.98741)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.948809 * (1 + TMath::Erf((pT - 33.019150) / (2 * 0.805303)));
+      else if(mode=="nom")      eff = 0.5 * 0.948087 * (1 + TMath::Erf((pT - 33.014883) / (2 * 0.807963)));
+      else if(mode=="systdown") eff = 0.5 * 0.947364 * (1 + TMath::Erf((pT - 33.010616) / (2 * 0.810624)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.958473 * (1 + TMath::Erf((pT - 34.020240) / (2 * 1.527333)));
+      else if(mode=="nom")      eff = 0.5 * 0.956660 * (1 + TMath::Erf((pT - 34.001716) / (2 * 1.541503)));
+      else if(mode=="systdown") eff = 0.5 * 0.954846 * (1 + TMath::Erf((pT - 33.983191) / (2 * 1.555672)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "2018_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.971841*(1.0+TMath::Erf((pt-33.0664)/(2.0*0.830281)));
-    else if(eta>1.479)  eff = 0.5*0.981582*(1.0+TMath::Erf((pt-33.9066)/(2.0*1.55882)));
-    return eff;
-  }
-  else if(_campaign.Contains("Run3")){
-    return 1.0;
-  }
-  else{
-    cout<<"Warning: TrigEFF_allCampaign_Ele27or32WPTightGSF_MC: Give proper campaign name."<<endl;
-    return 1.0;
-  }
-}
-
-double AnaScript::TrigEFF_allCampaign_Ele27or32WPTightGSF_Data(Particle electron){
-
-  double eff = 0.0;
-  
-  float pt  = electron.v.Pt();
-  float eta = fabs(electron.v.Eta());
-
-  if(_campaign == "2016preVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.980431*(1.0+TMath::Erf((pt-26.6311)/(2.0*0.977291)));
-    else if(eta>1.479)  eff = 0.5*0.984774*(1.0+TMath::Erf((pt-27.5187)/(2.0*1.33533)));
-    return eff;
-  }
-  else if(_campaign == "2016postVFP_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.975241*(1.0+TMath::Erf((pt-26.6834)/(2.0*1.08336)));
-    else if(eta>1.479)  eff = 0.5*0.981091*(1.0+TMath::Erf((pt-27.7339)/(2.0*1.44615)));
-    return eff;
-  }
-  else if(_campaign == "2017_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.955945*(1.0+TMath::Erf((pt-33.0345)/(2.0*0.885676)));
-    else if(eta>1.479)  eff = 0.5*0.962208*(1.0+TMath::Erf((pt-33.9927)/(2.0*1.55814)));
-    return eff;
-  }
-  else if(_campaign == "2018_UL"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.962897*(1.0+TMath::Erf((pt-33.1188)/(2.0*0.844886)));
-    else if(eta>1.479)  eff = 0.5*0.975043*(1.0+TMath::Erf((pt-32.9805)/(2.0*1.18094)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.955390 * (1 + TMath::Erf((pT - 33.094542) / (2 * 0.749700)));
+      else if(mode=="nom")      eff = 0.5 * 0.954918 * (1 + TMath::Erf((pT - 33.091970) / (2 * 0.751299)));
+      else if(mode=="systdown") eff = 0.5 * 0.954446 * (1 + TMath::Erf((pT - 33.089399) / (2 * 0.752897)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.974775 * (1 + TMath::Erf((pT - 33.019429) / (2 * 1.214851)));
+      else if(mode=="nom")      eff = 0.5 * 0.973760 * (1 + TMath::Erf((pT - 33.009364) / (2 * 1.223297)));
+      else if(mode=="systdown") eff = 0.5 * 0.972744 * (1 + TMath::Erf((pT - 32.999300) / (2 * 1.231742)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer22"){
-    if( pt<10 || eta>2.4 ) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.976349*(1.0+TMath::Erf((pt-31.1233)/(2.0*1.68838)));
-    else if(eta>1.479)  eff = 0.5*0.971387*(1.0+TMath::Erf((pt-29.2013)/(2.0*2.10407)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.932956 * (1 + TMath::Erf((pT - 30.331113) / (2 * 1.118045)));
+      else if(mode=="nom")      eff = 0.5 * 0.931914 * (1 + TMath::Erf((pT - 30.311388) / (2 * 1.129589)));
+      else if(mode=="systdown") eff = 0.5 * 0.930872 * (1 + TMath::Erf((pT - 30.291662) / (2 * 1.141133)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.957088 * (1 + TMath::Erf((pT - 29.236527) / (2 * 2.017859)));
+      else if(mode=="nom")      eff = 0.5 * 0.952509 * (1 + TMath::Erf((pT - 29.161100) / (2 * 2.067861)));
+      else if(mode=="systdown") eff = 0.5 * 0.947929 * (1 + TMath::Erf((pT - 29.085674) / (2 * 2.117863)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer22EE"){
-    if(pt<10 || eta>2.4) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.979149*(1.0+TMath::Erf((pt-33.3691)/(2.0*1.28607)));
-    else if(eta>1.479)  eff = 0.5*0.975062*(1.0+TMath::Erf((pt-32.9815)/(2.0*1.47289)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.965664 * (1 + TMath::Erf((pT - 33.319427) / (2 * 1.255990)));
+      else if(mode=="nom")      eff = 0.5 * 0.962697 * (1 + TMath::Erf((pT - 33.297239) / (2 * 1.266952)));
+      else if(mode=="systdown") eff = 0.5 * 0.959729 * (1 + TMath::Erf((pT - 33.275052) / (2 * 1.277915)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.971225 * (1 + TMath::Erf((pT - 32.986362) / (2 * 1.434580)));
+      else if(mode=="nom")      eff = 0.5 * 0.965744 * (1 + TMath::Erf((pT - 32.929387) / (2 * 1.464766)));
+      else if(mode=="systdown") eff = 0.5 * 0.960263 * (1 + TMath::Erf((pT - 32.872412) / (2 * 1.494951)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer23"){
-    if(pt<10 || eta>2.4) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.974765*(1.0+TMath::Erf((pt-33.0725)/(2.0*1.43905)));
-    else if(eta>1.479)  eff = 0.5*0.975377*(1.0+TMath::Erf((pt-32.6495)/(2.0*1.69333)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.958318 * (1 + TMath::Erf((pT - 35.053126) / (2 * 0.425648)));
+      else if(mode=="nom")      eff = 0.5 * 0.956914 * (1 + TMath::Erf((pT - 34.948848) / (2 * 0.472523)));
+      else if(mode=="systdown") eff = 0.5 * 0.955509 * (1 + TMath::Erf((pT - 34.844571) / (2 * 0.519399)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.969819 * (1 + TMath::Erf((pT - 35.234868) / (2 * 0.371504)));
+      else if(mode=="nom")      eff = 0.5 * 0.966932 * (1 + TMath::Erf((pT - 34.985523) / (2 * 0.492576)));
+      else if(mode=="systdown") eff = 0.5 * 0.964045 * (1 + TMath::Erf((pT - 34.736178) / (2 * 0.613648)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
   else if(_campaign == "Run3Summer23BPix"){
-    if(pt<10 || eta>2.4) return 0.0;
-    else if(eta<=1.479) eff = 0.5*0.97538*(1.0+TMath::Erf((pt-33.2668)/(2.0*1.39703)));
-    else if(eta>1.479)  eff = 0.5*0.970987*(1.0+TMath::Erf((pt-32.7315)/(2.0*1.64687)));
-    return eff;
+    if(barrel){
+      if     (mode=="systup")   eff = 0.5 * 0.961535 * (1 + TMath::Erf((pT - 35.215387) / (2 * 0.370555)));
+      else if(mode=="nom")      eff = 0.5 * 0.957858 * (1 + TMath::Erf((pT - 34.971512) / (2 * 0.485728)));
+      else if(mode=="systdown") eff = 0.5 * 0.954181 * (1 + TMath::Erf((pT - 34.727638) / (2 * 0.600901)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
+    else if(endcap){
+      if     (mode=="systup")   eff = 0.5 * 0.976184 * (1 + TMath::Erf((pT - 32.811267) / (2 * 1.608164)));
+      else if(mode=="nom")      eff = 0.5 * 0.968842 * (1 + TMath::Erf((pT - 32.720349) / (2 * 1.659981)));
+      else if(mode=="systdown") eff = 0.5 * 0.961500 * (1 + TMath::Erf((pT - 32.629432) / (2 * 1.711799)));
+      else cout<<"\033[31mTrigEff: invalid mode!\033[0m"<<endl;
+    }
   }
-  else{
-    cout<<"Warning: TrigEFF ele data: Give proper campaign name; not "<<_campaign<<endl;
-    return 1.0;
-  }
+  else cout<<"\033[31mTrigEff: invalid campaign!\033[0m"<<endl;
+  
+  return eff;
 }

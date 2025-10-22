@@ -16,11 +16,17 @@ channels.extend(["combined"])
 bkgs = ['DY', 'Higgs', 'MultiTop', 'QCD', 'ST', 'TTX', 'VV', 'VVV', 'WJetsGamma', 'WWss', 'ZGamma']
 #-------------------------------------------------
 
+## remove existing datacards:
+os.system("rm -rf shapes/*/datacard*")
+
 def main():
     time_start = time.time()
     for campaign in campaigns:
         for channel in channels:
 
+            #if "2018_UL" not in campaign: continue ## testing
+            #if channel not in ["mm", "ee"]: continue
+            
             indir = os.path.join(sourcedir, f"{campaign}_{channel}")
             if not os.path.exists(indir):
                 print(f"\n\033[31mSkipping missing campaign, channel = {campaign}, {channel}\033[0m")
@@ -32,7 +38,9 @@ def main():
             print(f"\n{hline}\n\033[94m{campaign} {channel}\033[0m\n{hline}")
 
             for fname in files:
+                #if "2LSS" in fname: continue
                 if not fname.endswith(".root"): continue
+                final_state = fname.split("_")[1] if "_" in fname else "unknown"
 
                 print(f"\033[33m==> Processing {fname} ...\033[0m", end="")
                 fpath = os.path.join(indir, fname)
@@ -41,7 +49,7 @@ def main():
                     print(f"Failed to open {fpath}")
                     continue
 
-                write_datacard_from_keys(outdir, tf, campaign, channel)
+                write_datacard_from_keys(outdir, tf, campaign, channel, final_state, useSyst=False)
                 tf.Close()
 
     time_end = time.time()
@@ -54,7 +62,7 @@ def safe_integral(h, is_signal=False):
     if val==0 and is_signal: val = 1e-6
     return val
 
-def write_datacard_from_keys(outdir, rfile, campaign, channel, useSyst=True):
+def write_datacard_from_keys(outdir, rfile, campaign, channel, final_state, useSyst=True):
 
     outdir = os.path.join(outdir, f"{campaign}_{channel}")
     os.makedirs(outdir, exist_ok=True)
@@ -67,6 +75,9 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel, useSyst=True):
     if not histodict:
         print("\033[33m[Error] No histograms in file.\0330m")
         return
+
+    #print("\033[36m\n[DEBUG] Histograms in ROOT file:\033[0m")
+    #for k, h in histodict.items(): print(f"{k}: integral = {h.Integral() if h else 'None'}")
 
     first_key = next(iter(histodict.keys()))
     parts = first_key.split("_")
@@ -93,7 +104,8 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel, useSyst=True):
 
     bins = sorted(list(bins_set))
     processes = sorted(list(processes_set))
-
+    print(f"Processes = {processes}")
+    
     signal_name = next((p for p in processes if "VLL" in p), None)
     if signal_name is None:
         print(f"\033[31m[Warning] Signal-name not found, taking first process as signal.\033[0m")
@@ -107,8 +119,14 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel, useSyst=True):
     all_bkgs = [p for p in processes if p != signal_name and p != data_name]
     missing = [b for b in all_bkgs if b not in bkgs]
     if missing: print(f"\033[31m[Warning] Missing in bkgs: {missing}\033[0m")
-
     samples = [signal_name] + bkgs
+
+    ## only include processes actually present in the ROOT file, not all bkgs.
+    #all_procs = set(p for (ch, p) in nominal.keys() if p != data_name)
+    #signal_name = next((p for p in all_procs if "VLL" in p), None)
+    #all_bkgs = [p for p in all_procs if p != signal_name]
+    #samples = [signal_name] + all_bkgs
+    #print(f"Using samples for bin {bins}: {samples}")
     
     # ----- debug statements -----
     #print("Found processes:")
@@ -119,7 +137,7 @@ def write_datacard_from_keys(outdir, rfile, campaign, channel, useSyst=True):
 
     #-------------------------------------------------------------------------------
     #-------------------------------------------------------------------------------
-    dcfilename = os.path.join(outdir, f"datacard_{campaign}_{channel}_{signal_name}_{variable}.txt")
+    dcfilename = os.path.join(outdir, f"datacard_{final_state}_{campaign}_{channel}_{signal_name}_{variable}.txt")
     with open(dcfilename, "w") as dc:
 
         ### HEADER

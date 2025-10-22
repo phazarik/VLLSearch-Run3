@@ -11,8 +11,9 @@
 #include <cstdlib>
 #include <iomanip>
 #include <nlohmann/json.hpp>
-#include "setBranchesAndHistograms.h"
-#include "eventProcessor.h"
+#include "process_events/setBranchesAndHistograms.h"
+//#include "process_events/eventProcessor_2LSS.h"
+#include "process_events/eventProcessor_2LOS.h"
 using namespace std;
 namespace fs = std::filesystem;
 using json = nlohmann::json;
@@ -25,13 +26,15 @@ Float_t HT, LT, STvis, ST, HTMETllpt, STfrac, metpt, metphi;
 Float_t HTfat, STvisfat, STfat, HTfatMETllpt;
 Float_t LTplusMET, HTplusMET, HTfatplusMET;
 Float_t dphi_metlep0, dphi_metlep1, dphi_metdilep, dphi_metlep_max, dphi_metlep_min;
-Float_t nnscore1, nnscore2, nnscore3, nnscore4, nnscore5, nnscore6, nnscore7, nnscore8;
-Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, weight;
-Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, weight_up;
-Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, weight_down;
+Float_t nnscore11, nnscore12, nnscore13, nnscore14, nnscore15, nnscore16, nnscore17, nnscore18;
+Float_t nnscore21, nnscore22, nnscore23, nnscore24;
+Double_t gen_weight_evt, lumi_weight_evt;
+Double_t wt_leptonSF, wt_trig, wt_pileup, wt_bjet, wt_pdf, wt_qcdscale;
+Double_t wt_leptonSF_up, wt_trig_up, wt_pileup_up, wt_bjet_up, wt_pdf_up, wt_qcdscale_up;
+Double_t wt_leptonSF_down, wt_trig_down, wt_pileup_down, wt_bjet_down, wt_pdf_down, wt_qcdscale_down;
 
-json loadJson(const string &filename);
-string todays_date();
+//json loadJson(const string &filename);
+//string todays_date();
 
 //External functions:
 void setBranches(TTree *tree);
@@ -56,6 +59,8 @@ void extractHistsFromTrees(
 			   bool test   = false,
 			   bool dryrun = false)
 {
+  if (channel == "em" or channel == "me") return; //For 2LOS
+  
   // Input and output directories
   string date_stamp  = todays_date();
   string indir = "../ROOT_FILES/treesWithNN/" + jobname;
@@ -66,42 +71,20 @@ void extractHistsFromTrees(
   //Load luminosity file:
   string lumifile;
   float datalumi = 0.0;
-  if (campaign == "2016preVFP_UL"){
-    lumifile = "../LumiJsons/lumidata_2016preVFP_UL.json";
-    datalumi = 19692;
-  }
-  else if (campaign == "2016postVFP_UL") {
-    lumifile = "../LumiJsons/lumidata_2016postVFP_UL.json";
-    datalumi = 16227;
-  }
-  else if (campaign == "2017_UL") {
-    lumifile = "../LumiJsons/lumidata_2017_UL.json";
-    datalumi = 41480;
-  }
-  else if (campaign == "2018_UL") {
-    lumifile = "../LumiJsons/lumidata_2018_UL.json";
-    datalumi = 59830;
-  }
-  else if (campaign == "Run3Summer22") {
-    lumifile = "../LumiJsons/lumidata_Run3Summer22.json";
-    datalumi = 7980.4;
-  }
-  else if (campaign == "Run3Summer22EE") {
-    lumifile = "../LumiJsons/lumidata_Run3Summer22EE.json";
-    datalumi = 26671.7;
-  }
-  else if (campaign == "Run3Summer23") {
-    lumifile = "../LumiJsons/lumidata_Run3Summer23.json";
-    datalumi = 17794.0;
-  }
-  else if (campaign == "Run3Summer23BPix") {
-    lumifile = "../LumiJsons/lumidata_Run3Summer23BPix.json";
-    datalumi = 9451.0;
-  }
-  else cout<<"Provide correct campaign name!"<<endl;
+  lumifile = "../sample_weights_JSON/lumidata_" + campaign + ".json";
+  if      (campaign == "2016preVFP_UL")    datalumi = 19692.0;
+  else if (campaign == "2016postVFP_UL")   datalumi = 16227.0;
+  else if (campaign == "2017_UL")          datalumi = 41480.0;
+  else if (campaign == "2018_UL")          datalumi = 59830.0;
+  else if (campaign == "Run3Summer22")     datalumi =  7980.4;
+  else if (campaign == "Run3Summer22EE")   datalumi = 26671.7;
+  else if (campaign == "Run3Summer23")     datalumi = 17794.0;
+  else if (campaign == "Run3Summer23BPix") datalumi =  9451.0;
+  else cout << "Provide correct campaign name!" << endl;
 
   // Load luminosity data
   auto samplelist = loadJson(lumifile);
+  if (samplelist.is_null()) cout<<"\033[31mFailed to load JSON: "<<lumifile<<"\033[0m"<<endl;
 
   // Determine channel value
   int chval = -1;
@@ -124,9 +107,6 @@ void extractHistsFromTrees(
 
     string treefile = entry.path().filename().string();
     if (treefile.find(".root") == string::npos) continue;
-
-    //if (treefile.find("tW_AntiTop_InclusiveDecays") == string::npos &&
-    //    treefile.find("WZTo2L2Q") == string::npos) continue;
     
     cout << "\n\033[033mProcessing " << treefile << "\033[0m" <<endl;
 
@@ -138,30 +118,6 @@ void extractHistsFromTrees(
 
     // Extract luminosity
     float lumi = 0.0;
-    /*for (const auto &[sample, subs] : samplelist) {
-      if (treefile.find(sample) == string::npos) continue;
-
-      for (const auto &[subsample, val] : subs) {
-	if (treefile.find(subsample) != string::npos) {
-	  lumi = val;
-	  break;
-	}
-      }
-      }*/
-    /*
-    for (auto it = samplelist.begin(); it != samplelist.end(); ++it) {
-      const auto& sample = it.key();
-      const auto& subs = it.value();
-      if (treefile.find(sample) == string::npos) continue;
-      for (auto sub_it = subs.begin(); sub_it != subs.end(); ++sub_it) {
-	const auto& subsample = sub_it.key();
-	const auto& val = sub_it.value();
-	if (treefile.find(subsample) != string::npos) {
-	  lumi = val;
-	  break;
-	}
-      }
-      }*/
 
     bool found_match = false;
     for (auto it = samplelist.begin(); it != samplelist.end(); ++it) {
@@ -171,7 +127,11 @@ void extractHistsFromTrees(
       for (auto sub_it = subs.begin(); sub_it != subs.end(); ++sub_it) {
         const auto& subsample = sub_it.key();
         const auto& val = sub_it.value();
-        if (treefile.find(sample + "_" + subsample) != string::npos || treefile.find(sample + subsample) != string::npos) {
+	string target = sample + "_" + subsample + ".root";
+        //if (treefile.find(sample + "_" + subsample) != string::npos ||
+	//    treefile.find(sample + subsample) != string::npos) {
+	if (treefile.find(target) != string::npos){
+	  cout<<"Target = "<<target<<", lumi = "<<val<<endl;
 	  lumi = val;
 	  found_match = true;
 	  break;
@@ -181,6 +141,7 @@ void extractHistsFromTrees(
     }
     if (!found_match) {
       cerr << "\033[31m[Warning]\033[0m No matching sample+subsample found for file: " << treefile << endl;
+      continue;
     }
 
     float lumisf = datalumi / lumi;
@@ -215,22 +176,3 @@ void extractHistsFromTrees(
   }
 }
 
-//--------------------------------------------------------------------------------------------
-// Additional functions:
-json loadJson(const string &filename) {
-    ifstream file(filename);
-    json j;
-    file >> j;
-    return j;
-}
-
-string todays_date(){
-  string processline = "date +%Y-%m-%d";
-  array<char, 128> buffer;
-  string result;
-  unique_ptr<FILE, decltype(&pclose)> pipe(popen(processline.c_str(), "r"), pclose);
-  if(!pipe) throw runtime_error("Failed to run Bash script.");
-  while(fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) result += buffer.data();
-  while(!result.empty() && (result.back() == '\n' || result.back() == '\r')) result.pop_back();
-  return result;
-}

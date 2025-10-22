@@ -11,10 +11,13 @@ from datetime import timedelta
 
 # ------------------- config ---------------------
 systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar", "jec", "jer"] ## non-global ones
-basedir = "../Systematics/yields/2025-09-26/" ## Assuming all yields to be in the same directory.
-dump = "shapes"
-os.system(f"rm -rf {dump}/*")
+basedir = "../Systematics/yields/2025-10-14/" ## Assuming all yields to be in the same directory.
+#basedir = "../Systematics/yields/2025-09-26/" ## Assuming all yields to be in the same directory.
 #-------------------------------------------------
+
+final_state = "2LOS"
+dump = "shapes"
+#os.system(f"rm -rf {dump}/*")
 
 campaigns = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
@@ -23,26 +26,35 @@ campaigns = [
 #campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
 #channels.extend(["combined"])
-tag = "sr"
+tag = f"{final_state}_sr"
 sigdict = {
     "VLLD": {
-        "ele": [100, 200, 300, 400, 600, 800, 1000],
-        "mu": [100, 200, 300, 400, 600, 800, 1000],
+        "ele": [100, 200, 300, 400, 600, 800, 1000, 1200],
+        "mu": [100, 200, 300, 400, 600, 800, 1000, 1200],
         "tau": []
     },
     "VLLS":{
     }
 }
+## Override this
 variable = {
     "name": "LTplusMET",
     "bins": {
-        "1":(0, 25),
-        "2":(25, 50),
-        "3":(50, 100),
-        "4":(100, 200),
-        "5":(200, 300),
-        "6":(300, 400),
-        "7":(400, 500)
+        "1":(0, 200),
+        "2":(200, 300),
+        "3":(300, 400),
+        "4":(400, 500)
+    }
+}
+variable = {
+    "name": "LTplusMET",
+    "bins": {
+        "1":(400, 450),
+        "2":(450, 500),
+        "3":(500, 550),
+        "4":(550, 600),
+        "5":(600, 800),
+        "6":(800, 1000)
     }
 }
 
@@ -52,6 +64,9 @@ def main():
     count = 0
     for camp in campaigns:
         for ch in channels:
+            if "2018_UL" not in camp:  continue ## testing one campaign
+            if ch not in ["mm", "ee"]: continue ## For 2LOS
+            
             if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
             count += 1
             print(f"\n[yellow bold][{count}] processing {camp}, {ch} channel[/yellow bold]")
@@ -70,6 +85,9 @@ def make_shapes(campaign, channel):
     file_nom = os.path.join(path_nom, f"yields_{tag}_{campaign}_{channel}.csv")
     df_nom = csv_into_df(file_nom)
     #print(df_nom)
+    if df_nom is None:
+        print(f"\033[31m[Error] Nominal CSV missing for {campaign}, {channel}\033[0m")
+        return
 
     ## Systematics
     dfs_syst = {}
@@ -83,14 +101,14 @@ def make_shapes(campaign, channel):
                 dfs_syst[(syst, direction)] = csv_into_df(file_sys)
                 #print(f"{syst}_{direction}", dfs_syst[(syst, direction)].shape)
                 #print(dfs_syst[(syst, direction)])
-            else: print(f"\033[31m[Warning] file not found: {file_sys}\033[0m")
+            else: print(f"\033[31m[Warning] file not found: {file_sys}.\033[0m {syst} systematics not included in shape file.")
 
     ## Loop over signals defined in sigdict
     for sigtype, flavs in sigdict.items():
         for flav, masses in flavs.items():
             for m in masses:
                 signal_name = f"{sigtype}_{flav}_{m}"
-                outname = f"shapes_{campaign}_{channel}_{signal_name}.root"
+                outname = f"shapes_{final_state}_{campaign}_{channel}_{signal_name}.root"
                 dump_subdir = f"{dump}/{campaign}_{channel}"
                 if os.path.exists(dump_subdir) and not os.path.isdir(dump_subdir): os.remove(dump_subdir)
                 os.makedirs(dump_subdir, exist_ok=True)
@@ -115,6 +133,7 @@ rootname = {
     "VLLD-mu_600": "VLLD_mu_600",
     "VLLD-mu_800": "VLLD_mu_800",
     "VLLD-mu_1000": "VLLD_mu_1000",
+    "VLLD-mu_1200": "VLLD_mu_1200",
     "VLLD-ele_100": "VLLD_ele_100",
     "VLLD-ele_200": "VLLD_ele_200",
     "VLLD-ele_300": "VLLD_ele_300",
@@ -122,41 +141,42 @@ rootname = {
     "VLLD-ele_600": "VLLD_ele_600",
     "VLLD-ele_800": "VLLD_ele_800",
     "VLLD-ele_1000": "VLLD_ele_1000",
+    "VLLD-ele_1200": "VLLD_ele_1200",
 }
 
 bin_alias = {
-    ("2016preVFP_UL","mm") : "sr16premm",
-    ("2016preVFP_UL","me") : "sr16preme",
-    ("2016preVFP_UL","em") : "sr16preem",
-    ("2016preVFP_UL","ee") : "sr16preee",
-    ("2016postVFP_UL","mm"): "sr16postmm",
-    ("2016postVFP_UL","me"): "sr16postme",
-    ("2016postVFP_UL","em"): "sr16postem",
-    ("2016postVFP_UL","ee"): "sr16postee",
-    ("2017_UL","mm")       : "sr17mm",
-    ("2017_UL","me")       : "sr17me",
-    ("2017_UL","em")       : "sr17em",
-    ("2017_UL","ee")       : "sr17ee",
-    ("2018_UL","mm")       : "sr18mm",
-    ("2018_UL","me")       : "sr18me",
-    ("2018_UL","em")       : "sr18em",
-    ("2018_UL","ee")       : "sr18ee",
-    ("Run3Summer22","mm")  : "sr22mm",
-    ("Run3Summer22","me")  : "sr22me",
-    ("Run3Summer22","em")  : "sr22em",
-    ("Run3Summer22","ee")  : "sr22ee",
-    ("Run3Summer22EE","mm"): "sr22EEmm",
-    ("Run3Summer22EE","me"): "sr22EEme",
-    ("Run3Summer22EE","em"): "sr22EEem",
-    ("Run3Summer22EE","ee"): "sr22EEee",
-    ("Run3Summer23","mm")  : "sr23mm",
-    ("Run3Summer23","me")  : "sr23me",
-    ("Run3Summer23","em")  : "sr23em",
-    ("Run3Summer23","ee")  : "sr23ee",
-    ("Run3Summer23BPix","mm") : "sr23BPixmm",
-    ("Run3Summer23BPix","me") : "sr23BPixme",
-    ("Run3Summer23BPix","em") : "sr23BPixem",
-    ("Run3Summer23BPix","ee") : "sr23BPixee"
+    ("2016preVFP_UL","mm") : f"sr{final_state}16premm",
+    ("2016preVFP_UL","me") : f"sr{final_state}16preme",
+    ("2016preVFP_UL","em") : f"sr{final_state}16preem",
+    ("2016preVFP_UL","ee") : f"sr{final_state}16preee",
+    ("2016postVFP_UL","mm"): f"sr{final_state}16postmm",
+    ("2016postVFP_UL","me"): f"sr{final_state}16postme",
+    ("2016postVFP_UL","em"): f"sr{final_state}16postem",
+    ("2016postVFP_UL","ee"): f"sr{final_state}16postee",
+    ("2017_UL","mm")       : f"sr{final_state}17mm",
+    ("2017_UL","me")       : f"sr{final_state}17me",
+    ("2017_UL","em")       : f"sr{final_state}17em",
+    ("2017_UL","ee")       : f"sr{final_state}17ee",
+    ("2018_UL","mm")       : f"sr{final_state}18mm",
+    ("2018_UL","me")       : f"sr{final_state}18me",
+    ("2018_UL","em")       : f"sr{final_state}18em",
+    ("2018_UL","ee")       : f"sr{final_state}18ee",
+    ("Run3Summer22","mm")  : f"sr{final_state}22mm",
+    ("Run3Summer22","me")  : f"sr{final_state}22me",
+    ("Run3Summer22","em")  : f"sr{final_state}22em",
+    ("Run3Summer22","ee")  : f"sr{final_state}22ee",
+    ("Run3Summer22EE","mm"): f"sr{final_state}22EEmm",
+    ("Run3Summer22EE","me"): f"sr{final_state}22EEme",
+    ("Run3Summer22EE","em"): f"sr{final_state}22EEem",
+    ("Run3Summer22EE","ee"): f"sr{final_state}22EEee",
+    ("Run3Summer23","mm")  : f"sr{final_state}23mm",
+    ("Run3Summer23","me")  : f"sr{final_state}23me",
+    ("Run3Summer23","em")  : f"sr{final_state}23em",
+    ("Run3Summer23","ee")  : f"sr{final_state}23ee",
+    ("Run3Summer23BPix","mm") : f"sr{final_state}23BPixmm",
+    ("Run3Summer23BPix","me") : f"sr{final_state}23BPixme",
+    ("Run3Summer23BPix","em") : f"sr{final_state}23BPixem",
+    ("Run3Summer23BPix","ee") : f"sr{final_state}23BPixee"
 }
 
 def csv_into_df(csvfile):

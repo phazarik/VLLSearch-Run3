@@ -29,8 +29,8 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "LTplusMET",
 		 TString _name = "LT+MET",
-		 TString _jobname = "2025-09-25_sr_jer-systdown",
-		 TString _tag = "sr_jer-systdown",
+		 TString _jobname = "2025-10-14_sr",
+		 TString _tag = "2LOS_sr",
 		 TString _displaytext = "sr",
 		 bool _data = false, //careful!
 		 bool _save = true
@@ -45,8 +45,10 @@ void writeYields(
   vector<TString> channels = {"mm", "me", "em", "ee", "combined"};
   vector<tuple<TString, TString, TString>> metadata;
   for (auto &campaign : campaigns) {
+    if(campaign != "2018_UL") continue;
     for (auto &channel : channels) {
-      if((campaign == "Run2" || campaign=="Run3") && channel != "combined") continue;
+      if(!(channel == "mm" || channel == "ee")) continue;
+      //if((campaign == "Run2" || campaign=="Run3") && channel != "combined") continue;
       TString path = _jobname + "/hist_" + _tag + "_" + campaign + "_" + channel; //Don't change it
       if (!gSystem->AccessPathName("../ROOT_FILES/hists/"+path)) {
 	metadata.push_back(make_tuple(path, campaign, channel));

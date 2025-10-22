@@ -23,22 +23,31 @@ parser.add_argument('--test', action='store_true', help='test mode')       # Fal
 args = parser.parse_args()
 
 #Global parameters:
+final_state = "2LSS"
 campaign = args.campaign
 indir = '../ROOT_FILES/trees/'
-jobname = "tree_signal_baseline_2018_UL"
-#jobname = f'tree_baseline-JERdown_{campaign}'
-outdir = f'../ROOT_FILES/treesWithNN/baseline_signal/tree_baseline_{campaign}'
+jobname = f"tree_{final_state}_baseline_{campaign}"
+#jobname = f"tree_{final_state}_baseline_signal"
+outdir = f'../ROOT_FILES/treesWithNN/{final_state}_baseline/tree_{final_state}_baseline_{campaign}'
 os.makedirs(outdir, exist_ok=True)
 
 modeldict = {
-    'QCD-vs-VLLD Run2 (Aug13)'    : 'nnscore_Run2_vlld_qcd',
-    'Top-vs-VLLD Run2 (Aug13)'    : 'nnscore_Run2_vlld_ttbar',
-    'Wjets-vs-VLLD Run2 (Aug13)'  : 'nnscore_Run2_vlld_wjets',
-    'DYjets-vs-VLLD Run2 (Aug13)' : 'nnscore_Run2_vlld_dy',
-    'QCD-vs-VLLD Run3 (Aug13)'    : 'nnscore_Run3_vlld_qcd',
-    'Top-vs-VLLD Run3 (Aug13)'    : 'nnscore_Run3_vlld_ttbar',
-    'Wjets-vs-VLLD Run3 (Aug13)'  : 'nnscore_Run3_vlld_wjets',
-    'DYjets-vs-VLLD Run3 (Aug13)' : 'nnscore_Run3_vlld_dy'
+    ## 2LSS Run2
+    'QCD-vs-VLLD Run2 (Aug13)'    : 'nnscore_2LSS_Run2_vlld_qcd',
+    'Top-vs-VLLD Run2 (Aug13)'    : 'nnscore_2LSS_Run2_vlld_ttbar',
+    'Wjets-vs-VLLD Run2 (Aug13)'  : 'nnscore_2LSS_Run2_vlld_wjets',
+    'DYjets-vs-VLLD Run2 (Aug13)' : 'nnscore_2LSS_Run2_vlld_dy',
+    ## 2LSS Run3
+    'QCD-vs-VLLD Run3 (Aug13)'    : 'nnscore_2LSS_Run3_vlld_qcd',
+    'Top-vs-VLLD Run3 (Aug13)'    : 'nnscore_2LSS_Run3_vlld_ttbar',
+    'Wjets-vs-VLLD Run3 (Aug13)'  : 'nnscore_2LSS_Run3_vlld_wjets',
+    'DYjets-vs-VLLD Run3 (Aug13)' : 'nnscore_2LSS_Run3_vlld_dy',
+    ## 2LOS Run2
+    'Top-vs-VLLD Run2 2LOS (Oct09)'    : 'nnscore_2LOS_Run2_vlld_ttbar',
+    'DYjets-vs-VLLD Run2 2LOS (Oct09)' : 'nnscore_2LOS_Run2_vlld_dy',
+    ## 2LOS Run3
+    'Top-vs-VLLD Run3 2LOS (Oct16)'    : 'nnscore_2LOS_Run3_vlld_ttbar',
+    'DYjets-vs-VLLD Run3 2LOS (Oct16)' : 'nnscore_2LOS_Run3_vlld_dy',
 }
 
 #-------------------------------------------
@@ -120,7 +129,7 @@ list_failed  = []
 
 for f in list_of_files:
 
-    #if "Muon" not in f: continue 
+    #if "EGamma" not in f: continue 
 
     #Step1: Prepare the dataframe
     filepath = os.path.join(indir, jobname, f)
@@ -142,46 +151,15 @@ for f in list_of_files:
 
         #Step 2.1: pick which variables to read, and turn those into a numpy array: 
         train_var = []
-        if 'QCD' in modelname:
-            train_var = [
-                'njet',
-                'dilep_dR',
-                'dilep_ptratio',
-                'LTplusMET',
-                'ST',
-                'STfrac',
-                'metpt',
-                'dphi_metdilep',
-                'dphi_metlep_min'
-            ]
-        elif 'Wjets' in modelname:
-            train_var =[
-                'njet',
-                'dilep_mt',
-                'dilep_ptratio',
-                'dilep_dR',
-                'LTplusMET',
-                'STfrac'
-            ]
-        elif 'Top' in modelname:
-            train_var = [
-                'nbjet',
-                'dilep_ptratio',
-                'LTplusMET',
-                'ST',
-                'STfrac',
-                'dphi_metlep0',
-            ]
-        elif 'DY' in modelname:
-            train_var = [
-                'njet',
-                'lep0_eta',
-                'lep1_eta',
-                'dilep_mt',
-                'LTplusMET',
-                'metpt',
-            ]
-        else: print('Error: Pick training variables first!')
+        if '2LOS' in modelname:
+            if 'Top' in modelname:   train_var = ['nbjet','dilep_ptratio','LTplusMET','STvis','STfrac','metpt']
+            if 'DY'  in modelname:   train_var = ['njet', 'dilep_eta', 'dilep_dR', 'ST', 'STfrac', 'dphi_metlep_max']
+        else:
+            if 'QCD'   in modelname: train_var = ['njet','dilep_dR','dilep_ptratio','LTplusMET','ST','STfrac','metpt','dphi_metdilep','dphi_metlep_min']
+            if 'Wjets' in modelname: train_var = ['njet','dilep_mt','dilep_ptratio','dilep_dR','LTplusMET','STfrac']
+            if 'Top'   in modelname: train_var = ['nbjet','dilep_ptratio','LTplusMET','ST','STfrac','dphi_metlep0',]
+            if 'DY'    in modelname: train_var = ['njet','lep0_eta','lep1_eta','dilep_mt','LTplusMET','metpt']
+        if len(train_var)==0: print('Error: Pick training variables first!')
 
         model_filename = f'trained_models/{modelname}/model_{modelname}.keras'
         model = tf.keras.models.load_model(model_filename)
@@ -209,7 +187,7 @@ for f in list_of_files:
     if not args.dryrun: write_df_into_file(df, os.path.join(outdir, f))
     list_success.append(f)
     
-    if not args.dryrun: print(f'\033[1;33mFile written: {os.path.abspath(outfile)}\033[0m')
+    if not args.dryrun: print(f'File written: \033[1;33m{os.path.abspath(outfile)}\033[0m')
     if args.test: break
     
 end_time = time.time()

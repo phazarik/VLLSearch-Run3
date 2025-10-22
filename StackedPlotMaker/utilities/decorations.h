@@ -51,11 +51,11 @@ TLegend *create_legend(double x1, double y1, double x2, double y2){
   return lg1;
 }
 
-void SetLegendEntry(TLegend *lg, TH1D *hist){
-  TString yield = Form("%d", (int)hist->Integral());
-  TString name  = hist->GetName();
-  TString text  = name + " [" + yield + "]";
-  lg->AddEntry(hist, text, "f");
+void SetLegendEntry(TLegend *lg, TH1D *hist, const char* option="f") {
+    TString yield = Form("%d", (int)hist->Integral());
+    TString name  = hist->GetName();
+    TString text  = name + " [" + yield + "]";
+    lg->AddEntry(hist, text, option);
 }
 
 void SetLegendEntry_nameonly(TLegend *lg, TH1D *hist){

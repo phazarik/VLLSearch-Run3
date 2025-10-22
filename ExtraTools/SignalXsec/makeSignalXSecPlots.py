@@ -165,13 +165,13 @@ def make_plot(df, selections, outfile="test.png",
     ax.set_xlim(xlim[0], xlim[1])
     ax.set_ylim(ylim[0], ylim[1])        
     ax.set_yscale("log")
-    ax.set_xlabel("Mass [GeV]")
-    ax.set_ylabel("Cross section [pb]")
+    ax.set_xlabel("Mass [GeV]", fontsize=14)
+    ax.set_ylabel("Cross section [pb]", fontsize=14)
 
-    ax.text(0.02, 0.95, "CMS", transform=ax.transAxes, fontsize=18, fontweight="bold", va="center")
+    ax.text(0.02, 0.94, "CMS", transform=ax.transAxes, fontsize=25, fontweight="bold", va="center")
 
     handles, labels = ax.get_legend_handles_labels()
-    if handles: ax.legend(fontsize=10, loc='upper right', frameon=False, title=legendheader, title_fontsize=12)
+    if handles: ax.legend(fontsize=10, loc='upper right', frameon=False, title=legendheader, title_fontsize=14)
 
     fullname = os.path.join("plots", outfile)
     #plt.tight_layout()

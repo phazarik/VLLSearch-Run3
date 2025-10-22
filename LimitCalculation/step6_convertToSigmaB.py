@@ -9,24 +9,30 @@ campaigns = [
     "Run2", "Run3", "FullDataset"
 ]
 channels  = ["mm", "me", "em", "ee", "combined"]
+final_states = ["2LSS", "2LOS", "2L"]
 
 def main():
     count = 0
     for camp in campaigns:
         for ch in channels:
-            ## Exception:
+            ## Exceptions:
+            #if "2018" not in camp: continue
+            #if ch not in ["mm", "ee"]: continue
             if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
-            count +=1
-            print("\n"+"-"*50+f"\n\033[33m[{count}] processing {camp}, {ch} channel\033[0m\n"+"-"*50)
 
-            process_once(camp, ch, "13TeV")
-            process_once(camp, ch, "13p6TeV")
-    
-            #break #channel
-        #break#campaign
+            for fs in final_states:
+                count +=1
+                print("\n"+"-"*50+f"\n\033[33m[{count}] processing {camp}, {ch} channel ({fs})\033[0m\n"+"-"*50)
+
+                process_once(camp, ch, fs, "13TeV")
+                process_once(camp, ch, fs, "13p6TeV")
+                
+                #break ##final state
+            #break ##channel
+        #break ##campaign
     print("\nDone!")
 
-def process_once(campaign="2018_UL", channel="mm", energy="13TeV"):
+def process_once(campaign="2018_UL", channel="mm", final_state="2LOS", energy="13TeV"):
 
     ## Setting up input/output
     indir = "limits_rvalue"
@@ -34,7 +40,7 @@ def process_once(campaign="2018_UL", channel="mm", energy="13TeV"):
     os.makedirs(outdir, exist_ok=True)
 
     ## Loading data
-    limits_rvalue_file = os.path.join(indir, f"limits_{campaign}_{channel}.json")
+    limits_rvalue_file = os.path.join(indir, f"limits_{final_state}_{campaign}_{channel}.json")
     if not os.path.exists(limits_rvalue_file):
         print(f"\033[31m[WARNING] File not found, skipping: {limits_rvalue_file}\033[0m")
         return
@@ -58,7 +64,7 @@ def process_once(campaign="2018_UL", channel="mm", energy="13TeV"):
             if not masspoints: continue
             
             if test: print(f"Processing {model}, {flavor}-type.")
-            outfile = os.path.join(outdir, f"sigmaB_{model}_{flavor}_{campaign}_{channel}.txt")
+            outfile = os.path.join(outdir, f"sigmaB_{final_state}_{model}_{flavor}_{campaign}_{channel}.txt")
 
             with open(outfile, "w") as fout:
                 fout.write("Mass\tObserved\tExp_2sigDn\tExp_1sigDn\tExp_nominal\tExp_1sigUp\tExp_2sigUp\ttheory\n")

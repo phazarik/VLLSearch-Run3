@@ -18,8 +18,10 @@ void make2Dcontour()
   vector<TString> channels = {"mm", "me", "em", "ee"};
 
   for(auto &camp : campaigns) {
+    if(camp != "2018_UL") continue;
     for(auto &ch : channels) {
-      TString jobname = Form("2025-08-14_baseline/hist_baseline_%s_%s", camp.Data(), ch.Data());
+      if(!(ch=="ee" || ch =="mm")) continue;
+      TString jobname = Form("2025-10-13_baseline/hist_2LOS_baseline_%s_%s", camp.Data(), ch.Data());
       cout<<"\n\033[1;33mProcessing "<<camp<<", "<<ch<<" channel ... \033[0m"<<endl;
       make2Dcontour_once(jobname, camp, ch, "baseline", "baseline", true);
       //break;
@@ -30,8 +32,8 @@ void make2Dcontour()
 }
 
 void make2Dcontour_once(
-		   TString _jobname="2025-08-14_baseline/hist_baseline_Run3Summer23_mm",
-		   TString _campaign = "Run3Summer23",
+		   TString _jobname="2025-10-13_baseline/hist_2LOS_baseline_2018_UL_mm",
+		   TString _campaign = "2018_UL",
 		   TString _channel = "mm",
 		   TString _tag = "baseline",
 		   TString _displaytext = "baseline",
@@ -53,9 +55,9 @@ void make2Dcontour_once(
   Double_t ymin = 0.1; Double_t ymax = 10E8;
   TString info1 = _displaytext; //event-selection
   TString info2 = channelname + "-channel";
-  TString hstname = "nnscore_Run2_vlld_1v3";
-  TString xtitle  = "DNN: QCD-vs-VLLD (Run-2)";
-  TString ytitle  = "DNN: W+jets/#gamma-vs-VLLD (Run-2)";
+  TString hstname = "nnscore_2LOS_Run2_vlld_1v2";
+  TString xtitle  = "DNN: DY-vs-VLLD (Run-2, 2LOS)";
+  TString ytitle  = "DNN: t#bar{t}-vs-VLLD (Run-2, 2LOS)";
   if(_campaign.Contains("Run3")){
     hstname = "nnscore_Run3_vlld_1v3";
     xtitle  = "DNN: QCD-vs-VLLD (Run-3)";
@@ -70,8 +72,9 @@ void make2Dcontour_once(
   // Preparing TH2D objects
   //-------------------------
   
-  // 1. QCD
-  vector<TH2D *> hst2D_qcd = {
+  // 1. BKGX
+  vector<TH2D *> hst2D_bkgx = {
+    /*
     gethist2D(hstname, input_path, "QCDMu", "20to30"),
     gethist2D(hstname, input_path, "QCDMu", "30to50"),
     gethist2D(hstname, input_path, "QCDMu", "50to80"),
@@ -82,32 +85,36 @@ void make2Dcontour_once(
     gethist2D(hstname, input_path, "QCDMu", "470to600"),
     gethist2D(hstname, input_path, "QCDMu", "600to800"),
     gethist2D(hstname, input_path, "QCDMu", "800to1000"),
-    gethist2D(hstname, input_path, "QCDMu", "1000"),
+    gethist2D(hstname, input_path, "QCDMu", "1000"),*/
+    gethist2D(hstname, input_path, "TT", "TTto2L2Nu"),
+    gethist2D(hstname, input_path, "TT", "TTtoLNu2Q"),
   };
 
-  //2. Wjets:
-  vector<TH2D *> hst2D_wjets = {
+  //2. Bkgy:
+  vector<TH2D *> hst2D_bkgy = {
+    /*
     gethist2D(hstname, input_path, "WtoLNu", "Inclusive"),
     gethist2D(hstname, input_path, "WGtoLNuG", "Inclusive"),
     gethist2D(hstname, input_path, "WGtoLNuG", "10to100"),
-    gethist2D(hstname, input_path, "WGtoLNuG", "100to200")
+    gethist2D(hstname, input_path, "WGtoLNuG", "100to200")*/
+    gethist2D(hstname, input_path, "DYto2L", "50toInf"),
   };
 
   //3.Signal:
   TString signame  = "VLLD-mu";        if(_channel=="ee"||_channel=="em") signame  = "VLLD-ele";
-  TString siglatex = "VLLD-#mu (400)"; if(_channel=="ee"||_channel=="em") siglatex = "VLLD-e (400)";
+  TString siglatex = "VLLD-#mu (600)"; if(_channel=="ee"||_channel=="em") siglatex = "VLLD-e (600)";
   vector<TH2D *> hst2D_sig1 = {
-    gethist2D(hstname, input_path, signame, "400"),
+    gethist2D(hstname, input_path, signame, "600"),
   };
 
   //Combine and decorate:
-  TH2D* hst2D_wjets_comb = combineHists2D(hst2D_wjets, "W+jets/#gamma", kGray+2,  6, 0.8);
-  TH2D* hst2D_qcd_comb   = combineHists2D(hst2D_qcd,   "QCD",           kRed,     8, 0.8);
+  TH2D* hst2D_bkgy_comb = combineHists2D(hst2D_bkgy, "DY", kGray+2,  6, 0.8);
+  TH2D* hst2D_bkgx_comb  = combineHists2D(hst2D_bkgx,  "t#bar{t}",           kRed,     8, 0.8);
   TH2D* hst2D_sig1_comb  = combineHists2D(hst2D_sig1,  siglatex,        kGreen+1, 7, 0.8);
 
   // Normalize histograms to unit integral for comparable scales
-  normalizeHist2D(hst2D_qcd_comb);
-  normalizeHist2D(hst2D_wjets_comb);
+  normalizeHist2D(hst2D_bkgx_comb);
+  normalizeHist2D(hst2D_bkgy_comb);
   normalizeHist2D(hst2D_sig1_comb);
 
   //--------------------
@@ -123,42 +130,45 @@ void make2Dcontour_once(
   //canvas->SetLogz();
 
   int rebin=10;
-  hst2D_qcd_comb->Rebin2D(10,10);  // combine rebinxrebin bins
-  //hst2D_wjets_comb->Rebin2D(10,10);
-  //hst2D_sig1_comb->Rebin2D(10,10);
+  hst2D_bkgx_comb->Rebin2D(10,10);  // combine rebinxrebin bins
+  hst2D_bkgy_comb->Rebin2D(10,10);
+  hst2D_sig1_comb->Rebin2D(10,10);
 
-  const int nlevels = 7;
-  double levels[nlevels] = {0.002, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0};
-  hst2D_qcd_comb->SetContour(nlevels, levels);
-  //hst2D_wjets_comb->SetContour(nlevels, levels);
+  //const int nlevels = 7;
+  //double levels[nlevels] = {0.002, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0};
+  //hst2D_bkgx_comb->SetContour(nlevels, levels);
+  //hst2D_bkgy_comb->SetContour(nlevels, levels);
   //hst2D_sig1_comb->SetContour(nlevels, levels);
 
   //First one
-  hst2D_qcd_comb->SetLineColor(kRed);
-  hst2D_qcd_comb->Draw("CONT3");
-  hst2D_qcd_comb->SetTitle("");
-  hst2D_qcd_comb->GetXaxis()->SetTitle(xtitle);
-  hst2D_qcd_comb->GetXaxis()->SetTitleSize(0.05);
-  hst2D_qcd_comb->GetYaxis()->SetTitle(ytitle);
-  hst2D_qcd_comb->GetYaxis()->SetTitleSize(0.05);
-  hst2D_qcd_comb->GetZaxis()->SetRangeUser(0.0001, 1.0);
-  hst2D_qcd_comb->GetXaxis()->SetRangeUser(0, 1);
-  hst2D_qcd_comb->GetYaxis()->SetRangeUser(0, 1);
+  hst2D_bkgx_comb->SetLineColor(kRed);
+  hst2D_bkgx_comb->Draw("CONT3");
+  //hst2D_bkgx_comb->Draw("P");
+  hst2D_bkgx_comb->SetTitle("");
+  hst2D_bkgx_comb->GetXaxis()->SetTitle(xtitle);
+  hst2D_bkgx_comb->GetXaxis()->SetTitleSize(0.05);
+  hst2D_bkgx_comb->GetYaxis()->SetTitle(ytitle);
+  hst2D_bkgx_comb->GetYaxis()->SetTitleSize(0.05);
+  //hst2D_bkgx_comb->GetZaxis()->SetRangeUser(0.0001, 1.0);
+  hst2D_bkgx_comb->GetXaxis()->SetRangeUser(0, 1);
+  hst2D_bkgx_comb->GetYaxis()->SetRangeUser(0, 1);
   //Rest of them
-  hst2D_wjets_comb->Draw("P SAME");
+  hst2D_bkgy_comb->Draw("P SAME");
   hst2D_sig1_comb->Draw("P SAME");
-  hst2D_qcd_comb->Draw("CONT3 SAME");
+  //hst2D_bkgx_comb->Draw("CONT3 SAME");
+  //hst2D_bkgx_comb->Draw("P SAME");
   canvas->Update();
 
   //Draw legend
   TLegend *lg = new TLegend(0.20, 0.65, 0.44, 0.87);
-  lg->SetTextFont(62); lg->SetTextSize(0.03);
-  lg->SetHeader(_channel + " channel", "C");
+  lg->SetTextFont(42); lg->SetTextSize(0.03);
+  lg->SetHeader(_channel.ReplaceAll("m", "#mu") + " channel", "C");
+  //lg->SetHeader(_channel + " channel", "C");
   lg->SetFillColor(kWhite); lg->SetFillStyle(1001);
   lg->SetLineColor(kBlack); lg->SetLineWidth(1);
   lg->SetTextFont(42);
-  lg->AddEntry(hst2D_qcd_comb, hst2D_qcd_comb->GetName(), "l");
-  lg->AddEntry(hst2D_wjets_comb, hst2D_wjets_comb->GetName(), "p");
+  lg->AddEntry(hst2D_bkgx_comb, hst2D_bkgx_comb->GetName(), "l");
+  lg->AddEntry(hst2D_bkgy_comb, hst2D_bkgy_comb->GetName(), "p");
   lg->AddEntry(hst2D_sig1_comb, hst2D_sig1_comb->GetName(), "p");
   lg->Draw();
   

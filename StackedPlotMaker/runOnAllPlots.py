@@ -26,9 +26,9 @@ campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
 campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
 channels.extend(["combined"])
-basename  = "2025-09-25_sr"
-tag       = "sr"
-text      = "signal region"
+basename  = "2025-10-17_cleanup"
+tag       = "2LOS_cleanup"
+text      = "baseline+HT>50 2LOS"
 tousedata = False
 tosave    = True
 jobdict = {}
@@ -36,11 +36,11 @@ jobdict = {}
 
 jobdict = {}
 for camp in campaigns:
-    if "Run3" not in camp: continue
     for ch in channels:
+        if camp != "Run3Summer22EE": continue      ## Testing one campaign
+        if ch not in ["mm", "ee"]: continue ## For 2LOS 
         #if not (ch == "combined" or ch == "ee"): continue
-        #if camp != "FullDataset": continue
-        #if not (ch=='combined' or camp=='FullDataset'): continue
+        if (ch=='combined' or camp=='FullDataset'): continue
         key = f"{basename}/hist_{tag}_{camp}_{ch}"
         jobdict[key] = {"campaign": camp, "channel": ch}
 
@@ -48,14 +48,19 @@ print("Processing the following jobs:")
 for job, val in jobdict.items(): print(f' - {job}')
 
 variables = [
-    ("nnscore_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2)"),
-    ("nnscore_Run2_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-2)"),
-    ("nnscore_Run2_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-2)"),
-    ("nnscore_Run2_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-2)"),
-    ("nnscore_Run3_vlld_qcd",   "NNScore: QCD vs VLLD (Run-3)"),
-    ("nnscore_Run3_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-3)"),
-    ("nnscore_Run3_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-3)"),
-    ("nnscore_Run3_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-3)"),
+    ("LTplusMET",    "L_{T}+p_{T}^{miss} (GeV)"),
+    ("nnscore_2LSS_Run2_vlld_qcd",   "NNScore: QCD vs VLLD (Run-2, 2LSS)"),
+    ("nnscore_2LSS_Run2_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-2, 2LSS)"),
+    ("nnscore_2LSS_Run2_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-2, 2LSS)"),
+    ("nnscore_2LSS_Run2_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-2, 2LSS)"),
+    ("nnscore_2LSS_Run3_vlld_qcd",   "NNScore: QCD vs VLLD (Run-3, 2LSS)"),
+    ("nnscore_2LSS_Run3_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-3, 2LSS)"),
+    ("nnscore_2LSS_Run3_vlld_wjets", "NNScore: W+#gamma vs VLLD (Run-3, 2LSS)"),
+    ("nnscore_2LSS_Run3_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-3, 2LSS)"),
+    ("nnscore_2LOS_Run2_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-2, 2LOS)"),
+    ("nnscore_2LOS_Run2_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-2, 2LOS)"),
+    ("nnscore_2LOS_Run3_vlld_ttbar", "NNScore: t#bar{t} vs VLLD (Run-3, 2LOS)"),
+    ("nnscore_2LOS_Run3_vlld_dy",    "NNScore: DY+jets vs VLLD (Run-3, 2LOS)"),
     
     ("nlep",  "N_{L}"),
     ("njet",  "N_{J} (AK4)"),
@@ -86,7 +91,6 @@ variables = [
     ("dilep_dR",      "#Delta R(L_{0}, L_{1})"),
     ("dilep_ptratio", "p_{T1} / p_{T0}"),
 
-    ("LTplusMET",    "L_{T}+p_{T}^{miss} (GeV)"),
     ("HT",           "H_{ T} (GeV)"),
     ("HTfat",        "H_{ T}(AK8) (GeV)"),
     ("STvis",        "H_{ T}+L_{T} (GeV)"),
@@ -105,11 +109,14 @@ variables = [
     ("dphi_metlep_max", "max(#Delta#phi(L, p_{T}^{miss}))"),
     ("dphi_metlep_min", "min(#Delta#phi(L, p_{T}^{miss}))"),
 
-    ("2LSS_wt_leptonSF", "Lepton IdIso SF"),
-    ("2LSS_wt_trig", "Trigger efficiency SF"),
-    ("2LSS_wt_pileup", "PileUp weight"),
-    ("2LSS_wt_bjet", "bJet weight"),
-    ("2LSS_wt_evt", "Event weight"),
+    ("gen_weight_evt", "Generator weight"),
+
+    ("wt_leptonSF", "Lepton IdIso SF"),
+    ("wt_trig",     "Trigger efficiency SF"),
+    ("wt_pileup",   "PileUp weight"),
+    ("wt_bjet",     "bJet weight"),
+    ("wt_bjet",     "bJet weight"),
+    ("wt_evt",      "Event weight"),
 ]
 
 #______________________________________________________________________________________________________________

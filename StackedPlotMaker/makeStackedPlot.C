@@ -7,17 +7,21 @@
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
+		     //TString _var = "njet",
+		     //TString _var = "nnscore_Run2_vlld_qcd",
+		     //TString _var = "metpt",
+		     //TString _var = "dilep_dR",
+		     //TString _var = "dilep_mt",
 		     //TString _var = "HT",
-		     //TString _var = "nnscore_Run2_vlld_ttbar",
-		     //TString _var = "lep0_iso",
-		     TString _var = "dilep_dR",
+		     TString _var = "LTplusMET",
+		     //TString _var = "gen_weight_evt",
 		     TString _name = "test",
-		     TString _jobname = "2025-09-24_baseline/hist_baseline_2018_UL_mm",
-		     TString _campaign = "2018_UL",
-		     TString _channel = "mm",
+		     TString _jobname = "2025-10-17_cleanup/hist_2LOS_cleanup_Run3Summer22EE_ee",
+		     TString _campaign = "Run3Summer22EE",
+		     TString _channel = "ee",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
-		     bool _data = false,
+		     bool _data = true,
 		     bool _save = false
 		     )
 {
@@ -33,8 +37,9 @@ void makeStackedPlot(
   // SET GLOBAL SETTINGS 
   bool toOverlayData=_data;
   bool toSave=_save;
-  // ymax_base = 10e9 for baseline
-  Double_t ymin = 0.1; Double_t ymax_base = 10E4; Double_t ymax = ymax_base;
+  // ymax_base = 10e9 for baseline 2LSS
+  // ymax_base = 10e11 for baseline 2OSS
+  Double_t ymin = 0.1; Double_t ymax_base = 10E8; Double_t ymax = ymax_base;
   if(_channel=="combined")                   ymax = ymax_base*10;
   if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
   if(_campaign=="FullDataset")               ymax = ymax_base*1000; 
@@ -221,32 +226,40 @@ void makeStackedPlot(
   //______________________________________________________________
 
   TH1D *sig1, *sig2, *sig3;
-  if(_channel == "ee"){
-    sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-ele", "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD-ele", "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{300}");}
+  TString M1 = "600"; //Reference signal
+  TString M2 = "200";
+  TString M3 = "1000";
+  TString masses[3] = {M1, M2, M3};
+  TH1D* sig[3];
+
+  Color_t colors[3] = {kRed+2, kRed+0, kRed+3};
+
+  // default model & name patterns
+  TString models[3] = {"VLLD-ele", "VLLD-ele", "VLLD-ele"};
+  TString names[3]  = {"VLLDe_{" + M1 + "}", "VLLDe_{" + M2 + "}", "VLLDe_{" + M3 + "}"};
+
+  // channel-specific overrides
+  if(_channel=="em")        { models[1]="VLLD-mu"; names[1]="VLLD#mu_{" + M2 + "}"; }
+  else if(_channel=="me")   { models[0]="VLLD-mu"; models[2]="VLLD-mu"; names[0]="VLLD#mu_{" + M1 + "}"; names[2]="VLLD#mu_{" + M3 + "}"; }
+  else if(_channel=="mm")   { models[0]=models[1]=models[2]="VLLD-mu"; 
+    names[0]="VLLD#mu_{" + M1 + "}"; names[1]="VLLD#mu_{" + M2 + "}"; names[2]="VLLD#mu_{" + M3 + "}"; }
+  else if(_channel=="combined") { models[0]=models[2]="VLLD-mu"; models[1]="VLLD-ele"; 
+    names[0]="VLLD#mu_{" + M1 + "}"; names[1]="VLLDe_{" + M2 + "}"; names[2]="VLLD#mu_{" + M3 + "}"; }
+
+  // load histograms
+  for(int i=0;i<3;i++){
+    sig[i] = get_hist(_var, input_path, models[i], masses[i]);
+    if(sig[i]) { SetHistoStyle(sig[i], colors[i]); sig[i]->SetName(names[i]); }
   }
-  else if (_channel == "em"){
-    sig1 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLDe_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-ele", "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLDe_{300}");}
-  }
-  else if (_channel == "me"){
-    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{300}");}
-  }
-  else if (_channel == "mm"){
-    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-mu",  "200"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLD#mu_{200}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{300}");}
-  }
-  else if (_channel=="combined"){
-    sig1 = get_hist(_var, input_path, "VLLD-mu",  "400"); if(sig1) {SetHistoStyle(sig1, kRed+0); sig1->SetName("VLLD#mu_{400}");}
-    sig2 = get_hist(_var, input_path, "VLLD-ele", "400"); if(sig2) {SetHistoStyle(sig2, kRed+2); sig2->SetName("VLLDe_{400}");}
-    sig3 = get_hist(_var, input_path, "VLLD-mu",  "300"); if(sig3) {SetHistoStyle(sig3, kRed+3); sig3->SetName("VLLD#mu_{300}");}
-  }
-  else cout<<"\033[31m[ERROR:] all signal are null!"<<endl;
+
+  sig1 = sig[0];
+  sig2 = sig[1];
+  sig3 = sig[2];
+
+  if(sig1) sig1->SetLineStyle(1); // reference is solid
+  if(sig2) sig2->SetLineStyle(2); // others are dotted
+  if(sig3) sig3->SetLineStyle(2);
+  
   //sig2 = nullptr;
   //sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
@@ -439,18 +452,18 @@ void makeStackedPlot(
   if(toOverlayData){
     TString data_yield = Form("%d", (int)hst_data->Integral());
     TString text = "Observed ["+data_yield+"]";
-    lg->AddEntry(hst_data, text, "f");
-    if(hst_smuon)  SetLegendEntry(lg, hst_smuon);
-    if(hst_egamma) SetLegendEntry(lg, hst_egamma);
+    lg->AddEntry(hst_data, text, "ep");
+    if(hst_smuon)  SetLegendEntry(lg, hst_smuon, "ep");
+    if(hst_egamma) SetLegendEntry(lg, hst_egamma, "ep");
   }
   for(int i=(int)bkg.size()-1; i>=0; i--){
     bkg[i]->SetLineColor(kBlack);
     bkg[i]->SetLineWidth(1);
     SetLegendEntry(lg, bkg[i]);
   }
-  if(sig1) SetLegendEntry(lg, sig1);
-  if(sig2) SetLegendEntry(lg, sig2);
-  if(sig3) SetLegendEntry(lg, sig3);
+  if(sig1) SetLegendEntry(lg, sig1, "l");
+  if(sig2) SetLegendEntry(lg, sig2, "l");
+  if(sig3) SetLegendEntry(lg, sig3, "l");
   TString legendheader = Form("Global S/#sqrt{B} = %.3f #pm %.3f", globalSbyB, globalSbyBErr);
   if(toOverlayData){
     TString val = Form("Global obs/exp = %.3f", globalObsbyExp);

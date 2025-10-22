@@ -16,6 +16,7 @@ sigdict = {
     },
     "VLLS": {}
 }
+final_states = ["2LOS", "2LSS"]
 
 def main():
     parser = argparse.ArgumentParser()
@@ -58,11 +59,21 @@ def main():
     print(f"\nTotal elapsed time: {global_end - global_start:.1f} s")
 
 def parse_file(f):
-    fname = os.path.basename(f).replace("shapes_","").replace(".root","")    
+    fname = os.path.basename(f).replace(".root","")
+
+    ## Extract final state
+    fs_match = next((fs for fs in final_states if fname.startswith(f"shapes_{fs}_")), None)
+    if not fs_match: return None
+
+    ## Remove final state prefix for the next search
+    fname = fname[len(f"shapes_{fs_match}_"):]  
+
+    ## Extract campaign
     c = next((c for c in sorted(campaigns,key=len,reverse=True) if fname.startswith(c)), None)
     if not c: return None
     rest = fname[len(c)+1:]
 
+    ## Extract channel
     ch = next((ch for ch in channels if rest.startswith(ch+"_")), None)
     if not ch: return None
 
@@ -71,8 +82,8 @@ def parse_file(f):
     flav = rem[1] if len(rem)==3 else ""
     mass = rem[-1]
 
-    # keep full campaign name including "_UL"
-    return c, ch, sig, flav, mass, f
+    ## keep full campaign name including "_UL"
+    return fs_match, c, ch, sig, flav, mass, f
 
 def combine(file_info, out_dir, groups, by_option, test=False, dryrun=False):
     tasks = []
@@ -83,7 +94,7 @@ def combine(file_info, out_dir, groups, by_option, test=False, dryrun=False):
             for flav, masslist in masses.items():
                 for mass in masslist:
                     paths = [
-                        fp for c,ch,s,fla,mass_str,fp in file_info
+                        fp for fs_, c,ch,s,fla,mass_str,fp in file_info
                         if sel(c,ch,s,fla,mass_str) and s==sig and fla==flav and int(mass_str)==mass
                     ]
                     if paths:
@@ -107,7 +118,10 @@ def combine(file_info, out_dir, groups, by_option, test=False, dryrun=False):
 
                         odir = os.path.join(out_dir, folder_name)
                         os.makedirs(odir, exist_ok=True)
-                        out = os.path.join(odir, f"shapes_{file_name}_{sig}_{flav}_{mass}.root")
+
+                        if len(final_states) == 2: fs_prefix = "2L"
+                        else: fs_prefix = final_states[0]
+                        out = os.path.join(odir, f"shapes_{fs_prefix}_{file_name}_{sig}_{flav}_{mass}.root")
                         tasks.append((out, paths))
 
     total = len(tasks)

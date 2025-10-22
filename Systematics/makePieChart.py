@@ -6,9 +6,10 @@ import os, ROOT
 channelnames = {"mm": r"$\mu\mu$", "me": r"$\mu e$", "em": r"$e\mu$", "ee": r"$ee$", "combined": "combined"}
 
 def main():
-    indir = "yields/2025-09-18/sr"
-    outdir = "pie/2025-09-18_sr"
-    tag = "sr"
+    finalstate = "2LOS"
+    indir = f"yields/2025-10-13/{finalstate}_val1"
+    outdir = f"pie/2025-10-13/{finalstate}_val1"
+    tag = "val1"
     campaigndict = {
         "2016preVFP_UL":"2016-preVFP",
         "2016postVFP_UL":"2016-postVFP",
@@ -24,10 +25,12 @@ def main():
     }
     channels = ["mm", "me", "em", "ee", "combined"]
     for campaign, name in campaigndict.items():
+        if "2018" not in campaign: continue
         for ch in channels:
             ### Excpetion:
-            if campaign in ['Run2', 'Run3'] and ch != 'combined': continue
-            csvfile = f"{indir}/yields_{tag}_{campaign}_{ch}.csv"
+            if ch not in ["mm", "ee"]: continue
+            #if campaign in ['Run2', 'Run3'] and ch != 'combined': continue
+            csvfile = f"{indir}/yields_{finalstate}_{tag}_{campaign}_{ch}.csv"
             if not os.path.exists(csvfile):
                 print(f"\033[31mWarning: Missing file {csvfile}\033[0m")
                 continue

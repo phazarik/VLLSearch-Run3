@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+## clean existing combined shapes.
+rm -rf "shapes/*combined"
+rm -rf "shapes/FullDataset*"
+rm -rf "shapes/Run2*"
+rm -rf "shapes/Run3*"
+
 ## Start global timer
 start_time=$(date +%s)
 
