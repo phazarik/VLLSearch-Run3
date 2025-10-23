@@ -142,7 +142,7 @@ vector<TH1D *> return_hist_collection(
 				      int rebin = 1
 				      ){
 
-  TString json_path = "../LumiJsons/lumidata_"+campaign+".json";
+  TString json_path = "../sample_weights_JSON/lumidata_"+campaign+".json";
   std::ifstream infile(json_path.Data());
   if (!infile.is_open())  cerr << "Error: Could not open JSON file: " << json_path << endl;
   infile.seekg(0, std::ios::end);

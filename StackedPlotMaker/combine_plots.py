@@ -10,8 +10,9 @@ args = parser.parse_args()
 indir = args.indir
 
 set0 = ["njet", "nbjet", "HT", "LT", "ST", "STfrac", "dilep_ptratio", "metpt", "metphi"]
-set1 = ["nnscore_Run2_vlld_qcd", "nnscore_Run2_vlld_wjets", "nnscore_Run2_vlld_ttbar",
-        "nnscore_Run3_vlld_qcd", "nnscore_Run3_vlld_wjets", "nnscore_Run3_vlld_ttbar"]
+set11 = ["nnscore_2LSS_Run2_vlld_qcd", "nnscore_2LSS_Run2_vlld_wjets", "nnscore_2LSS_Run2_vlld_ttbar",
+        "nnscore_2LSS_Run3_vlld_qcd", "nnscore_2LSS_Run3_vlld_wjets", "nnscore_2LSS_Run3_vlld_ttbar"]
+set12 = ["nnscore_2LOS_Run2_vlld_ttbar", "nnscore_2LOS_Run2_vlld_dy"]
 set2 = ["lep0_pt", "lep0_eta", "lep0_phi", "lep0_mt", "lep0_iso", "lep0_sip3d"]
 set3 = ["lep1_pt", "lep1_eta", "lep1_phi", "lep1_mt", "lep1_iso", "lep1_sip3d"]
 set4 = ["dilep_pt", "dilep_eta", "dilep_phi", "dilep_mt", "dilep_dphi", "dilep_dR"]
@@ -22,45 +23,17 @@ set7 = ["dilep_mass", "dilep_pt", "dilep_mt", "dilep_dR",
         "lep0_pt", "lep0_phi", "njet", "nbjet"
         ]
 set8 = ["lep0_pt", "dilep_dR", "dilep_mt", "njet"]
-dnn1 = [
-    'njet',
-    'dilep_dR',
-    'dilep_ptratio',
-    'LTplusMET',
-    'ST',
-    'STfrac',
-    'metpt',
-    'dphi_metdilep',
-    'dphi_metlep_min'
-]
-dnn2 = [
-    'njet',
-    'dilep_mt',
-    'dilep_ptratio',
-    'dilep_dR',
-    'LTplusMET',
-    'STfrac'
-]
-dnn3 = [
-    'nbjet',
-    'dilep_ptratio',
-    'LTplusMET',
-    'ST',
-    'STfrac',
-    'dphi_metlep0',
-]
-dnn4 = [
-    'njet',
-    'lep0_eta',
-    'lep1_eta',
-    'dilep_mt',
-    'LTplusMET',
-    'metpt',
-]
+dnn1 = ['njet','dilep_dR','dilep_ptratio','LTplusMET','ST','STfrac','metpt','dphi_metdilep','dphi_metlep_min']
+dnn2 = ['njet','dilep_mt','dilep_ptratio','dilep_dR','LTplusMET','STfrac']
+dnn3 = ['nbjet','dilep_ptratio','LTplusMET','ST','STfrac','dphi_metlep0',]
+dnn4 = ['njet','lep0_eta','lep1_eta','dilep_mt','LTplusMET','metpt']
+dnn5 = ['nbjet','dilep_ptratio','LTplusMET','STvis','STfrac','metpt']
+dnn6 = ['njet', 'dilep_eta', 'dilep_dR', 'ST', 'STfrac', 'dphi_metlep_max']
 
 plotdict = {
     "event_level": set0,
-    "nnscores": set1,
+    "nnscores_2LSS": set11,
+    "nnscores_2LOS": set12,
     "lep0": set2,
     "lep1": set3,
     "dilep": set4,
@@ -68,10 +41,12 @@ plotdict = {
     "weights": set6,
     "mixed": set7,
     "slides": set8,
-    "dnn-qcd": dnn1,
-    "dnn-wjets": dnn2,
-    "dnn-top": dnn3,
-    "dnn-dy": dnn4
+    "dnn-2LSS-qcd": dnn1,
+    "dnn-2LSS-wjets": dnn2,
+    "dnn-2LSS-top": dnn3,
+    "dnn-2LSS-dy": dnn4,
+    "dnn-2LOS-top": dnn5,
+    "dnn-2LOS-dy": dnn6,
 }
 
 for plotname, plotset in plotdict.items():

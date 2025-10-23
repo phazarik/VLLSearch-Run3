@@ -2,17 +2,18 @@ import time
 import os, argparse
 from datetime import timedelta
 from tqdm import tqdm
+from rich.progress import Progress, BarColumn, TaskProgressColumn, TimeElapsedColumn, TimeRemainingColumn
 
 #---------------- CONFIG ------------------#
 basedir = "../ROOT_FILES/hists/"
-final_states = ["2LSS", "2LOS"]
-jobname = "2025-10-13_baseline"
-tag = "baseline"
+final_states = ["2LOS"]
+jobname = "2025-10-23_2LOS_topcr"
+tag = "topcr" ## Don't put finalstate here
 campaigns_all = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"
 ]
-channels = ["ee", "em", "me", "mm"]
+channels = ["ee", "mm"]
 #------------------------------------------#
 
 def parse_args():
@@ -27,17 +28,13 @@ def main():
     args = parse_args()
 
     outdirs = define_outdirs(args.by)
-    if not args.dryrun:
-        for od in outdirs.values():
-            os.makedirs(od, exist_ok=True)
-
     folders_by_key = collect_folders(args.by, outdirs)
 
     jobcount = 0
     global_start_time = time.time()
     for key, folders in folders_by_key.items():
         jobcount += 1
-        print("\n"+"="*20+f"\nRunning job {jobcount}/{len(folders_by_key)} ...\n"+"="*20)
+        print("\n" + "="*20 + f"\nRunning job {jobcount}/{len(folders_by_key)} ...\n" + "="*20)
         all_files = collect_files(folders)
         combine_files(key, folders, outdirs[key], all_files, dryrun=args.dryrun, test=args.test)
 
@@ -92,7 +89,7 @@ def collect_folders(by, outdirs):
 
     if by.startswith("run2_") or by.startswith("run3_"): 
         channels_to_check = [by.split("_", 1)[1]]
-        combined_key = list(outdirs.keys())[0]  ## single key for the whole run/channel
+        combined_key = list(outdirs.keys())[0]
     else:
         channels_to_check = channels
         combined_key = None
@@ -104,7 +101,7 @@ def collect_folders(by, outdirs):
                 fullpath = os.path.join(basedir, jobname, folder)
                 print(f"\033[2;3mSearching: {fullpath} ... \033[0m", end="")
                 if os.path.isdir(fullpath):
-                    if combined_key:         key = combined_key  ## use single job key
+                    if combined_key:         key = combined_key
                     elif by == "channels":   key = camp
                     elif by == "campaigns":  key = ch
                     else:                    key = list(outdirs.keys())[0]
@@ -113,7 +110,6 @@ def collect_folders(by, outdirs):
                 else:
                     print("\033[2;31mNot found, skipping.\033[0m")
 
-    ## remove empty entries
     folders_by_key = {k: v for k, v in folders_by_key.items() if v}
     return folders_by_key
 
@@ -149,6 +145,9 @@ def combine_files(key, folders, outdir, all_files, dryrun=False, test=False):
 
     for fname, paths in iterator_var:
         outpath = os.path.join(outdir, fname)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir, exist_ok=True)
+
         if len(paths) == 1: cmd = f"cp {paths[0]} {outpath}"
         else:               cmd = f"hadd -f {outpath} " + " ".join(paths)
 
@@ -162,13 +161,12 @@ def combine_files(key, folders, outdir, all_files, dryrun=False, test=False):
         count += 1
         if test: break
 
-    if not dryrun:  progress.stop()
+    if not dryrun: progress.stop()
 
     end_time = time.time()
     print(f"Time taken = {str(timedelta(seconds=int(end_time - start_time)))}\n")
-    
+
 # ----------- fancy progress bar ------------
-from rich.progress import Progress, BarColumn, TaskProgressColumn, TimeElapsedColumn, TimeRemainingColumn
 def make_progress_columns(
     desc_color="yellow bold",
     bar_width=40,
@@ -191,5 +189,4 @@ def make_progress_columns(
     ]
 
 # ----------- EXECUTION ------------
-if __name__ == "__main__":  main()
-    
+if __name__ == "__main__": main()

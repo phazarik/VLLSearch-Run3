@@ -91,7 +91,7 @@ TH1D *DivideHists(TH1D *hst_num, TH1D*hst_den){
   if (nbins != hst_den->GetNbinsX()) return nullptr;
   TH1D* hst_result = (TH1D*)hst_num->Clone("hst_result"); hst_result->Reset();
 
-  for (int i = 1; i <= nbins; ++i) {
+  for (int i = 0; i <= nbins + 1; ++i) {
     double num = hst_num->GetBinContent(i);
     double den = hst_den->GetBinContent(i);
     double num_err = hst_num->GetBinError(i);
@@ -114,11 +114,16 @@ TH1D *GetSbyRootB(TH1D *sig, vector<TH1D*> bkg){
   TH1D *rootb = (TH1D *)bkg[0]->Clone(); rootb->Reset();
   for(int i=0; i<(int)bkg.size(); i++) rootb->Add(bkg[i]);
   //Taking the square root:
-  for(int bin=0; bin<rootb->GetNbinsX(); bin++){
+  for(int bin=0; bin<rootb->GetNbinsX()+1; bin++){
     double val = rootb->GetBinContent(bin);
     double err = rootb->GetBinError(bin);
-    rootb->SetBinContent(bin, std::sqrt(val));
-    rootb->SetBinError(bin, err/(2.0*std::sqrt(val)));
+    if(val > 0){
+      rootb->SetBinContent(bin, sqrt(val));
+      rootb->SetBinError(bin, err / (2.0 * sqrt(val)));
+    } else {
+      rootb->SetBinContent(bin, 0);
+      rootb->SetBinError(bin, 0);
+    }
   }
   if(!rootb){
     cout<<"Error: Background is null!"<<endl;

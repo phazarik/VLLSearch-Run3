@@ -21,14 +21,17 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 
 #----------------------------------- config ----------------------------------------
-basedir   = '../../ROOT_FILES/treesWithNN/'
-#campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
-#             "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
-campaigns = ["2018_UL"]
+basedir   = '../../ROOT_FILES/treesWithNN/' ## relative path from this file.
+campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
+             "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
+#campaigns = ["Run3Summer22EE"]
 basename  = "2LOS_baseline/tree_2LOS_baseline"
-dumpdir   = "2LOS_sr"
-tag       = "2LOS_sr"
+dumpdir   = "2LOS_val3"
+tag       = "2LOS_val3"
 #-----------------------------------------------------------------------------------
+
+basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), basedir)
+basedir = os.path.abspath(basedir)
 
 jobdict = {}
 for camp in campaigns:
@@ -116,21 +119,20 @@ for injob, info in jobdict.items():
 
         tight_iso   = 'lep0_iso<0.05 and lep1_iso<0.2'
         tight_sip3d = 'lep0_sip3d<5 and lep1_sip3d<10'
-        basic_cleanup = f"{tight_iso} and {tight_sip3d} and dilep_deta < 2.5"
-        
+        cleanup = f"{tight_iso} and {tight_sip3d} and dilep_deta < 2.5"      
         
         ## Step1: control and kill DY
-        dycr    = f"{basic_cleanup} and {nnscore_dy}<0.2"
-        killdy  = f"{basic_cleanup} and {nnscore_dy}>0.8 and abs(dilep_eta)<5"
+        dycr    = f"{cleanup} and {nnscore_dy}<0.2"
+        killdy  = f"{cleanup} and {nnscore_dy}>0.6 and HT>50"
 
         ## Step2: ttbar CR
-        topcr     = f"{killdy} and {nnscore_ttbar}<0.2"
+        topcr     = f"{killdy} and {nnscore_ttbar}<0.3"
         killttbar = f"{killdy} and {nnscore_ttbar}>0.8"
 
         ## Step3: Validation regions
-        val1 = f"{basic_cleanup} and     {nnscore_ttbar}<0.2 and 0.2<{nnscore_dy}<0.8" ## low tt-score
-        val2 = f"{basic_cleanup} and 0.2<{nnscore_ttbar}<0.6 and 0.2<{nnscore_dy}"     ## med tt-score
-        val3 = f"{basic_cleanup} and 0.8<{nnscore_ttbar}     and 0.2<{nnscore_dy}<0.6" ## high tt-score
+        val1 = f"{cleanup} and HT>50 and     {nnscore_ttbar}<0.3 and 0.2<{nnscore_dy}<0.6" ## low tt-score
+        val2 = f"{cleanup} and HT>50 and 0.3<{nnscore_ttbar}<0.7 and 0.2<{nnscore_dy}"     ## med tt-score
+        val3 = f"{cleanup}           and 0.8<{nnscore_ttbar}     and 0.2<{nnscore_dy}<0.7" ## high tt-score
 
         ## Step4: signal region
         srpre = f"{killttbar}"
@@ -138,7 +140,7 @@ for injob, info in jobdict.items():
         
         #------------------------------
         # Final event selection:
-        event_selection = sr
+        event_selection = val3
         #------------------------------
 
         filecount += 1

@@ -21,13 +21,16 @@ if test:   print('[WARNING]: test mode',   style="red")
 if dryrun: print('[WARNING]: dryrun mode', style="red")
 
 #----------------------------------- config ----------------------------------------
-basedir   = '../../ROOT_FILES/treesWithNN/'
+basedir   = '../../ROOT_FILES/treesWithNN/' ## relative path from this file.
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 basename  = "baseline/tree_baseline"
 dumpdir   = "sr"
 tag       = "sr"
 #-----------------------------------------------------------------------------------
+
+basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), basedir)
+basedir = os.path.abspath(basedir)
 
 jobdict = {}
 for camp in campaigns:
