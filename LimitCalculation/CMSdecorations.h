@@ -66,7 +66,7 @@ void put_latex_text(TString text, float x, float y, int style, float size, bool 
     latex->DrawLatex(x, y, text);
 }
 
-void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString energy, bool bottomleft = false, bool systematics=true) {
+void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString energy, TString final_state, bool bottomleft = false, bool systematics=false) {
 
   TString methodname = "Asymptotic, stat only";
   if (systematics) methodname = "Asymptotic, stat+syst";
@@ -74,6 +74,7 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString ene
   put_text("CMS", 0.15, 0.85, 62, 0.07);            // Larger, bold CMS label
   put_text("Preliminary", 0.30, 0.85, 52, 0.05);    // Smaller preliminary label
   put_latex_text(methodname, 0.15, 0.80, 42, 0.04); // Additional information
+  put_latex_text(final_state, 0.15, 0.75, 42, 0.04); // Additional information
 
   float xright = 0.95; float yup = 0.94;
   if(campaign == "2016preVFP_UL")    put_latex_text("19.7 fb^{-1} (2016-preVFP)",   xright, yup, 42, 0.05, true);

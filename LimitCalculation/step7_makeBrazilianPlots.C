@@ -26,6 +26,15 @@ vector<LimitData> ReadDataFromFile(const TString& filename);
 TGraph* ReadTheoryGraph(const TString& infile, const TString &modelname);
 string todays_date();
 
+struct plotdata {
+  TString outname;
+  TString modelname;
+  TString final_state;
+  TString campaign;
+  TString channel;
+  TString energy;
+};
+
 void makeOneLimitPlot(
 		      TString infile   = "limits_sigmaB_13TeV/sigmaB_VLLD_mu_Run3_combined.txt",
 		      TString outfile  = "test_run3_vlldmu",
@@ -33,9 +42,10 @@ void makeOneLimitPlot(
 		      TString campaign = "Run3",
 		      TString channel  = "combined",
 		      TString energy   = "13p6TeV",
-		      float ymin       = 1e-3,
+		      TString final_state = "2L",
+		      float ymin       = 1e-4,
 		      float ymax       = 1e3,
-		      bool systematics = true,
+		      bool systematics = false,
 		      bool bottomleft  = false
 		      )
 {
@@ -44,6 +54,9 @@ void makeOneLimitPlot(
   bool showdata = false;
   bool tosave = true;
 
+  //Quick fix:
+  if(modelname == "VLLD_mu")  modelname= "VLLD-#mu";
+  if(modelname == "VLLD_ele") modelname= "VLLD-e";
   //-----------------------------------------------------------------------------------------
   // Loading data from input file in the following format:
   // Mass >> Observed >> Exp_2sigDn >> Exp_1sigDn >> Exp_nominal >> Exp_1sigUp >> Exp_2sigUp
@@ -65,10 +78,10 @@ void makeOneLimitPlot(
   //---------------------------
   TCanvas* c1 = CreateCanvas(cname); c1->Clear();
 
-  // Remove points beyond 800 GeV
+  // Filter limit values
   vector<LimitData> filteredLimits;
   for (const auto& l : limits) {
-    if (l.mass <= 800) filteredLimits.push_back(l);
+    if (125<l.mass && l.mass <= 1200) filteredLimits.push_back(l);
   }
   limits = filteredLimits;
   nPoints = limits.size();
@@ -110,7 +123,7 @@ void makeOneLimitPlot(
   TGraph* theory_vlls = ReadTheoryGraph("xsec/sigmaB_VLLS_" + energy + ".txt", modelname_singlet);
 
   // Drawing one canvas
-  SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1000); theory_vlld->Draw("AL"); //This decides the decorations
+  SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1200); theory_vlld->Draw("AL"); //This decides the decorations
   yellow->Draw("F same");
   green ->Draw("F same");
   exp   ->Draw("L same");
@@ -131,7 +144,7 @@ void makeOneLimitPlot(
   legend->Draw();
 
   // Add CMS label
-  AddCMSLabel(c1, campaign, channel, energy, bottomleft, systematics);;
+  AddCMSLabel(c1, campaign, channel, energy, final_state, bottomleft, systematics);;
   c1->Update();
   
   if(tosave){
@@ -144,7 +157,24 @@ void makeOneLimitPlot(
 
 void step7_makeBrazilianPlots(){
 
-  makeOneLimitPlot();
+  vector<plotdata> limitfiles = {
+    {"test_VLLDmu_2L",   "VLLD_mu",   "2L", "FullDataset", "combined", "13TeV"},
+    {"test_VLLDele_2L",  "VLLD_ele",  "2L", "FullDataset", "combined", "13p6TeV"},
+    //{"test_VLLDmu_2LOS", "VLLD_mu", "2LOS", "2018_UL", "mm", "13TeV"},
+    //{"test_VLLDmu_2LSS", "VLLD_mu", "2LSS", "2018_UL", "mm", "13TeV"}
+  };
+
+  for(int i=0; i<(int)limitfiles.size(); i++){
+    TString outname     = limitfiles[i].outname;
+    TString modelname   = limitfiles[i].modelname;
+    TString final_state = limitfiles[i].final_state;
+    TString campaign    = limitfiles[i].campaign;
+    TString channel     = limitfiles[i].channel;
+    TString energy      = limitfiles[i].energy;
+    TString infile = "limits_sigmaB_"+energy+"/sigmaB_"+final_state+"_"+modelname+"_"+campaign+"_"+channel+".txt";
+    cout<<"Processing .. "<<infile<<endl;
+    makeOneLimitPlot(infile, "plots/"+outname, modelname, campaign, channel, energy, final_state);
+  }
   
 }
 
@@ -194,7 +224,7 @@ TGraph* ReadTheoryGraph(const TString& infile, const TString &modelname) {
         istringstream iss(line);
         double m, xs;
         if (!(iss >> m >> xs)) continue;
-        if (m > 800) continue;  // skip points beyond 800 GeV
+        //if (m > 800) continue;  // skip points beyond 800 GeV
         mass.push_back(m);
         xsec.push_back(xs);
     }

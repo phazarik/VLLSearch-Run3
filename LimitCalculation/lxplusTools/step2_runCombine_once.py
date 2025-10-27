@@ -12,7 +12,8 @@ sigdict = {
             "400": {"scale":10},
             "600": {"scale":10},
             "800": {"scale":10},
-            "1000":{"scale":10}
+            "1000":{"scale":10},
+            "1200":{"scale":10}
         },
         "mu": {
             "100": {"scale":1},
@@ -21,7 +22,8 @@ sigdict = {
             "400": {"scale":10},
             "600": {"scale":10},
             "800": {"scale":10},
-            "1000":{"scale":10}
+            "1000":{"scale":10},
+            "1200":{"scale":10}
         },
         "tau": {}
     },
@@ -35,45 +37,53 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--campaign", default="2018_UL")
     parser.add_argument("--channel",  default="mm")
+    parser.add_argument("--fs",       default="2LOS")
     parser.add_argument("--method",   default="AsymptoticLimits")
     parser.add_argument("--test",     action="store_true")
     parser.add_argument("--dryrun",   action="store_true")
     args = parser.parse_args()
 
-    datacards = collect_datacards(args.campaign, args.channel)
+    datacards = collect_datacards(args.fs, args.campaign, args.channel)
 
+    # --- dryrun path ---
+    if args.dryrun:
+        datacards = collect_datacards(args.fs, args.campaign, args.channel, require_exist=False)
+        for model, flav, mass, scale, datacard in datacards: run_combine(datacard, scale, args.method, dryrun=True)
+        return
+
+    # --- test path ---
     if args.test:
         for model, flav, mass, scale, datacard in datacards:
-            output = run_combine(datacard, scale, args.method, args.dryrun)
+            output = run_combine(datacard, scale, args.method)
             if not output: continue
             limits = parse_limits(output)
             if limits: sigdict[model][flav][mass]["limit"] = limits
-            print(f"\n=== Result for {datacard} ===\n")
+            print(f"\n=== Result for {datacard} ({args.fs}) ===\n")
             print(output.strip())
             print("\nParsed limits:", limits)
             break
 
-    else:
-        with Progress(
-                TextColumn("[green]Processing {task.fields[campaign]} {task.fields[channel]}[/green]"),
-                BarColumn(bar_width=40, complete_style="yellow"),
-                TextColumn("[yellow]{task.percentage:>3.0f}%[/yellow]"),
-                TimeElapsedColumn(),
-                TimeRemainingColumn(),
-        ) as progress:
-            task = progress.add_task(
-                "combine",
-                total=len(datacards),
-                campaign=args.campaign,
-                channel=args.channel,
-            )
-            for model, flav, mass, scale, datacard in datacards:
-                output = run_combine(datacard, scale, args.method, args.dryrun)
-                if output:
-                    limits = parse_limits(output)
-                    if limits: sigdict[model][flav][mass]["limit"] = limits
-                progress.advance(task)
-        
+    # --- normal processing path ---
+    with Progress(
+            TextColumn("[green]Processing {task.fields[campaign]} {task.fields[channel]} ({task.fields[fs]})[/green]"),
+            BarColumn(bar_width=40, complete_style="yellow"),
+            TextColumn("[yellow]{task.percentage:>3.0f}%[/yellow]"),
+            TimeElapsedColumn(),
+            TimeRemainingColumn(),
+    ) as progress:
+        task = progress.add_task(
+            "combine",
+            total=len(datacards),
+            campaign=args.campaign,
+            channel=args.channel,
+            fs=args.fs
+        )
+        for model, flav, mass, scale, datacard in datacards:
+            output = run_combine(datacard, scale, args.method)
+            if output:
+                limits = parse_limits(output)
+                if limits: sigdict[model][flav][mass]["limit"] = limits
+            progress.advance(task)
 
     print("===== RESULT =====")
     print(f"campaign={args.campaign}")
@@ -81,24 +91,24 @@ def main():
     print_limits_tables(sigdict)
 
     ##Save as JSON
-    if not args.dryrun: os.makedirs(outdir, exist_ok=True)
-    jsonfile = f"limits_{args.campaign}_{args.channel}.json"
+    os.makedirs(outdir, exist_ok=True)
+    jsonfile = f"limits_{args.fs}_{args.campaign}_{args.channel}.json"
     jsonpath = os.path.join(outdir, jsonfile)
     formatted_sigdict = format_sigdict_for_json(sigdict)
     with open(jsonpath, "w") as f: json.dump(formatted_sigdict, f, indent=2)
     print(f"\nFile created: \033[93m{jsonpath}\033[0m\n")
-            
+
 # ------------ colllect all datacards ------------
-def collect_datacards(campaign, channel):
+def collect_datacards(final_state, campaign, channel, require_exist=True):
     indir = f"shapes/{campaign}_{channel}"
     datacards = []
     for model, flavors in sigdict.items():
         for flav, masses in flavors.items():
             for mass, info in masses.items():
                 scale = info["scale"]
-                datacard = f"{indir}/datacard_{campaign}_{channel}_{model}{flav}{mass}_LTplusMET.txt"
-                if os.path.exists(datacard):
-                    datacards.append((model, flav, mass, scale, datacard))
+                datacard = f"{indir}/datacard_{final_state}_{campaign}_{channel}_{model}{flav}{mass}_LTplusMET.txt"
+                if require_exist and not os.path.exists(datacard): continue
+                datacards.append((model, flav, mass, scale, datacard))
     return datacards
 
 # ------------ running on one datacard ------------
