@@ -18,7 +18,7 @@ def main():
             ## Exceptions:
             #if "2018" not in camp: continue
             #if ch not in ["mm", "ee"]: continue
-            if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
+            #if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
 
             for fs in final_states:
                 count +=1

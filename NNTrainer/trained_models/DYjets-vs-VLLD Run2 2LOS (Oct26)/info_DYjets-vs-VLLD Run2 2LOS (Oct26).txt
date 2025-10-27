@@ -1,0 +1,28 @@
+Model Name: DYjets-vs-VLLD Run2 2LOS (Oct26)
+Signal and Background before filtering: 184230, 111438
+Signal in training: 128961
+Signal in testing: 55269
+Background in training: 78006
+Background in testing: 33432
+Training Variables: ['njet', 'dilep_eta', 'dilep_dR', 'ST', 'STfrac', 'dphi_metlep_max']
+Number of Epochs: 50
+Batch Size: 2048
+
+Model Summary:
+
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense (Dense)                   │ (None, 64)             │           448 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 32)             │         2,080 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 1)              │            33 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 7,685 (30.02 KB)
+ Trainable params: 2,561 (10.00 KB)
+ Non-trainable params: 0 (0.00 B)
+ Optimizer params: 5,124 (20.02 KB)
+
+

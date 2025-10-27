@@ -11,7 +11,7 @@ from datetime import timedelta
 
 # ------------------- config ---------------------
 systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar", "jec", "jer"] ## non-global ones
-basedir = "../Systematics/yields/2025-10-14/" ## Assuming all yields to be in the same directory.
+basedir = "../Systematics/yields/2025-10-27/" ## Assuming all yields to be in the same directory.
 #basedir = "../Systematics/yields/2025-09-26/" ## Assuming all yields to be in the same directory.
 #-------------------------------------------------
 
@@ -26,7 +26,7 @@ campaigns = [
 #campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
 #channels.extend(["combined"])
-tag = f"{final_state}_sr"
+tag = f"{final_state}_srpre"
 sigdict = {
     "VLLD": {
         "ele": [100, 200, 300, 400, 600, 800, 1000, 1200],
@@ -36,25 +36,15 @@ sigdict = {
     "VLLS":{
     }
 }
-## Override this
 variable = {
     "name": "LTplusMET",
     "bins": {
         "1":(0, 200),
-        "2":(200, 300),
-        "3":(300, 400),
-        "4":(400, 500)
-    }
-}
-variable = {
-    "name": "LTplusMET",
-    "bins": {
-        "1":(400, 450),
-        "2":(450, 500),
-        "3":(500, 550),
-        "4":(550, 600),
-        "5":(600, 800),
-        "6":(800, 1000)
+        "2":(200, 400),
+        "3":(400, 450),
+        "4":(450, 500),
+        "5":(500, 550),
+        "6":(550, 600)
     }
 }
 
@@ -64,10 +54,9 @@ def main():
     count = 0
     for camp in campaigns:
         for ch in channels:
-            if "2018_UL" not in camp:  continue ## testing one campaign
-            if ch not in ["mm", "ee"]: continue ## For 2LOS
-            
-            if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
+            #if "2018_UL" not in camp:  continue ## testing one campaign
+            #if ch not in ["mm", "ee"]: continue ## For 2LOS
+            #if (camp=="Run2" or camp=="Run3") and ch != "combined": continue
             count += 1
             print(f"\n[yellow bold][{count}] processing {camp}, {ch} channel[/yellow bold]")
             make_shapes(camp, ch)

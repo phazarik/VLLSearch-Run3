@@ -43,7 +43,7 @@ void makeOneLimitPlot(
 		      TString channel  = "combined",
 		      TString energy   = "13p6TeV",
 		      TString final_state = "2L",
-		      float ymin       = 1e-3,
+		      float ymin       = 1e-4,
 		      float ymax       = 1e3,
 		      bool systematics = false,
 		      bool bottomleft  = false
@@ -78,10 +78,10 @@ void makeOneLimitPlot(
   //---------------------------
   TCanvas* c1 = CreateCanvas(cname); c1->Clear();
 
-  // Remove points beyond 800 GeV
+  // Filter limit values
   vector<LimitData> filteredLimits;
   for (const auto& l : limits) {
-    if (l.mass <= 800) filteredLimits.push_back(l);
+    if (125<l.mass && l.mass <= 1200) filteredLimits.push_back(l);
   }
   limits = filteredLimits;
   nPoints = limits.size();
@@ -123,7 +123,7 @@ void makeOneLimitPlot(
   TGraph* theory_vlls = ReadTheoryGraph("xsec/sigmaB_VLLS_" + energy + ".txt", modelname_singlet);
 
   // Drawing one canvas
-  SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1000); theory_vlld->Draw("AL"); //This decides the decorations
+  SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1200); theory_vlld->Draw("AL"); //This decides the decorations
   yellow->Draw("F same");
   green ->Draw("F same");
   exp   ->Draw("L same");
@@ -158,8 +158,8 @@ void makeOneLimitPlot(
 void step7_makeBrazilianPlots(){
 
   vector<plotdata> limitfiles = {
-    {"test_VLLDmu_2L",   "VLLD_mu",   "2LOS", "2018_UL", "mm", "13TeV"},
-    {"test_VLLDele_2L",   "VLLD_ele",   "2LOS", "2018_UL", "ee", "13TeV"},
+    {"test_VLLDmu_2L",   "VLLD_mu",   "2L", "FullDataset", "combined", "13TeV"},
+    {"test_VLLDele_2L",  "VLLD_ele",  "2L", "FullDataset", "combined", "13p6TeV"},
     //{"test_VLLDmu_2LOS", "VLLD_mu", "2LOS", "2018_UL", "mm", "13TeV"},
     //{"test_VLLDmu_2LSS", "VLLD_mu", "2LSS", "2018_UL", "mm", "13TeV"}
   };
@@ -224,7 +224,7 @@ TGraph* ReadTheoryGraph(const TString& infile, const TString &modelname) {
         istringstream iss(line);
         double m, xs;
         if (!(iss >> m >> xs)) continue;
-        if (m > 800) continue;  // skip points beyond 800 GeV
+        //if (m > 800) continue;  // skip points beyond 800 GeV
         mass.push_back(m);
         xsec.push_back(xs);
     }

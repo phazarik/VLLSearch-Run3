@@ -87,11 +87,11 @@ void processTree(
 		 )
 { 
   // Load corrections from JSON:
-  json sf_chargemisID = loadJson("corrections/DY_Zptbinned_chargemisID_corrections.json");
-  json sf_dy          = loadJson("corrections/DY_Zptbinned_corrections.json");
-  json sf_qcd         = loadJson("corrections/QCD_global_corrections.json");
-  json sf_ttbar       = loadJson("corrections/TTBar_HTbinned_corrections.json");
-  json sf_wjets       = loadJson("corrections/Wjets_global_corrections.json");
+  json sf_qcd         = loadJson("corrections/2L_QCD_global_corrections.json");
+  //json sf_chargemisID = loadJson("corrections/DY_Zptbinned_chargemisID_corrections.json");
+  //json sf_dy          = loadJson("corrections/DY_Zptbinned_corrections.json");
+  //json sf_ttbar       = loadJson("corrections/TTBar_HTbinned_corrections.json");
+  //json sf_wjets       = loadJson("corrections/Wjets_global_corrections.json");
   cout << "Corrections loaded from JSON." << endl;
   
   vector<TH1D*> hst_collection;
@@ -247,7 +247,7 @@ void processTree(
 
   //-------------------------------------------------------------------------
   //Flagging specific files for corrections:
-  bool flag_dy    = (channelval == 3) && find_key(inputFilename, "_DYto2L_");
+  bool flag_dy    = (channelval == 3) && (find_key(inputFilename, "_DYto2L_") || find_key(inputFilename, "_DYGtoLLG_"));
   bool flag_qcd   = find_key(inputFilename, "_QCDEM_") || find_key(inputFilename, "_QCDMu_");
   bool flag_ttbar = find_key(inputFilename, "_TT_") || find_key(inputFilename, "_TTV_");
   bool flag_wjets = find_key(inputFilename, "_WtoLNu_") || find_key(inputFilename, "_WGtoLNuG_");

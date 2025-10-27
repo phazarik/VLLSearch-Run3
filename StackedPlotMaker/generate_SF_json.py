@@ -4,9 +4,10 @@ from datetime import timedelta
 import subprocess, json, os, re
 
 # ================================ GLOBAL PARAMETERS =========================================
-jobdir = "2025-09-08_presrval" ## hist folder
-tag = "presrval" ## event tag
-var = "HT" ## bins
+finalstate = "2LOS"
+jobdir = "2025-10-26_val32" ## hist folder
+tag = "2LOS_val3" ## event tag
+var = "LTplusMET" ## bins
 lookatdata = True
 
 debug = False
@@ -18,7 +19,8 @@ test_chan = "mm"
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 campaigns.extend(["Run2", "Run3", "FullDataset"])
-channels = ["mm", "me", "em", "ee", "combined"] ## order is important for index
+channels = ["mm", "me", "em", "ee"] ## order is important for index
+channels.extend(["combined"])
 channel_idx = {c: str(i) for i, c in enumerate(channels)}
 
 ## Custom JSON encoder
@@ -37,7 +39,16 @@ def dump_compact(obj, fp, indent=2):
             if all(isinstance(e, dict) for e in o):
                 body = []
                 for e in o:
-                    if e.get('scale') == [0, 0]: continue  # Filter zero bins
+                    scale = e.get('scale')
+                    if isinstance(scale, list) and len(scale) == 2:
+                        skipthis = False
+                        val, err = scale
+                        if val <= 0: skipthis = True  # skip zero or negative bins
+                        if val > 2:  skipthis = True
+                        #if err > 2:  skipthis = True
+                        if skipthis:
+                            print(f"Skipping weird SF in bin [{e.get('low')}, {e.get('high')}]: {val}±{err}")
+                            continue
                     items = []
                     for k, v in e.items():
                         if k == 'scale' and isinstance(v, list):
@@ -61,7 +72,8 @@ obs_exp_table, ssqrtb_table, global_sf_table = [], [], []
 
 ## Exception handling:
 def is_valid(camp, ch):
-    if camp in ["Run2", "Run3"] and ch != "combined": return False
+    #if camp in ["Run2", "Run3"] and ch != "combined": return False
+    if finalstate=="2LOS" and ch in ["em", "me"]: return False
     return True
 
 valid_pairs = [(camp, ch) for camp in campaigns for ch in channels if is_valid(camp, ch)]
@@ -123,6 +135,7 @@ for camp in campaigns:
 
         if json_lines:
             json_str = "\n".join(json_lines).replace('"high": "inf"', '"high": 1e6')
+            json_str = re.sub(r'\b-?nan\b', '0.0', json_str, flags=re.IGNORECASE) ## protect from NaN
             if debug: print(f"\033[93m[Debug] JSON string to parse:\n{json_str}\033[0m")
             try:
                 js = json.loads(json_str)
@@ -154,8 +167,8 @@ for camp in campaigns:
 
 ## Display tables
 def show(title, rows):
-    print(f'\n\033[93m{"Campaign":20} {"Ch":2} {title:>10}\033[0m')
-    for c, ch, v, e in rows: print(f'{c:20} {ch:2} {v:>6.3f} ± {e:<6.3f}')
+    print(f'\n\033[93m{"Campaign":<20} {"Ch":<10} {title}\033[0m')
+    for c, ch, v, e in rows: print(f'{c:<20} {ch:<10} {v:>7.3f} ± {e:<7.3f}')
     print()
 
 show("Obs/Exp", obs_exp_table)
@@ -170,7 +183,7 @@ def savejson(json, filename):
             print(f"File created: \033[93m{filename}\033[0m")
 
 if not debug:
-    savejson(scale_json,     f'{outdir}/{tag}_SF_inBins.json')
+    savejson(scale_json,     f'{outdir}/{tag}_SF_inBins_{var}.json')
     savejson(obs_exp_json,   f'{outdir}/{tag}_obsbyexp.json')
     savejson(global_sf_json, f'{outdir}/{tag}_SF_global.json')
     savejson(ssqrtb_json,    f'{outdir}/{tag}_sbysqrtb.json' )

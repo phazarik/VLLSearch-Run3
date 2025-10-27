@@ -43,11 +43,11 @@ modeldict = {
     'Wjets-vs-VLLD Run3 (Aug13)'  : 'nnscore_2LSS_Run3_vlld_wjets',
     'DYjets-vs-VLLD Run3 (Aug13)' : 'nnscore_2LSS_Run3_vlld_dy',
     ## 2LOS Run2
-    'Top-vs-VLLD Run2 2LOS (Oct09)'    : 'nnscore_2LOS_Run2_vlld_ttbar',
-    'DYjets-vs-VLLD Run2 2LOS (Oct09)' : 'nnscore_2LOS_Run2_vlld_dy',
+    'Top-vs-VLLD Run2 2LOS (Oct26)'    : 'nnscore_2LOS_Run2_vlld_ttbar',
+    'DYjets-vs-VLLD Run2 2LOS (Oct26)' : 'nnscore_2LOS_Run2_vlld_dy',
     ## 2LOS Run3
-    'Top-vs-VLLD Run3 2LOS (Oct16)'    : 'nnscore_2LOS_Run3_vlld_ttbar',
-    'DYjets-vs-VLLD Run3 2LOS (Oct16)' : 'nnscore_2LOS_Run3_vlld_dy',
+    'Top-vs-VLLD Run3 2LOS (Oct26)'    : 'nnscore_2LOS_Run3_vlld_ttbar',
+    'DYjets-vs-VLLD Run3 2LOS (Oct26)' : 'nnscore_2LOS_Run3_vlld_dy',
 }
 
 #-------------------------------------------

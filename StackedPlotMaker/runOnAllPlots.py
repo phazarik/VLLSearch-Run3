@@ -21,14 +21,16 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 #default = True
 
 #----------------------------------- config ----------------------------------------
+finalstate = "2LOS"
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
-campaigns.extend(["Run2", "Run3", "FullDataset"])
+campaigns.extend(["Run3", "Run2", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
+if finalstate=="2LOS": channels = ["mm", "ee"]
 channels.extend(["combined"])
-basename  = "2025-10-17_cleanup"
-tag       = "2LOS_cleanup"
-text      = "baseline+HT>50 2LOS"
+basename  = "2025-10-27_2LOS_srpre"
+tag       = "2LOS_srpre"
+text      = "SR"+ f" {finalstate}"
 tousedata = False
 tosave    = True
 jobdict = {}
@@ -37,10 +39,12 @@ jobdict = {}
 jobdict = {}
 for camp in campaigns:
     for ch in channels:
-        if camp != "Run3Summer22EE": continue      ## Testing one campaign
-        if ch not in ["mm", "ee"]: continue ## For 2LOS 
+        if camp not in ["Run2", "Run3"]: continue
+        #if "Run3" not in camp: continue
+        #if camp != "Run3Summer22EE": continue      ## Testing one campaign
+        #if ch not in ["mm", "ee"]: continue ## For 2LOS 
         #if not (ch == "combined" or ch == "ee"): continue
-        if (ch=='combined' or camp=='FullDataset'): continue
+        #if (ch=='combined' or camp=='FullDataset'): continue
         key = f"{basename}/hist_{tag}_{camp}_{ch}"
         jobdict[key] = {"campaign": camp, "channel": ch}
 

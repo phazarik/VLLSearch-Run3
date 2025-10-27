@@ -191,7 +191,7 @@ vector<TH1D *> return_hist_collection(
     {"WtoLNu",        "W+jets", kGray+1},
     {"HTbinnedWJets", "W+jets", kGray+1},
     {"ZGamma",   "Z#gamma", kRed-9},
-    {"DYGToLLG", "Z#gamma",   kRed-9},
+    {"DYGToLLG", "Z#gamma", kRed-9},
   };
   
   vector<TH1D *> hist_collection;
