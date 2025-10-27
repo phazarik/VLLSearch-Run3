@@ -1,9 +1,9 @@
-Model Name: Top-vs-VLLD Run3 2LOS (Oct16)
-Signal and Background before filtering: 134702, 150000
-Signal in training: 94291
-Signal in testing: 40411
-Background in training: 105000
-Background in testing: 45000
+Model Name: Top-vs-VLLD Run2 2LOS (Oct26)
+Signal and Background before filtering: 184230, 200000
+Signal in training: 128961
+Signal in testing: 55269
+Background in training: 140000
+Background in testing: 60000
 Training Variables: ['nbjet', 'dilep_ptratio', 'LTplusMET', 'STvis', 'STfrac', 'metpt']
 Number of Epochs: 100
 Batch Size: 1024

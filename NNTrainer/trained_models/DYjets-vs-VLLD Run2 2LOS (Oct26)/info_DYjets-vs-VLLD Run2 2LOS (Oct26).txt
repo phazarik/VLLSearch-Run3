@@ -1,12 +1,12 @@
-Model Name: DYjets-vs-VLLD Run3 2LOS (Oct16)
-Signal and Background before filtering: 134702, 150000
-Signal in training: 94291
-Signal in testing: 40411
-Background in training: 105000
-Background in testing: 45000
+Model Name: DYjets-vs-VLLD Run2 2LOS (Oct26)
+Signal and Background before filtering: 184230, 111438
+Signal in training: 128961
+Signal in testing: 55269
+Background in training: 78006
+Background in testing: 33432
 Training Variables: ['njet', 'dilep_eta', 'dilep_dR', 'ST', 'STfrac', 'dphi_metlep_max']
-Number of Epochs: 25
-Batch Size: 1024
+Number of Epochs: 50
+Batch Size: 2048
 
 Model Summary:
 

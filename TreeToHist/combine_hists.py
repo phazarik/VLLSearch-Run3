@@ -7,8 +7,8 @@ from rich.progress import Progress, BarColumn, TaskProgressColumn, TimeElapsedCo
 #---------------- CONFIG ------------------#
 basedir = "../ROOT_FILES/hists/"
 final_states = ["2LOS"]
-jobname = "2025-10-23_2LOS_topcr"
-tag = "topcr" ## Don't put finalstate here
+jobname = "2025-10-26_2LOS_baseline"
+tag = "baseline" ## Don't put finalstate here
 campaigns_all = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"

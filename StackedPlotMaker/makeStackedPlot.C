@@ -16,9 +16,9 @@ void makeStackedPlot(
 		     TString _var = "LTplusMET",
 		     //TString _var = "gen_weight_evt",
 		     TString _name = "test",
-		     TString _jobname = "2025-10-23/hist_2LOS_topcr_Run3Summer22EE_mm",
-		     TString _campaign = "Run3Summer22EE",
-		     TString _channel = "mm",
+		     TString _jobname = "2025-10-27_2LOS_srpre/hist_2LOS_srpre_Run3_combined",
+		     TString _campaign = "Run3",
+		     TString _channel = "combined",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
 		     bool _data = true,
@@ -39,7 +39,7 @@ void makeStackedPlot(
   bool toSave=_save;
   // ymax_base = 10e9 for baseline 2LSS
   // ymax_base = 10e11 for baseline 2OSS
-  Double_t ymin = 0.1; Double_t ymax_base = 10E11; Double_t ymax = ymax_base;
+  Double_t ymin = 0.1; Double_t ymax_base = 10E6; Double_t ymax = ymax_base;
   if(_channel=="combined")                   ymax = ymax_base*10;
   if(_campaign=="Run2" or _campaign=="Run3") ymax = ymax_base*100; 
   if(_campaign=="FullDataset")               ymax = ymax_base*1000; 
@@ -260,7 +260,7 @@ void makeStackedPlot(
   if(sig2) sig2->SetLineStyle(2); // others are dotted
   if(sig3) sig3->SetLineStyle(2);
   
-  sig2 = nullptr;
+  //sig2 = nullptr;
   //sig3 = nullptr;
   vector<TH1D*> sigvec = {sig1, sig2, sig3};
   cout<<"Signal ready!"<<endl;
@@ -272,11 +272,13 @@ void makeStackedPlot(
 
   if(toOverlayData){
     //GetBinwiseSF(_var, "LTplusMET", hst_data, bkg, "DY");
+    //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
     GetBinwiseSF(_var, "LTplusMET", hst_data, bkg, "t#bar{t}+x");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
     
     //DisplayBinwiseSF(_var, "LTplusMET", hst_data, bkg, "DY");
+    //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
     DisplayBinwiseSF(_var, "LTplusMET", hst_data, bkg, "t#bar{t}+x");
     //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
   }

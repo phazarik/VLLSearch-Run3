@@ -88,8 +88,9 @@ void processTree(
 {
   // Load corrections from JSON: (use path from the main macro)
   json sf_qcd   = loadJson("corrections/2L_QCD_global_corrections.json");
-  json sf_dy    = loadJson("corrections/2LOS_dycr_SF_inBins_LTplusMET.json");
   json sf_ttbar = loadJson("corrections/2LOS_topcr_SF_inBins_LTplusMET.json");
+  json sf_dy    = loadJson("corrections/2LOS_dycr_SF_inBins_LTplusMET.json");
+  //json sf_dy    = loadJson("corrections/2LOS_dycr_SF_inBins_dilep_pt.json");
   cout << "Corrections loaded from JSON." << endl;
   
   vector<TH1D*> hst_collection;
@@ -251,8 +252,8 @@ void processTree(
   bool flag_ttbar = find_key(inputFilename, "_TT_") || find_key(inputFilename, "_TTV_");
   bool flag_vll   = find_key(inputFilename, "_VLLD");
   if(flag_qcd)   cout<<"\033[35;1m==> Correcting QCD globally.\033[0m"<<endl;
-  if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
-  if(flag_ttbar) cout<<"\033[35;1m==> Correcting tt+X in HT bins.\033[0m"<<endl;
+  //if(flag_dy)    cout<<"\033[35;1m==> Correcting DY in dilep_pt bins.\033[0m"<<endl;
+  //if(flag_ttbar) cout<<"\033[35;1m==> Correcting tt+X in HT bins.\033[0m"<<endl;
   //-------------------------------------------------------------------------
   
   TTree* tree = (TTree*)file->Get("myEvents");
@@ -288,24 +289,23 @@ void processTree(
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-
     //1) QCD global correction (same as 2LSS):
     if(flag_qcd){
       Double_t scale_qcd = 1.0;
       scale_qcd = (Double_t)getScaleFactorGlobal(campaign, channelval, sf_qcd, "nom");
       wt = wt * scale_qcd;
     }
-    //2) DY correction:
-    if(flag_dy){
-      Double_t scale_dy = 1.0;
-      scale_dy = (Double_t)getScaleFactorInBins(campaign, channelval, LTplusMET, sf_dy, "nom");
-      wt = wt * scale_dy;
-    }
-    //3) TTBar+TTV:
+    //2) TTBar+TTV:
     if(flag_ttbar){
       Double_t scale_ttbar = 1.0;
       scale_ttbar = getScaleFactorInBins(campaign, channelval, LTplusMET, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
+    }
+    //3) DY correction:
+    if(flag_dy){
+      Double_t scale_dy = 1.0;
+      scale_dy = (Double_t)getScaleFactorInBins(campaign, channelval, LTplusMET, sf_dy, "nom");
+      wt = wt * scale_dy;
     }
    
     //--------------------------------

@@ -26,8 +26,8 @@ campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
 #campaigns = ["Run3Summer22EE"]
 basename  = "2LOS_baseline/tree_2LOS_baseline"
-dumpdir   = "2LOS_val3"
-tag       = "2LOS_val3"
+dumpdir   = "2LOS_srpre"
+tag       = dumpdir #"2LOS_dycr"
 #-----------------------------------------------------------------------------------
 
 basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), basedir)
@@ -119,28 +119,34 @@ for injob, info in jobdict.items():
 
         tight_iso   = 'lep0_iso<0.05 and lep1_iso<0.2'
         tight_sip3d = 'lep0_sip3d<5 and lep1_sip3d<10'
-        cleanup = f"{tight_iso} and {tight_sip3d} and dilep_deta < 2.5"      
-        
-        ## Step1: control and kill DY
-        dycr    = f"{cleanup} and {nnscore_dy}<0.2"
-        killdy  = f"{cleanup} and {nnscore_dy}>0.6 and HT>50"
+        cleanup = f"{tight_iso} and {tight_sip3d} and dilep_deta<2.5 and HT>50"
 
-        ## Step2: ttbar CR
-        topcr     = f"{killdy} and {nnscore_ttbar}<0.3"
-        killttbar = f"{killdy} and {nnscore_ttbar}>0.8"
+        # Axis convention:
+        # x = nnscore_ttbar (increasing → signal-like)
+        # y = nnscore_dy    (increasing → signal-like)
 
-        ## Step3: Validation regions
-        val1 = f"{cleanup} and HT>50 and     {nnscore_ttbar}<0.3 and 0.2<{nnscore_dy}<0.6" ## low tt-score
-        val2 = f"{cleanup} and HT>50 and 0.3<{nnscore_ttbar}<0.7 and 0.2<{nnscore_dy}"     ## med tt-score
-        val3 = f"{cleanup}           and 0.8<{nnscore_ttbar}     and 0.2<{nnscore_dy}<0.7" ## high tt-score
+        # Define contiguous boxes across (x,y) in [0,1]×[0,1]
+        box1 = f"{cleanup} and     {nnscore_ttbar}<=0.3 and 0.6<{nnscore_dy}"      ## top-left
+        box2 = f"{cleanup} and 0.3<{nnscore_ttbar}<=0.7 and 0.6<{nnscore_dy}"      ## top-middle
+        box3 = f"{cleanup} and 0.8<{nnscore_ttbar}      and 0.8<{nnscore_dy}"      ## top-right, SR
+        box4 = f"{cleanup} and     {nnscore_ttbar}<=0.3 and 0.3<{nnscore_dy}<0.6"  ## mid-left
+        box5 = f"{cleanup} and 0.3<{nnscore_ttbar}<=0.7 and 0.3<{nnscore_dy}<0.6"  ## center
+        box6 = f"{cleanup} and 0.7<{nnscore_ttbar}      and 0.3<{nnscore_dy}<0.8"  ## mid-right
+        box7 = f"{cleanup} and     {nnscore_ttbar}<=0.3 and     {nnscore_dy}<0.3"  ## bottom-left
+        box8 = f"{cleanup} and 0.3<{nnscore_ttbar}<=0.7 and     {nnscore_dy}<0.3"  ## bottom-mid
+        box9 = f"{cleanup} and 0.7<{nnscore_ttbar}      and     {nnscore_dy}<0.3"  ## bottom-right
 
-        ## Step4: signal region
-        srpre = f"{killttbar}"
-        sr = f"{srpre} and LTplusMET>400"
+        # Combine into regions
+        topcr = f"{box1}"
+        dycr  = f"{box6} or {box7} or {box8} or {box9}"
+        val1  = f"{box4}" ## more ttbar-like
+        val2  = f"{box2} or {box5}" ## mixed
+        srpre = f"{box3}" ## preselection
+        sr    = f"{srpre} and LTplusMET>400" # signal region
         
         #------------------------------
         # Final event selection:
-        event_selection = val3
+        event_selection = srpre
         #------------------------------
 
         filecount += 1

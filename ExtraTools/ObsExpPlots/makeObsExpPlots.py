@@ -56,14 +56,6 @@ def main():
         yrange   = [0.6, 1.5]
     )
     plotObsExp(
-        jsonfile = "jsons/2LOS_val3_obsbyexp.json",
-        outfile  = "2LOS_VR3.png",
-        name     = "Obs/exp",
-        moretext = "2LOS VR3",
-        syst     = False,
-        yrange   = [0.6, 1.5]
-    )
-    plotObsExp(
         jsonfile = "jsons/2LOS_topcr_obsbyexp.json",
         outfile  = "2LOS_ttbarCR_uncorrected.png",
         name     = "Obs/exp",

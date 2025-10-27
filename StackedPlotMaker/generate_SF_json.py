@@ -5,7 +5,7 @@ import subprocess, json, os, re
 
 # ================================ GLOBAL PARAMETERS =========================================
 finalstate = "2LOS"
-jobdir = "2025-10-23_2LOS_val3" ## hist folder
+jobdir = "2025-10-26_val32" ## hist folder
 tag = "2LOS_val3" ## event tag
 var = "LTplusMET" ## bins
 lookatdata = True
@@ -167,8 +167,8 @@ for camp in campaigns:
 
 ## Display tables
 def show(title, rows):
-    print(f'\n\033[93m{"Campaign":20} {"Ch":2} {title:>10}\033[0m')
-    for c, ch, v, e in rows: print(f'{c:20} {ch:2} {v:>6.3f} ± {e:<6.3f}')
+    print(f'\n\033[93m{"Campaign":<20} {"Ch":<10} {title}\033[0m')
+    for c, ch, v, e in rows: print(f'{c:<20} {ch:<10} {v:>7.3f} ± {e:<7.3f}')
     print()
 
 show("Obs/Exp", obs_exp_table)

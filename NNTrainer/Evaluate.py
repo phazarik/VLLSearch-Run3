@@ -27,6 +27,7 @@ final_state = "2LOS"
 campaign = args.campaign
 indir = '../ROOT_FILES/trees/'
 jobname = f"tree_{final_state}_baseline_{campaign}"
+#jobname = f"tree_{final_state}_baseline_signal"
 outdir = f'../ROOT_FILES/treesWithNN/{final_state}_baseline/tree_{final_state}_baseline_{campaign}'
 os.makedirs(outdir, exist_ok=True)
 
@@ -42,11 +43,11 @@ modeldict = {
     'Wjets-vs-VLLD Run3 (Aug13)'  : 'nnscore_2LSS_Run3_vlld_wjets',
     'DYjets-vs-VLLD Run3 (Aug13)' : 'nnscore_2LSS_Run3_vlld_dy',
     ## 2LOS Run2
-    'Top-vs-VLLD Run2 2LOS (Oct09)'    : 'nnscore_2LOS_Run2_vlld_ttbar',
-    'DYjets-vs-VLLD Run2 2LOS (Oct09)' : 'nnscore_2LOS_Run2_vlld_dy',
+    'Top-vs-VLLD Run2 2LOS (Oct26)'    : 'nnscore_2LOS_Run2_vlld_ttbar',
+    'DYjets-vs-VLLD Run2 2LOS (Oct26)' : 'nnscore_2LOS_Run2_vlld_dy',
     ## 2LOS Run3
-    'Top-vs-VLLD Run3 2LOS (Oct16)'    : 'nnscore_2LOS_Run3_vlld_ttbar',
-    'DYjets-vs-VLLD Run3 2LOS (Oct16)' : 'nnscore_2LOS_Run3_vlld_dy',
+    'Top-vs-VLLD Run3 2LOS (Oct26)'    : 'nnscore_2LOS_Run3_vlld_ttbar',
+    'DYjets-vs-VLLD Run3 2LOS (Oct26)' : 'nnscore_2LOS_Run3_vlld_dy',
 }
 
 #-------------------------------------------
@@ -128,7 +129,7 @@ list_failed  = []
 
 for f in list_of_files:
 
-    #if "Muon" not in f: continue 
+    #if "EGamma" not in f: continue 
 
     #Step1: Prepare the dataframe
     filepath = os.path.join(indir, jobname, f)
@@ -186,7 +187,7 @@ for f in list_of_files:
     if not args.dryrun: write_df_into_file(df, os.path.join(outdir, f))
     list_success.append(f)
     
-    if not args.dryrun: print(f'\033[1;33mFile written: {os.path.abspath(outfile)}\033[0m')
+    if not args.dryrun: print(f'File written: \033[1;33m{os.path.abspath(outfile)}\033[0m')
     if args.test: break
     
 end_time = time.time()
