@@ -4,10 +4,11 @@ from datetime import timedelta
 import subprocess, json, os, re
 
 # ================================ GLOBAL PARAMETERS =========================================
-finalstate = "2LOS"
-jobdir = "2025-10-26_val32" ## hist folder
-tag = "2LOS_val3" ## event tag
-var = "LTplusMET" ## bins
+finalstate = "2LSS"
+jobdir = "2025-10-28_2LSS_sr" ## hist folder
+tag = "2LSS_sr" ## event tag
+#var = "LTplusMET" ## bins
+var = "HT" ## bins
 lookatdata = True
 
 debug = False
@@ -70,11 +71,14 @@ os.makedirs(outdir, exist_ok=True)
 scale_json, obs_exp_json, ssqrtb_json, global_sf_json = {}, {}, {}, {}
 obs_exp_table, ssqrtb_table, global_sf_table = [], [], []
 
+#---------------------------------------------------------------------
 ## Exception handling:
 def is_valid(camp, ch):
+    #if ch not in ["ee"]: return False
     #if camp in ["Run2", "Run3"] and ch != "combined": return False
     if finalstate=="2LOS" and ch in ["em", "me"]: return False
     return True
+#---------------------------------------------------------------------
 
 valid_pairs = [(camp, ch) for camp in campaigns for ch in channels if is_valid(camp, ch)]
 total_runs  = len(valid_pairs)

@@ -7,8 +7,8 @@
 float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 
 void makeStackedPlot(
-		     //TString _var = "njet",
-		     //TString _var = "nnscore_Run2_vlld_qcd",
+		     //TString _var = "nbjet",
+		     //TString _var = "nnscore_2LSS_Run2_vlld_ttbar",
 		     //TString _var = "metpt",
 		     //TString _var = "dilep_dR",
 		     //TString _var = "dilep_pt",
@@ -16,9 +16,9 @@ void makeStackedPlot(
 		     TString _var = "LTplusMET",
 		     //TString _var = "gen_weight_evt",
 		     TString _name = "test",
-		     TString _jobname = "2025-10-27_2LOS_srpre/hist_2LOS_srpre_Run3_combined",
-		     TString _campaign = "Run3",
-		     TString _channel = "combined",
+		     TString _jobname = "2025-10-28_2LSS_nice/hist_2LSS_nice_2016preVFP_UL_mm",
+		     TString _campaign = "2016preVFP_UL",
+		     TString _channel = "mm",
 		     TString _tag = "test",
 		     TString _displaytext = "test",
 		     bool _data = true,
@@ -72,6 +72,7 @@ void makeStackedPlot(
   combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
   combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
   combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
+  combine_hists(hist_collection, {"DY", "Z#gamma"},              "Z(+#gamma)", kRed-7);
   /*
   cout<<"\nAfter combining:"<<endl;
   total = 0;
@@ -226,9 +227,8 @@ void makeStackedPlot(
   //______________________________________________________________
 
   TH1D *sig1, *sig2, *sig3;
-  TString M1 = "600"; //Reference signal
-  TString M2 = "200";
-  TString M3 = "800";
+  TString M1="300", M2="400", M3="600"; //2LSS reference signals
+  //TString M1="600", M2="200", M3="800"; //2LOS reference signals
   TString masses[3] = {M1, M2, M3};
   TH1D* sig[3];
 
@@ -271,16 +271,21 @@ void makeStackedPlot(
   //______________________________________________________________
 
   if(toOverlayData){
+    //2LOS:
     //GetBinwiseSF(_var, "LTplusMET", hst_data, bkg, "DY");
-    //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
+    //GetBinwiseSF(_var, "LTplusMET", hst_data, bkg, "t#bar{t}+x");
+    //2LSS:
+    //GetBinwiseSF(_var, "dilep_pt", hst_data, bkg, "Z(+#gamma)");
     //GetBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
-    GetBinwiseSF(_var, "LTplusMET", hst_data, bkg, "t#bar{t}+x");
-    //GetBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
-    
+    GetBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
+
+    //2LOS:
     //DisplayBinwiseSF(_var, "LTplusMET", hst_data, bkg, "DY");
-    //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "DY");
-    DisplayBinwiseSF(_var, "LTplusMET", hst_data, bkg, "t#bar{t}+x");
-    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "W+jets/#gamma");
+    //DisplayBinwiseSF(_var, "LTplusMET", hst_data, bkg, "t#bar{t}+x");
+    //2LSS:
+    //DisplayBinwiseSF(_var, "dilep_pt", hst_data, bkg, "Z(+#gamma)");
+    //DisplayBinwiseSF(_var, "HT", hst_data, bkg, "QCD");
+    DisplayBinwiseSF(_var, "HT", hst_data, bkg, "t#bar{t}+x");
   }
   
   //______________________________________________________________

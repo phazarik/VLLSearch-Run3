@@ -20,11 +20,12 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 print()
 
 #----------------------------------- config ----------------------------------------
+finalstate = "2LSS"
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
-channels  = ["mm", "me", "em", "ee"]
-finalstate = "2LOS"
-basedir   = f"{finalstate}_srpre"
+channels  = ["mm", "ee"]
+if finalstate == "2LSS": channels.extend(["me", "em"])
+basedir   = f"{finalstate}_sr"
 tag       = basedir #f"{finalstate}_killdy"
 tagout    = basedir #f"{finalstate}_killdy" ## Shows up in hist directory names
 jobdict = {}
@@ -42,6 +43,7 @@ processed = []
 
 for jobname, info in jobdict.items():
     for channel in channels:
+        #if channel not in ["ee"]: continue ## for DY cr
         
         if finalstate == "2LOS":
             if channel not in ["ee", "mm"]: continue

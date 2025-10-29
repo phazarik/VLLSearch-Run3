@@ -87,11 +87,10 @@ void processTree(
 		 )
 { 
   // Load corrections from JSON:
-  json sf_chargemisID = loadJson("corrections/DY_Zptbinned_chargemisID_corrections.json");
-  json sf_dy          = loadJson("corrections/DY_Zptbinned_corrections.json");
-  json sf_qcd         = loadJson("corrections/QCD_global_corrections.json");
-  json sf_ttbar       = loadJson("corrections/TTBar_HTbinned_corrections.json");
-  json sf_wjets       = loadJson("corrections/Wjets_global_corrections.json");
+  json sf_qcd    = loadJson("corrections/2L_qcdcr_SF_global.json");
+  json sf_dy     = loadJson("corrections/2LSS_dycr_SF_inBins_dilep_pt.json");
+  json sf_ttbar = loadJson("corrections/2LOS_topcr_SF_inBins_LTplusMET.json");
+  //json sf_wjets = loadJson("corrections/Wjets_global_corrections.json");
   cout << "Corrections loaded from JSON." << endl;
   
   vector<TH1D*> hst_collection;
@@ -101,7 +100,7 @@ void processTree(
   vector<float> ptbins500 = {0, 25, 50, 100, 200, 300, 400, 500};
   vector<float> ptbins300 = {0, 25, 50, 100, 200, 300};
   vector<float> isobinslog = {0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256};
-  vector<float> searchbins = {0, 200, 300, 400, 500};
+  vector<float> searchbins = {0, 200, 400, 450, 500, 550, 600};
   
   vector<hists> hdef = {
     // integers:
@@ -247,7 +246,7 @@ void processTree(
 
   //-------------------------------------------------------------------------
   //Flagging specific files for corrections:
-  bool flag_dy    = (channelval == 3) && find_key(inputFilename, "_DYto2L_");
+  bool flag_dy    = (channelval == 3) && (find_key(inputFilename, "_DYto2L_") || find_key(inputFilename, "_DYGtoLLG_"));
   bool flag_qcd   = find_key(inputFilename, "_QCDEM_") || find_key(inputFilename, "_QCDMu_");
   bool flag_ttbar = find_key(inputFilename, "_TT_") || find_key(inputFilename, "_TTV_");
   bool flag_wjets = find_key(inputFilename, "_WtoLNu_") || find_key(inputFilename, "_WGtoLNuG_");
@@ -288,13 +287,11 @@ void processTree(
     //--------------------------------
     // Corrections to the histograms:
     //--------------------------------
-    /*
+    
     //1) DY correction for the ee channel:
     if(flag_dy){
-      Double_t scale_dy = 1.0; Double_t scale_dy1 = 1.0; Double_t scale_dy2 = 1.0;
-      //scale_dy1 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_chargemisID, "nom");
-      scale_dy2 = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
-      scale_dy = scale_dy1*scale_dy2;
+      Double_t scale_dy = 1.0;
+      scale_dy = (Double_t)getScaleFactorInBins(campaign, channelval, dilep_pt, sf_dy, "nom");
       wt = wt * scale_dy;
     }
     //2) QCD global correction:
@@ -306,9 +303,9 @@ void processTree(
     //3) TTBar+TTV HT binned correction
     if(flag_ttbar){
       Double_t scale_ttbar = 1.0;
-      scale_ttbar = getScaleFactorInBins(campaign, channelval, HT, sf_ttbar, "nom");
+      scale_ttbar = getScaleFactorInBins(campaign, channelval, LTplusMET, sf_ttbar, "nom");
       wt = wt * scale_ttbar;
-      }*/
+    }
     /*
     //4)WJets+WGamma global correction
     if(flag_wjets){
@@ -324,7 +321,7 @@ void processTree(
     //--------------------------------
     
     event_selection = channel_selection && (lep0_iso<0.15 && lep1_iso<0.15);
-    if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106);
+    if(channelval == 3) event_selection = event_selection && !(76<dilep_mass && dilep_mass<106); //not DYCR
 
     int count = 0;
     if(event_selection){

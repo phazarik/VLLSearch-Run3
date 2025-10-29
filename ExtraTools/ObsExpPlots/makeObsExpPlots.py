@@ -71,6 +71,22 @@ def main():
         syst     = False,
         yrange   = [0.6, 1.5]
     )
+    plotObsExp(
+        jsonfile = "jsons/2LSS_dycr_obsbyexp.json",
+        outfile  = "2LSS_dyCR_uncorrected.png",
+        name     = "Obs/exp",
+        moretext = r"2LSS DY CR (uncorrected)",
+        syst     = False,
+        yrange   = [0.6, 1.5]
+    )
+    plotObsExp(
+        jsonfile = "jsons/2LSS_val_obsbyexp.json",
+        outfile  = "2LSS_VR.png",
+        name     = "Obs/exp",
+        moretext = r"2LSS VR",
+        syst     = False,
+        yrange   = [0.6, 1.5]
+    )
 
 #____________________________________________________________________________________________________
 def plotObsExp(jsonfile, outfile, name="Obs/Exp", yrange=None, signal=False, moretext=None, syst=True):

@@ -6,10 +6,10 @@ import os, ROOT
 channelnames = {"mm": r"$\mu\mu$", "me": r"$\mu e$", "em": r"$e\mu$", "ee": r"$ee$", "combined": "combined"}
 
 def main():
-    finalstate = "2LOS"
-    indir = f"yields/2025-10-27/{finalstate}_srpre"
-    outdir = f"pie/2025-10-27/{finalstate}_srpre"
-    tag = "srpre"
+    finalstate = "2LSS"
+    indir = f"yields/2025-10-29/{finalstate}_sr"
+    outdir = f"pie/2025-10-29/{finalstate}_sr"
+    tag = "sr"
     campaigndict = {
         "2016preVFP_UL":"2016-preVFP",
         "2016postVFP_UL":"2016-postVFP",

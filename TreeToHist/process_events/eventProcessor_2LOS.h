@@ -87,7 +87,7 @@ void processTree(
 		 )
 {
   // Load corrections from JSON: (use path from the main macro)
-  json sf_qcd   = loadJson("corrections/2L_QCD_global_corrections.json");
+  json sf_qcd   = loadJson("corrections/2L_qcdcr_SF_global.json");
   json sf_ttbar = loadJson("corrections/2LOS_topcr_SF_inBins_LTplusMET.json");
   json sf_dy    = loadJson("corrections/2LOS_dycr_SF_inBins_LTplusMET.json");
   //json sf_dy    = loadJson("corrections/2LOS_dycr_SF_inBins_dilep_pt.json");
@@ -100,7 +100,6 @@ void processTree(
   vector<float> ptbins500 = {0, 25, 50, 100, 200, 300, 400, 500};
   vector<float> ptbins300 = {0, 25, 50, 100, 200, 300};
   vector<float> isobinslog = {0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256};
-  //vector<float> searchbins = {200, 300, 350, 400, 450, 500, 550};
   vector<float> searchbins = {0, 200, 400, 450, 500, 550, 600};
   
   vector<hists> hdef = {

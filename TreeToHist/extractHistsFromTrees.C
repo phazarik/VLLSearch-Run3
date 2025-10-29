@@ -12,8 +12,8 @@
 #include <iomanip>
 #include <nlohmann/json.hpp>
 #include "process_events/setBranchesAndHistograms.h"
-//#include "process_events/eventProcessor_2LSS.h"
-#include "process_events/eventProcessor_2LOS.h"
+#include "process_events/eventProcessor_2LSS.h"
+//#include "process_events/eventProcessor_2LOS.h"
 using namespace std;
 namespace fs = std::filesystem;
 using json = nlohmann::json;
@@ -59,7 +59,7 @@ void extractHistsFromTrees(
 			   bool test   = false,
 			   bool dryrun = false)
 {
-  if (channel == "em" or channel == "me") return; //For 2LOS
+  //if (channel == "em" or channel == "me") return; //For 2LOS
   
   // Input and output directories
   string date_stamp  = todays_date();

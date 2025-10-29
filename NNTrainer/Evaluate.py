@@ -23,7 +23,7 @@ parser.add_argument('--test', action='store_true', help='test mode')       # Fal
 args = parser.parse_args()
 
 #Global parameters:
-final_state = "2LOS"
+final_state = "2LSS"
 campaign = args.campaign
 indir = '../ROOT_FILES/trees/'
 jobname = f"tree_{final_state}_baseline_{campaign}"

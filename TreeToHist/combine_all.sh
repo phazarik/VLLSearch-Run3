@@ -6,12 +6,16 @@ start_time=$(date +%s)
 by_list=(
   channels  ## Outputs = 8. Combines all channels for each campaigns.
   campaigns ## Outputs = nchannel. Combined the full dataset separately for each channel.
+  all       ## Outputs = 1. Combines everything.
   run2      ## Outputs = 1. Combines everything for Run-2.
   run3      ## Outputs = 1. Combines everything for Run-3.
-  all       ## Outputs = 1. Combines everything.
   run2_ee   ## Outputs = 1. Combines ee channels for the 4 Run-2 campaigns.
-  run2_mm   ## Same for the rest. Mention the channel after the underscore.
+  run2_em
+  run2_me
+  run2_mm
   run3_ee
+  run3_em
+  run3_me
   run3_mm
 )
 

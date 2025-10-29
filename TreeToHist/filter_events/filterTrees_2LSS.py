@@ -24,9 +24,9 @@ if dryrun: print('[WARNING]: dryrun mode', style="red")
 basedir   = '../../ROOT_FILES/treesWithNN/' ## relative path from this file.
 campaigns = ["2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
              "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix"]
-basename  = "baseline/tree_baseline"
-dumpdir   = "sr"
-tag       = "sr"
+basename  = "2LSS_baseline/tree_2LSS_baseline"
+dumpdir   = "2LSS_sr"
+tag       = dumpdir
 #-----------------------------------------------------------------------------------
 
 basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), basedir)
@@ -80,15 +80,15 @@ for injob, info in jobdict.items():
     jobcount += 1
     
     ### Picking the right DNN score for event selection:
-    nnscore_qcd   = "nnscore_Run3_vlld_qcd"
-    nnscore_wjets = "nnscore_Run3_vlld_wjets"
-    nnscore_ttbar = "nnscore_Run3_vlld_ttbar"
-    nnscore_dy    = "nnscore_Run3_vlld_dy"
+    nnscore_qcd   = "nnscore_2LSS_Run3_vlld_qcd"
+    nnscore_wjets = "nnscore_2LSS_Run3_vlld_wjets"
+    nnscore_ttbar = "nnscore_2LSS_Run3_vlld_ttbar"
+    nnscore_dy    = "nnscore_2LSS_Run3_vlld_dy"
     if 'Run3' not in campaign:
-        nnscore_qcd   = "nnscore_Run2_vlld_qcd"
-        nnscore_wjets = "nnscore_Run2_vlld_wjets"
-        nnscore_ttbar = "nnscore_Run2_vlld_ttbar"
-        nnscore_dy    = "nnscore_Run2_vlld_dy"
+        nnscore_qcd   = "nnscore_2LSS_Run2_vlld_qcd"
+        nnscore_wjets = "nnscore_2LSS_Run2_vlld_wjets"
+        nnscore_ttbar = "nnscore_2LSS_Run2_vlld_ttbar"
+        nnscore_dy    = "nnscore_2LSS_Run2_vlld_dy"
 
     print(f"\n({jobcount}/{len(list(jobdict.items()))}) injob = {injob}, outjob = {outjob}, campaign = {campaign}", style="yellow")
     
@@ -121,36 +121,28 @@ for injob, info in jobdict.items():
         ####################################
 
         ## cleaning
-        clean = f'dilep_deta < 2.5 and dilep_dR > 1'
-
-        ## Step1: Controlling Drell-Yan:
-        dy_cr  = f'76<dilep_mass<106  and dilep_ptratio > 0.7'
-        dy_veto = 'not (channel == 3 and 76 < dilep_mass < 106)'
-        
-        ## Step2: Controlling QCD:
-        qcd_enhanced = f'{dy_veto} and {nnscore_qcd}<0.20 and 0.01<lep0_iso<0.15'
-        qcd_cr = f'{qcd_enhanced} and abs(dilep_phi) < 1.5'
-        qcd_vr = f'{qcd_enhanced} and abs(dilep_phi) > 1.5'
         tight_iso   = 'lep0_iso<0.05 and lep1_iso<0.2'
         tight_sip3d = 'lep0_sip3d<5 and lep1_sip3d<10'
-        qcd_veto    = f'{tight_sip3d} and {tight_iso} and {dy_veto} and {nnscore_qcd}>0.30 and HT>50'
+        cleanup = f"{tight_iso} and {tight_sip3d} and dilep_deta<2.5 and HT>50"
+        #cleanup = f"{cleanup} and LTplusMET > 200"
 
-        ## Step3: Controlling WJets: WORK IN PROGRESS
-        wjets_cr    = f'{qcd_veto} and {nnscore_wjets}<0.50 and nbjet==0'
-        wjets_veto  = f'{qcd_veto} and {nnscore_wjets}>0.70' 
+        ## Control DY first:
+        dycr  = f'{cleanup} and 76<dilep_mass<106  and dilep_ptratio > 0.7'
+        dyveto  = 'not (channel == 3 and 76 < dilep_mass < 106)'
         
-        ## Step4: Controlling TTbar:
-        #top_cr = f'{wjets_veto} and {nnscore_qcd}>0.70 and {nnscore_ttbar}<0.30'
-        top_cr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet>0'
+        ## Control QCD using DNN:
+        qcdcr = f'{dyveto} and {nnscore_qcd}<0.20 and 0.01<lep0_iso<0.15'
+        qcdveto = f"{cleanup} and {nnscore_qcd} > 0.50"
         
-        ## Step5: Validation:
-        val_region = f'{wjets_veto} and 0.30<{nnscore_qcd}<0.70'
-        val_region = val_region+f'and {tight_iso} and {tight_sip3d} and {clean}'
+        ## Veto QCD and DY:
+        nice_events = f"{dyveto} and {qcdveto} and {nnscore_wjets}>0.6"
+
         
-        ## Step6: Signal regions:
-        presr = f'{wjets_veto} and {nnscore_qcd}>0.70 and nbjet==0 and {clean}'
-        presrval = f'{presr} and {nnscore_ttbar}<0.70'
-        sr = f'{presr} and {nnscore_ttbar}>0.70'
+        ## Validation:
+        val = f"{nice_events} and {nnscore_ttbar}<0.40"
+        
+        ## SR:
+        sr = f"{nice_events} and 0.70<{nnscore_ttbar}"
         
         #------------------------------
         # Final event selection:

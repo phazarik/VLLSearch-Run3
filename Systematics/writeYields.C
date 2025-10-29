@@ -29,9 +29,9 @@ float globalSbyB, globalSbyBErr, globalObsbyExp, globalObsbyExpErr;
 void writeYields(
 		 TString _var = "LTplusMET",
 		 TString _name = "LT+MET",
-		 TString _jobname = "2025-10-27_2LOS_srpre",
-		 TString _tag = "2LOS_srpre",
-		 TString _displaytext = "srpre",
+		 TString _jobname = "2025-10-28_2LSS_baseline",
+		 TString _tag = "2LSS_baseline",
+		 TString _displaytext = "baseline",
 		 bool _data = false, //careful!
 		 bool _save = true
 		 ){
@@ -89,6 +89,7 @@ void writeYieldsOneCampaign(TString _var, TString _name, TString _jobname,
   combine_hists(hist_collection, {"t#bar{t}", "t#bar{t}V", "t#bar{t}W", "t#bar{t}Z"}, "t#bar{t}+x", kAzure+1);
   combine_hists(hist_collection, {"tX", "tW"},                   "Single t", kCyan-7);
   combine_hists(hist_collection, {"W+jets", "W#gamma"},          "W+jets/#gamma", kGray+2);
+  combine_hists(hist_collection, {"DY", "Z#gamma"},              "Z(+#gamma)", kRed-7);
   cout<<"Histogram collection read."<<endl;
 
   //----------------------------------------------------------
