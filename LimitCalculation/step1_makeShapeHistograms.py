@@ -11,11 +11,11 @@ from datetime import timedelta
 
 # ------------------- config ---------------------
 systematics = ["lep", "trig", "pileup", "bjet", "dy", "qcd", "ttbar", "jec", "jer"] ## non-global ones
-basedir = "../Systematics/yields/2025-10-27/" ## Assuming all yields to be in the same directory.
-#basedir = "../Systematics/yields/2025-09-26/" ## Assuming all yields to be in the same directory.
+basedir = "../Systematics/yields/2025-10-29/" ## Assuming all yields to be in the same directory.
+#basedir = "../Systematics/yields/2025-10-27/" ## Assuming all yields to be in the same directory.
 #-------------------------------------------------
 
-final_state = "2LOS"
+final_state = "2LSS"
 dump = "shapes"
 #os.system(f"rm -rf {dump}/*")
 
@@ -23,10 +23,8 @@ campaigns = [
     "2016preVFP_UL", "2016postVFP_UL", "2017_UL", "2018_UL",
     "Run3Summer22", "Run3Summer22EE", "Run3Summer23", "Run3Summer23BPix",
 ]
-#campaigns.extend(["Run2", "Run3", "FullDataset"])
 channels  = ["mm", "me", "em", "ee"]
-#channels.extend(["combined"])
-tag = f"{final_state}_srpre"
+tag = f"{final_state}_sr"
 sigdict = {
     "VLLD": {
         "ele": [100, 200, 300, 400, 600, 800, 1000, 1200],
@@ -115,6 +113,7 @@ rootname = {
     "W+jets/#gamma": "WJetsGamma",
     "Z#gamma": "ZGamma",
     "Single t":"ST",
+    "Z(+#gamma)":"DY",
     "VLLD-mu_100": "VLLD_mu_100",
     "VLLD-mu_200": "VLLD_mu_200",
     "VLLD-mu_300": "VLLD_mu_300",

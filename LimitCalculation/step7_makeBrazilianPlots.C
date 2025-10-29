@@ -27,9 +27,8 @@ TGraph* ReadTheoryGraph(const TString& infile, const TString &modelname);
 string todays_date();
 
 struct plotdata {
-  TString outname;
   TString modelname;
-  TString final_state;
+  TString finalstate;
   TString campaign;
   TString channel;
   TString energy;
@@ -80,9 +79,8 @@ void makeOneLimitPlot(
 
   // Filter limit values
   vector<LimitData> filteredLimits;
-  for (const auto& l : limits) {
-    if (125<l.mass && l.mass <= 1200) filteredLimits.push_back(l);
-  }
+  int minmass = 100; int maxmass = 1200; if(final_state=="2LOS") minmass=125;
+  for (const auto& l : limits) { if (minmass <= l.mass && l.mass <= maxmass) filteredLimits.push_back(l);}
   limits = filteredLimits;
   nPoints = limits.size();
   if (nPoints == 0) return;
@@ -123,7 +121,7 @@ void makeOneLimitPlot(
   TGraph* theory_vlls = ReadTheoryGraph("xsec/sigmaB_VLLS_" + energy + ".txt", modelname_singlet);
 
   // Drawing one canvas
-  SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1200); theory_vlld->Draw("AL"); //This decides the decorations
+  SetAxisTitlesAndRange(theory_vlld, ymin, ymax, 0, 1400); theory_vlld->Draw("AL"); //This decides the decorations
   yellow->Draw("F same");
   green ->Draw("F same");
   exp   ->Draw("L same");
@@ -158,22 +156,32 @@ void makeOneLimitPlot(
 void step7_makeBrazilianPlots(){
 
   vector<plotdata> limitfiles = {
-    {"test_VLLDmu_2L",   "VLLD_mu",   "2L", "FullDataset", "combined", "13TeV"},
-    {"test_VLLDele_2L",  "VLLD_ele",  "2L", "FullDataset", "combined", "13p6TeV"},
-    //{"test_VLLDmu_2LOS", "VLLD_mu", "2LOS", "2018_UL", "mm", "13TeV"},
-    //{"test_VLLDmu_2LSS", "VLLD_mu", "2LSS", "2018_UL", "mm", "13TeV"}
+    //mu-like models:
+    {"VLLD_mu",  "2L",   "FullDataset", "combined", "13TeV"},
+    {"VLLD_mu",  "2L",   "FullDataset", "combined", "13p6TeV"},
+    {"VLLD_mu",  "2LSS", "FullDataset", "combined", "13TeV"},
+    {"VLLD_mu",  "2LSS", "FullDataset", "combined", "13p6TeV"},
+    {"VLLD_mu",  "2LOS", "FullDataset", "combined", "13TeV"},
+    {"VLLD_mu",  "2LOS", "FullDataset", "combined", "13p6TeV"},
+    //e-like models:
+    {"VLLD_ele",  "2L",   "FullDataset", "combined", "13TeV"},
+    {"VLLD_ele",  "2L",   "FullDataset", "combined", "13p6TeV"},
+    {"VLLD_ele",  "2LSS", "FullDataset", "combined", "13TeV"},
+    {"VLLD_ele",  "2LSS", "FullDataset", "combined", "13p6TeV"},
+    {"VLLD_ele",  "2LOS", "FullDataset", "combined", "13TeV"},
+    {"VLLD_ele",  "2LOS", "FullDataset", "combined", "13p6TeV"},
   };
 
   for(int i=0; i<(int)limitfiles.size(); i++){
-    TString outname     = limitfiles[i].outname;
     TString modelname   = limitfiles[i].modelname;
-    TString final_state = limitfiles[i].final_state;
+    TString finalstate  = limitfiles[i].finalstate;
     TString campaign    = limitfiles[i].campaign;
     TString channel     = limitfiles[i].channel;
     TString energy      = limitfiles[i].energy;
-    TString infile = "limits_sigmaB_"+energy+"/sigmaB_"+final_state+"_"+modelname+"_"+campaign+"_"+channel+".txt";
+    TString outname     = "limits_"+modelname+"_"+finalstate+"_"+energy; 
+    TString infile = "limits_sigmaB_"+energy+"/sigmaB_"+finalstate+"_"+modelname+"_"+campaign+"_"+channel+".txt";
     cout<<"Processing .. "<<infile<<endl;
-    makeOneLimitPlot(infile, "plots/"+outname, modelname, campaign, channel, energy, final_state);
+    makeOneLimitPlot(infile, "plots/"+outname, modelname, campaign, channel, energy, finalstate);
   }
   
 }

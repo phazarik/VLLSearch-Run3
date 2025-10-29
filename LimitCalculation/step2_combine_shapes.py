@@ -11,13 +11,13 @@ campaigns = [
 channels  = ["mm", "me", "em", "ee"]
 sigdict = {
     "VLLD": {
-        "ele": [100,200,300,400,600,800,1000],
-        "mu":  [100,200,300,400,600,800,1000],
+        "ele": [100,200,300,400,600,800,1000,1200],
+        "mu":  [100,200,300,400,600,800,1000,1200],
         "tau": []
     },
     "VLLS": {}
 }
-final_states = ["2LOS", "2LSS"]
+final_states = ["2LSS","2LOS"]
 
 def main():
     parser = argparse.ArgumentParser()

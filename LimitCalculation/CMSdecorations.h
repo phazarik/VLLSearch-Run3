@@ -77,6 +77,7 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString ene
   put_latex_text(final_state, 0.15, 0.75, 42, 0.04); // Additional information
 
   float xright = 0.95; float yup = 0.94;
+  /*
   if(campaign == "2016preVFP_UL")    put_latex_text("19.7 fb^{-1} (2016-preVFP)",   xright, yup, 42, 0.05, true);
   if(campaign == "2016postVFP_UL")   put_latex_text("16.2 fb^{-1} (2016-postVFP)",  xright, yup, 42, 0.05, true);
   if(campaign == "2017_UL")          put_latex_text("41.5 fb^{-1} (2017)",          xright, yup, 42, 0.05, true);
@@ -88,7 +89,9 @@ void AddCMSLabel(TCanvas* canvas, TString campaign, TString channel, TString ene
   if(campaign == "Run3Summer23BPix") put_latex_text("9.45 fb^{-1} (2023-postBPix)", xright, yup, 42, 0.05, true);
   if(campaign == "Run3")             put_latex_text("61.9 fb^{-1} (2022+2023)",     xright, yup, 42, 0.05, true);
   if(campaign == "FullDataset")   put_latex_text("199.1 fb^{-1} (Run-2+2022+2023)", xright, yup, 42, 0.05, true);
-  else std::cout << "Put correct campaign name!" << std::endl;
+  else std::cout << "Put correct campaign name!" << std::endl;*/
+  if      (energy=="13TeV")   put_latex_text("13 TeV",   xright, yup, 42, 0.05, true);
+  else if (energy=="13p6TeV") put_latex_text("13.6 TeV", xright, yup, 42, 0.05, true);
 }
 
 TLegend* CreateLegend(bool bottomleft=false) {
