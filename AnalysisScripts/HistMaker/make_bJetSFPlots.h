@@ -1,48 +1,73 @@
 //This function is called in the main C file.
 void AnaScript::MakebJetSFPlots(){
   
-  //Picking 2LSS events
+    // This function sets values to the variables that goes into the tree.
   bool basic_evt_selection = false;
   bool ee = false;
   bool em = false;
   bool me = false;
   bool mm = false;
-
-  //Offline cuts on the leptons:
-  float ptcut_mu  = 26; if(_year==2017) ptcut_mu  = 29;
-  float ptcut_ele = 35; if(_year==2017) ptcut_ele = 37; if(_year==2016) ptcut_ele = 30;
   
-  if(LightLepton.size() == 2){
-    if(LightLepton.at(0).charge == LightLepton.at(1).charge){
+  //Offline cuts on the leptons:
+  float ptcut_mu  = 26;
+  float ptcut_ele = 35; 
+  if(_year==2016) {ptcut_ele = 30; ptcut_mu = 26;}
+  if(_year==2017) {ptcut_ele = 37; ptcut_mu = 29;}
 
+  bool evt_2LSS = false;
+  bool evt_2LOS = false;
+
+  //Baseline selection
+  if((int)LightLepton.size()==2){
+
+    //Check offline trigger:
+    bool trigger = false;
+    for(int i=0; i<(int)LightLepton.size(); i++){
+      int lepton_id = fabs(LightLepton.at(i).id);
+      float lepton_pt = LightLepton.at(i).v.Pt();
+      if(lepton_id == 11 && lepton_pt > ptcut_ele) trigger = true;
+      if(lepton_id == 13 && lepton_pt > ptcut_mu)  trigger = true;
+    }    
+    if(LooseLepton.size() > 2) trigger = false; //Veto additional loose leptons:
+
+    //Check resonance-cut:
+    bool reject_low_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 15;
+    bool reject_most_resonances = (LightLepton.at(0).v + LightLepton.at(1).v).M() > 150;
+
+    //Check lepton charges:
+    bool samesign = LightLepton.at(0).charge == LightLepton.at(1).charge;
+
+    //Define events:
+    if(trigger && reject_low_resonances && samesign)   evt_2LSS = true; //2LSS
+    if(trigger && reject_most_resonances && !samesign) evt_2LOS = true; //2LOS
+
+    //Veto additional events
+    bool veto_3L4L_event = Veto3L4L();
+    bool veto_HEM_event  = VetoHEM(Jet);
+    bool veto_this_event = veto_3L4L_event || veto_HEM_event;
+    if(veto_this_event){
+      nEvtVeto++;
+      evt_2LSS = false;
+      evt_2LOS = false;
+      return;
+    }
+    
+    if(evt_2LSS){ //IMPORTANT: SELECT ONLY ONE FINAL STATE
+      
       int flav0 = fabs(LightLepton.at(0).id);
       int flav1 = fabs(LightLepton.at(1).id);
-
-      //At least one of these two leptons must satisfy the offline trigger cut.
-      bool offline_trigger = false;
-      if(      flav0 == 13 && LightLepton.at(0).v.Pt() > ptcut_mu)  offline_trigger = true;
-      else if (flav0 == 11 && LightLepton.at(0).v.Pt() > ptcut_ele) offline_trigger = true;
-      if(      flav1 == 13 && LightLepton.at(1).v.Pt() > ptcut_mu)  offline_trigger = true;
-      else if (flav1 == 11 && LightLepton.at(1).v.Pt() > ptcut_ele) offline_trigger = true;
-
-      //Veto additional loose leptons:
-      if(LooseLepton.size() > 2) offline_trigger = false;
       
-      if(offline_trigger){
-	if(     flav0 == 13 && flav1 == 13) mm = true;
-	else if(flav0 == 13 && flav1 == 11) me = true;
-	else if(flav0 == 11 && flav1 == 13) em = true;
-	else if(flav0 == 11 && flav1 == 11) ee = true;
-      }
+      if(     flav0 == 13 && flav1 == 13){ mm = true; }
+      else if(flav0 == 13 && flav1 == 11){ me = true; }
+      else if(flav0 == 11 && flav1 == 13){ em = true; }
+      else if(flav0 == 11 && flav1 == 11){ ee = true; }
     }
   }
-
-  basic_evt_selection = ee || em || me || mm;
-
-  //Making sure all leptons are isolated:
-  bool all_leptons_isolated = true;
-  for(int i=0; i<(int)LightLepton.size(); i++){if(LightLepton.at(i).reliso03 > 0.15) all_leptons_isolated = false;}
-  basic_evt_selection = basic_evt_selection && all_leptons_isolated;
+  
+  //-------------------------------------------
+  // Select the channel :
+  basic_evt_selection = mm || me || em || ee ;
+  //-------------------------------------------
   
   if(basic_evt_selection && _data==0){
 

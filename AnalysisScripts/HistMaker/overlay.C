@@ -13,6 +13,9 @@
 #include <fstream>
 #include <math.h>
 #include <algorithm>
+#include <ctime>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 using namespace std;
 int nPlot = 0;
@@ -32,6 +35,13 @@ void plothist(TH1* h, plotdata pd, float ymin, float ymax, bool first, TString x
 void sort_legends(TLegend* leg);
 
 void overlay(){
+
+  time_t now = time(0);
+  tm *ltm = localtime(&now);
+  TString dateTag = Form("%04d-%02d-%02d", 1900 + ltm->tm_year, 1 + ltm->tm_mon, ltm->tm_mday);
+  TString outdir = "signal_plots/" + dateTag;
+  gSystem->Exec("mkdir -p " + outdir);
+  
   overlay_one("vllep_all_pt", "p_{T}(E)", 10);
   //return;
   overlay_one("vllep_all_eta", "#eta(E)", 10);
@@ -108,17 +118,17 @@ void overlay_one(TString var, TString name, int rebin){
   bool toNorm = true;
 
   vector<plotdata> hists = {
-    {"hst_VLLD_ele_M150.root",  "VLLD-e_{150}",  kAzure-4, 3},
-    {"hst_VLLD_ele_M500.root",  "VLLD-e_{500}",  kAzure+2, 2},
-    {"hst_VLLD_ele_M1000.root", "VLLD-e_{1000}", kBlue+0,  1},
+    {"hst_newsignal_VLLD_E_M-1100.root",  "VLLD-e_{1100}",  kAzure-4, 3},
+    {"hst_newsignal_VLLD_E_M-1200.root",  "VLLD-e_{1200}",  kAzure+2, 2},
+    //{"hst_VLLD_ele_M1000.root", "VLLD-e_{1000}", kBlue+0,  1},
     
-    {"hst_VLLD_mu_M150.root",    "VLLD-#mu_{150}", kRed-4,   3},
-    {"hst_VLLD_mu_M500.root",    "VLLD-#mu_{500}", kRed+0,   2},
-    {"hst_VLLD_mu_M1000.root",   "VLLD-#mu_{1000}",kRed+1,   1},
+    {"hst_newsignal_VLLD_Mu_M-200.root ", "VLLD-#mu_{200}", kRed-4, 3},
+    {"hst_newsignal_VLLD_Mu_M-300.root ", "VLLD-#mu_{300}", kRed+0, 2},
+    {"hst_newsignal_VLLD_Mu_M-800.root ", "VLLD-#mu_{800}", kRed+1, 1},
 
-    {"hst_VLLD_tau_M150.root",   "VLLD-#tau_{150}",kGreen-6, 3},
-    {"hst_VLLD_tau_M500.root",   "VLLD-#tau_{500}",kGreen+1, 2},
-    {"hst_VLLD_tau_M1000.root",  "VLLD-#tau_{1000}",kGreen+2,1},
+    //{"hst_VLLD_tau_M150.root",   "VLLD-#tau_{150}",kGreen-6, 3},
+    //{"hst_VLLD_tau_M500.root",   "VLLD-#tau_{500}",kGreen+1, 2},
+    //{"hst_VLLD_tau_M1000.root",  "VLLD-#tau_{1000}",kGreen+2,1},
   };
 
   vector<TH1*> histObjs;
@@ -174,7 +184,9 @@ void overlay_one(TString var, TString name, int rebin){
   AddCMSLabel();
 
   //Done.
-  c1->SaveAs("signal_plots/"+var+".png");
+  TString dateTag = gSystem->GetFromPipe("date +%Y-%m-%d");
+  dateTag.ReplaceAll("\n", "");
+  c1->SaveAs("signal_plots/" + dateTag + "/" + var + ".png");
   nPlot += 1;
 }
 
@@ -244,5 +256,5 @@ void AddCMSLabel(bool bottomleft) {
   latex.SetTextFont(42);
   latex.SetTextSize(0.04);
   latex.SetTextAlign(31);
-  latex.DrawLatex(0.80, 0.94, "Signal study");
+  latex.DrawLatex(0.80, 0.94, "Signal study (Run-3)");
 }

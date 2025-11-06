@@ -86,7 +86,6 @@ void AnaScript::SlaveTerminate()
   time(&end);
   double time_taken = double(end-start);
   cout<<"\033[34m\nTime taken to process = " << (int)time_taken << " seconds.\033[0m"<< endl;
-  cout<<" sec \n"<<endl;
 }
 void AnaScript::Terminate()
 {
@@ -192,8 +191,10 @@ Bool_t AnaScript::Process(Long64_t entry)
       }
 
       //Gen-Particles block moved to make_signalPlots.h
-      if(_data == 0) MakeSignalPlots(); //nEvtBad is here
-
+      if(_data == 0) MakeSignalPlots();
+      //nEvtBad is here
+      //signal arrays area created here.
+      
       //----------------------------------------------------------------------------------------------------------
       // Analysis:
       //----------------------------------------------------------------------------------------------------------
